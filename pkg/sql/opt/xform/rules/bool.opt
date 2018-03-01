@@ -1,0 +1,85 @@
+# =============================================================================
+# bool.opt contains normalization rules for boolean And, Or, Not operators.
+# =============================================================================
+
+
+# EliminateAnd discards the And operator if any of its operands is false.
+[EliminateAnd, Normalize]
+(And
+    $conditions:[ ... (False) ... ]
+)
+=>
+(False)
+
+# EliminateOr discards the Or operator if any of its operands is true.
+[EliminateOr, Normalize]
+(Or
+    $conditions:[ ... (True) ... ]
+)
+=>
+(True)
+
+# FlattenAnd ensures that And operators are never nested within one another. If
+# an And operator has another And as a child, then the child And is "flattened"
+# by merging its conditions into the parent And. Flattened And conditions are
+# easier to match and enumerate.
+[FlattenAnd, Normalize]
+(And
+    $conditions:[ ... (And) ... ]
+)
+=>
+(FlattenAnd $conditions)
+
+# FlattenOr ensures that Or operators are never nested within one another. If
+# an Or operator has another Or as a child, then the child Or is "flattened" by
+# merging its conditions into the parent Or. Flattened Or conditions are easier
+# to match and enumerate.
+[FlattenOr, Normalize]
+(Or
+    $conditions:[ ... (Or) ... ]
+)
+=>
+(FlattenOr $conditions)
+
+# SimplifyAnd removes True children of an And. If all children are True,
+# replaces the And node with True.
+# This rule is especially important when we build a simplified filter.
+[SimplifyAnd, Normalize]
+(And
+    $conditions:[ ... (True) ... ]
+)
+=>
+(SimplifyAnd $conditions)
+
+# SimplifyOr removes False children of an Or. If all children are False,
+# replaces the Or node with False.
+# This rule is especially important when we build a simplified filter.
+[SimplifyOr, Normalize]
+(Or
+    $conditions:[ ... (False) ... ]
+)
+=>
+(SimplifyOr $conditions)
+
+# TODO(radu): we don't yet eliminate singleton Ands because we assume filters
+# are always under an And.
+
+# EliminateSingletonOr replaces an Or node with a single condition with that
+# condition.
+[EliminateSingletonOr, Normalize]
+(Or
+    $conditions:[ $item:* ]
+)
+=>
+$item
+
+# NegateComparison inverts eligible comparison operators when they are negated
+# by the Not operator. For example, Eq maps to Ne, and Gt maps to Le.
+[NegateComparison, Normalize]
+(Not $input:(Comparison) & (CanInvertComparison $input))
+=>
+(InvertComparison $input)
+
+# EliminateNot discards a doubled Not operator.
+[EliminateNot, Normalize]
+(Not (Not $input:*)) => $input

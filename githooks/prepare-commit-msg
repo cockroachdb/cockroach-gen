@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Prepare the commit message by adding a release note.
+
+if [ -n "$2" ]; then
+  exit 0
+fi
+
+old=$(sed -n '1!p' "$1")
+
+cat > "$1" << EOF
+
+
+Release note: None
+
+# Write a commit message of the form:
+#
+# ---
+# <pkg>: <short description>
+#
+# <long description>
+#
+# Release note (category): <release note description>
+# ---
+#
+# Wrap long lines! 72 columns is best.
+#
+# The release note must be present if your commit has
+# user-facing changes. Leave the default above if not.
+#
+# Categories for release notes:
+# - cli change
+# - sql change
+# - admin ui change
+# - general change (e.g., change of required Go version)
+# - build change (e.g., compatibility with older CPUs)
+# - enterprise change (e.g., change to backup/restore)
+# - backwards-incompatible change
+# - performance improvement
+# - bug fix
+EOF
+echo "${old}" >> "$1"

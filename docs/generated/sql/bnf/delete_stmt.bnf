@@ -1,0 +1,2 @@
+delete_stmt ::=
+	 'DELETE' 'FROM' ( relation_expr | relation_expr table_alias_name | relation_expr 'AS' table_alias_name ) ( 'WHERE' a_expr |  ) ( ( 'ORDER' 'BY' sortby_list ) |  ) ( ( 'LIMIT' count | 'FETCH' ( 'FIRST' | 'NEXT' ) count ( 'ROW' | 'ROWS' ) 'ONLY' ) |  ) ( 'RETURNING' ( ( ( a_expr 'AS' target_name | a_expr 'identifier' | a_expr | '*' ) ) ( ( ',' ( a_expr 'AS' target_name | a_expr 'identifier' | a_expr | '*' ) ) )* ) | 'RETURNING' 'NOTHING' |  )

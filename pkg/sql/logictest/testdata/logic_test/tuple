@@ -1,0 +1,666 @@
+# LogicTest: default parallel-stmts distsql distsql-disk
+
+query TT
+SELECT (1, 2, 'hello', NULL, NULL), (true, NULL, (false, 6.6, false))
+----
+(1,2,'hello',,) (true,,(false, 6.6, false))
+
+query BBBBBBBBB
+SELECT
+	(2, 2) < (1, 1),
+	(2, 2) < (1, 2),
+	(2, 2) < (1, 3),
+	(2, 2) < (2, 1),
+	(2, 2) < (2, 2),
+	(2, 2) < (2, 3),
+	(2, 2) < (3, 1),
+	(2, 2) < (3, 2),
+	(2, 2) < (3, 3)
+----
+false false false false false true true true true
+
+query BBBBBBBBB
+SELECT
+	(2, 2) > (1, 1),
+	(2, 2) > (1, 2),
+	(2, 2) > (1, 3),
+	(2, 2) > (2, 1),
+	(2, 2) > (2, 2),
+	(2, 2) > (2, 3),
+	(2, 2) > (3, 1),
+	(2, 2) > (3, 2),
+	(2, 2) > (3, 3)
+----
+true true true true false false false false false
+
+query BBBBBBBBB
+SELECT
+	(2, 2) <= (1, 1),
+	(2, 2) <= (1, 2),
+	(2, 2) <= (1, 3),
+	(2, 2) <= (2, 1),
+	(2, 2) <= (2, 2),
+	(2, 2) <= (2, 3),
+	(2, 2) <= (3, 1),
+	(2, 2) <= (3, 2),
+	(2, 2) <= (3, 3)
+----
+false false false false true true true true true
+
+query BBBBBBBBB
+SELECT
+	(2, 2) >= (1, 1),
+	(2, 2) >= (1, 2),
+	(2, 2) >= (1, 3),
+	(2, 2) >= (2, 1),
+	(2, 2) >= (2, 2),
+	(2, 2) >= (2, 3),
+	(2, 2) >= (3, 1),
+	(2, 2) >= (3, 2),
+	(2, 2) >= (3, 3)
+----
+true true true true true false false false false
+
+query BBBBBBBBB
+SELECT
+	(2, 2) = (1, 1),
+	(2, 2) = (1, 2),
+	(2, 2) = (1, 3),
+	(2, 2) = (2, 1),
+	(2, 2) = (2, 2),
+	(2, 2) = (2, 3),
+	(2, 2) = (3, 1),
+	(2, 2) = (3, 2),
+	(2, 2) = (3, 3)
+----
+false false false false true false false false false
+
+query BBBBBBBBB
+SELECT
+	(2, 2) != (1, 1),
+	(2, 2) != (1, 2),
+	(2, 2) != (1, 3),
+	(2, 2) != (2, 1),
+	(2, 2) != (2, 2),
+	(2, 2) != (2, 3),
+	(2, 2) != (3, 1),
+	(2, 2) != (3, 2),
+	(2, 2) != (3, 3)
+----
+true true true true false true true true true
+
+query BBBB
+SELECT
+	(1, 1) > (0, NULL),
+	(1, 1) > (1, NULL),
+	(1, 1) > (2, NULL),
+	(1, 1) > (NULL, 0)
+----
+true NULL false NULL
+
+statement error pq: tuples \(1, 2\), \(1, 'hi'\) are not comparable at index 2: unsupported comparison operator
+SELECT (1, 2) > (1, 'hi')
+
+statement error pq: expected tuple \(1, 2, 3\) to have a length of 2
+SELECT (1, 2) > (1, 2, 3)
+
+statement ok
+CREATE TABLE t (a int, b int, c int)
+
+statement ok
+INSERT INTO t VALUES (1, 2, 3), (2, 3, 1), (3, 1, 2)
+
+query III
+SELECT * FROM t ORDER BY a, b, c
+----
+1 2 3
+2 3 1
+3 1 2
+
+query III
+SELECT * FROM t WHERE (a, b, c) > (1, 2, 3) ORDER BY a, b, c
+----
+2 3 1
+3 1 2
+
+query BB
+SELECT ((1, 2), 'equal') = ((1, 2.0), 'equal'), ((1, 2), 'equal') = ((1, 2.0), 'not equal')
+----
+true false
+
+query B
+SELECT ((1, 2), 'equal') = ((1, 2.1), 'equal')
+----
+false
+
+query B
+SELECT (ROW(POW(1, 10.0) + 9), 'a' || 'b') = (ROW(SQRT(100.0)), 'ab')
+----
+true
+
+query B
+SELECT (ROW(SQRT(100.0)), 'ab') = (ROW(POW(1, 10.0) + 9), 'a' || 'b')
+----
+true
+
+query error pq: tuples \(\(1, 2\), 'equal'\), \(\(1, 'huh'\), 'equal'\) are not comparable at index 1: tuples \(1, 2\), \(1, 'huh'\) are not comparable at index 2: unsupported comparison operator
+SELECT ((1, 2), 'equal') = ((1, 'huh'), 'equal')
+
+# Issue #3568
+
+statement ok
+CREATE TABLE kv (
+  k INT PRIMARY KEY,
+  v INT
+)
+
+statement ok
+INSERT INTO kv VALUES (1, 2)
+
+query II
+SELECT k, v FROM kv WHERE (k, v) = (1, 100)
+----
+
+query II
+SELECT k, v FROM kv WHERE (k, v) IN ((1, 100))
+----
+
+# Issue #12295
+
+query B
+SELECT 'foo' IN (x, 'aaa') FROM (SELECT 'foo' AS x)
+----
+true
+
+query B
+SELECT 'foo' IN (x, 'zzz') FROM (SELECT 'foo' AS x)
+----
+true
+
+# Subquery tuples are already sorted
+
+query B
+SELECT 3 IN (SELECT c FROM t ORDER BY 1 ASC)
+----
+true
+
+query B
+SELECT 4 IN (SELECT c FROM t ORDER BY 1 DESC)
+----
+false
+
+query B
+SELECT (1, 2) IN (SELECT a, b FROM t ORDER BY 1 ASC, 2 ASC)
+----
+true
+
+query B
+SELECT (1, 2) IN (SELECT a, b FROM t ORDER BY 1 DESC, 2 DESC)
+----
+true
+
+# Issue #12302
+
+query B
+SELECT 1 IN (2, NULL)
+----
+NULL
+
+query B
+SELECT 1 IN (2, x) FROM (SELECT NULL AS x)
+----
+NULL
+
+# Issue 10407: tuple comparisons should not require homogeneous types
+query B
+SELECT (now(), 2) = ((now() :: timestamp), 2)
+----
+true
+
+query B
+SELECT (1, 2) > (1.0, 2.0)
+----
+false
+
+statement ok
+CREATE TABLE uvw (
+  u INT,
+  v INT,
+  w INT,
+  INDEX (u,v,w)
+)
+
+statement ok
+INSERT INTO uvw SELECT u, v, w FROM
+  GENERATE_SERIES(0, 3) AS u,
+  GENERATE_SERIES(0, 3) AS v,
+  GENERATE_SERIES(0, 3) AS w;
+UPDATE uvw SET u = NULL WHERE u = 0;
+UPDATE uvw SET v = NULL WHERE v = 0;
+UPDATE uvw SET w = NULL WHERE w = 0
+
+query III
+SELECT * FROM uvw ORDER BY u, v, w
+----
+NULL  NULL  NULL
+NULL  NULL  1
+NULL  NULL  2
+NULL  NULL  3
+NULL  1     NULL
+NULL  1     1
+NULL  1     2
+NULL  1     3
+NULL  2     NULL
+NULL  2     1
+NULL  2     2
+NULL  2     3
+NULL  3     NULL
+NULL  3     1
+NULL  3     2
+NULL  3     3
+1     NULL  NULL
+1     NULL  1
+1     NULL  2
+1     NULL  3
+1     1     NULL
+1     1     1
+1     1     2
+1     1     3
+1     2     NULL
+1     2     1
+1     2     2
+1     2     3
+1     3     NULL
+1     3     1
+1     3     2
+1     3     3
+2     NULL  NULL
+2     NULL  1
+2     NULL  2
+2     NULL  3
+2     1     NULL
+2     1     1
+2     1     2
+2     1     3
+2     2     NULL
+2     2     1
+2     2     2
+2     2     3
+2     3     NULL
+2     3     1
+2     3     2
+2     3     3
+3     NULL  NULL
+3     NULL  1
+3     NULL  2
+3     NULL  3
+3     1     NULL
+3     1     1
+3     1     2
+3     1     3
+3     2     NULL
+3     2     1
+3     2     2
+3     2     3
+3     3     NULL
+3     3     1
+3     3     2
+3     3     3
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) >= (1, 2, 3) ORDER BY u, v, w
+----
+render     0  render  ·         ·                  (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u  ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v  ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w  ·                                 ·
+ └── scan  1  scan    ·         ·                  (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx  ·                                 ·
+·          1  ·       spans     /1/2/3-            ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) >= (1, 2, 3) ORDER BY u, v, w
+----
+1  2     3
+1  3     NULL
+1  3     1
+1  3     2
+1  3     3
+2  NULL  NULL
+2  NULL  1
+2  NULL  2
+2  NULL  3
+2  1     NULL
+2  1     1
+2  1     2
+2  1     3
+2  2     NULL
+2  2     1
+2  2     2
+2  2     3
+2  3     NULL
+2  3     1
+2  3     2
+2  3     3
+3  NULL  NULL
+3  NULL  1
+3  NULL  2
+3  NULL  3
+3  1     NULL
+3  1     1
+3  1     2
+3  1     3
+3  2     NULL
+3  2     1
+3  2     2
+3  2     3
+3  3     NULL
+3  3     1
+3  3     2
+3  3     3
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) > (2, 1, 1) ORDER BY u, v, w
+----
+render     0  render  ·         ·                  (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u  ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v  ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w  ·                                 ·
+ └── scan  1  scan    ·         ·                  (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx  ·                                 ·
+·          1  ·       spans     /2/1/2-            ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) > (2, 1, 1) ORDER BY u, v, w
+----
+2  1     2
+2  1     3
+2  2     NULL
+2  2     1
+2  2     2
+2  2     3
+2  3     NULL
+2  3     1
+2  3     2
+2  3     3
+3  NULL  NULL
+3  NULL  1
+3  NULL  2
+3  NULL  3
+3  1     NULL
+3  1     1
+3  1     2
+3  1     3
+3  2     NULL
+3  2     1
+3  2     2
+3  2     3
+3  3     NULL
+3  3     1
+3  3     2
+3  3     3
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) <= (2, 3, 1) ORDER BY u, v, w
+----
+render     0  render  ·         ·                       (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u       ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v       ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w       ·                                 ·
+ └── scan  1  scan    ·         ·                       (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx       ·                                 ·
+·          1  ·       spans     /!NULL-/2/3/2           ·                                 ·
+·          1  ·       filter    (u, v, w) <= (2, 3, 1)  ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) <= (2, 3, 1) ORDER BY u, v, w
+----
+1  NULL  NULL
+1  NULL  1
+1  NULL  2
+1  NULL  3
+1  1     NULL
+1  1     1
+1  1     2
+1  1     3
+1  2     NULL
+1  2     1
+1  2     2
+1  2     3
+1  3     NULL
+1  3     1
+1  3     2
+1  3     3
+2  1     NULL
+2  1     1
+2  1     2
+2  1     3
+2  2     NULL
+2  2     1
+2  2     2
+2  2     3
+2  3     1
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) < (2, 2, 2) ORDER BY u, v, w
+----
+render     0  render  ·         ·                      (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u      ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v      ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w      ·                                 ·
+ └── scan  1  scan    ·         ·                      (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx      ·                                 ·
+·          1  ·       spans     /!NULL-/2/2/2          ·                                 ·
+·          1  ·       filter    (u, v, w) < (2, 2, 2)  ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) < (2, 2, 2) ORDER BY u, v, w
+----
+1  NULL  NULL
+1  NULL  1
+1  NULL  2
+1  NULL  3
+1  1     NULL
+1  1     1
+1  1     2
+1  1     3
+1  2     NULL
+1  2     1
+1  2     2
+1  2     3
+1  3     NULL
+1  3     1
+1  3     2
+1  3     3
+2  1     NULL
+2  1     1
+2  1     2
+2  1     3
+2  2     1
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) != (1, 2, 3) ORDER BY u, v, w
+----
+render     0  render  ·         ·                       (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u       ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v       ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w       ·                                 ·
+ └── scan  1  scan    ·         ·                       (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx       ·                                 ·
+·          1  ·       spans     -/1/2/3 /1/2/4-         ·                                 ·
+·          1  ·       filter    (u, v, w) != (1, 2, 3)  ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) != (1, 2, 3) ORDER BY u, v, w
+----
+NULL  NULL  1
+NULL  NULL  2
+NULL  1     NULL
+NULL  1     1
+NULL  1     2
+NULL  1     3
+NULL  2     1
+NULL  2     2
+NULL  3     NULL
+NULL  3     1
+NULL  3     2
+NULL  3     3
+1     NULL  1
+1     NULL  2
+1     1     NULL
+1     1     1
+1     1     2
+1     1     3
+1     2     1
+1     2     2
+1     3     NULL
+1     3     1
+1     3     2
+1     3     3
+2     NULL  NULL
+2     NULL  1
+2     NULL  2
+2     NULL  3
+2     1     NULL
+2     1     1
+2     1     2
+2     1     3
+2     2     NULL
+2     2     1
+2     2     2
+2     2     3
+2     3     NULL
+2     3     1
+2     3     2
+2     3     3
+3     NULL  NULL
+3     NULL  1
+3     NULL  2
+3     NULL  3
+3     1     NULL
+3     1     1
+3     1     2
+3     1     3
+3     2     NULL
+3     2     1
+3     2     2
+3     2     3
+3     3     NULL
+3     3     1
+3     3     2
+3     3     3
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) >= (1, NULL, 3) ORDER BY u, v, w
+----
+render     0  render  ·         ·                  (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u  ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v  ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w  ·                                 ·
+ └── scan  1  scan    ·         ·                  (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx  ·                                 ·
+·          1  ·       spans     /2-                ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) >= (1, NULL, 3) ORDER BY u, v, w
+----
+2  NULL  NULL
+2  NULL  1
+2  NULL  2
+2  NULL  3
+2  1     NULL
+2  1     1
+2  1     2
+2  1     3
+2  2     NULL
+2  2     1
+2  2     2
+2  2     3
+2  3     NULL
+2  3     1
+2  3     2
+2  3     3
+3  NULL  NULL
+3  NULL  1
+3  NULL  2
+3  NULL  3
+3  1     NULL
+3  1     1
+3  1     2
+3  1     3
+3  2     NULL
+3  2     1
+3  2     2
+3  2     3
+3  3     NULL
+3  3     1
+3  3     2
+3  3     3
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM uvw WHERE (u, v, w) < (2, NULL, 3) ORDER BY u, v, w
+----
+render     0  render  ·         ·                  (u, v, w)                         +u,+v,+w
+ │         0  ·       render 0  test.public.uvw.u  ·                                 ·
+ │         0  ·       render 1  test.public.uvw.v  ·                                 ·
+ │         0  ·       render 2  test.public.uvw.w  ·                                 ·
+ └── scan  1  scan    ·         ·                  (u, v, w, rowid[hidden,omitted])  rowid!=NULL; weak-key(u,v,w,rowid); +u,+v,+w
+·          1  ·       table     uvw@uvw_u_v_w_idx  ·                                 ·
+·          1  ·       spans     /!NULL-/2          ·                                 ·
+
+query III
+SELECT * FROM uvw WHERE (u, v, w) < (2, NULL, 3) ORDER BY u, v, w
+----
+1  NULL  NULL
+1  NULL  1
+1  NULL  2
+1  NULL  3
+1  1     NULL
+1  1     1
+1  1     2
+1  1     3
+1  2     NULL
+1  2     1
+1  2     2
+1  2     3
+1  3     NULL
+1  3     1
+1  3     2
+1  3     3
+
+
+# Regression test for #6390.
+statement ok
+CREATE TABLE abc (a INT, b INT, c INT, INDEX(a, b))
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM abc WHERE (a, b, c) > (1, 2, 3);
+----
+render           0  render      ·         ·                      (a, b, c)                          ·
+ │               0  ·           render 0  test.public.abc.a      ·                                  ·
+ │               0  ·           render 1  test.public.abc.b      ·                                  ·
+ │               0  ·           render 2  test.public.abc.c      ·                                  ·
+ └── index-join  1  index-join  ·         ·                      (a, b, c, rowid[hidden,omitted])   rowid!=NULL; weak-key(a,b,rowid)
+      ├── scan   2  scan        ·         ·                      (a, b, c[omitted], rowid[hidden])  rowid!=NULL; weak-key(a,b,rowid)
+      │          2  ·           table     abc@abc_a_b_idx        ·                                  ·
+      │          2  ·           spans     /1/2-                  ·                                  ·
+      │          2  ·           filter    (a, b) >= (1, 2)       ·                                  ·
+      └── scan   2  scan        ·         ·                      (a, b, c, rowid[hidden,omitted])   ·
+·                2  ·           table     abc@primary            ·                                  ·
+·                2  ·           filter    (a, b, c) > (1, 2, 3)  ·                                  ·
+
+statement ok
+DROP TABLE abc;
+CREATE TABLE abc (a INT, b INT, c INT, INDEX(a, b DESC, c))
+
+query TITTTTT
+EXPLAIN (VERBOSE) SELECT * FROM abc WHERE (a, b, c) > (1, 2, 3)
+----
+render     0  render  ·         ·                      (a, b, c)                         ·
+ │         0  ·       render 0  test.public.abc.a      ·                                 ·
+ │         0  ·       render 1  test.public.abc.b      ·                                 ·
+ │         0  ·       render 2  test.public.abc.c      ·                                 ·
+ └── scan  1  scan    ·         ·                      (a, b, c, rowid[hidden,omitted])  rowid!=NULL; weak-key(a,b,c,rowid)
+·          1  ·       table     abc@abc_a_b_c_idx      ·                                 ·
+·          1  ·       spans     /1-                    ·                                 ·
+·          1  ·       filter    (a, b, c) > (1, 2, 3)  ·                                 ·

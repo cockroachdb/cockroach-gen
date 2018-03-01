@@ -1,0 +1,284 @@
+# LogicTest: default
+
+query T colnames
+SELECT * FROM [SHOW client_encoding]
+----
+client_encoding
+UTF8
+
+query T colnames
+SELECT c.x FROM [SHOW client_encoding] AS c(x)
+----
+x
+UTF8
+
+query TI colnames
+SELECT * FROM [SHOW client_encoding] WITH ORDINALITY
+----
+client_encoding     ordinality
+UTF8                1
+
+query TT colnames
+SELECT * FROM [SHOW ALL]
+----
+variable                        value
+application_name                ·
+client_encoding                 UTF8
+client_min_messages             ·
+database                        test
+datestyle                       ISO
+default_transaction_isolation   serializable
+default_transaction_read_only   off
+distsql                         off
+experimental_force_lookup_join  off
+experimental_opt                off
+extra_float_digits              ·
+intervalstyle                   postgres
+max_index_keys                  32
+node_id                         1
+search_path                     public
+server_version                  9.5.0
+server_version_num              90500
+session_user                    root
+sql_safe_updates                false
+standard_conforming_strings     on
+timezone                        UTC
+tracing                         off
+transaction_isolation           serializable
+transaction_priority            normal
+transaction_read_only           off
+transaction_status              NoTxn
+
+query I colnames
+SELECT * FROM [SHOW CLUSTER SETTING sql.defaults.distsql]
+----
+sql.defaults.distsql
+0
+
+query TTTT colnames
+SELECT * FROM [SHOW ALL CLUSTER SETTINGS] WHERE name LIKE '%organization'
+----
+name                                               current_value  type  description
+cluster.organization                               ·              s     organization name
+
+query T colnames
+SELECT * FROM [SHOW SESSION_USER]
+----
+session_user
+root
+
+query T colnames
+SELECT * FROM [SHOW DATABASE]
+----
+database
+test
+
+query T colnames
+SELECT * FROM [SHOW DATABASES]
+----
+Database
+system
+test
+
+query TTTTT colnames
+SELECT * FROM [SHOW GRANTS ON system.descriptor]
+----
+Database  Schema  Table       User   Privileges
+system    public  descriptor  admin  GRANT
+system    public  descriptor  admin  SELECT
+system    public  descriptor  root   GRANT
+system    public  descriptor  root   SELECT
+
+query TTBITTBB colnames
+SELECT * FROM [SHOW INDEX FROM system.descriptor]
+----
+Table       Name     Unique  Seq  Column  Direction  Storing  Implicit
+descriptor  primary  true    1    id      ASC        false    false
+
+query TTTTT colnames
+SELECT * FROM [SHOW CONSTRAINT FROM system.descriptor]
+----
+Table       Name     Type         Column(s)  Details
+descriptor  primary  PRIMARY KEY  id         NULL
+
+query TTBITTBB colnames
+SELECT * FROM [SHOW KEYS FROM system.descriptor]
+----
+Table       Name     Unique  Seq  Column  Direction  Storing  Implicit
+descriptor  primary  true    1    id      ASC        false    false
+
+query T colnames
+SELECT * FROM [SHOW SCHEMAS FROM system]
+----
+Schema
+crdb_internal
+information_schema
+pg_catalog
+public
+
+query T colnames
+SELECT * FROM [SHOW TABLES FROM system]
+----
+Table
+descriptor
+eventlog
+jobs
+lease
+locations
+namespace
+rangelog
+role_members
+settings
+table_statistics
+ui
+users
+web_sessions
+zones
+
+query ITTT colnames
+SELECT node_id,username,application_name,active_queries FROM [SHOW SESSIONS] WHERE active_queries != ''
+----
+node_id  username  application_name  active_queries
+1        root      ·                 SELECT node_id, username, application_name, active_queries FROM [SHOW CLUSTER SESSIONS] WHERE active_queries != ''
+
+query ITT colnames
+SELECT node_id, username, query FROM [SHOW QUERIES]
+----
+node_id   username   query
+1         root       SELECT node_id, username, query FROM [SHOW CLUSTER QUERIES]
+
+
+query T colnames
+SELECT * FROM [SHOW SCHEMAS]
+----
+Schema
+crdb_internal
+information_schema
+pg_catalog
+public
+
+query T colnames
+CREATE TABLE foo(x INT); SELECT * FROM [SHOW TABLES]
+----
+Table
+foo
+
+
+query T colnames
+SELECT * FROM [SHOW TIMEZONE]
+----
+timezone
+UTC
+
+
+query T colnames
+SELECT * FROM [SHOW TIME ZONE]
+----
+timezone
+UTC
+
+
+query T colnames
+SELECT * FROM [SHOW TRANSACTION ISOLATION LEVEL]
+----
+transaction_isolation
+serializable
+
+
+query T colnames
+SELECT * FROM [SHOW TRANSACTION PRIORITY]
+----
+transaction_priority
+normal
+
+query T colnames
+SELECT * FROM [SHOW TRANSACTION STATUS]
+----
+transaction_status
+NoTxn
+
+
+query TT colnames
+SELECT * FROM [SHOW CREATE TABLE system.descriptor]
+----
+Table                     CreateTable
+system.public.descriptor  CREATE TABLE descriptor (
+                          id INT NOT NULL,
+                          descriptor BYTES NULL,
+                          CONSTRAINT "primary" PRIMARY KEY (id ASC),
+                          FAMILY "primary" (id),
+                          FAMILY fam_2_descriptor (descriptor)
+)
+
+
+query TT colnames
+CREATE VIEW v AS SELECT id FROM system.descriptor; SELECT * FROM [SHOW CREATE VIEW v]
+----
+View  CreateView
+v     CREATE VIEW v (id) AS SELECT id FROM system.public.descriptor
+
+
+query T colnames
+SELECT * FROM [SHOW USERS]
+----
+username
+root
+testuser
+
+
+query TTITI colnames
+SELECT * FROM [SHOW TESTING_RANGES FROM TABLE system.descriptor]
+----
+Start Key  End Key  Range ID  Replicas  Lease Holder
+NULL       NULL     1         {1}       1
+
+query TTITI colnames
+CREATE INDEX ix ON foo(x); SELECT * FROM [SHOW TESTING_RANGES FROM INDEX foo@ix]
+----
+Start Key  End Key  Range ID  Replicas  Lease Holder
+NULL       NULL     1         {1}       1
+
+query TTTTTTT colnames
+SELECT * FROM [SHOW TRACE FOR SESSION] LIMIT 0
+----
+timestamp age message tag loc operation span
+
+query TTTTTTT colnames
+SELECT * FROM [SHOW TRACE FOR SELECT 1] LIMIT 0
+----
+timestamp  age  message  tag  loc  operation  span
+
+query TTTT colnames
+SELECT * FROM [SHOW COMPACT TRACE FOR SESSION] LIMIT 0
+----
+age  message  tag  operation
+
+query TTTT colnames
+SELECT * FROM [SHOW COMPACT TRACE FOR SELECT 1] LIMIT 0
+----
+age  message  tag  operation
+
+query ITTTTTTTTRTI colnames
+SELECT * FROM [SHOW JOBS] LIMIT 0
+----
+id  type  description  username  status  created  started  finished  modified  fraction_completed  error  coordinator_id
+
+query TT colnames
+SELECT * FROM [SHOW SYNTAX 'select 1; select 2']
+----
+field  text
+sql    SELECT 1
+sql    SELECT 2
+
+# Test the SHOW SYNTAX statement. We avoid printing out the line number
+# here because that is highly likely to change as code is edited.
+query TT colnames
+SELECT field, replace(text, e'\n', ' ') AS text FROM [SHOW SYNTAX 'foo']
+ WHERE field != 'line'
+----
+field     text
+error     syntax error at or near "foo"
+code      42601
+file      sql/show_syntax.go
+function  runShowSyntax
+detail    source SQL: foo ^

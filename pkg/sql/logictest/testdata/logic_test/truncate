@@ -1,0 +1,67 @@
+# LogicTest: default parallel-stmts distsql
+
+statement ok
+CREATE TABLE kv (
+  k INT PRIMARY KEY,
+  v INT
+)
+
+statement ok
+INSERT INTO kv VALUES (1, 2), (3, 4), (5, 6), (7, 8)
+
+query II rowsort
+SELECT * FROM kv
+----
+1 2
+3 4
+5 6
+7 8
+
+statement ok
+CREATE VIEW kview AS SELECT k,v FROM kv
+
+query II rowsort
+SELECT * FROM kview
+----
+1 2
+3 4
+5 6
+7 8
+
+statement error "kview" is not a table
+TRUNCATE TABLE kview
+
+query II rowsort
+SELECT * FROM kview
+----
+1 2
+3 4
+5 6
+7 8
+
+statement ok
+TRUNCATE TABLE kv
+
+query II
+SELECT * FROM kv
+----
+
+query II
+SELECT * FROM kview
+----
+
+# Ensure that TRUNCATE works with a self referential FK.
+statement ok
+CREATE TABLE selfref (
+  y INT PRIMARY KEY,
+  Z INT REFERENCES selfref (y)
+)
+
+statement ok
+TRUNCATE table selfref
+
+statement ok
+INSERT INTO selfref VALUES (1, NULL);
+
+statement ok
+DROP TABLE selfref
