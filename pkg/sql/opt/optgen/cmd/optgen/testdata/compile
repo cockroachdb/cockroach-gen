@@ -1,0 +1,71 @@
+#
+# Print out compiled tree.
+#
+optgen compile test.opt
+# Not comment.
+define Not {
+    Input Expr
+}
+
+[EliminateNot]
+(Not (Not $input:*)) => $input
+----
+(Compiled
+	(Defines
+		(Define
+			Comments=(Comments # Not comment.)
+			Tags=(Tags)
+			Name="Not"
+			Fields=(DefineFields
+				(DefineField Name="Input" Type="Expr" Src=<test.opt:3:5>)
+			)
+			Src=<test.opt:2:1>
+		)
+	)
+	(Rules
+		(Rule
+			Comments=(Comments)
+			Name="EliminateNot"
+			Tags=(Tags)
+			Match=(Match
+				Names=(OpNames NotOp)
+				Args=(List
+					(Match
+						Names=(OpNames NotOp)
+						Args=(List
+							(Bind Label="input" Target=(MatchAny) Src=<test.opt:7:11>)
+						)
+						Src=<test.opt:7:6>
+					)
+				)
+				Src=<test.opt:7:1>
+			)
+			Replace=(Ref Label="input" Src=<test.opt:7:25>)
+			Src=<test.opt:6:1>
+		)
+	)
+)
+
+#
+# Test single compile error.
+#
+optgen compile test.opt
+define Lt {}
+define Lt {}
+----
+test.opt:2:1: duplicate 'Lt' define statement
+
+#
+# Test multiple parse errors.
+#
+optgen compile test.opt
+define {}
+
+[Name]
+(Foo) => ()
+
+[Name]
+(Foo) =>
+----
+test.opt:1:8: expected define name, found '{'
+... too many errors (2 more)

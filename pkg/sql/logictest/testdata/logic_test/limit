@@ -1,0 +1,94 @@
+# LogicTest: default distsql
+
+query I
+SELECT generate_series FROM GENERATE_SERIES(1, 100) ORDER BY generate_series LIMIT 5;
+----
+1
+2
+3
+4
+5
+
+query I
+SELECT generate_series FROM GENERATE_SERIES(1, 100) ORDER BY generate_series FETCH FIRST 5 ROWS ONLY;
+----
+1
+2
+3
+4
+5
+
+query I
+SELECT generate_series FROM GENERATE_SERIES(1, 100) ORDER BY generate_series FETCH FIRST ROW ONLY;
+----
+1
+
+query I
+SELECT generate_series FROM GENERATE_SERIES(1, 100) ORDER BY generate_series OFFSET 3 ROWS FETCH NEXT ROW ONLY;
+----
+4
+
+statement error syntax error
+SELECT generate_series FROM GENERATE_SERIES(1, 100) FETCH NEXT ROW ONLY LIMIT 3;
+
+statement error syntax error
+SELECT generate_series FROM GENERATE_SERIES(1, 100) LIMIT 3 FETCH NEXT ROW ONLY;
+
+statement error syntax error
+SELECT generate_series FROM GENERATE_SERIES(1, 100) FETCH NEXT 1 + 1 ROWS ONLY;
+
+query I
+SELECT generate_series FROM GENERATE_SERIES(1, 100) ORDER BY generate_series FETCH FIRST (1 + 1) ROWS ONLY;
+----
+1
+2
+
+statement ok
+CREATE TABLE t (k INT PRIMARY KEY, v INT, w INT, INDEX(v))
+
+statement ok
+INSERT INTO t VALUES (1, 1, 1), (2, 4, 8), (3, 9, 27), (4, 16, 94), (5, 25, 125), (6, 36, 216)
+
+# Verify we don't incorrectly impose a hard limit at the index scan level.
+query III
+SELECT * FROM t WHERE v > 4 AND w > 30 ORDER BY v LIMIT 2
+----
+4 16 94
+5 25 125
+
+# There must be no limit at the index scan level.
+query TITTTTT colnames
+EXPLAIN (VERBOSE) SELECT * FROM t WHERE v > 4 AND w > 30 ORDER BY v LIMIT 2
+----
+Tree             Level  Type        Field   Description  Columns                      Ordering
+limit            0      limit       ·       ·            (k, v, w)                    k!=NULL; v!=NULL; w!=NULL; key(k,v); +v
+ │               0      ·           count   2            ·                            ·
+ └── index-join  1      index-join  ·       ·            (k, v, w)                    k!=NULL; v!=NULL; w!=NULL; key(k,v); +v
+      ├── scan   2      scan        ·       ·            (k, v[omitted], w[omitted])  k!=NULL; v!=NULL; w!=NULL; key(k,v); +v
+      │          2      ·           table   t@t_v_idx    ·                            ·
+      │          2      ·           spans   /5-          ·                            ·
+      └── scan   2      scan        ·       ·            (k, v, w)                    ·
+·                2      ·           table   t@primary    ·                            ·
+·                2      ·           filter  w > 30       ·                            ·
+
+# This kind of query can be used to work around memory usage limits. We need to
+# choose the "hard" limit of 100 over the "soft" limit of 25 (with the hard
+# limit we will only store 100 rows in the sort node). See #19677.
+query TITTTTT colnames
+EXPLAIN (VERBOSE) SELECT DISTINCT w FROM (SELECT w FROM t ORDER BY w LIMIT 100) ORDER BY w LIMIT 25
+----
+Tree                           Level  Type      Field      Description      Columns                      Ordering
+limit                          0      limit     ·          ·                (w)                          weak-key(w); +w
+ │                             0      ·         count      25               ·                            ·
+ └── distinct                  1      distinct  ·          ·                (w)                          weak-key(w); +w
+      │                        1      ·         order key  w                ·                            ·
+      └── limit                2      limit     ·          ·                (w)                          +w
+           │                   2      ·         count      100              ·                            ·
+           └── sort            3      sort      ·          ·                (w)                          +w
+                │              3      ·         order      +w               ·                            ·
+                │              3      ·         strategy   top 100          ·                            ·
+                └── render     4      render    ·          ·                (w)                          ·
+                     │         4      ·         render 0   test.public.t.w  ·                            ·
+                     └── scan  5      scan      ·          ·                (k[omitted], v[omitted], w)  k!=NULL; key(k)
+·                              5      ·         table      t@primary        ·                            ·
+·                              5      ·         spans      ALL              ·                            ·

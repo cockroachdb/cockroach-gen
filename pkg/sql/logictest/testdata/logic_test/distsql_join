@@ -1,0 +1,344 @@
+# LogicTest: 5node-distsql
+
+statement ok
+CREATE TABLE data (a INT, b INT, c INT, d INT, PRIMARY KEY (a, b, c, d))
+
+# Split into ten parts.
+statement ok
+ALTER TABLE data SPLIT AT SELECT i FROM GENERATE_SERIES(1, 9) AS g(i)
+
+# Relocate the ten parts to the five nodes.
+statement ok
+ALTER TABLE data TESTING_RELOCATE
+  SELECT ARRAY[i%5+1], i FROM GENERATE_SERIES(0, 9) AS g(i)
+
+# Generate all combinations of values 1 to 10.
+statement ok
+INSERT INTO data SELECT a, b, c, d FROM
+   GENERATE_SERIES(1, 10) AS A(a),
+   GENERATE_SERIES(1, 10) AS B(b),
+   GENERATE_SERIES(1, 10) AS C(c),
+   GENERATE_SERIES(1, 10) AS D(d)
+
+# Verify data placement.
+query TTITI colnames
+SHOW TESTING_RANGES FROM TABLE data
+----
+Start Key  End Key  Range ID  Replicas  Lease Holder
+NULL       /1       1         {1}       1
+/1         /2       2         {2}       2
+/2         /3       3         {3}       3
+/3         /4       4         {4}       4
+/4         /5       5         {5}       5
+/5         /6       6         {1}       1
+/6         /7       7         {2}       2
+/7         /8       8         {3}       3
+/8         /9       9         {4}       4
+/9         NULL     10        {5}       5
+
+statement ok
+SET CLUSTER SETTING sql.distsql.merge_joins.enabled = true;
+
+# ensure merge joins are planned when there's orderings.
+query TITTTTT
+EXPLAIN (VERBOSE) (SELECT * FROM (SELECT a,b FROM data) NATURAL JOIN (SELECT a,b FROM data AS data2))
+----
+render               0  render  ·               ·                   (a, b)                          a!=NULL; b!=NULL
+ │                   0  ·       render 0        a                   ·                               ·
+ │                   0  ·       render 1        b                   ·                               ·
+ └── join            1  join    ·               ·                   (a, b, a[omitted], b[omitted])  a=a; b=b; a!=NULL; b!=NULL
+      │              1  ·       type            inner               ·                               ·
+      │              1  ·       equality        (a, b) = (a, b)     ·                               ·
+      │              1  ·       mergeJoinOrder  +"(a=a)",+"(b=b)"   ·                               ·
+      ├── render     2  render  ·               ·                   (a, b)                          a!=NULL; b!=NULL; +a,+b
+      │    │         2  ·       render 0        test.public.data.a  ·                               ·
+      │    │         2  ·       render 1        test.public.data.b  ·                               ·
+      │    └── scan  3  scan    ·               ·                   (a, b, c[omitted], d[omitted])  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b
+      │              3  ·       table           data@primary        ·                               ·
+      │              3  ·       spans           ALL                 ·                               ·
+      └── render     2  render  ·               ·                   (a, b)                          a!=NULL; b!=NULL; +a,+b
+           │         2  ·       render 0        data2.a             ·                               ·
+           │         2  ·       render 1        data2.b             ·                               ·
+           └── scan  3  scan    ·               ·                   (a, b, c[omitted], d[omitted])  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b
+·                    3  ·       table           data@primary        ·                               ·
+·                    3  ·       spans           ALL                 ·                               ·
+
+
+# ORDER BY on the mergeJoinOrder columns should not require a SORT node
+query TITTTTT
+EXPLAIN (VERBOSE) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d ORDER BY c,d)
+----
+join                 0  join    ·               ·                  (a, b, c, d)                    a=c; b=d; a!=NULL; b!=NULL; +a,+b
+ │                   0  ·       type            inner              ·                               ·
+ │                   0  ·       equality        (a, b) = (c, d)    ·                               ·
+ │                   0  ·       mergeJoinOrder  +"(a=c)",+"(b=d)"  ·                               ·
+ ├── render          1  render  ·               ·                  (a, b)                          a!=NULL; b!=NULL; +a,+b
+ │    │              1  ·       render 0        data1.a            ·                               ·
+ │    │              1  ·       render 1        data1.b            ·                               ·
+ │    └── scan       2  scan    ·               ·                  (a, b, c[omitted], d[omitted])  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b
+ │                   2  ·       table           data@primary       ·                               ·
+ │                   2  ·       spans           ALL                ·                               ·
+ └── sort            1  sort    ·               ·                  (c, d)                          c!=NULL; d!=NULL; +c,+d
+      │              1  ·       order           +c,+d              ·                               ·
+      └── render     2  render  ·               ·                  (c, d)                          c!=NULL; d!=NULL
+           │         2  ·       render 0        data2.c            ·                               ·
+           │         2  ·       render 1        data2.d            ·                               ·
+           └── scan  3  scan    ·               ·                  (a[omitted], b[omitted], c, d)  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d)
+·                    3  ·       table           data@primary       ·                               ·
+·                    3  ·       spans           ALL                ·                               ·
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d ORDER BY c,d)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzclk1r20AQhu_9FWFOLdmCdyXnQ1DQNYUmJe2t-KBYW1vgeM1qDQ3B_73YSjGS4nk9rGuMj4r1aEazz-TVK81dae-LZ1tT9os0KTKkKCFFKSka0kjRwruxrWvn17c0wF35h7KBomq-WIb1n0eKxs5byl4pVGFmKaOfxdPMPtqitJ4UlTYU1WxTZOGr58K_5GURClL0sAzZRa5Vbmi0UuSW4e2Z20c9vVxMi3rafsw_ZKSoDsXEUqZX6n-1l6g87bS3rWskdX84H7olc32pcnMZ-_7Jzj62j3K-tN6WO-vvfec7r_bN-on96qp59_1m9nf4-IZ--uKryXR72TJA8YNO41_wnbbv3We3aN2_q_6wVV-ftv8HbU_gP6h7NP_1uftvTtu_g7Yn8A_UPZp_5tz9S07bv4O2J_AP1D2af8m5-5eetn8HbU_gH6h7NP_Sc_cPfOg_2nrh5rXd68tysH4fW05sM63aLf3YfvduvCnTXD5suM2HTWnr0PyaNBd38-andYP7wzcxsDZR9FUMbQY8rbv0oEW34EEXNoKBGxl8EwN3Bi6lr2LozsB7dMIOPOVPK-VPS_PHNYzZDx4G-8HDaD8ADfaDp9F-XLETv-YHfh2zHzwM9oOH0X4AGuwHT6P9uInZj9sYw3kYGM7DyHBAA8N5GiZAL0BaE9fgn4ruJYhEckADywGNNEc48BzgSHTdyxGJ6bqXIxLVAQ1cBzSSHeHAdoBD3fkM1UOguyRE-2cuSVEpDXUX5agUh7rzSYp0l0SplEa6i8JUjCPdRXHax_k81bdAd0mi9s9cEqlSGuouClUpjnQ3fKp2dR-tPvwNAAD__1XEQ9M=
+
+# ORDER BY on the columns equal to the mergeJoinOrder columns should not
+# require a terminal SORT node.
+query TITTTTT
+EXPLAIN (VERBOSE) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d ORDER BY a,b)
+----
+join                 0  join    ·               ·                  (a, b, c, d)                    a=c; b=d; a!=NULL; b!=NULL; +a,+b
+ │                   0  ·       type            inner              ·                               ·
+ │                   0  ·       equality        (a, b) = (c, d)    ·                               ·
+ │                   0  ·       mergeJoinOrder  +"(a=c)",+"(b=d)"  ·                               ·
+ ├── render          1  render  ·               ·                  (a, b)                          a!=NULL; b!=NULL; +a,+b
+ │    │              1  ·       render 0        data1.a            ·                               ·
+ │    │              1  ·       render 1        data1.b            ·                               ·
+ │    └── scan       2  scan    ·               ·                  (a, b, c[omitted], d[omitted])  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b
+ │                   2  ·       table           data@primary       ·                               ·
+ │                   2  ·       spans           ALL                ·                               ·
+ └── sort            1  sort    ·               ·                  (c, d)                          c!=NULL; d!=NULL; +c,+d
+      │              1  ·       order           +c,+d              ·                               ·
+      └── render     2  render  ·               ·                  (c, d)                          c!=NULL; d!=NULL
+           │         2  ·       render 0        data2.c            ·                               ·
+           │         2  ·       render 1        data2.d            ·                               ·
+           └── scan  3  scan    ·               ·                  (a[omitted], b[omitted], c, d)  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d)
+·                    3  ·       table           data@primary       ·                               ·
+·                    3  ·       spans           ALL                ·                               ·
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d ORDER BY a,b)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzclk1r20AQhu_9FWFOLdmCdyXnQ1DQNYUmJe2t-KBYW1vgeM1qDQ3B_73YSjGS4nk9rGuMj4r1aEazz-TVK81dae-LZ1tT9os0KTKkKCFFKSka0kjRwruxrWvn17c0wF35h7KBomq-WIb1n0eKxs5byl4pVGFmKaOfxdPMPtqitJ4UlTYU1WxTZOGr58K_5GURClL0sAzZRa5Vbmi0UuSW4e2Z20c9vVxMi3rafsw_ZKSoDsXEUqZX6n-1l6g87bS3rWskdX84H7olc32pcnMZ-_7Jzj62j3K-tN6WO-vvfec7r_bN-on96qp59_1m9nf4-IZ--uKryXR72TJA8YNO41_wnbbv3We3aN2_q_6wVV-ftv8HbU_gP6h7NP_1uftvTtu_g7Yn8A_UPZp_5tz9S07bv4O2J_AP1D2af8m5-5eetn8HbU_gH6h7NP_Sc_cPfOg_2nrh5rXd68tysH4fW05sM63aLf3YfvduvCnTXD5suM2HTWnr0PyaNBd38-andYP7wzcxsDZR9FUMbQY8rbv0oEW34EEXNoKBGxl8EwN3Bi6lr2LozsB7dMIOPOVPK-VPS_PHNYzZDx4G-8HDaD8ADfaDp9F-XLETv-YHfh2zHzwM9oOH0X4AGuwHT6P9uInZj9sYw3kYGM7DyHBAA8N5GiZAL0BaE9fgn4ruJYhEckADywGNNEc48BzgSHTdyxGJ6bqXIxLVAQ1cBzSSHeHAdoBD3fkM1UOguyRE-2cuSVEpDXUX5agUh7rzSYp0l0SplEa6i8JUjCPdRXHax_k81bdAd0mi9s9cEqlSGuouClUpjnQ3fKp2dR-tPvwNAAD__1XEQ9M=
+
+# ORDER BY on a different ordering should require a terminal SORT NODE.
+query TITTTTT
+EXPLAIN (VERBOSE) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d ORDER BY b,a)
+----
+sort                      0  sort    ·               ·                  (a, b, c, d)                    a=c; b=d; a!=NULL; b!=NULL; +b,+a
+ │                        0  ·       order           +b,+a              ·                               ·
+ └── join                 1  join    ·               ·                  (a, b, c, d)                    a=c; b=d; a!=NULL; b!=NULL
+      │                   1  ·       type            inner              ·                               ·
+      │                   1  ·       equality        (a, b) = (c, d)    ·                               ·
+      │                   1  ·       mergeJoinOrder  +"(a=c)",+"(b=d)"  ·                               ·
+      ├── render          2  render  ·               ·                  (a, b)                          a!=NULL; b!=NULL; +a,+b
+      │    │              2  ·       render 0        data1.a            ·                               ·
+      │    │              2  ·       render 1        data1.b            ·                               ·
+      │    └── scan       3  scan    ·               ·                  (a, b, c[omitted], d[omitted])  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b
+      │                   3  ·       table           data@primary       ·                               ·
+      │                   3  ·       spans           ALL                ·                               ·
+      └── sort            2  sort    ·               ·                  (c, d)                          c!=NULL; d!=NULL; +c,+d
+           │              2  ·       order           +c,+d              ·                               ·
+           └── render     3  render  ·               ·                  (c, d)                          c!=NULL; d!=NULL
+                │         3  ·       render 0        data2.c            ·                               ·
+                │         3  ·       render 1        data2.d            ·                               ·
+                └── scan  4  scan    ·               ·                  (a[omitted], b[omitted], c, d)  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d)
+·                         4  ·       table           data@primary       ·                               ·
+·                         4  ·       spans           ALL                ·                               ·
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d ORDER BY b,a)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzcl8GL2kAYxe_9K5bv1OIUnEm0a6CQ6xa6W7a9FQ9ZM9WA68hkhC6L_3vRbBsSdZ6Tz4p4jOY3b_LNe3n6SguT6_vsWZeU_CRJghQJikhQTIIGNBa0tGaiy9LYzS0VcJf_pqQvqFgsV27z8VjQxFhNySu5ws01JfQje5rrR53l2pKgXLusmG9FlrZ4zuxLmmcuI0EPK5fcpFKkisZrQWbl3tasl3p6uZll5ay5zF9kLKh02VRTItfif20vEmnc2l6tq0J0vxvr2pKp7IlU9bjPHx3cR72Usbm2Oj-of_Sdex7tq7ZT_cUUi_bzzfUv9_4N_fDZFtNZfdlwgPAPOmYPWvVEKtuDrgUGnSf4b-E9O7k3H82ycf8h_WFDX152wE66vYCAAd2zBUxee8C6DDooYOqyDX7S7QUYHOiezeDq2g3eZdBBBo8u2-An3V6AwYHu2QweXbvBuww6yODxZRv8pNsLMDjQPZvB42s3eJdBd_4PsEfgUZdLsyj1Ub_u-5uB6Xyqq-MozcpO9DdrJluZ6vJhy21_e-W6dNW3UXVxt6i-2mzweHjEgWXMolnaCmjLNt1v0A2434ZVwMBVGDziwK2Bh9IsbQW0I-_AY__AYy888B_1wH_UQ7_0kBMuPwwM7odRuADN0kbh-uSd-K1_4LeccPlhYHA_jMIFaJY2CtfIO3DZ909c7rxKQ-Ild16lIQkBNLApoFFGEM5ThxW080JtnloETm3njRoSFEADtwIaRQXhPHUUFulvEzkAc_f3CUoLq08AjfzKaxSE89RhWvylIkGrSFatABr5lVcsCOepw7T4u0WBblGsblGsbgE08CugUVoQzlNHaVH-blGgWxSrWwCN_mbwugXhPHWUFuXvFgW6RYV1y3j97k8AAAD__xM-R9Y=
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c and b=d ORDER BY a,b)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzclk1r20AQhu_9FWFOLdmCdyXnQ1DQNYUmJe2t-KBYW1vgeM1qDQ3B_73YSjGS4nk9rGuMj4r1aEazz-TVK81dae-LZ1tT9os0KTKkKCFFKSka0kjRwruxrWvn17c0wF35h7KBomq-WIb1n0eKxs5byl4pVGFmKaOfxdPMPtqitJ4UlTYU1WxTZOGr58K_5GURClL0sAzZRa5Vbmi0UuSW4e2Z20c9vVxMi3rafsw_ZKSoDsXEUqZX6n-1l6g87bS3rWskdX84H7olc32pcnMZ-_7Jzj62j3K-tN6WO-vvfec7r_bN-on96qp59_1m9nf4-IZ--uKryXR72TJA8YNO41_wnbbv3We3aN2_q_6wVV-ftv8HbU_gP6h7NP_1uftvTtu_g7Yn8A_UPZp_5tz9S07bv4O2J_AP1D2af8m5-5eetn8HbU_gH6h7NP_Sc_cPfOg_2nrh5rXd68tysH4fW05sM63aLf3YfvduvCnTXD5suM2HTWnr0PyaNBd38-andYP7wzcxsDZR9FUMbQY8rbv0oEW34EEXNoKBGxl8EwN3Bi6lr2LozsB7dMIOPOVPK-VPS_PHNYzZDx4G-8HDaD8ADfaDp9F-XLETv-YHfh2zHzwM9oOH0X4AGuwHT6P9uInZj9sYw3kYGM7DyHBAA8N5GiZAL0BaE9fgn4ruJYhEckADywGNNEc48BzgSHTdyxGJ6bqXIxLVAQ1cBzSSHeHAdoBD3fkM1UOguyRE-2cuSVEpDXUX5agUh7rzSYp0l0SplEa6i8JUjCPdRXHax_k81bdAd0mi9s9cEqlSGuouClUpjnQ3fKp2dR-tPvwNAAD__1XEQ9M=
+
+
+# Merge joins should be planned for (FULL|LEFT|RIGHT) OUTER joins
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) FULL OUTER JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c and b=d ORDER BY a,b)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzkl0Fr20AUhO_9FeadWrIF70pOE0FBlxYS0rikyan4oFhbW-B4xUqGmuD_XmylGMnWjpenGIOPjv1pVu_NaKJXmptU3ycvuqDoN0kSpEhQQIJCEjSgkaDcmrEuCmPXP6mAm_QvRX1B2TxflOs_jwSNjdUUvVKZlTNNET0mzzP9oJNUWxKU6jLJZhuR3GYviV3GaVImJGi4KKNeLEWsaLQSZBbl2zW3l3pe9qZJMa1f5j8yElSUyURTJFfivY4XiDhsHG-rq3x0fxlbNiVjeSFidcG9_6D1HNtLGZtqq9NW_YN_uefWfmg70bcmmzfv73GZ66j3_enurjd8evz20Lsd3tyToJn-U358u-SnrzabTLcfa84Q7gWE77OArcCAP9k9J7k3n01e-32b_mVNX5528Do9nkfwgO7RgifPNXidLaAteOq0jd_p8TyMD3SPZnx1rsbvbAFtxg9O2_idHs_D-ED3aMYPztX4nS2gzfjhaRu_0-N5GB_oHs344bkav7MFHPKOsUfgQRe5mRf6oLeH_nqQOp3oak2FWdix_mnNeCNTfRxuuM3_cKkuyurboPpwM6--Wh_wcPiaA8uQRbO0FdCWTbpfo2twvwkrj4ErP_iaAzcG7kuztBXQDpwDD90DD53wwL3qgXvVl27pS0643DAwuBtG4QI0SxuF64tz4lfugV9xwuWGgcHdMAoXoFnaKFzXzoHLvnvicudR6hMvufMo9UkIoIFNAY0ygnCeOqygnQdqfWsB2NrOE9UnKIAGbgU0igrCeeooLNLdJnIA5u7uE5QWVp8AGvmV1ygI56nDtLhLRYJWkaxaATTyK69YEM5Th2lxd4sC3aJY3aJY3QJo4FdAo7QgnKeO0qLc3aJAtyhWtwAavWbwugXhPHWUFuXuFgW6Rfl1y2j14V8AAAD___XQaOw=
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) LEFT OUTER JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c and b=d ORDER BY a,b)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzkl1Fr4k4Uxd__n0Lu03_pLDiT2G0DC3npQstuXbru0-JDamY1YJ0wibBS_O6LposkmjkONxXBR6u_nMm95-Q0r7QwqX5MXnRB0S-SJEiRoIAEhSRoQGNBuTUTXRTGbn5SAffpH4r6grJFviw3fx4LmhirKXqlMivnmiIaJc9z_aSTVFsSlOoyyeZbkdxmL4ldxWlSJiRouCyjXixFrGi8FmSW5ds1d5d6XvVmSTGrX-YfMhZUlMlUUyTX4r2OF4g4bBxvp6t8dH8YWzYlY3klYnXFvf-g9Ry7SxmbaqvTVv2jf3ng1r5pO9UPJls072-0ynXU-3r3ZdQb_hzdPfUehvePJGiuf5f_v13yw2ebTWe7jzVnCPcCwvdZwE5gwJ_sgZM8mo8mr_2-Tf-6pi_PO3idHs8jeED3ZMGTlxq8zhbQFjx13sbv9Hgexge6JzO-ulTjd7aANuMH5238To_nYXygezLjB5dq_M4W0Gb88LyN3-nxPIwPdE9m_PBSjd_ZAo55xzgg8KSL3CwKfdTbQ38zSJ1OdbWmwiztRH-3ZrKVqT4Ot9z2f7hUF2X1bVB9uF9UX20OeDx8y4FlyKJZ2gpoyybdr9E1uN-ElcfAlR98y4EbA_elWdoKaAfOgYfugYdOeOBe9cC96mu39DUnXG4YGNwNo3ABmqWNwvXJOfEb98BvOOFyw8DgbhiFC9AsbRSuW-fAZd89cbn3KPWJl9x7lPokBNDApoBGGUE4Tx1W0N4Dtb61AGxt74nqExRAA7cCGkUF4Tx1FBbpbhM5AHN39wlKC6tPAI38ymsUhPPUYVrcpSJBq0hWrQAa-ZVXLAjnqcO0uLtFgW5RrG5RrG4BNPAroFFaEM5TR2lR7m5RoFsUq1sAjV4zeN2CcJ46Sotyd4sC3aL8umW8_u9vAAAA__9VB2jE
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b FROM data AS data1) RIGHT OUTER JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c and b=d ORDER BY a,b)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzkl1GL2kAUhd_7K-Q-tewUnEnc7gYKeSmtC12LtU_Fh6yZugHXCZMIXRb_e9FskUQzx-FmRfDR1S9ncu85OZsXWppU3ydPuqDoN0kSpEhQQIJCEjSgqaDcmpkuCmM3P6mAYfqXor6gbJmvys2fp4JmxmqKXqjMyoWmiCbJw0KPdZJqS4JSXSbZYiuS2-wpsc9xmpQJCRqtyqgXSxErmq4FmVX5es3dpR6ee49J8Vi_zH9kKqgok7mmSK7FWx0vEHHYON5OV_no_jS2bErG8krE6op7_0HrOXaXMjbVVqet-kf_8sCtfdd2ru9Mtmze3-Q511FvPPz6bdIb_Zp8GffuRsN7ErTQf8r3r9f88Nlm88fdx5o1hHsD4dtsYCcw4I_2wEnuzUeT137fpn9d05fnnbxOj-eRPKB7suTJi01eZxtoS546b-d3ejwP5wPdkzlfXazzO9tAm_OD83Z-p8fzcD7QPZnzg4t1fmcbaHN-eN7O7_R4Hs4Huidzfnixzu9sA8e8ZxwQGOsiN8tCH_UG0d9MUqdzXe2pMCs70z-smW1lqo-jLbf9Ny7VRVl9G1Qfhsvqq80Bj4dvObAMWTRLWwFt2aT7NboG95uw8hi48oNvOXBj4L40S1sB7cA58NA98NAJD9yrHrhXfe2WvuaEyw0Dg7thFC5As7RRuD45J37jHvgNJ1xuGBjcDaNwAZqljcJ16xy47LsnLvcepT7xknuPUp-EABrYFNAoIwjnqcMK2nug1rcWgK3tPVF9ggJo4FZAo6ggnKeOwiLdbSIHYO7uPkFpYfUJoJFfeY2CcJ46TIu7VCRoFcmqFUAjv_KKBeE8dZgWd7co0C2K1S2K1S2ABn4FNEoLwnnqKC3K3S0KdItidQug0WsGr1sQzlNHaVHublGgW5Rft0zX7_4FAAD__8v3amM=
+
+
+# Nested merge joins should be planned on the same ordering
+query TITTTTT
+EXPLAIN (VERBOSE) (SELECT a,b from data AS data3 NATURAL JOIN ((SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d))
+----
+render                         0  render  ·               ·                                    (a, b)                                                                          a!=NULL; b!=NULL
+ │                             0  ·       render 0        data3.a                              ·                                                                               ·
+ │                             0  ·       render 1        data3.b                              ·                                                                               ·
+ └── join                      1  join    ·               ·                                    (a, b, c[omitted], d[omitted], a[omitted], b[omitted], c[omitted], d[omitted])  a=c=a=c; b=d=b=d; a!=NULL; b!=NULL
+      │                        1  ·       type            inner                                ·                                                                               ·
+      │                        1  ·       equality        (a, b, c, d) = (a, b, c, d)          ·                                                                               ·
+      │                        1  ·       mergeJoinOrder  +"(a=a)",+"(b=b)",+"(c=c)",+"(d=d)"  ·                                                                               ·
+      ├── scan                 2  scan    ·               ·                                    (a, b, c, d)                                                                    a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b,+c,+d
+      │                        2  ·       table           data@primary                         ·                                                                               ·
+      │                        2  ·       spans           ALL                                  ·                                                                               ·
+      └── join                 2  join    ·               ·                                    (a, b, c, d)                                                                    a=c; b=d; a!=NULL; b!=NULL; +a,+b
+           │                   2  ·       type            inner                                ·                                                                               ·
+           │                   2  ·       equality        (a, b) = (c, d)                      ·                                                                               ·
+           │                   2  ·       mergeJoinOrder  +"(a=c)",+"(b=d)"                    ·                                                                               ·
+           ├── render          3  render  ·               ·                                    (a, b)                                                                          a!=NULL; b!=NULL; +a,+b
+           │    │              3  ·       render 0        data1.a                              ·                                                                               ·
+           │    │              3  ·       render 1        data1.b                              ·                                                                               ·
+           │    └── scan       4  scan    ·               ·                                    (a, b, c[omitted], d[omitted])                                                  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d); +a,+b
+           │                   4  ·       table           data@primary                         ·                                                                               ·
+           │                   4  ·       spans           ALL                                  ·                                                                               ·
+           └── sort            3  sort    ·               ·                                    (c, d)                                                                          c!=NULL; d!=NULL; +c,+d
+                │              3  ·       order           +c,+d                                ·                                                                               ·
+                └── render     4  render  ·               ·                                    (c, d)                                                                          c!=NULL; d!=NULL
+                     │         4  ·       render 0        data2.c                              ·                                                                               ·
+                     │         4  ·       render 1        data2.d                              ·                                                                               ·
+                     └── scan  5  scan    ·               ·                                    (a[omitted], b[omitted], c, d)                                                  a!=NULL; b!=NULL; c!=NULL; d!=NULL; key(a,b,c,d)
+·                              5  ·       table           data@primary                         ·                                                                               ·
+·                              5  ·       spans           ALL                                  ·                                                                               ·
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT * FROM (SELECT a,b from data AS data3 NATURAL JOIN ((SELECT a,b FROM data AS data1) JOIN (SELECT c,d FROM data AS data2 ORDER BY c,d) ON a=c AND b=d)))]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzsmE1v4kgQhu_7K6I67Sq9Et02H0FaydesNMkoM7cRBwf3ECRCo7aRJory30dAZhi7Sb1U2kECcQT8uKor7cdv-pnmrrA3-aMtafiNNCkypCghRSkp6tJI0cK7sS1L51eXbIDr4gcNO4qm88WyWn09UjR23tLwmappNbM0pK_5_cze2bywnhQVtsqns3WRhZ8-5v4pK_IqJ0W3y2p4kWmVGZUlKktp9KLILavXO29veP908ZCXD_Wb1cGRorLKJ5aG-kV9ZKvvaLLWnvm49nbMcFs3kdT94nzVLJnpS5WZy9j1p2_2sb2V84X1tniz_t5X7ljaJ-sn9n83nTfXN7Pfq79f0X_-89PJw_bjh23WbuQ0VJZcqiwVTOUP4r3T-XWLxpR-f809L9ul9_ZY-nK-ayk7O79x_7pF47Ldhfu1wvp4XNZ6q-26rNX2BC4DdQ_mMn12WdQ0TsZl5niU0nqr7Sql1fYESgF1D6YUc1ZK1DRORinJ8Sil9VbbVUqr7QmUAuoeTCnJWSlR0zgZpaTHo5TWW21XKa22J1AKqHswpaRnpURN42SUAk4V72y5cPPS7nVK01mtzBYTu5lj6ZZ-bD97N16X2Xy8XXPr_zULW1abX7ubD9fzzU-rBveHtYmiBzG0SWPopMPTmqVBaR7WOorux9AmiaKveNo06U5t5DW404QTwcSNDG5MXEr3Y-jGxKX0FU-ngmdbCDeebSk9iKEN-HPzdOPZDuguu017_B7v8Xtc85u8H-NiHkYuBjRwMU8jF_M0cvEgxsU8jFwMaOBinkYuBjRw8RW7T3WH36eaf3uCxxPQSMcIBz4GOBIywoGRNf8KBUoGNHIywoGUAY6sDHCkZc3HB-Blzb9IgVoBjdyKcCBXgCO7AhxGXf5tioqDHIDCLsBR2gU5AsVdgAPHaj5J6B6QbJAlRJLlaShZgCPJ8jiULMCRZCU5SkpDyYqSlBSHkhVlqRAPUoVIskGqEEmWp6FkAY4ky-NQsjyOJGskgUpKI8kiHEgW4EiyCEeHCkGqqO1YY3jJmiBVSCQLaCRZhAPJAhxJFuFAskaSqKQ0kizCgWQBjiQLcCRZE8QKiWRNkCokkgU0kizCgWQBjiQLcChZSaCS0lCyokAlxaFkRYEqxINUUZfsAEhWckQTPi6iMxoxjiQrOqUR40iykkQlpaFkRYlKikPJihJVeHAexApWsqOXv34GAAD___sgIII=
+
+
+# Test that the distSQL MergeJoiner follows SQL NULL semantics for ON predicate equivilance.
+# The use of sorts here force
+
+statement ok
+CREATE TABLE distsql_mj_test (k INT, v INT)
+
+statement ok
+INSERT INTO distsql_mj_test VALUES (0, NULL), (0, 1), (2, 4), (NULL, 4)
+
+# If SQL NULL semantics are not followed, NULL = NULL is truthy. This makes the rows with NULL also appear in the inner join.
+
+query IIII rowsort
+SELECT l.k, l.v, r.k, r.v FROM (SELECT * FROM distsql_mj_test ORDER BY k, v) l INNER JOIN (SELECT * FROM distsql_mj_test ORDER BY k, v) r ON l.k = r.k AND l.v = r.v
+----
+0  1  0  1
+2  4  2  4
+
+statement ok
+DELETE FROM distsql_mj_test WHERE TRUE;
+
+statement ok
+INSERT INTO distsql_mj_test VALUES (0, NULL), (1, NULL), (2, NULL)
+
+# We should not have any results for values with NULLs
+query IIII rowsort
+SELECT l.k, l.v, r.k, r.v FROM (SELECT * FROM distsql_mj_test ORDER BY k, v) l INNER JOIN (SELECT * FROM distsql_mj_test ORDER BY k, v) r ON l.k = r.k AND l.v = r.v
+----
+
+statement ok
+DELETE FROM distsql_mj_test WHERE TRUE;
+
+statement ok
+INSERT INTO distsql_mj_test VALUES (NULL)
+
+# We shouldn't expect a row of (NULL, NULL), otherwise NULL = NULL was joined.
+query II rowsort
+SELECT l.k, r.k FROM (SELECT * FROM distsql_mj_test ORDER BY k) l INNER JOIN (SELECT * FROM distsql_mj_test ORDER BY k) r ON l.k = r.k
+----
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) (SELECT l.k, r.k FROM (SELECT * FROM distsql_mj_test ORDER BY k) l INNER JOIN (SELECT * FROM distsql_mj_test ORDER BY k) r ON l.k = r.k)]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzEkkFr4zAQhe_7K5Y57RIVIifOwVDwNYUmJe2thOBaU1fF8bijMbSE_Pdi65DE1EpzKL1Jo_nemydmBxUZXGRbdJA8ggYFMawV1Ew5Okfcln3T3LxDMlZgq7qRtrxWkBMjJDsQKyVCAgu6ohoUGJTMll3TXgE1ckCcZAVCMturI1kdln3InkpcYWaQT8ShZrvN-CM11ol7Kzfb142gE1CwbCT5m2oY8teX-N8TS9861aNB8eiXw01-Mtx0UPyg2VTEBhlNfxfOt3wx4S1ygTdkq_6YJT7Lv1SP_l-zLV788fA9Ko0GQ8QnIc5s9QpdTZXDby32uE2ApkD_I44azvGOKe9s_HXZcV3BoBP_OvOXeeWf2gGPYR2EozAcBeH4BNZ9eBKEp2Hn6QXOUR-Og_C457ze__kMAAD__4m9mGY=
+
+
+statement ok
+SET experimental_force_lookup_join = true;
+
+
+statement ok
+CREATE TABLE distsql_lookup_test_1 (a INT, b INT, c INT, PRIMARY KEY (a, c))
+
+
+statement ok
+INSERT INTO distsql_lookup_test_1 VALUES (1, 1, 2), (2, 1, 1), (2, NULL, 2)
+
+
+statement ok
+CREATE TABLE distsql_lookup_test_2 (d INT, e INT, f INT, PRIMARY KEY (f, e))
+
+
+statement ok
+INSERT INTO distsql_lookup_test_2 VALUES (1, 1, 2), (2, 1, 1), (NULL, 2, 1)
+
+
+query IIIIII
+SELECT * FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = b
+----
+1  1  2  2  1  1
+2  1  1  2  1  1
+1  1  2  NULL  2  1
+2  1  1  NULL  2  1
+
+
+query IIIIII
+SELECT * FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = b WHERE a > 1 AND e > 1
+----
+2  1  1  NULL  2  1
+
+
+# Filter right side of a lookup join with a restriction on an indexed column.
+query IIIIII
+SELECT * FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = a WHERE f > 1
+----
+2  1  1  1  1  2
+2  NULL  2  1  1  2
+
+
+# Test lookup join with restriction relating the left and right side.
+query IIIIII
+SELECT * FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = b WHERE a >= e
+----
+1  1  2  2  1  1
+2  1  1  2  1  1
+2  1  1  NULL  2  1
+
+
+# Test lookup join with selecting a subset of the columns.
+query III
+SELECT a, b, e FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = b WHERE a >= e
+----
+1  1  1
+2  1  1
+2  1  2
+
+
+# Ensure lookup join is planned.
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) SELECT * FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = b]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJyUkc9Kw0AQh-8-hcx5hCa1Hva013popXiTENbsUBbTzLozAaXk3SXZg22h0R7nz_fLl9kjdOxp4w4kYN6gAIQVVAgxcUMinMZ2Xlr7LzALhNDFXsd2hdBwIjBH0KAtgYENP3AEBE_qQjstDQjc6y8i6vYEZjngSWwxH_vq3lvakfOUzsIhpnBw6dv6ICqfbd0yf_SxVhKtx3_Z9mrubYG2RLuEay7FLS7PHLpbVcpLFbSPaFdon646lWdOf5x9RxK5E_rX5RdDhUB-T_lphfvU0EviZvpMLrcTNzU8iebpMhfrLo9GwVO4mIXLebichRcXcDXc_QQAAP__D3vm2w==
+
+
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) SELECT * FROM distsql_lookup_test_1 JOIN distsql_lookup_test_2 ON f = b WHERE a > 1 AND e > 1]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJyUkT1rwzAQhvf-CnPzFfzRdNCkqZAOSQnZWhNc6wiijk-VTtAS_N-LraFJIG4z3sdzesR7hJ4NrZoDBVCvUADCAmoE57mlENiP7bS0NF-gcgTbuyhju0Zo2ROoI4iVjkDBiu_ZAYIhaWw3LQ0IHOUXCdLsCVQ14MnZYv7stnnvaEONIX92HJy3h8Z_a2ODhM9u1zF_RLcTCrIb_7KOojJdoC5RV3DNpbjF5Zltf6tKCQhPthPyKtOL7C3meUVZoZRarraXmqgfUC9QP171Lc98_4hkQ8FxH-hfqeRDjUBmTyn2wNG39OK5nZ5J5XripoahIGlapWLZp9EoeAoXs3A5D5ezcH4B18PdTwAAAP__g_HuUw==
+
+
+# Ensure lookup join is planned on a multi-node cluster.
+query T
+SELECT "URL" FROM [EXPLAIN (DISTSQL) SELECT * FROM data JOIN data AS data2 on data.b = data2.a]
+----
+https://cockroachdb.github.io/distsqlplan/decode.html?eJzElL1qwzAUhfc-RTnzLUS281NPWtMhKaFb8aBal2BILCPJ0BL87sX2kCYkcmggHvXz-Tsci3tAaTSv1J4d0k8IECIQYhASEKbICJU1OTtnbHulB5b6G-mEUJRV7dvtjJAby0gP8IXfMVJ8qK8db1hptiBo9qrYdZLKFntlf6RWXoGwrn36LAXJiGRMMkHWEEztj192Xm0ZqWjodvubKcp_yElOSc5IzkkurgaJrgY5-uvSWM2W9Yk-ay5EXZkXU51duyyOT8Ri1P4H7I_rPxq1hgH742qIR61hwP64GpJRaxiwjzOULgTZsKtM6fimqTNphxbrLfcTzpna5vxuTd5p-uW647oNzc73p6JfLMv-qA34FxZBODqBxTkchc0D6jhIJ2E4uSf3NAjPwubZPeZ5EF6EzYt7zK_hfzUZeCbhR3buzpqn3wAAAP__4BLZeQ==
+
+
+statement ok
+SET experimental_force_lookup_join = false;

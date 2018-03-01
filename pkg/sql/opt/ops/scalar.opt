@@ -1,0 +1,358 @@
+# scalar.opt contains Optgen language definitions for all of Cockroach's
+# physical and logical operators that return a single result value having a
+# simple scalar type like string or float, rather than a table-valued type.
+#
+# Tags
+#
+# Scalar - All operators in this file are marked with the Scalar tag, so they
+#          can be easily distinguished from Relational and Enforcer operators.
+
+[Scalar]
+define Subquery {
+    Input      Expr
+    Projection Expr
+}
+
+# Variable is the typed scalar value of a column in the query. The private
+# field is a Metadata.ColumnIndex that references the column by index.
+[Scalar]
+define Variable {
+    Col ColumnIndex
+}
+
+# Const is a typed scalar constant value. The private field is a tree.Datum
+# value having any datum type that's legal in the expression's context.
+[Scalar, ConstValue]
+define Const {
+    Value Datum
+}
+
+# True is the boolean true value that is equivalent to the tree.DBoolTrue datum
+# value. It is a separate operator to make matching and replacement simpler and
+# more efficient, as patterns can contain (True) expressions.
+[Scalar, Boolean, ConstValue]
+define True {
+}
+
+# False is the boolean false value that is equivalent to the tree.DBoolFalse
+# datum value. It is a separate operator to make matching and replacement
+# simpler and more efficient, as patterns can contain (False) expressions.
+[Scalar, Boolean, ConstValue]
+define False {
+}
+
+[Scalar]
+define Placeholder {
+    Value Interface
+}
+
+[Scalar]
+define Tuple {
+    Elems ExprList
+}
+
+# Projections is a set of typed scalar expressions that will become output
+# columns for a containing Project operator. The private Cols field contains
+# the set of column indexes returned by the expression, as a *ColList.
+[Scalar]
+define Projections {
+    Elems ExprList
+    Cols  ColList
+}
+
+# Aggregations is a set of aggregate expressions that will become output
+# columns for a containing GroupBy operator. The private Cols field contains
+# the set of column indexes returned by the expression, as a *ColList.
+[Scalar]
+define Aggregations {
+    Aggs ExprList
+    Cols ColList
+}
+
+# Groupings is a set of grouping expressions that will become output columns
+# for a containing GroupBy operator. The GroupBy operator groups its input by
+# the value of these expressions, and may compute aggregates over the groups.
+# The private Cols field contains the set of column indexes returned by the
+# expression, as a *ColList.
+[Scalar]
+define Groupings {
+    Elems ExprList
+    Cols  ColList
+}
+
+[Scalar]
+define Exists {
+    Input Expr
+}
+
+# And is the boolean conjunction operator that evalutes to true if all of its
+# conditions evaluate to true. If the conditions list is empty, it evalutes to
+# true.
+[Scalar, Boolean]
+define And {
+    Conditions ExprList
+}
+
+# Or is the boolean disjunction operator that evalutes to true if any of its
+# conditions evaluate to true. If the conditions list is empty, it evaluates to
+# false.
+[Scalar, Boolean]
+define Or {
+    Conditions ExprList
+}
+
+# Not is the boolean negation operator that evaluates to true if its input
+# evalutes to false.
+[Scalar, Boolean]
+define Not {
+    Input Expr
+}
+
+[Scalar, Comparison]
+define Eq {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Lt {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Gt {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Le {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Ge {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Ne {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define In {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define NotIn {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Like {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define NotLike {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define ILike {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define NotILike {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define SimilarTo {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define NotSimilarTo {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define RegMatch {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define NotRegMatch {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define RegIMatch {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define NotRegIMatch {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Is {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define IsNot {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Comparison]
+define Contains {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Bitand {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Bitor {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Bitxor {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Plus {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Minus {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Mult {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Div {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define FloorDiv {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Mod {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Pow {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define Concat {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define LShift {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define RShift {
+   Left  Expr
+   Right Expr
+}
+
+[Scalar, Binary]
+define FetchVal {
+   Json  Expr
+   Index Expr
+}
+
+[Scalar, Binary]
+define FetchText {
+   Json  Expr
+   Index Expr
+}
+
+[Scalar, Binary]
+define FetchValPath {
+   Json Expr
+   Path Expr
+}
+
+[Scalar, Binary]
+define FetchTextPath {
+   Json Expr
+   Path Expr
+}
+
+[Scalar, Unary]
+define UnaryPlus {
+    Input Expr
+}
+
+[Scalar, Unary]
+define UnaryMinus {
+    Input Expr
+}
+
+[Scalar, Unary]
+define UnaryComplement {
+    Input Expr
+}
+
+[Scalar]
+define Function {
+    Args ExprList
+    Def  FuncDef
+}
