@@ -1,0 +1,48 @@
+@require "~styl/base/palette.styl"
+
+.events
+  font-family Lato-Regular
+  table
+    width 100%
+    border-collapse collapse
+    tr
+      height 39px
+      border-bottom 1px solid $table-border-color
+      &:last-child
+        border 0
+    td
+      padding-left 0
+      text-overflow ellipsis
+      overflow hidden
+
+      div
+        text-overflow ellipsis
+        overflow hidden
+
+.events__message
+  font-size 14
+  color $body-color
+  text-overflow ellipsis
+  display block
+  white-space nowrap
+  overflow hidden
+  width 180px
+
+.events__timestamp
+  font-size 12
+  color $tooltip-color
+  margin-left 20px
+  text-align right
+
+.events__more-link
+  text-align center
+  color $link-color
+  font-family Lato-Bold
+  text-transform uppercase
+  font-size 12px
+  letter-spacing 2px
+  cursor pointer
+
+  a
+    color $link-color
+    text-decoration none

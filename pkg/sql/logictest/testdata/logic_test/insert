@@ -1,0 +1,742 @@
+# LogicTest: default parallel-stmts
+
+statement error relation "kv" does not exist
+INSERT INTO kv VALUES ('a', 'b')
+
+statement ok
+CREATE TABLE kv (
+  k CHAR PRIMARY KEY,
+  v CHAR,
+  UNIQUE INDEX a (v),
+  FAMILY (k),
+  FAMILY (v)
+)
+
+query TT
+SELECT * FROM kv
+----
+
+statement ok
+INSERT INTO kv VALUES ('A')
+
+statement error missing "k" primary key column
+INSERT INTO kv (v) VALUES ('a')
+
+statement ok
+INSERT INTO kv (k) VALUES ('nil1')
+
+statement ok
+INSERT INTO kv (k) VALUES ('nil2')
+
+statement ok
+INSERT INTO kv VALUES ('nil3', NULL)
+
+statement ok
+INSERT INTO kv VALUES ('nil4', NULL)
+
+statement ok
+INSERT INTO kv (k,v) VALUES ('a', 'b'), ('c', 'd')
+
+query T
+SELECT v || 'hello' FROM [INSERT INTO kv VALUES ('e', 'f'), ('g', '') RETURNING v]
+----
+fhello
+hello
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/primary/'A' -> NULL
+output row: ['A' NULL]
+fetched: /kv/primary/'a' -> NULL
+fetched: /kv/primary/'a'/v -> 'b'
+output row: ['a' 'b']
+fetched: /kv/primary/'c' -> NULL
+fetched: /kv/primary/'c'/v -> 'd'
+output row: ['c' 'd']
+fetched: /kv/primary/'e' -> NULL
+fetched: /kv/primary/'e'/v -> 'f'
+output row: ['e' 'f']
+fetched: /kv/primary/'g' -> NULL
+fetched: /kv/primary/'g'/v -> ''
+output row: ['g' '']
+fetched: /kv/primary/'nil1' -> NULL
+output row: ['nil1' NULL]
+fetched: /kv/primary/'nil2' -> NULL
+output row: ['nil2' NULL]
+fetched: /kv/primary/'nil3' -> NULL
+output row: ['nil3' NULL]
+fetched: /kv/primary/'nil4' -> NULL
+output row: ['nil4' NULL]
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv@a]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/a/NULL -> /'A'
+output row: ['A' NULL]
+fetched: /kv/a/NULL -> /'nil1'
+output row: ['nil1' NULL]
+fetched: /kv/a/NULL -> /'nil2'
+output row: ['nil2' NULL]
+fetched: /kv/a/NULL -> /'nil3'
+output row: ['nil3' NULL]
+fetched: /kv/a/NULL -> /'nil4'
+output row: ['nil4' NULL]
+fetched: /kv/a/'' -> /'g'
+output row: ['g' '']
+fetched: /kv/a/'b' -> /'a'
+output row: ['a' 'b']
+fetched: /kv/a/'d' -> /'c'
+output row: ['c' 'd']
+fetched: /kv/a/'f' -> /'e'
+output row: ['e' 'f']
+
+statement error pgcode 23505 duplicate key value \(v\)=\('f'\) violates unique constraint "a"
+INSERT INTO kv VALUES ('h', 'f')
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/primary/'A' -> NULL
+output row: ['A' NULL]
+fetched: /kv/primary/'a' -> NULL
+fetched: /kv/primary/'a'/v -> 'b'
+output row: ['a' 'b']
+fetched: /kv/primary/'c' -> NULL
+fetched: /kv/primary/'c'/v -> 'd'
+output row: ['c' 'd']
+fetched: /kv/primary/'e' -> NULL
+fetched: /kv/primary/'e'/v -> 'f'
+output row: ['e' 'f']
+fetched: /kv/primary/'g' -> NULL
+fetched: /kv/primary/'g'/v -> ''
+output row: ['g' '']
+fetched: /kv/primary/'nil1' -> NULL
+output row: ['nil1' NULL]
+fetched: /kv/primary/'nil2' -> NULL
+output row: ['nil2' NULL]
+fetched: /kv/primary/'nil3' -> NULL
+output row: ['nil3' NULL]
+fetched: /kv/primary/'nil4' -> NULL
+output row: ['nil4' NULL]
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv@a]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/a/NULL -> /'A'
+output row: ['A' NULL]
+fetched: /kv/a/NULL -> /'nil1'
+output row: ['nil1' NULL]
+fetched: /kv/a/NULL -> /'nil2'
+output row: ['nil2' NULL]
+fetched: /kv/a/NULL -> /'nil3'
+output row: ['nil3' NULL]
+fetched: /kv/a/NULL -> /'nil4'
+output row: ['nil4' NULL]
+fetched: /kv/a/'' -> /'g'
+output row: ['g' '']
+fetched: /kv/a/'b' -> /'a'
+output row: ['a' 'b']
+fetched: /kv/a/'d' -> /'c'
+output row: ['c' 'd']
+fetched: /kv/a/'f' -> /'e'
+output row: ['e' 'f']
+
+statement ok
+INSERT INTO kv VALUES ('f', 'g')
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/primary/'A' -> NULL
+output row: ['A' NULL]
+fetched: /kv/primary/'a' -> NULL
+fetched: /kv/primary/'a'/v -> 'b'
+output row: ['a' 'b']
+fetched: /kv/primary/'c' -> NULL
+fetched: /kv/primary/'c'/v -> 'd'
+output row: ['c' 'd']
+fetched: /kv/primary/'e' -> NULL
+fetched: /kv/primary/'e'/v -> 'f'
+output row: ['e' 'f']
+fetched: /kv/primary/'f' -> NULL
+fetched: /kv/primary/'f'/v -> 'g'
+output row: ['f' 'g']
+fetched: /kv/primary/'g' -> NULL
+fetched: /kv/primary/'g'/v -> ''
+output row: ['g' '']
+fetched: /kv/primary/'nil1' -> NULL
+output row: ['nil1' NULL]
+fetched: /kv/primary/'nil2' -> NULL
+output row: ['nil2' NULL]
+fetched: /kv/primary/'nil3' -> NULL
+output row: ['nil3' NULL]
+fetched: /kv/primary/'nil4' -> NULL
+output row: ['nil4' NULL]
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv@a]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/a/NULL -> /'A'
+output row: ['A' NULL]
+fetched: /kv/a/NULL -> /'nil1'
+output row: ['nil1' NULL]
+fetched: /kv/a/NULL -> /'nil2'
+output row: ['nil2' NULL]
+fetched: /kv/a/NULL -> /'nil3'
+output row: ['nil3' NULL]
+fetched: /kv/a/NULL -> /'nil4'
+output row: ['nil4' NULL]
+fetched: /kv/a/'' -> /'g'
+output row: ['g' '']
+fetched: /kv/a/'b' -> /'a'
+output row: ['a' 'b']
+fetched: /kv/a/'d' -> /'c'
+output row: ['c' 'd']
+fetched: /kv/a/'f' -> /'e'
+output row: ['e' 'f']
+fetched: /kv/a/'g' -> /'f'
+output row: ['f' 'g']
+
+statement error duplicate key value \(v\)=\('g'\) violates unique constraint "a"
+INSERT INTO kv VALUES ('h', 'g')
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/primary/'A' -> NULL
+output row: ['A' NULL]
+fetched: /kv/primary/'a' -> NULL
+fetched: /kv/primary/'a'/v -> 'b'
+output row: ['a' 'b']
+fetched: /kv/primary/'c' -> NULL
+fetched: /kv/primary/'c'/v -> 'd'
+output row: ['c' 'd']
+fetched: /kv/primary/'e' -> NULL
+fetched: /kv/primary/'e'/v -> 'f'
+output row: ['e' 'f']
+fetched: /kv/primary/'f' -> NULL
+fetched: /kv/primary/'f'/v -> 'g'
+output row: ['f' 'g']
+fetched: /kv/primary/'g' -> NULL
+fetched: /kv/primary/'g'/v -> ''
+output row: ['g' '']
+fetched: /kv/primary/'nil1' -> NULL
+output row: ['nil1' NULL]
+fetched: /kv/primary/'nil2' -> NULL
+output row: ['nil2' NULL]
+fetched: /kv/primary/'nil3' -> NULL
+output row: ['nil3' NULL]
+fetched: /kv/primary/'nil4' -> NULL
+output row: ['nil4' NULL]
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv@a]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv/a/NULL -> /'A'
+output row: ['A' NULL]
+fetched: /kv/a/NULL -> /'nil1'
+output row: ['nil1' NULL]
+fetched: /kv/a/NULL -> /'nil2'
+output row: ['nil2' NULL]
+fetched: /kv/a/NULL -> /'nil3'
+output row: ['nil3' NULL]
+fetched: /kv/a/NULL -> /'nil4'
+output row: ['nil4' NULL]
+fetched: /kv/a/'' -> /'g'
+output row: ['g' '']
+fetched: /kv/a/'b' -> /'a'
+output row: ['a' 'b']
+fetched: /kv/a/'d' -> /'c'
+output row: ['c' 'd']
+fetched: /kv/a/'f' -> /'e'
+output row: ['e' 'f']
+fetched: /kv/a/'g' -> /'f'
+output row: ['f' 'g']
+
+query TT
+SELECT * FROM kv ORDER BY k
+----
+A     NULL
+a     b
+c     d
+e     f
+f     g
+g     ·
+nil1  NULL
+nil2  NULL
+nil3  NULL
+nil4  NULL
+
+statement ok
+CREATE TABLE kv2 (
+  k CHAR,
+  v CHAR,
+  UNIQUE INDEX a (v),
+  PRIMARY KEY (k, v)
+)
+
+statement ok
+INSERT INTO kv2 VALUES ('a', 'b'), ('c', 'd'), ('e', 'f'), ('f', 'g')
+
+query TT rowsort
+SELECT * FROM kv2
+----
+a   b
+c   d
+e   f
+f   g
+
+statement ok
+CREATE TABLE kv3 (
+  k CHAR PRIMARY KEY,
+  v CHAR NOT NULL
+)
+
+statement error null value in column "v" violates not-null constraint
+INSERT INTO kv3 VALUES ('a')
+
+statement error null value in column "v" violates not-null constraint
+INSERT INTO kv3 VALUES ('a', NULL)
+
+statement error null value in column "v" violates not-null constraint
+INSERT INTO kv3 (k) VALUES ('a')
+
+query TT
+SELECT * FROM kv3
+----
+
+statement ok
+CREATE TABLE kv4 (
+  int INT PRIMARY KEY,
+  bit BIT,
+  bool BOOLEAN,
+  char CHAR,
+  float FLOAT
+)
+
+statement error could not parse "a" as type int
+INSERT INTO kv4 (int) VALUES ('a')
+
+statement ok
+INSERT INTO kv4 (int) VALUES (1)
+
+statement error could not parse "a" as type int
+INSERT INTO kv4 (int, bit) VALUES (2, 'a')
+
+statement ok
+INSERT INTO kv4 (int, bit) VALUES (2, 1)
+
+statement error could not parse "a" as type bool
+INSERT INTO kv4 (int, bool) VALUES (3, 'a')
+
+statement ok
+INSERT INTO kv4 (int, bool) VALUES (3, true)
+
+statement error value type int doesn't match type STRING of column "char"
+INSERT INTO kv4 (int, char) VALUES (4, 1)
+
+statement ok
+INSERT INTO kv4 (int, char) VALUES (4, 'a')
+
+statement error value type int doesn't match type FLOAT of column "float"
+INSERT INTO kv4 (int, float) VALUES (5, 1::INT)
+
+statement ok
+INSERT INTO kv4 (int, float) VALUES (5, 2.3)
+
+query IIBTR rowsort
+SELECT * from kv4
+----
+1    NULL NULL NULL NULL
+2    1    NULL NULL NULL
+3    NULL true NULL NULL
+4    NULL NULL a    NULL
+5    NULL NULL NULL 2.3
+
+statement ok
+CREATE TABLE kv5 (
+  k CHAR PRIMARY KEY,
+  v CHAR,
+  UNIQUE INDEX a (v, k)
+)
+
+statement ok
+INSERT INTO kv5 VALUES ('a', NULL)
+
+statement error VALUES lists must all be the same length, expected 1 columns, found 2
+INSERT INTO kv5 VALUES ('b'), ('c', DEFAULT)
+
+query T
+SELECT message FROM [SHOW KV TRACE FOR SELECT * FROM kv5@a]
+ WHERE message LIKE 'fetched:%' OR message LIKE 'output row%'
+----
+fetched: /kv5/a/NULL/'a' -> NULL
+output row: ['a' NULL]
+
+query TT
+SELECT v, k FROM kv5@a
+----
+NULL a
+
+statement error INSERT has more expressions than target columns, 3 expressions for 2 targets
+INSERT INTO kv VALUES ('a', 'b', 'c')
+
+statement error INSERT has more expressions than target columns, 2 expressions for 1 targets
+INSERT INTO kv (k) VALUES ('a', 'b')
+
+statement error INSERT has more target columns than expressions, 1 expressions for 2 targets
+INSERT INTO kv5 (k, v) VALUES ('a')
+
+statement ok
+CREATE TABLE return (a INT DEFAULT 3, b INT)
+
+query III
+INSERT INTO return (a) VALUES (default), (8) RETURNING a, 2, a+4
+----
+3 2 7
+8 2 12
+
+query III
+INSERT INTO return (b) VALUES (default), (8) RETURNING a, a+4, b
+----
+3 7 NULL
+3 7 8
+
+# All columns returned if none specified.
+query II
+INSERT INTO return VALUES (default) RETURNING a, b
+----
+3 NULL
+
+# Test column names
+query III colnames
+INSERT INTO return VALUES (default) RETURNING a, b as C, 4
+----
+a  c     4
+3  NULL  4
+
+# Return a qualified name
+query I
+INSERT INTO return VALUES (default) RETURNING return.a
+----
+3
+
+# Can fetch rowid
+statement ok
+INSERT INTO return VALUES (default) RETURNING rowid != unique_rowid()
+
+query I colnames
+INSERT INTO return (a) VALUES (default) RETURNING b
+----
+b
+NULL
+
+query III
+INSERT INTO return (b) VALUES (1) RETURNING *, a+1
+----
+3 1 4
+
+query II colnames
+INSERT INTO return VALUES (default) RETURNING *
+----
+a b
+3 NULL
+
+query II colnames
+INSERT INTO return VALUES (1, 2), (3, 4) RETURNING return.a, b
+----
+a b
+1 2
+3 4
+
+query II colnames
+INSERT INTO return VALUES (1, 2), (3, 4) RETURNING *
+----
+a b
+1 2
+3 4
+
+# Verify we return all columns even if we don't provide a value for all of them.
+query II colnames
+INSERT INTO return VALUES (1) RETURNING *
+----
+a b
+1 NULL
+
+query II colnames
+INSERT INTO return (a) VALUES (1) RETURNING *
+----
+a b
+1 NULL
+
+statement error pq: "return.*" cannot be aliased
+INSERT INTO return VALUES (1, 2), (3, 4) RETURNING return.* as x
+
+query III colnames
+INSERT INTO return VALUES (1, 2), (3, 4) RETURNING return.*, a + b
+----
+a b a + b
+1 2 3
+3 4 7
+
+# Table alias
+statement ok
+INSERT INTO return AS r VALUES (5, 6)
+
+# TODO(knz) after #6092 is fixed
+# statement ok
+# INSERT INTO return AS r VALUES (5, 6) RETURNING r.a
+
+# #17008: allow fully-qualified table names in RETURNING clauses
+statement ok
+INSERT INTO return VALUES (5, 6) RETURNING test.return.a
+
+statement error source name "x" not found in FROM clause
+INSERT INTO return VALUES (1, 2) RETURNING x.*[1]
+
+statement error column name "x" not found
+INSERT INTO return VALUES (1, 2) RETURNING x[1]
+
+statement ok
+CREATE VIEW kview AS VALUES ('a', 'b'), ('c', 'd')
+
+query TT
+SELECT * FROM kview
+----
+a b
+c d
+
+statement error cannot run INSERT on view "kview" - views are not updateable
+INSERT INTO kview VALUES ('e', 'f')
+
+query TT
+SELECT * FROM kview
+----
+a b
+c d
+
+statement ok
+CREATE TABLE abc (
+  a INT,
+  b INT,
+  c INT,
+  PRIMARY KEY (a, b),
+  INDEX a (a)
+)
+
+statement ok
+INSERT INTO abc VALUES (1, 2, 10)
+
+# Verify we get the correct message, even though internally the ConditionalPut
+# for the index key will also fail.
+statement error pgcode 23505 duplicate key value \(a,b\)=\(1,2\) violates unique constraint "primary"
+INSERT INTO abc VALUES (1, 2, 20)
+
+statement ok
+CREATE TABLE decimal (
+  a DECIMAL PRIMARY KEY
+)
+
+statement ok
+INSERT INTO decimal VALUES (4)
+
+# Verify that the "blind" ConditionalPut optimization correctly handles a batch
+# with two CPuts of the same key.
+statement ok
+CREATE TABLE blindcput (
+  x INT,
+  v INT,
+  PRIMARY KEY (x)
+)
+
+# The optimization thresholds at 10 k/v operations, so we need at least that
+# many in one batch to trigger it.
+statement error duplicate key value \(x\)=\(1\) violates unique constraint "primary"
+INSERT INTO blindcput values (1, 1), (2, 2), (3, 3), (4, 4), (1, 5)
+
+statement ok
+CREATE TABLE nocols()
+
+statement error INSERT has more expressions than target columns, 2 expressions for 0 targets
+INSERT INTO nocols VALUES (true, default)
+
+statement error unimplemented at or near "k"
+INSERT INTO kv (kv.k) VALUES ('hello')
+
+statement error unimplemented at or near "*"
+INSERT INTO kv (k.*) VALUES ('hello')
+
+statement error unimplemented at or near "v"
+INSERT INTO kv (k.v) VALUES ('hello')
+
+
+
+statement ok
+CREATE TABLE insert_t (x INT, v INT)
+
+statement ok
+CREATE TABLE select_t (x INT, v INT)
+
+statement ok
+INSERT INTO select_t VALUES (1, 9), (8, 2), (3, 7), (6, 4)
+
+# Check that INSERT supports ORDER BY (MySQL extension)
+
+query TTT
+EXPLAIN (PLAN,EXPRS) INSERT INTO insert_t TABLE select_t ORDER BY v DESC
+----
+insert               ·          ·
+ │                   into       insert_t(x, v, rowid)
+ │                   default 0  NULL
+ │                   default 1  NULL
+ │                   default 2  unique_rowid()
+ └── sort            ·          ·
+      │              order      -v
+      └── render     ·          ·
+           │         render 0   x
+           │         render 1   v
+           └── scan  ·          ·
+·                    table      select_t@primary
+·                    spans      ALL
+
+query II
+INSERT INTO insert_t TABLE select_t ORDER BY v DESC RETURNING x, v
+----
+1  9
+3  7
+6  4
+8  2
+
+# Check that INSERT supports LIMIT (MySQL extension)
+
+statement ok
+TRUNCATE TABLE insert_t
+
+query TTT
+EXPLAIN (PLAN,EXPRS) INSERT INTO insert_t SELECT * FROM select_t LIMIT 1
+----
+insert               ·          ·
+ │                   into       insert_t(x, v, rowid)
+ │                   default 0  NULL
+ │                   default 1  NULL
+ │                   default 2  unique_rowid()
+ └── limit           ·          ·
+      │              count      1
+      └── render     ·          ·
+           │         render 0   x
+           │         render 1   v
+           └── scan  ·          ·
+·                    table      select_t@primary
+·                    spans      ALL
+·                    limit      1
+
+statement ok
+INSERT INTO insert_t SELECT * FROM select_t LIMIT 1
+
+query II
+SELECT * FROM insert_t
+----
+1  9
+
+statement ok
+TRUNCATE TABLE insert_t
+
+statement ok
+INSERT INTO insert_t (SELECT * FROM select_t LIMIT 1)
+
+query II
+SELECT * FROM insert_t
+----
+1  9
+
+# Check the grouping of LIMIT and ORDER BY
+
+query TTT
+EXPLAIN (PLAN) INSERT INTO insert_t VALUES (1,1), (2,2) LIMIT 1
+----
+insert            ·     ·
+ │                into  insert_t(x, v, rowid)
+ └── limit        ·     ·
+      └── values  ·     ·
+·                 size  2 columns, 2 rows
+
+query TTT
+EXPLAIN (PLAN) INSERT INTO insert_t VALUES (1,1), (2,2) ORDER BY 2 LIMIT 1
+----
+insert                 ·         ·
+ │                     into      insert_t(x, v, rowid)
+ └── limit             ·         ·
+      └── sort         ·         ·
+           │           order     +column2
+           │           strategy  top 1
+           └── values  ·         ·
+·                      size      2 columns, 2 rows
+
+query TTT
+EXPLAIN (PLAN) INSERT INTO insert_t (VALUES (1,1), (2,2) ORDER BY 2) LIMIT 1
+----
+insert                 ·         ·
+ │                     into      insert_t(x, v, rowid)
+ └── limit             ·         ·
+      └── sort         ·         ·
+           │           order     +column2
+           │           strategy  top 1
+           └── values  ·         ·
+·                      size      2 columns, 2 rows
+
+query TTT
+EXPLAIN (PLAN) INSERT INTO insert_t (VALUES (1,1), (2,2) ORDER BY 2 LIMIT 1)
+----
+insert                 ·         ·
+ │                     into      insert_t(x, v, rowid)
+ └── limit             ·         ·
+      └── sort         ·         ·
+           │           order     +column2
+           │           strategy  top 1
+           └── values  ·         ·
+·                      size      2 columns, 2 rows
+
+statement error pq: multiple LIMIT clauses not allowed
+EXPLAIN (PLAN) INSERT INTO insert_t (VALUES (1,1), (2,2) LIMIT 1) LIMIT 1
+
+statement error pq: multiple ORDER BY clauses not allowed
+EXPLAIN (PLAN) INSERT INTO insert_t (VALUES (1,1), (2,2) ORDER BY 2) ORDER BY 2
+
+statement error DEFAULT can only appear in a VALUES list within INSERT or on the right side of a SET
+INSERT INTO insert_t (VALUES (1, DEFAULT), (2,'BBB') LIMIT 1)
+
+statement error DEFAULT can only appear in a VALUES list within INSERT or on the right side of a SET
+INSERT INTO insert_t (VALUES (1, DEFAULT), (2,'BBB')) LIMIT 1
+
+# Check string/bytes type conflicts during insertions.
+
+statement ok
+CREATE TABLE bytes_t (
+  b BYTES PRIMARY KEY
+)
+
+statement ok
+INSERT INTO bytes_t VALUES ('byte')
+
+statement ok
+CREATE TABLE string_t (
+  s STRING PRIMARY KEY
+)
+
+statement ok
+INSERT INTO string_t VALUES ('str')
+
+query error value type string doesn't match type BYTES of column "b"
+INSERT INTO bytes_t SELECT * FROM string_t
+
+query error value type bytes doesn't match type STRING of column "s"
+INSERT INTO string_t SELECT * FROM bytes_t

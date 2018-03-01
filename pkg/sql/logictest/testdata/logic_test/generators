@@ -1,0 +1,315 @@
+# LogicTest: default parallel-stmts distsql
+
+query I colnames
+SELECT * FROM GENERATE_SERIES(1, 3)
+----
+generate_series
+1
+2
+3
+
+query T colnames
+SELECT * FROM GENERATE_SERIES('2017-11-11 00:00:00'::TIMESTAMP, '2017-11-11 03:00:00'::TIMESTAMP, '1 hour')
+----
+generate_series
+2017-11-11 00:00:00 +0000 +0000
+2017-11-11 01:00:00 +0000 +0000
+2017-11-11 02:00:00 +0000 +0000
+2017-11-11 03:00:00 +0000 +0000
+
+query T colnames
+SELECT * FROM GENERATE_SERIES('2017-11-11 03:00:00'::TIMESTAMP, '2017-11-11 00:00:00'::TIMESTAMP, '-1 hour')
+----
+generate_series
+2017-11-11 03:00:00 +0000 +0000
+2017-11-11 02:00:00 +0000 +0000
+2017-11-11 01:00:00 +0000 +0000
+2017-11-11 00:00:00 +0000 +0000
+
+query T
+SELECT * FROM GENERATE_SERIES('2017-11-11 00:00:00'::TIMESTAMP, '2017-11-11 03:00:00'::TIMESTAMP, '-1 hour')
+----
+
+query TTT
+EXPLAIN SELECT * FROM GENERATE_SERIES(1, 3)
+----
+generator  ·  ·
+
+query II colnames
+SELECT * FROM GENERATE_SERIES(1, 2), GENERATE_SERIES(1, 2)
+----
+generate_series  generate_series
+1                1
+1                2
+2                1
+2                2
+
+query TTT
+EXPLAIN SELECT * FROM GENERATE_SERIES(1, 2), GENERATE_SERIES(1, 2)
+----
+join            ·     ·
+ │              type  cross
+ ├── generator  ·     ·
+ └── generator  ·     ·
+
+query I
+SELECT * FROM GENERATE_SERIES(3, 1, -1)
+----
+3
+2
+1
+
+query I
+SELECT * FROM GENERATE_SERIES(3, 1)
+----
+
+query error step cannot be 0
+SELECT * FROM GENERATE_SERIES(1, 3, 0)
+
+query I
+SELECT * FROM PG_CATALOG.GENERATE_SERIES(1, 3)
+----
+1
+2
+3
+
+query I colnames
+SELECT * FROM GENERATE_SERIES(1, 1) AS c(x)
+----
+x
+1
+
+query II colnames
+SELECT * FROM GENERATE_SERIES(1, 1) WITH ORDINALITY
+----
+generate_series  ordinality
+1                1
+
+query II colnames
+SELECT * FROM GENERATE_SERIES(1, 1) WITH ORDINALITY AS c(x, y)
+----
+x y
+1 1
+
+query error argument of LIMIT must be type int, not type setof
+SELECT * FROM (VALUES (1)) LIMIT GENERATE_SERIES(1, 3)
+
+query I colnames
+SELECT GENERATE_SERIES(1, 2)
+----
+generate_series
+1
+2
+
+query TTT
+EXPLAIN SELECT GENERATE_SERIES(1, 3)
+----
+generator  ·  ·
+
+query II colnames
+SELECT GENERATE_SERIES(1, 2), GENERATE_SERIES(3, 4)
+----
+generate_series             generate_series
+1                           3
+1                           4
+2                           3
+2                           4
+
+query TTT
+EXPLAIN SELECT GENERATE_SERIES(1, 2), GENERATE_SERIES(1, 2)
+----
+join            ·     ·
+ │              type  cross
+ ├── generator  ·     ·
+ └── generator  ·     ·
+
+statement ok
+CREATE TABLE t (a string)
+
+statement ok
+CREATE TABLE u (b string)
+
+statement ok
+INSERT INTO t VALUES ('cat')
+
+statement ok
+INSERT INTO u VALUES ('bird')
+
+# The following two queries should have the same result. This exercises the
+# transformation that moves generator expressions in render positions to cross
+# joins.
+query TTII
+SELECT t.*, u.*, generate_series(1,2), generate_series(3, 4) FROM t, u
+----
+cat  bird  1  3
+cat  bird  1  4
+cat  bird  2  3
+cat  bird  2  4
+
+query TTT
+EXPLAIN(EXPRS) SELECT t.*, u.*, generate_series(1,2), generate_series(3, 4) FROM t, u
+----
+render                    ·         ·
+ │                        render 0  a
+ │                        render 1  b
+ │                        render 2  generate_series
+ │                        render 3  generate_series
+ └── join                 ·         ·
+      │                   type      cross
+      ├── join            ·         ·
+      │    │              type      cross
+      │    ├── join       ·         ·
+      │    │    │         type      cross
+      │    │    ├── scan  ·         ·
+      │    │    │         table     t@primary
+      │    │    │         spans     ALL
+      │    │    └── scan  ·         ·
+      │    │              table     u@primary
+      │    │              spans     ALL
+      │    └── generator  ·         ·
+      │                   expr      generate_series(1, 2)
+      └── generator       ·         ·
+·                         expr      generate_series(3, 4)
+
+query TTII
+SELECT t.*, u.*, a.*, b.* FROM t, u, generate_series(1, 2) AS a, generate_series(3, 4) AS b
+----
+cat  bird  1  3
+cat  bird  1  4
+cat  bird  2  3
+cat  bird  2  4
+
+query I
+SELECT 3 + x FROM generate_series(1,2) AS a(x)
+----
+4
+5
+
+
+query I colnames
+SELECT 3 + generate_series(1,2)
+----
+3 + generate_series(1, 2)
+4
+5
+
+query I
+SELECT 3 + (3 * generate_series(1,3))
+----
+6
+9
+12
+
+query I
+SELECT * from unnest(ARRAY[1,2])
+----
+1
+2
+
+query IT
+SELECT unnest(ARRAY[1,2]), unnest(ARRAY['a', 'b'])
+----
+1  a
+1  b
+2  a
+2  b
+
+query I
+SELECT unnest(ARRAY[3,4]) - 2
+----
+1
+2
+
+query II
+SELECT 1 + generate_series(0, 1), unnest(ARRAY[2, 4]) - 1
+----
+1  1
+1  3
+2  1
+2  3
+
+query I
+SELECT ascii(unnest(ARRAY['a', 'b', 'c']));
+----
+97
+98
+99
+
+query error pq: cannot specify two set-returning functions in the same SELECT expression
+SELECT generate_series(generate_series(1, 3), 3)
+
+query error pq: cannot specify two set-returning functions in the same SELECT expression
+SELECT generate_series(1, 3) + generate_series(1, 3)
+
+query error pq: column name "generate_series" not found
+SELECT generate_series(1, 3) FROM t WHERE generate_series > 3
+
+# Regressions for #15900: ensure that null parameters to generate_series don't
+# cause issues.
+
+query T
+SELECT * from generate_series(1, (select * from generate_series(1, 0)))
+----
+
+# The following query is designed to produce a null array argument to unnest
+# in a way that the type system can't detect before evaluation.
+query T
+SELECT unnest((select current_schemas((select isnan((select round(3.4, (select generate_series(1, 0)))))))));
+----
+
+# Regression for #18021.
+query I
+SELECT GENERATE_SERIES(9223372036854775807::int, -9223372036854775807::int, -9223372036854775807::int)
+----
+9223372036854775807
+0
+-9223372036854775807
+
+# pg_get_keywords for compatibility (#10291)
+query TTT colnames
+SELECT * FROM pg_get_keywords() WHERE word IN ('alter', 'and', 'between', 'cross') ORDER BY word
+----
+word     catcode catdesc
+alter    U       unreserved
+and      R       reserved
+between  C       unreserved (cannot be function or type name)
+cross    T       reserved (can be function or type name)
+
+# Postgres enables renaming both the source and the column name for
+# single-column generators, but not for multi-column generators.
+query IITTT colnames
+SELECT a.*, b.*, c.* FROM generate_series(1,1) a, unnest(ARRAY[1]) b, pg_get_keywords() c LIMIT 0
+----
+a  b  word  catcode  catdesc
+
+# Beware of multi-valued SRFs in render position (#19149)
+query TTT colnames
+SELECT 'a', pg_get_keywords(), 'c' LIMIT 1
+----
+'a'  pg_get_keywords              'c'
+a    ('abort','U','unreserved')  c
+
+query TTT colnames
+SELECT 'a', pg_get_keywords() b, 'c' LIMIT 1
+----
+'a'  b                            'c'
+a    ('abort','U','unreserved')  c
+
+query TTT colnames
+SELECT 'a', crdb_internal.unary_table() b, 'c' LIMIT 1
+----
+'a'  b   'c'
+a    ()  c
+
+# Regular scalar functions can be used as functions too. #22312
+query T colnames
+SELECT * FROM upper('abc')
+----
+upper
+ABC
+
+query TI colnames
+SELECT * FROM current_schema() WITH ORDINALITY AS a(b)
+----
+b    ordinality
+test 1
