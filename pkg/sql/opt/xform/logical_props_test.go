@@ -70,10 +70,9 @@ func TestLogicalSetProps(t *testing.T) {
 	a1 := f.Metadata().TableColumn(a, 1)
 	b0 := f.Metadata().TableColumn(b, 0)
 	b1 := f.Metadata().TableColumn(b, 1)
-	colMap := &opt.SetOpColMap{}
-	colMap.Left = opt.ColList{b0, b1}
-	colMap.Right = opt.ColList{a1, a0}
-	colMap.Out = opt.ColList{b0, b1}
+	colMap := &opt.ColMap{}
+	colMap.Set(int(b0), int(a1))
+	colMap.Set(int(b1), int(a0))
 
 	unionGroup := f.ConstructUnion(leftGroup, rightGroup, f.InternPrivate(colMap))
 

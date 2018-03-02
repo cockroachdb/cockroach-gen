@@ -270,11 +270,6 @@ func (ev ExprView) formatRelational(tp treeprinter.Node) {
 			colList := *ev.Private().(*opt.ColList)
 			logProps.formatColList("columns:", colList, ev.Metadata(), tp)
 
-		case opt.UnionOp, opt.IntersectOp, opt.ExceptOp,
-			opt.UnionAllOp, opt.IntersectAllOp, opt.ExceptAllOp:
-			colMap := ev.Private().(*opt.SetOpColMap)
-			logProps.formatColList("columns:", colMap.Out, ev.Metadata(), tp)
-
 		default:
 			// Fall back to writing output columns in column index order, with
 			// best guess label.
@@ -282,20 +277,11 @@ func (ev ExprView) formatRelational(tp treeprinter.Node) {
 		}
 	}
 
-	switch ev.Operator() {
 	// Special-case handling for GroupBy private; print grouping columns in
 	// addition to full set of columns.
-	case opt.GroupByOp:
+	if ev.Operator() == opt.GroupByOp {
 		groupingColSet := *ev.Private().(*opt.ColSet)
 		logProps.formatColSet("grouping columns:", groupingColSet, ev.Metadata(), tp)
-
-	// Special-case handling for set operators to show the left and right
-	// input columns that correspond to the output columns.
-	case opt.UnionOp, opt.IntersectOp, opt.ExceptOp,
-		opt.UnionAllOp, opt.IntersectAllOp, opt.ExceptAllOp:
-		colMap := ev.Private().(*opt.SetOpColMap)
-		logProps.formatColList("left columns:", colMap.Left, ev.Metadata(), tp)
-		logProps.formatColList("right columns:", colMap.Right, ev.Metadata(), tp)
 	}
 
 	if physProps.Ordering.Defined() {

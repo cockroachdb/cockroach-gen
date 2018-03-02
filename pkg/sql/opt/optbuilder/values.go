@@ -73,7 +73,10 @@ func (b *Builder) buildValuesClause(
 		b.synthesizeColumn(outScope, label, colTypes[i])
 	}
 
-	colList := colsToColList(outScope.cols)
+	colList := make(opt.ColList, len(outScope.cols))
+	for i := range outScope.cols {
+		colList[i] = outScope.cols[i].index
+	}
 	out = b.factory.ConstructValues(b.factory.InternList(rows), b.factory.InternPrivate(&colList))
 	return out, outScope
 }

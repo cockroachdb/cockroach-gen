@@ -61,8 +61,7 @@ func (f logicalPropsFactory) constructRelationalProps(ev ExprView) LogicalProps 
 		opt.RightJoinApplyOp, opt.FullJoinApplyOp, opt.SemiJoinApplyOp, opt.AntiJoinApplyOp:
 		return f.constructJoinProps(ev)
 
-	case opt.UnionOp, opt.IntersectOp, opt.ExceptOp,
-		opt.UnionAllOp, opt.IntersectAllOp, opt.ExceptAllOp:
+	case opt.UnionOp:
 		return f.constructSetProps(ev)
 
 	case opt.GroupByOp:
@@ -180,25 +179,24 @@ func (f logicalPropsFactory) constructSetProps(ev ExprView) LogicalProps {
 
 	leftProps := ev.lookupChildGroup(0).logical
 	rightProps := ev.lookupChildGroup(1).logical
-	colMap := *ev.Private().(*opt.SetOpColMap)
-	if len(colMap.Out) != len(colMap.Left) || len(colMap.Out) != len(colMap.Right) {
-		panic(fmt.Errorf("lists in SetOpColMap are not all the same length. new:%d, left:%d, right:%d",
-			len(colMap.Out), len(colMap.Left), len(colMap.Right)))
-	}
+	colMap := *ev.Private().(*opt.ColMap)
 
-	// Set the new output columns.
-	props.Relational.OutputCols = opt.ColListToSet(colMap.Out)
+	// Use left input's output columns.
+	props.Relational.OutputCols = leftProps.Relational.OutputCols
 
 	// Columns have to be not-null on both sides to be not-null in result.
-	// colMap matches columns on the left and right sides of the operator
-	// with the output columns, since OutputCols are not ordered and may
-	// not correspond to each other.
-	for i := range colMap.Out {
-		if leftProps.Relational.NotNullCols.Contains(int((colMap.Left)[i])) &&
-			rightProps.Relational.NotNullCols.Contains(int((colMap.Right)[i])) {
-			props.Relational.NotNullCols.Add(int((colMap.Out)[i]))
+	// colMap matches columns on the left side of the operator with columns on
+	// the right side, since OutputCols are not ordered and may not correspond
+	// to each other.
+	colMap.ForEach(func(key, val int) {
+		if !leftProps.Relational.NotNullCols.Contains(key) {
+			return
 		}
-	}
+		if !rightProps.Relational.NotNullCols.Contains(val) {
+			return
+		}
+		props.Relational.NotNullCols.Add(key)
+	})
 
 	return props
 }
