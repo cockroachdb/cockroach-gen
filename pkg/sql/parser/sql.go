@@ -12534,6 +12534,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 		//line sql.y:2821
 		{
+			/* SKIP DOC */
 			sqlVAL.union.val = &tree.ShowTrace{Statement: sqlDollar[5].union.stmt(), TraceType: tree.ShowTraceReplica}
 		}
 	case 520:
