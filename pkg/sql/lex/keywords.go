@@ -205,6 +205,7 @@ var Keywords = map[string]struct {
 	"off":                       {OFF, "U"},
 	"offset":                    {OFFSET, "R"},
 	"oid":                       {OID, "U"},
+	"oidvector":                 {OIDVECTOR, "U"},
 	"on":                        {ON, "R"},
 	"only":                      {ONLY, "R"},
 	"option":                    {OPTION, "U"},
