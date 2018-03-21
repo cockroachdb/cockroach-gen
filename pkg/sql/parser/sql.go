@@ -10729,7 +10729,6 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 		//line sql.y:1411
 		{
-			/* SKIP DOC */
 			sqlVAL.union.val = &tree.AlterTableSetAudit{Mode: sqlDollar[3].union.auditMode()}
 		}
 	case 133:
