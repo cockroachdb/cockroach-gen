@@ -1,0 +1,168 @@
+exec-ddl
+CREATE TABLE a (k INT PRIMARY KEY, i INT, f FLOAT, d DECIMAL, t TIME)
+----
+TABLE a
+ ├── k int not null
+ ├── i int
+ ├── f float
+ ├── d decimal
+ ├── t time
+ └── INDEX primary
+      └── k int not null
+
+# --------------------------------------------------
+# FoldPlusZero, FoldZeroPlus
+# --------------------------------------------------
+
+# Add columns to prevent NormalizeVar from swapping left and right.
+opt
+SELECT
+    (a.i + a.i) + 0, 0 + (a.i + a.i),
+    (a.f + a.f) + 0, 0 + (a.f + a.f),
+    (a.d + a.d) + 0, 0 + (a.d + a.d)
+FROM a
+----
+project
+ ├── columns: column6:6(int) column7:7(int) column8:8(float) column9:9(float) column10:10(decimal) column11:11(decimal)
+ ├── scan a
+ │    └── columns: a.i:2(int) a.f:3(float) a.d:4(decimal)
+ └── projections [outer=(2-4)]
+      ├── plus [type=int, outer=(2)]
+      │    ├── variable: a.i [type=int, outer=(2)]
+      │    └── variable: a.i [type=int, outer=(2)]
+      ├── plus [type=int, outer=(2)]
+      │    ├── variable: a.i [type=int, outer=(2)]
+      │    └── variable: a.i [type=int, outer=(2)]
+      ├── plus [type=float, outer=(3)]
+      │    ├── variable: a.f [type=float, outer=(3)]
+      │    └── variable: a.f [type=float, outer=(3)]
+      ├── plus [type=float, outer=(3)]
+      │    ├── variable: a.f [type=float, outer=(3)]
+      │    └── variable: a.f [type=float, outer=(3)]
+      ├── plus [type=decimal, outer=(4)]
+      │    ├── variable: a.d [type=decimal, outer=(4)]
+      │    └── variable: a.d [type=decimal, outer=(4)]
+      └── plus [type=decimal, outer=(4)]
+           ├── variable: a.d [type=decimal, outer=(4)]
+           └── variable: a.d [type=decimal, outer=(4)]
+
+# --------------------------------------------------
+# FoldMinusZero
+# --------------------------------------------------
+
+# Add columns to prevent NormalizeVar from swapping left and right.
+opt
+SELECT
+    (a.i + a.i) - 0,
+    (a.f + a.f) - 0,
+    (a.d + a.d) - 0
+FROM a
+----
+project
+ ├── columns: column6:6(int) column7:7(float) column8:8(decimal)
+ ├── scan a
+ │    └── columns: a.i:2(int) a.f:3(float) a.d:4(decimal)
+ └── projections [outer=(2-4)]
+      ├── plus [type=int, outer=(2)]
+      │    ├── variable: a.i [type=int, outer=(2)]
+      │    └── variable: a.i [type=int, outer=(2)]
+      ├── plus [type=float, outer=(3)]
+      │    ├── variable: a.f [type=float, outer=(3)]
+      │    └── variable: a.f [type=float, outer=(3)]
+      └── plus [type=decimal, outer=(4)]
+           ├── variable: a.d [type=decimal, outer=(4)]
+           └── variable: a.d [type=decimal, outer=(4)]
+
+# --------------------------------------------------
+# FoldMultOne, FoldOneMult
+# --------------------------------------------------
+
+# Add columns to prevent NormalizeVar from swapping left and right.
+opt
+SELECT
+    (a.i + a.i) * 1, 1 * (a.i + a.i),
+    (a.f + a.f) * 1, 1 * (a.f + a.f),
+    (a.d + a.d) * 1, 1 * (a.d + a.d)
+FROM a
+----
+project
+ ├── columns: column6:6(int) column7:7(int) column8:8(float) column9:9(float) column10:10(decimal) column11:11(decimal)
+ ├── scan a
+ │    └── columns: a.i:2(int) a.f:3(float) a.d:4(decimal)
+ └── projections [outer=(2-4)]
+      ├── plus [type=int, outer=(2)]
+      │    ├── variable: a.i [type=int, outer=(2)]
+      │    └── variable: a.i [type=int, outer=(2)]
+      ├── plus [type=int, outer=(2)]
+      │    ├── variable: a.i [type=int, outer=(2)]
+      │    └── variable: a.i [type=int, outer=(2)]
+      ├── plus [type=float, outer=(3)]
+      │    ├── variable: a.f [type=float, outer=(3)]
+      │    └── variable: a.f [type=float, outer=(3)]
+      ├── plus [type=float, outer=(3)]
+      │    ├── variable: a.f [type=float, outer=(3)]
+      │    └── variable: a.f [type=float, outer=(3)]
+      ├── plus [type=decimal, outer=(4)]
+      │    ├── variable: a.d [type=decimal, outer=(4)]
+      │    └── variable: a.d [type=decimal, outer=(4)]
+      └── plus [type=decimal, outer=(4)]
+           ├── variable: a.d [type=decimal, outer=(4)]
+           └── variable: a.d [type=decimal, outer=(4)]
+
+# --------------------------------------------------
+# FoldDivOne
+# --------------------------------------------------
+
+opt
+SELECT
+    a.i / 1,
+    a.f / 1,
+    a.d / 1
+FROM a
+----
+project
+ ├── columns: column6:6(decimal) column7:7(float) column8:8(decimal)
+ ├── scan a
+ │    └── columns: a.i:2(int) a.f:3(float) a.d:4(decimal)
+ └── projections [outer=(2-4)]
+      ├── variable: a.i [type=int, outer=(2)]
+      ├── variable: a.f [type=float, outer=(3)]
+      └── variable: a.d [type=decimal, outer=(4)]
+
+# --------------------------------------------------
+# InvertMinus
+# --------------------------------------------------
+opt
+SELECT
+    -(a.f - a.f),
+    -(a.d - a.i),
+    -(a.t - a.t)
+FROM a
+----
+project
+ ├── columns: column6:6(float) column7:7(decimal) column8:8(interval)
+ ├── scan a
+ │    └── columns: a.i:2(int) a.f:3(float) a.d:4(decimal) a.t:5(time)
+ └── projections [outer=(2-5)]
+      ├── minus [type=float, outer=(3)]
+      │    ├── variable: a.f [type=float, outer=(3)]
+      │    └── variable: a.f [type=float, outer=(3)]
+      ├── minus [type=decimal, outer=(2,4)]
+      │    ├── variable: a.i [type=int, outer=(2)]
+      │    └── variable: a.d [type=decimal, outer=(4)]
+      └── minus [type=interval, outer=(5)]
+           ├── variable: a.t [type=time, outer=(5)]
+           └── variable: a.t [type=time, outer=(5)]
+
+# --------------------------------------------------
+# EliminateUnaryMinus
+# --------------------------------------------------
+opt
+SELECT -(-a.i::int) FROM a
+----
+project
+ ├── columns: column6:6(int)
+ ├── scan a
+ │    └── columns: a.i:2(int)
+ └── projections [outer=(2)]
+      └── variable: a.i [type=int, outer=(2)]
