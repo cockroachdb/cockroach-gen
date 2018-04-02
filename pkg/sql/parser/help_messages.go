@@ -1236,7 +1236,7 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        [ OFFSET <expr> [ ROW | ROWS ] ]
 `,
 		//line sql.y: 4583
-		SeeAlso: `WEBDOCS/select.html
+		SeeAlso: `WEBDOCS/select-clause.html
 `,
 	},
 	//line sql.y: 4658
