@@ -17,6 +17,7 @@ var expectedHelpStrings = []string{
 	"BEGIN",
 	"CANCEL JOB",
 	"CANCEL QUERY",
+	"CANCEL SESSION",
 	"CANCEL",
 	"COMMIT",
 	"CREATE DATABASE",
