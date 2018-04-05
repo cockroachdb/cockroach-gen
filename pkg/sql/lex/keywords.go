@@ -141,6 +141,7 @@ var Keywords = map[string]struct {
 	"indexes":                   {INDEXES, "U"},
 	"inet":                      {INET, "U"},
 	"initially":                 {INITIALLY, "R"},
+	"inject":                    {INJECT, "U"},
 	"inner":                     {INNER, "T"},
 	"insert":                    {INSERT, "U"},
 	"int":                       {INT, "C"},
