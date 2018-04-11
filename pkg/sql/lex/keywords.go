@@ -256,7 +256,7 @@ var Keywords = map[string]struct {
 	"returning":                 {RETURNING, "R"},
 	"revoke":                    {REVOKE, "U"},
 	"right":                     {RIGHT, "T"},
-	"role":                      {ROLE, "R"},
+	"role":                      {ROLE, "U"},
 	"roles":                     {ROLES, "U"},
 	"rollback":                  {ROLLBACK, "U"},
 	"rollup":                    {ROLLUP, "U"},

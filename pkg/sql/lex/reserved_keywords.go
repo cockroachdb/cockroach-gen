@@ -129,7 +129,6 @@ var reservedKeywords = map[string]struct{}{
 	"references":        {},
 	"returning":         {},
 	"right":             {},
-	"role":              {},
 	"row":               {},
 	"select":            {},
 	"serial":            {},
