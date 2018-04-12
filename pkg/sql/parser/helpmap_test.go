@@ -75,6 +75,7 @@ var expectedHelpStrings = []string{
 	"SHOW INDEXES",
 	"SHOW JOBS",
 	"SHOW QUERIES",
+	"SHOW RANGES",
 	"SHOW ROLES",
 	"SHOW SCHEMAS",
 	"SHOW SESSION",
