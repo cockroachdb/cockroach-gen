@@ -108,6 +108,7 @@ var Keywords = map[string]struct {
 	"experimental_relocate":     {EXPERIMENTAL_RELOCATE, "U"},
 	"experimental_replica":      {EXPERIMENTAL_REPLICA, "U"},
 	"explain":                   {EXPLAIN, "U"},
+	"export":                    {EXPORT, "U"},
 	"extract":                   {EXTRACT, "C"},
 	"extract_duration":          {EXTRACT_DURATION, "C"},
 	"false":                     {FALSE, "R"},

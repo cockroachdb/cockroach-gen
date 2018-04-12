@@ -42,6 +42,7 @@ var expectedHelpStrings = []string{
 	"DROP",
 	"EXECUTE",
 	"EXPLAIN",
+	"EXPORT",
 	"GRANT",
 	"IMPORT",
 	"INSERT",
