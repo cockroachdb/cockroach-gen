@@ -303,7 +303,7 @@ var Keywords = map[string]struct {
 	"status":                    {STATUS, "U"},
 	"stdin":                     {STDIN, "U"},
 	"store":                     {STORE, "U"},
-	"stored":                    {STORED, "R"},
+	"stored":                    {STORED, "U"},
 	"storing":                   {STORING, "U"},
 	"strict":                    {STRICT, "U"},
 	"string":                    {STRING, "U"},

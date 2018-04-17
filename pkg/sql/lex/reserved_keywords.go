@@ -120,7 +120,6 @@ var reservedKeywords = map[string]struct{}{
 	"similar":           {},
 	"smallint":          {},
 	"some":              {},
-	"stored":            {},
 	"substring":         {},
 	"symmetric":         {},
 	"table":             {},
