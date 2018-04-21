@@ -126,6 +126,7 @@ var reservedKeywords = map[string]struct{}{
 	"then":              {},
 	"time":              {},
 	"timestamp":         {},
+	"timetz":            {},
 	"to":                {},
 	"trailing":          {},
 	"treat":             {},
