@@ -213,7 +213,6 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectIntoProject]
 	{
-		project := input
 		_projectExpr := _f.mem.NormExpr(input).AsProject()
 		if _projectExpr != nil {
 			input := _projectExpr.Input()
@@ -223,17 +222,17 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if !_f.isCorrelatedCols(condition, _f.synthesizedCols(project)) {
+					if _f.isBoundBy(condition, input) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoProject) {
 							_group = _f.ConstructSelect(
 								_f.projectNoCycle(_f.ConstructSelect(
 									input,
 									_f.ConstructFilters(
-										_f.extractUncorrelatedConditions(list, _f.synthesizedCols(project)),
+										_f.extractBoundConditions(list, input),
 									),
 								), projections),
 								_f.ConstructFilters(
-									_f.extractCorrelatedConditions(list, _f.synthesizedCols(project)),
+									_f.extractUnboundConditions(list, input),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -260,7 +259,7 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if !_f.isCorrelated(condition, right) {
+					if _f.isBoundBy(condition, left) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinLeft) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
@@ -269,7 +268,7 @@ func (_f *Factory) ConstructSelect(
 										memo.DynamicID(_f.ConstructSelect(
 											left,
 											_f.ConstructFilters(
-												_f.extractUncorrelatedConditions(list, _f.outputCols(right)),
+												_f.extractBoundConditions(list, left),
 											),
 										)),
 										memo.DynamicID(right),
@@ -277,7 +276,7 @@ func (_f *Factory) ConstructSelect(
 									},
 								),
 								_f.ConstructFilters(
-									_f.extractCorrelatedConditions(list, _f.outputCols(right)),
+									_f.extractUnboundConditions(list, left),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -304,7 +303,7 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if !_f.isCorrelated(condition, left) {
+					if _f.isBoundBy(condition, right) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinRight) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
@@ -314,14 +313,14 @@ func (_f *Factory) ConstructSelect(
 										memo.DynamicID(_f.ConstructSelect(
 											right,
 											_f.ConstructFilters(
-												_f.extractUncorrelatedConditions(list, _f.outputCols(left)),
+												_f.extractBoundConditions(list, right),
 											),
 										)),
 										memo.DynamicID(on),
 									},
 								),
 								_f.ConstructFilters(
-									_f.extractCorrelatedConditions(list, _f.outputCols(left)),
+									_f.extractUnboundConditions(list, right),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -368,32 +367,100 @@ func (_f *Factory) ConstructSelect(
 			input := _groupByExpr.Input()
 			aggregations := _groupByExpr.Aggregations()
 			groupingCols := _groupByExpr.GroupingCols()
-			if !_f.emptyGroupingCols(groupingCols) {
+			if !_f.isScalarGroupBy(groupingCols) {
 				_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 				if _filtersExpr != nil {
 					list := _filtersExpr.Conditions()
 					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 						condition := _item
-						if !_f.isCorrelated(condition, aggregations) {
+						if _f.isBoundBy(condition, input) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
 								_group = _f.ConstructSelect(
 									_f.ConstructGroupBy(
 										_f.ConstructSelect(
 											input,
 											_f.ConstructFilters(
-												_f.extractUncorrelatedConditions(list, _f.outputCols(aggregations)),
+												_f.extractBoundConditions(list, input),
 											),
 										),
 										aggregations,
 										groupingCols,
 									),
 									_f.ConstructFilters(
-										_f.extractCorrelatedConditions(list, _f.outputCols(aggregations)),
+										_f.extractUnboundConditions(list, input),
 									),
 								)
 								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
 									_f.appliedRule(opt.PushSelectIntoGroupBy, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectExists]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				exists := _item
+				_existsExpr := _f.mem.NormExpr(_item).AsExists()
+				if _existsExpr != nil {
+					subquery := _existsExpr.Input()
+					if _f.hasOuterCols(subquery) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
+							_group = _f.ConstructSemiJoinApply(
+								input,
+								subquery,
+								_f.ConstructFilters(
+									_f.removeListItem(list, exists),
+								),
+							)
+							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.HoistSelectExists, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectNotExists]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				exists := _item
+				_notExpr := _f.mem.NormExpr(_item).AsNot()
+				if _notExpr != nil {
+					_existsExpr := _f.mem.NormExpr(_notExpr.Input()).AsExists()
+					if _existsExpr != nil {
+						subquery := _existsExpr.Input()
+						if _f.hasOuterCols(subquery) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
+								_group = _f.ConstructAntiJoinApply(
+									_f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.removeListItem(list, exists),
+										),
+									),
+									subquery,
+									_f.ConstructTrue(),
+								)
+								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.HoistSelectNotExists, _group, 0)
 								}
 								return _group
 							}
@@ -758,18 +825,18 @@ func (_f *Factory) ConstructInnerJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, right) {
+				if _f.isBoundBy(condition, left) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructInnerJoin(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(right)),
+									_f.extractBoundConditions(list, left),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(right)),
+								_f.extractUnboundConditions(list, left),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
@@ -790,18 +857,18 @@ func (_f *Factory) ConstructInnerJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, left) {
+				if _f.isBoundBy(condition, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructInnerJoin(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(left)),
+									_f.extractBoundConditions(list, right),
 								),
 							),
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(left)),
+								_f.extractUnboundConditions(list, right),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
@@ -881,18 +948,18 @@ func (_f *Factory) ConstructLeftJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, left) {
+				if _f.isBoundBy(condition, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructLeftJoin(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(left)),
+									_f.extractBoundConditions(list, right),
 								),
 							),
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(left)),
+								_f.extractUnboundConditions(list, right),
 							),
 						)
 						_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
@@ -972,18 +1039,18 @@ func (_f *Factory) ConstructRightJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, right) {
+				if _f.isBoundBy(condition, left) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructRightJoin(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(right)),
+									_f.extractBoundConditions(list, left),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(right)),
+								_f.extractUnboundConditions(list, left),
 							),
 						)
 						_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
@@ -1115,6 +1182,70 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [PushFilterIntoJoinLeft]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				if _f.isBoundBy(condition, left) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
+						_group = _f.ConstructSemiJoin(
+							_f.ConstructSelect(
+								left,
+								_f.ConstructFilters(
+									_f.extractBoundConditions(list, left),
+								),
+							),
+							right,
+							_f.ConstructFilters(
+								_f.extractUnboundConditions(list, left),
+							),
+						)
+						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [PushFilterIntoJoinRight]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				if _f.isBoundBy(condition, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
+						_group = _f.ConstructSemiJoin(
+							left,
+							_f.ConstructSelect(
+								right,
+								_f.ConstructFilters(
+									_f.extractBoundConditions(list, right),
+								),
+							),
+							_f.ConstructFilters(
+								_f.extractUnboundConditions(list, right),
+							),
+						)
+						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_semiJoinExpr)))
 }
 
@@ -1170,6 +1301,38 @@ func (_f *Factory) ConstructAntiJoin(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [PushFilterIntoJoinRight]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				if _f.isBoundBy(condition, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
+						_group = _f.ConstructAntiJoin(
+							left,
+							_f.ConstructSelect(
+								right,
+								_f.ConstructFilters(
+									_f.extractBoundConditions(list, right),
+								),
+							),
+							_f.ConstructFilters(
+								_f.extractUnboundConditions(list, right),
+							),
+						)
+						_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -1243,18 +1406,18 @@ func (_f *Factory) ConstructInnerJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, right) {
+				if _f.isBoundBy(condition, left) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructInnerJoinApply(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(right)),
+									_f.extractBoundConditions(list, left),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(right)),
+								_f.extractUnboundConditions(list, left),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
@@ -1275,23 +1438,66 @@ func (_f *Factory) ConstructInnerJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, left) {
+				if _f.isBoundBy(condition, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructInnerJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(left)),
+									_f.extractBoundConditions(list, right),
 								),
 							),
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(left)),
+								_f.extractUnboundConditions(list, right),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.removeApply(opt.InnerJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		_selectExpr := _f.mem.NormExpr(right).AsSelect()
+		if _selectExpr != nil {
+			input := _selectExpr.Input()
+			filter := _selectExpr.Filter()
+			if _f.hasOuterCols(right) {
+				if !_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+						_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructInnerJoinApply(
+							left,
+							input,
+							_f.concatFilters(on, filter),
+						)
+						delete(_f.ruleCycles, _innerJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
 						}
 						return _group
 					}
@@ -1366,23 +1572,66 @@ func (_f *Factory) ConstructLeftJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, left) {
+				if _f.isBoundBy(condition, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructLeftJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(left)),
+									_f.extractBoundConditions(list, right),
 								),
 							),
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(left)),
+								_f.extractUnboundConditions(list, right),
 							),
 						)
 						_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.removeApply(opt.LeftJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		_selectExpr := _f.mem.NormExpr(right).AsSelect()
+		if _selectExpr != nil {
+			input := _selectExpr.Input()
+			filter := _selectExpr.Filter()
+			if _f.hasOuterCols(right) {
+				if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+						_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructLeftJoinApply(
+							left,
+							input,
+							_f.concatFilters(on, filter),
+						)
+						delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
 						}
 						return _group
 					}
@@ -1457,18 +1706,18 @@ func (_f *Factory) ConstructRightJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if !_f.isCorrelated(condition, right) {
+				if _f.isBoundBy(condition, left) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructRightJoinApply(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.extractUncorrelatedConditions(list, _f.outputCols(right)),
+									_f.extractBoundConditions(list, left),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.extractCorrelatedConditions(list, _f.outputCols(right)),
+								_f.extractUnboundConditions(list, left),
 							),
 						)
 						_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
@@ -1478,6 +1727,20 @@ func (_f *Factory) ConstructRightJoinApply(
 						return _group
 					}
 				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.removeApply(opt.RightJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -1535,6 +1798,20 @@ func (_f *Factory) ConstructFullJoinApply(
 				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.removeApply(opt.FullJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
 				}
 				return _group
 			}
@@ -1600,6 +1877,113 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [PushFilterIntoJoinLeft]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				if _f.isBoundBy(condition, left) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
+						_group = _f.ConstructSemiJoinApply(
+							_f.ConstructSelect(
+								left,
+								_f.ConstructFilters(
+									_f.extractBoundConditions(list, left),
+								),
+							),
+							right,
+							_f.ConstructFilters(
+								_f.extractUnboundConditions(list, left),
+							),
+						)
+						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [PushFilterIntoJoinRight]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				if _f.isBoundBy(condition, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
+						_group = _f.ConstructSemiJoinApply(
+							left,
+							_f.ConstructSelect(
+								right,
+								_f.ConstructFilters(
+									_f.extractBoundConditions(list, right),
+								),
+							),
+							_f.ConstructFilters(
+								_f.extractUnboundConditions(list, right),
+							),
+						)
+						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.removeApply(opt.SemiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		_selectExpr := _f.mem.NormExpr(right).AsSelect()
+		if _selectExpr != nil {
+			input := _selectExpr.Input()
+			filter := _selectExpr.Filter()
+			if _f.hasOuterCols(right) {
+				if !_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+						_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructSemiJoinApply(
+							left,
+							input,
+							_f.concatFilters(on, filter),
+						)
+						delete(_f.ruleCycles, _semiJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_semiJoinApplyExpr)))
 }
 
@@ -1655,6 +2039,81 @@ func (_f *Factory) ConstructAntiJoinApply(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [PushFilterIntoJoinRight]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				if _f.isBoundBy(condition, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
+						_group = _f.ConstructAntiJoinApply(
+							left,
+							_f.ConstructSelect(
+								right,
+								_f.ConstructFilters(
+									_f.extractBoundConditions(list, right),
+								),
+							),
+							_f.ConstructFilters(
+								_f.extractUnboundConditions(list, right),
+							),
+						)
+						_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.removeApply(opt.AntiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		_selectExpr := _f.mem.NormExpr(right).AsSelect()
+		if _selectExpr != nil {
+			input := _selectExpr.Input()
+			filter := _selectExpr.Filter()
+			if _f.hasOuterCols(right) {
+				if !_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+						_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructAntiJoinApply(
+							left,
+							input,
+							_f.concatFilters(on, filter),
+						)
+						delete(_f.ruleCycles, _antiJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -1989,48 +2448,62 @@ func (_f *Factory) ConstructMax1Row(
 }
 
 // ConstructSubquery constructs an expression for the Subquery operator.
-// Subquery is a subquery in a single-row context such as
-// `SELECT 1 = (SELECT 1)` or `SELECT (1, 'a') = (SELECT 1, 'a')`.
-// In a single-row context, the outer query is only valid if the subquery
-// returns at most one row.
+// Subquery is a subquery in a single-row context. Here are some examples:
 //
-// Subqueries in a multi-row context such as
-// `SELECT 1 IN (SELECT c FROM t)` or `SELECT (1, 'a') IN (SELECT 1, 'a')`
-// can be transformed to a single row context using the Any operator. (Note that
-// this is different from the SQL ANY operator. See the comment above the Any
-// operator for more details.)
+//   SELECT 1 = (SELECT 1)
+//   SELECT (1, 'a') = (SELECT 1, 'a')`
 //
-// We use the following transformations:
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// `<var> IN (<subquery>)`
-//    ==> `Any(SELECT <var> = x FROM (<subquery>) AS q(x))`
-//
-// `<var> NOT IN (<subquery>)`
-//    ==> `NOT Any(SELECT <var> = x FROM (<subquery>) AS q(x))`
-//
-// `<var> <comp> {SOME|ANY}(<subquery>)`
-//    ==> `Any(SELECT <var> <comp> x FROM (<subquery>) AS q(x))`
-//
-// `<var> <comp> ALL(<subquery>)`
-//    ==> `NOT Any(SELECT NOT(<var> <comp> x) FROM (<subquery>) AS q(x))`
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// In a single-row context, the outer query is only valid if the subquery returns
+// at most one row. Subqueries in a multi-row context can be transformed to a
+// single row context using the Any operator. See the comment above the Any
+// operator for more details.
 //
 // The Input field contains the subquery itself, which should be wrapped in a
 // Max1Row operator to enforce that the subquery can return at most one row
 // (Max1Row may be removed by the optimizer later if it can determine statically
-// that the subquery will always return at most one row). The Projection field
-// contains a single column representing the output of the subquery. For
-// example, `(SELECT 1, 'a')` would be represented by the following structure:
+// that the subquery will always return at most one row). In addition, the
+// subquery must project exactly one output column. If the subquery returns one
+// row, then that column is bound to the single column value in that row. If the
+// subquery returns zero rows, then that column is bound to NULL.
 //
-// (Subquery
-//   (Max1Row
-//     (Project (Values (Tuple)) (Projections (Tuple (Const 1) (Const 'a'))))
+// The Projection field contains a single expression that represents the output
+// of the Subquery operator. The expression can be of arbitrary complexity, and
+// can depend on the output column of the Input expression by using a Variable
+// operator. For example, `(SELECT 1, 'a')` would be represented by the following
+// structure:
+//
+//   (Subquery
+//     (Max1Row
+//       (Project (Values (Tuple)) (Projections (Tuple (Const 1) (Const 'a'))))
+//     )
+//     (Variable 3)
 //   )
-//   (Variable 3)
-// )
 //
-// Here Variable 3 refers to the projection from the Input,
-// (Tuple (Const 1) (Const 'a')).
+// Here Variable 3 refers to the projection from the Input expression, which is
+// (Tuple (Const 1) (Const 'a')). Here is an example with a more complex
+// Projection field, in which the Subquery evaluates to non-NULL even though its
+// Input expression returns zero rows:
+//
+//   (Subquery
+//     (Select (Scan a) (False))
+//     (IsNull (Variable 1))
+//   )
+//
+// Since the subquery returns zero rows, (Variable 1) is bound to NULL, and so
+// the IsNull operator returns True, which then becomes the final output of the
+// Subquery operator. It is equivalent to this formulation:
+//
+//   (IsNull
+//     (Subquery
+//       (Select (Scan a) (False))
+//       (Variable 1)
+//     )
+//   )
+//
+// These behaviors may seem unnecessary or arbitrary at first glance, but they're
+// designed to allow transformation rules to easily "bubble up" a subquery to the
+// root of a scalar expression tree, so that it can then be turned into one of
+// the JoinApply operators.
 func (_f *Factory) ConstructSubquery(
 	input memo.GroupID,
 	projection memo.GroupID,
@@ -2048,7 +2521,23 @@ func (_f *Factory) ConstructSubquery(
 // Any is a special operator that does not exist in SQL. However, it is very
 // similar to the SQL ANY, and can be converted to the SQL ANY operator using
 // the following transformation:
-//  `Any(<subquery>)` ==> `True = ANY(<subquery>)`
+//
+//   Any(<subquery>) ==> True = ANY(<subquery>)
+//
+// The following transformations translate from various SQL operators into the
+// Any operator:
+//
+//   <var> IN (<subquery>)
+//   ==> Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+//
+//   <var> NOT IN (<subquery>)
+//   ==> NOT Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+//
+//   <var> <comp> {SOME|ANY}(<subquery>)
+//   ==> Any(SELECT <var> <comp> x FROM (<subquery>) AS q(x))
+//
+//   <var> <comp> ALL(<subquery>)
+//   ==> NOT Any(SELECT NOT(<var> <comp> x) FROM (<subquery>) AS q(x))
 //
 // Any expects the subquery to return a single boolean column. The semantics
 // are equivalent to the SQL ANY expression above on the right: Any returns true
@@ -2223,6 +2712,45 @@ func (_f *Factory) ConstructExists(
 	_group := _f.mem.GroupByFingerprint(_existsExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [EliminateExistsProject]
+	{
+		_projectExpr := _f.mem.NormExpr(input).AsProject()
+		if _projectExpr != nil {
+			input := _projectExpr.Input()
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsProject) {
+				_group = _f.ConstructExists(
+					input,
+				)
+				_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateExistsProject, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [EliminateExistsGroupBy]
+	{
+		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
+		if _groupByExpr != nil {
+			input := _groupByExpr.Input()
+			groupingCols := _groupByExpr.GroupingCols()
+			if !_f.isScalarGroupBy(groupingCols) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
+					_group = _f.ConstructExists(
+						input,
+					)
+					_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateExistsGroupBy, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
 	}
 
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_existsExpr)))

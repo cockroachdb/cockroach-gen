@@ -37,6 +37,8 @@ const (
 	EnsureJoinFilters
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
+	DecorrelateJoin
+	TryDecorrelateSelect
 	PushLimitIntoProject
 	PushOffsetIntoProject
 	FoldPlusZero
@@ -73,6 +75,8 @@ const (
 	FoldNullNotInEmpty
 	NormalizeInConst
 	FoldInNull
+	EliminateExistsProject
+	EliminateExistsGroupBy
 	EnsureSelectFiltersAnd
 	EnsureSelectFilters
 	EliminateSelect
@@ -82,6 +86,8 @@ const (
 	PushSelectIntoJoinRight
 	MergeSelectInnerJoin
 	PushSelectIntoGroupBy
+	HoistSelectExists
+	HoistSelectNotExists
 
 	// ------------------------------------------------------------
 	// Explore Rule Names
