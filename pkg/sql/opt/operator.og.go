@@ -68,6 +68,9 @@ const (
 
 	AntiJoinOp
 
+	// LookupJoinOp represents a join between an input expression and an index.
+	LookupJoinOp
+
 	// InnerJoinApplyOp has the same join semantics as InnerJoin. However, unlike
 	// InnerJoin, it allows the right input to refer to columns projected by the
 	// left input.
@@ -486,9 +489,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-expr"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-expr"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 106, 121, 137, 152, 167, 182, 190, 195, 204, 210, 219, 232, 242, 247, 253, 261, 269, 272, 280, 285, 289, 293, 298, 309, 314, 325, 337, 343, 350, 353, 355, 358, 360, 362, 364, 366, 368, 370, 372, 378, 382, 390, 396, 406, 416, 430, 439, 452, 463, 478, 480, 486, 494, 505, 520, 536, 542, 547, 553, 557, 562, 566, 569, 578, 581, 584, 590, 597, 604, 613, 623, 637, 652, 663, 679, 683, 687, 691, 696, 704, 712, 728}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 280, 283, 291, 296, 300, 304, 309, 320, 325, 336, 348, 354, 361, 364, 366, 369, 371, 373, 375, 377, 379, 381, 383, 389, 393, 401, 407, 417, 427, 441, 450, 463, 474, 489, 491, 497, 505, 516, 531, 547, 553, 558, 564, 568, 573, 577, 580, 589, 592, 595, 601, 608, 615, 624, 634, 648, 663, 674, 690, 694, 698, 702, 707, 715, 723, 739}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -505,6 +508,7 @@ var RelationalOperators = [...]Operator{
 	FullJoinOp,
 	SemiJoinOp,
 	AntiJoinOp,
+	LookupJoinOp,
 	InnerJoinApplyOp,
 	LeftJoinApplyOp,
 	RightJoinApplyOp,

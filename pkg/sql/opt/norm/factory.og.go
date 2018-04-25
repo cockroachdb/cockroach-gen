@@ -23,6 +23,13 @@ func (_f *Factory) InternColList(val opt.ColList) memo.PrivateID {
 	return _f.mem.InternColList(val)
 }
 
+// InternLookupJoinDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternLookupJoinDef(val *memo.LookupJoinDef) memo.PrivateID {
+	return _f.mem.InternLookupJoinDef(val)
+}
+
 // InternColSet adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -1338,6 +1345,21 @@ func (_f *Factory) ConstructAntiJoin(
 	}
 
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_antiJoinExpr)))
+}
+
+// ConstructLookupJoin constructs an expression for the LookupJoin operator.
+// LookupJoin represents a join between an input expression and an index.
+func (_f *Factory) ConstructLookupJoin(
+	input memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_lookupJoinExpr := memo.MakeLookupJoinExpr(input, def)
+	_group := _f.mem.GroupByFingerprint(_lookupJoinExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_lookupJoinExpr)))
 }
 
 // ConstructInnerJoinApply constructs an expression for the InnerJoinApply operator.
@@ -6650,6 +6672,11 @@ func init() {
 	// AntiJoinOp
 	dynConstructLookup[opt.AntiJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructAntiJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
+	}
+
+	// LookupJoinOp
+	dynConstructLookup[opt.LookupJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructLookupJoin(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// InnerJoinApplyOp
