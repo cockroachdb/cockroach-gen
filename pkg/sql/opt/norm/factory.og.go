@@ -741,19 +741,19 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedValueCols]
+	// [FilterUnusedValuesCols]
 	{
 		_valuesExpr := _f.mem.NormExpr(input).AsValues()
 		if _valuesExpr != nil {
 			if _f.hasUnusedColumns(input, _f.neededCols(projections)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedValueCols) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedValuesCols) {
 					_group = _f.ConstructProject(
 						_f.filterUnusedColumns(input, _f.neededCols(projections)),
 						projections,
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedValueCols, _group, 0)
+						_f.appliedRule(opt.FilterUnusedValuesCols, _group, 0)
 					}
 					return _group
 				}
@@ -2373,6 +2373,24 @@ func (_f *Factory) ConstructLimit(
 		return _group
 	}
 
+	// [EliminateLimit]
+	{
+		_constExpr := _f.mem.NormExpr(limit).AsConst()
+		if _constExpr != nil {
+			limit := _constExpr.Value()
+			if _f.limitGeMaxRows(limit, input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateLimit) {
+					_group = input
+					_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateLimit, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	// [PushLimitIntoProject]
 	{
 		_projectExpr := _f.mem.NormExpr(input).AsProject()
@@ -2464,6 +2482,20 @@ func (_f *Factory) ConstructMax1Row(
 	_group := _f.mem.GroupByFingerprint(_max1RowExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [EliminateMax1Row]
+	{
+		if _f.hasZeroOrOneRow(input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateMax1Row) {
+				_group = input
+				_f.mem.AddAltFingerprint(_max1RowExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateMax1Row, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_max1RowExpr)))

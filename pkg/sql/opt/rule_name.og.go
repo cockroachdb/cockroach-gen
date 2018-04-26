@@ -39,8 +39,10 @@ const (
 	PushFilterIntoJoinRight
 	DecorrelateJoin
 	TryDecorrelateSelect
+	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject
+	EliminateMax1Row
 	FoldPlusZero
 	FoldZeroPlus
 	FoldMinusZero
@@ -60,7 +62,7 @@ const (
 	FilterUnusedJoinRightCols
 	FilterUnusedAggCols
 	FilterUnusedGroupByCols
-	FilterUnusedValueCols
+	FilterUnusedValuesCols
 	CommuteVar
 	CommuteConst
 	EliminateCoalesce

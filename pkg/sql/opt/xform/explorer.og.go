@@ -115,7 +115,7 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 				if _constExpr != nil {
 					limit := _constExpr.Value()
 					ordering := _rootExpr.Ordering()
-					if _e.canLimitScan(def, ordering) {
+					if _e.canLimitScan(def, limit, ordering) {
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoScan) {
 							_expr := memo.MakeScanExpr(
 								_e.limitScanDef(def, limit),
