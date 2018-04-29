@@ -88,6 +88,7 @@ const (
 	PushSelectIntoJoinRight
 	MergeSelectInnerJoin
 	PushSelectIntoGroupBy
+	NormalizeSelectAny
 	HoistSelectExists
 	HoistSelectNotExists
 

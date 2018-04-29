@@ -410,6 +410,51 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [NormalizeSelectAny]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				any := _item
+				_anyExpr := _f.mem.NormExpr(_item).AsAny()
+				if _anyExpr != nil {
+					_projectExpr := _f.mem.NormExpr(_anyExpr.Input()).AsProject()
+					if _projectExpr != nil {
+						projectInput := _projectExpr.Input()
+						_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
+						if _projectionsExpr != nil {
+							if _projectionsExpr.Elems().Length == 1 {
+								_item := _f.mem.LookupList(_projectionsExpr.Elems())[0]
+								condition := _item
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeSelectAny) {
+									_group = _f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.replaceListItem(list, any, _f.ConstructExists(
+												_f.ConstructSelect(
+													projectInput,
+													_f.ConstructFilters(
+														_f.mem.InternList([]memo.GroupID{condition}),
+													),
+												),
+											)),
+										),
+									)
+									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeSelectAny, _group, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistSelectExists]
 	{
 		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
