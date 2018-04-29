@@ -485,13 +485,51 @@ const (
 	// encapsulate a TypedExpr that is otherwise not supported by the optimizer.
 	UnsupportedExprOp
 
+	ArrayAggOp
+
+	AvgOp
+
+	BoolAndOp
+
+	BoolOrOp
+
+	ConcatAggOp
+
+	CountOp
+
+	CountRowsOp
+
+	MaxOp
+
+	MinOp
+
+	SumIntOp
+
+	SumOp
+
+	SqrDiffOp
+
+	FinalVarianceOp
+
+	FinalStdDevOp
+
+	VarianceOp
+
+	StdDevOp
+
+	XorAggOp
+
+	JsonAggOp
+
+	JsonbAggOp
+
 	// NumOperators tracks the total count of operators.
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-expr"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-difffinal-variancefinal-std-devvariancestd-devxor-aggjson-aggjsonb-agg"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 280, 283, 291, 296, 300, 304, 309, 320, 325, 336, 348, 354, 361, 364, 366, 369, 371, 373, 375, 377, 379, 381, 383, 389, 393, 401, 407, 417, 427, 441, 450, 463, 474, 489, 491, 497, 505, 516, 531, 547, 553, 558, 564, 568, 573, 577, 580, 589, 592, 595, 601, 608, 615, 624, 634, 648, 663, 674, 690, 694, 698, 702, 707, 715, 723, 739}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 280, 283, 291, 296, 300, 304, 309, 320, 325, 336, 348, 354, 361, 364, 366, 369, 371, 373, 375, 377, 379, 381, 383, 389, 393, 401, 407, 417, 427, 441, 450, 463, 474, 489, 491, 497, 505, 516, 531, 547, 553, 558, 564, 568, 573, 577, 580, 589, 592, 595, 601, 608, 615, 624, 634, 648, 663, 674, 690, 694, 698, 702, 707, 715, 723, 739, 748, 751, 759, 766, 776, 781, 791, 794, 797, 804, 807, 815, 829, 842, 850, 857, 864, 872, 881}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -618,6 +656,25 @@ var ScalarOperators = [...]Operator{
 	FunctionOp,
 	CoalesceOp,
 	UnsupportedExprOp,
+	ArrayAggOp,
+	AvgOp,
+	BoolAndOp,
+	BoolOrOp,
+	ConcatAggOp,
+	CountOp,
+	CountRowsOp,
+	MaxOp,
+	MinOp,
+	SumIntOp,
+	SumOp,
+	SqrDiffOp,
+	FinalVarianceOp,
+	FinalStdDevOp,
+	VarianceOp,
+	StdDevOp,
+	XorAggOp,
+	JsonAggOp,
+	JsonbAggOp,
 }
 
 var ConstValueOperators = [...]Operator{
@@ -686,4 +743,26 @@ var BinaryOperators = [...]Operator{
 var UnaryOperators = [...]Operator{
 	UnaryMinusOp,
 	UnaryComplementOp,
+}
+
+var AggregateOperators = [...]Operator{
+	ArrayAggOp,
+	AvgOp,
+	BoolAndOp,
+	BoolOrOp,
+	ConcatAggOp,
+	CountOp,
+	CountRowsOp,
+	MaxOp,
+	MinOp,
+	SumIntOp,
+	SumOp,
+	SqrDiffOp,
+	FinalVarianceOp,
+	FinalStdDevOp,
+	VarianceOp,
+	StdDevOp,
+	XorAggOp,
+	JsonAggOp,
+	JsonbAggOp,
 }

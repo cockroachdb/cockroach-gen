@@ -104,6 +104,25 @@ var opLayoutTable = [...]opLayout{
 	opt.FunctionOp:        makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.CoalesceOp:        makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
 	opt.UnsupportedExprOp: makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
+	opt.ArrayAggOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.AvgOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.BoolAndOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.BoolOrOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.ConcatAggOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.CountOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.CountRowsOp:       makeOpLayout(0 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.MaxOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.MinOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.SumIntOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.SumOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.SqrDiffOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.FinalVarianceOp:   makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.FinalStdDevOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.VarianceOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.StdDevOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.XorAggOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.JsonAggOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.JsonbAggOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -203,6 +222,25 @@ var isEnforcerLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -302,6 +340,25 @@ var isRelationalLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isJoinLookup = [...]bool{
@@ -401,6 +458,25 @@ var isJoinLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -500,6 +576,25 @@ var isJoinApplyLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isScalarLookup = [...]bool{
@@ -599,6 +694,25 @@ var isScalarLookup = [...]bool{
 	opt.FunctionOp:        true,
 	opt.CoalesceOp:        true,
 	opt.UnsupportedExprOp: true,
+	opt.ArrayAggOp:        true,
+	opt.AvgOp:             true,
+	opt.BoolAndOp:         true,
+	opt.BoolOrOp:          true,
+	opt.ConcatAggOp:       true,
+	opt.CountOp:           true,
+	opt.CountRowsOp:       true,
+	opt.MaxOp:             true,
+	opt.MinOp:             true,
+	opt.SumIntOp:          true,
+	opt.SumOp:             true,
+	opt.SqrDiffOp:         true,
+	opt.FinalVarianceOp:   true,
+	opt.FinalStdDevOp:     true,
+	opt.VarianceOp:        true,
+	opt.StdDevOp:          true,
+	opt.XorAggOp:          true,
+	opt.JsonAggOp:         true,
+	opt.JsonbAggOp:        true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -698,6 +812,25 @@ var isConstValueLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -797,6 +930,25 @@ var isBooleanLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -896,6 +1048,25 @@ var isComparisonLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -995,6 +1166,25 @@ var isBinaryLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1094,6 +1284,143 @@ var isUnaryLookup = [...]bool{
 	opt.FunctionOp:        false,
 	opt.CoalesceOp:        false,
 	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        false,
+	opt.AvgOp:             false,
+	opt.BoolAndOp:         false,
+	opt.BoolOrOp:          false,
+	opt.ConcatAggOp:       false,
+	opt.CountOp:           false,
+	opt.CountRowsOp:       false,
+	opt.MaxOp:             false,
+	opt.MinOp:             false,
+	opt.SumIntOp:          false,
+	opt.SumOp:             false,
+	opt.SqrDiffOp:         false,
+	opt.FinalVarianceOp:   false,
+	opt.FinalStdDevOp:     false,
+	opt.VarianceOp:        false,
+	opt.StdDevOp:          false,
+	opt.XorAggOp:          false,
+	opt.JsonAggOp:         false,
+	opt.JsonbAggOp:        false,
+}
+
+var isAggregateLookup = [...]bool{
+	opt.UnknownOp: false,
+
+	opt.SortOp:            false,
+	opt.ScanOp:            false,
+	opt.ValuesOp:          false,
+	opt.SelectOp:          false,
+	opt.ProjectOp:         false,
+	opt.InnerJoinOp:       false,
+	opt.LeftJoinOp:        false,
+	opt.RightJoinOp:       false,
+	opt.FullJoinOp:        false,
+	opt.SemiJoinOp:        false,
+	opt.AntiJoinOp:        false,
+	opt.LookupJoinOp:      false,
+	opt.InnerJoinApplyOp:  false,
+	opt.LeftJoinApplyOp:   false,
+	opt.RightJoinApplyOp:  false,
+	opt.FullJoinApplyOp:   false,
+	opt.SemiJoinApplyOp:   false,
+	opt.AntiJoinApplyOp:   false,
+	opt.GroupByOp:         false,
+	opt.UnionOp:           false,
+	opt.IntersectOp:       false,
+	opt.ExceptOp:          false,
+	opt.UnionAllOp:        false,
+	opt.IntersectAllOp:    false,
+	opt.ExceptAllOp:       false,
+	opt.LimitOp:           false,
+	opt.OffsetOp:          false,
+	opt.Max1RowOp:         false,
+	opt.SubqueryOp:        false,
+	opt.AnyOp:             false,
+	opt.VariableOp:        false,
+	opt.ConstOp:           false,
+	opt.NullOp:            false,
+	opt.TrueOp:            false,
+	opt.FalseOp:           false,
+	opt.PlaceholderOp:     false,
+	opt.TupleOp:           false,
+	opt.ProjectionsOp:     false,
+	opt.AggregationsOp:    false,
+	opt.ExistsOp:          false,
+	opt.FiltersOp:         false,
+	opt.AndOp:             false,
+	opt.OrOp:              false,
+	opt.NotOp:             false,
+	opt.EqOp:              false,
+	opt.LtOp:              false,
+	opt.GtOp:              false,
+	opt.LeOp:              false,
+	opt.GeOp:              false,
+	opt.NeOp:              false,
+	opt.InOp:              false,
+	opt.NotInOp:           false,
+	opt.LikeOp:            false,
+	opt.NotLikeOp:         false,
+	opt.ILikeOp:           false,
+	opt.NotILikeOp:        false,
+	opt.SimilarToOp:       false,
+	opt.NotSimilarToOp:    false,
+	opt.RegMatchOp:        false,
+	opt.NotRegMatchOp:     false,
+	opt.RegIMatchOp:       false,
+	opt.NotRegIMatchOp:    false,
+	opt.IsOp:              false,
+	opt.IsNotOp:           false,
+	opt.ContainsOp:        false,
+	opt.JsonExistsOp:      false,
+	opt.JsonAllExistsOp:   false,
+	opt.JsonSomeExistsOp:  false,
+	opt.BitandOp:          false,
+	opt.BitorOp:           false,
+	opt.BitxorOp:          false,
+	opt.PlusOp:            false,
+	opt.MinusOp:           false,
+	opt.MultOp:            false,
+	opt.DivOp:             false,
+	opt.FloorDivOp:        false,
+	opt.ModOp:             false,
+	opt.PowOp:             false,
+	opt.ConcatOp:          false,
+	opt.LShiftOp:          false,
+	opt.RShiftOp:          false,
+	opt.FetchValOp:        false,
+	opt.FetchTextOp:       false,
+	opt.FetchValPathOp:    false,
+	opt.FetchTextPathOp:   false,
+	opt.UnaryMinusOp:      false,
+	opt.UnaryComplementOp: false,
+	opt.CastOp:            false,
+	opt.CaseOp:            false,
+	opt.WhenOp:            false,
+	opt.ArrayOp:           false,
+	opt.FunctionOp:        false,
+	opt.CoalesceOp:        false,
+	opt.UnsupportedExprOp: false,
+	opt.ArrayAggOp:        true,
+	opt.AvgOp:             true,
+	opt.BoolAndOp:         true,
+	opt.BoolOrOp:          true,
+	opt.ConcatAggOp:       true,
+	opt.CountOp:           true,
+	opt.CountRowsOp:       true,
+	opt.MaxOp:             true,
+	opt.MinOp:             true,
+	opt.SumIntOp:          true,
+	opt.SumOp:             true,
+	opt.SqrDiffOp:         true,
+	opt.FinalVarianceOp:   true,
+	opt.FinalStdDevOp:     true,
+	opt.VarianceOp:        true,
+	opt.StdDevOp:          true,
+	opt.XorAggOp:          true,
+	opt.JsonAggOp:         true,
+	opt.JsonbAggOp:        true,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -1136,6 +1463,10 @@ func (ev ExprView) IsUnary() bool {
 	return isUnaryLookup[ev.op]
 }
 
+func (ev ExprView) IsAggregate() bool {
+	return isAggregateLookup[ev.op]
+}
+
 func (e *Expr) IsEnforcer() bool {
 	return isEnforcerLookup[e.op]
 }
@@ -1174,6 +1505,10 @@ func (e *Expr) IsBinary() bool {
 
 func (e *Expr) IsUnary() bool {
 	return isUnaryLookup[e.op]
+}
+
+func (e *Expr) IsAggregate() bool {
+	return isAggregateLookup[e.op]
 }
 
 // ScanExpr returns a result set containing every row in the specified table, by
@@ -3776,6 +4111,401 @@ func (e *Expr) AsUnsupportedExpr() *UnsupportedExprExpr {
 	return (*UnsupportedExprExpr)(e)
 }
 
+type ArrayAggExpr Expr
+
+func MakeArrayAggExpr(input GroupID) ArrayAggExpr {
+	return ArrayAggExpr{op: opt.ArrayAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *ArrayAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *ArrayAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsArrayAgg() *ArrayAggExpr {
+	if e.op != opt.ArrayAggOp {
+		return nil
+	}
+	return (*ArrayAggExpr)(e)
+}
+
+type AvgExpr Expr
+
+func MakeAvgExpr(input GroupID) AvgExpr {
+	return AvgExpr{op: opt.AvgOp, state: exprState{uint32(input)}}
+}
+
+func (e *AvgExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *AvgExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsAvg() *AvgExpr {
+	if e.op != opt.AvgOp {
+		return nil
+	}
+	return (*AvgExpr)(e)
+}
+
+type BoolAndExpr Expr
+
+func MakeBoolAndExpr(input GroupID) BoolAndExpr {
+	return BoolAndExpr{op: opt.BoolAndOp, state: exprState{uint32(input)}}
+}
+
+func (e *BoolAndExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *BoolAndExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsBoolAnd() *BoolAndExpr {
+	if e.op != opt.BoolAndOp {
+		return nil
+	}
+	return (*BoolAndExpr)(e)
+}
+
+type BoolOrExpr Expr
+
+func MakeBoolOrExpr(input GroupID) BoolOrExpr {
+	return BoolOrExpr{op: opt.BoolOrOp, state: exprState{uint32(input)}}
+}
+
+func (e *BoolOrExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *BoolOrExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsBoolOr() *BoolOrExpr {
+	if e.op != opt.BoolOrOp {
+		return nil
+	}
+	return (*BoolOrExpr)(e)
+}
+
+type ConcatAggExpr Expr
+
+func MakeConcatAggExpr(input GroupID) ConcatAggExpr {
+	return ConcatAggExpr{op: opt.ConcatAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *ConcatAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *ConcatAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsConcatAgg() *ConcatAggExpr {
+	if e.op != opt.ConcatAggOp {
+		return nil
+	}
+	return (*ConcatAggExpr)(e)
+}
+
+type CountExpr Expr
+
+func MakeCountExpr(input GroupID) CountExpr {
+	return CountExpr{op: opt.CountOp, state: exprState{uint32(input)}}
+}
+
+func (e *CountExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *CountExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsCount() *CountExpr {
+	if e.op != opt.CountOp {
+		return nil
+	}
+	return (*CountExpr)(e)
+}
+
+type CountRowsExpr Expr
+
+func MakeCountRowsExpr() CountRowsExpr {
+	return CountRowsExpr{op: opt.CountRowsOp, state: exprState{}}
+}
+
+func (e *CountRowsExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsCountRows() *CountRowsExpr {
+	if e.op != opt.CountRowsOp {
+		return nil
+	}
+	return (*CountRowsExpr)(e)
+}
+
+type MaxExpr Expr
+
+func MakeMaxExpr(input GroupID) MaxExpr {
+	return MaxExpr{op: opt.MaxOp, state: exprState{uint32(input)}}
+}
+
+func (e *MaxExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *MaxExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsMax() *MaxExpr {
+	if e.op != opt.MaxOp {
+		return nil
+	}
+	return (*MaxExpr)(e)
+}
+
+type MinExpr Expr
+
+func MakeMinExpr(input GroupID) MinExpr {
+	return MinExpr{op: opt.MinOp, state: exprState{uint32(input)}}
+}
+
+func (e *MinExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *MinExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsMin() *MinExpr {
+	if e.op != opt.MinOp {
+		return nil
+	}
+	return (*MinExpr)(e)
+}
+
+type SumIntExpr Expr
+
+func MakeSumIntExpr(input GroupID) SumIntExpr {
+	return SumIntExpr{op: opt.SumIntOp, state: exprState{uint32(input)}}
+}
+
+func (e *SumIntExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *SumIntExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsSumInt() *SumIntExpr {
+	if e.op != opt.SumIntOp {
+		return nil
+	}
+	return (*SumIntExpr)(e)
+}
+
+type SumExpr Expr
+
+func MakeSumExpr(input GroupID) SumExpr {
+	return SumExpr{op: opt.SumOp, state: exprState{uint32(input)}}
+}
+
+func (e *SumExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *SumExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsSum() *SumExpr {
+	if e.op != opt.SumOp {
+		return nil
+	}
+	return (*SumExpr)(e)
+}
+
+type SqrDiffExpr Expr
+
+func MakeSqrDiffExpr(input GroupID) SqrDiffExpr {
+	return SqrDiffExpr{op: opt.SqrDiffOp, state: exprState{uint32(input)}}
+}
+
+func (e *SqrDiffExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *SqrDiffExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsSqrDiff() *SqrDiffExpr {
+	if e.op != opt.SqrDiffOp {
+		return nil
+	}
+	return (*SqrDiffExpr)(e)
+}
+
+type FinalVarianceExpr Expr
+
+func MakeFinalVarianceExpr(input GroupID) FinalVarianceExpr {
+	return FinalVarianceExpr{op: opt.FinalVarianceOp, state: exprState{uint32(input)}}
+}
+
+func (e *FinalVarianceExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *FinalVarianceExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsFinalVariance() *FinalVarianceExpr {
+	if e.op != opt.FinalVarianceOp {
+		return nil
+	}
+	return (*FinalVarianceExpr)(e)
+}
+
+type FinalStdDevExpr Expr
+
+func MakeFinalStdDevExpr(input GroupID) FinalStdDevExpr {
+	return FinalStdDevExpr{op: opt.FinalStdDevOp, state: exprState{uint32(input)}}
+}
+
+func (e *FinalStdDevExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *FinalStdDevExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsFinalStdDev() *FinalStdDevExpr {
+	if e.op != opt.FinalStdDevOp {
+		return nil
+	}
+	return (*FinalStdDevExpr)(e)
+}
+
+type VarianceExpr Expr
+
+func MakeVarianceExpr(input GroupID) VarianceExpr {
+	return VarianceExpr{op: opt.VarianceOp, state: exprState{uint32(input)}}
+}
+
+func (e *VarianceExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *VarianceExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsVariance() *VarianceExpr {
+	if e.op != opt.VarianceOp {
+		return nil
+	}
+	return (*VarianceExpr)(e)
+}
+
+type StdDevExpr Expr
+
+func MakeStdDevExpr(input GroupID) StdDevExpr {
+	return StdDevExpr{op: opt.StdDevOp, state: exprState{uint32(input)}}
+}
+
+func (e *StdDevExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *StdDevExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsStdDev() *StdDevExpr {
+	if e.op != opt.StdDevOp {
+		return nil
+	}
+	return (*StdDevExpr)(e)
+}
+
+type XorAggExpr Expr
+
+func MakeXorAggExpr(input GroupID) XorAggExpr {
+	return XorAggExpr{op: opt.XorAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *XorAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *XorAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsXorAgg() *XorAggExpr {
+	if e.op != opt.XorAggOp {
+		return nil
+	}
+	return (*XorAggExpr)(e)
+}
+
+type JsonAggExpr Expr
+
+func MakeJsonAggExpr(input GroupID) JsonAggExpr {
+	return JsonAggExpr{op: opt.JsonAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *JsonAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *JsonAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsJsonAgg() *JsonAggExpr {
+	if e.op != opt.JsonAggOp {
+		return nil
+	}
+	return (*JsonAggExpr)(e)
+}
+
+type JsonbAggExpr Expr
+
+func MakeJsonbAggExpr(input GroupID) JsonbAggExpr {
+	return JsonbAggExpr{op: opt.JsonbAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *JsonbAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *JsonbAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
+	if e.op != opt.JsonbAggOp {
+		return nil
+	}
+	return (*JsonbAggExpr)(e)
+}
+
 // InternScanOpDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -4326,6 +5056,101 @@ func init() {
 	// UnsupportedExprOp
 	makeExprLookup[opt.UnsupportedExprOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeUnsupportedExprExpr(PrivateID(operands[0])))
+	}
+
+	// ArrayAggOp
+	makeExprLookup[opt.ArrayAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeArrayAggExpr(GroupID(operands[0])))
+	}
+
+	// AvgOp
+	makeExprLookup[opt.AvgOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeAvgExpr(GroupID(operands[0])))
+	}
+
+	// BoolAndOp
+	makeExprLookup[opt.BoolAndOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeBoolAndExpr(GroupID(operands[0])))
+	}
+
+	// BoolOrOp
+	makeExprLookup[opt.BoolOrOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeBoolOrExpr(GroupID(operands[0])))
+	}
+
+	// ConcatAggOp
+	makeExprLookup[opt.ConcatAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeConcatAggExpr(GroupID(operands[0])))
+	}
+
+	// CountOp
+	makeExprLookup[opt.CountOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeCountExpr(GroupID(operands[0])))
+	}
+
+	// CountRowsOp
+	makeExprLookup[opt.CountRowsOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeCountRowsExpr())
+	}
+
+	// MaxOp
+	makeExprLookup[opt.MaxOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeMaxExpr(GroupID(operands[0])))
+	}
+
+	// MinOp
+	makeExprLookup[opt.MinOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeMinExpr(GroupID(operands[0])))
+	}
+
+	// SumIntOp
+	makeExprLookup[opt.SumIntOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeSumIntExpr(GroupID(operands[0])))
+	}
+
+	// SumOp
+	makeExprLookup[opt.SumOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeSumExpr(GroupID(operands[0])))
+	}
+
+	// SqrDiffOp
+	makeExprLookup[opt.SqrDiffOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeSqrDiffExpr(GroupID(operands[0])))
+	}
+
+	// FinalVarianceOp
+	makeExprLookup[opt.FinalVarianceOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeFinalVarianceExpr(GroupID(operands[0])))
+	}
+
+	// FinalStdDevOp
+	makeExprLookup[opt.FinalStdDevOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeFinalStdDevExpr(GroupID(operands[0])))
+	}
+
+	// VarianceOp
+	makeExprLookup[opt.VarianceOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeVarianceExpr(GroupID(operands[0])))
+	}
+
+	// StdDevOp
+	makeExprLookup[opt.StdDevOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeStdDevExpr(GroupID(operands[0])))
+	}
+
+	// XorAggOp
+	makeExprLookup[opt.XorAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeXorAggExpr(GroupID(operands[0])))
+	}
+
+	// JsonAggOp
+	makeExprLookup[opt.JsonAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeJsonAggExpr(GroupID(operands[0])))
+	}
+
+	// JsonbAggOp
+	makeExprLookup[opt.JsonbAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeJsonbAggExpr(GroupID(operands[0])))
 	}
 
 }

@@ -6691,6 +6691,251 @@ func (_f *Factory) ConstructUnsupportedExpr(
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_unsupportedExprExpr)))
 }
 
+// ConstructArrayAgg constructs an expression for the ArrayAgg operator.
+func (_f *Factory) ConstructArrayAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_arrayAggExpr := memo.MakeArrayAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_arrayAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_arrayAggExpr)))
+}
+
+// ConstructAvg constructs an expression for the Avg operator.
+func (_f *Factory) ConstructAvg(
+	input memo.GroupID,
+) memo.GroupID {
+	_avgExpr := memo.MakeAvgExpr(input)
+	_group := _f.mem.GroupByFingerprint(_avgExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_avgExpr)))
+}
+
+// ConstructBoolAnd constructs an expression for the BoolAnd operator.
+func (_f *Factory) ConstructBoolAnd(
+	input memo.GroupID,
+) memo.GroupID {
+	_boolAndExpr := memo.MakeBoolAndExpr(input)
+	_group := _f.mem.GroupByFingerprint(_boolAndExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_boolAndExpr)))
+}
+
+// ConstructBoolOr constructs an expression for the BoolOr operator.
+func (_f *Factory) ConstructBoolOr(
+	input memo.GroupID,
+) memo.GroupID {
+	_boolOrExpr := memo.MakeBoolOrExpr(input)
+	_group := _f.mem.GroupByFingerprint(_boolOrExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_boolOrExpr)))
+}
+
+// ConstructConcatAgg constructs an expression for the ConcatAgg operator.
+func (_f *Factory) ConstructConcatAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_concatAggExpr := memo.MakeConcatAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_concatAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_concatAggExpr)))
+}
+
+// ConstructCount constructs an expression for the Count operator.
+func (_f *Factory) ConstructCount(
+	input memo.GroupID,
+) memo.GroupID {
+	_countExpr := memo.MakeCountExpr(input)
+	_group := _f.mem.GroupByFingerprint(_countExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_countExpr)))
+}
+
+// ConstructCountRows constructs an expression for the CountRows operator.
+func (_f *Factory) ConstructCountRows() memo.GroupID {
+	_countRowsExpr := memo.MakeCountRowsExpr()
+	_group := _f.mem.GroupByFingerprint(_countRowsExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_countRowsExpr)))
+}
+
+// ConstructMax constructs an expression for the Max operator.
+func (_f *Factory) ConstructMax(
+	input memo.GroupID,
+) memo.GroupID {
+	_maxExpr := memo.MakeMaxExpr(input)
+	_group := _f.mem.GroupByFingerprint(_maxExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_maxExpr)))
+}
+
+// ConstructMin constructs an expression for the Min operator.
+func (_f *Factory) ConstructMin(
+	input memo.GroupID,
+) memo.GroupID {
+	_minExpr := memo.MakeMinExpr(input)
+	_group := _f.mem.GroupByFingerprint(_minExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_minExpr)))
+}
+
+// ConstructSumInt constructs an expression for the SumInt operator.
+func (_f *Factory) ConstructSumInt(
+	input memo.GroupID,
+) memo.GroupID {
+	_sumIntExpr := memo.MakeSumIntExpr(input)
+	_group := _f.mem.GroupByFingerprint(_sumIntExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_sumIntExpr)))
+}
+
+// ConstructSum constructs an expression for the Sum operator.
+func (_f *Factory) ConstructSum(
+	input memo.GroupID,
+) memo.GroupID {
+	_sumExpr := memo.MakeSumExpr(input)
+	_group := _f.mem.GroupByFingerprint(_sumExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_sumExpr)))
+}
+
+// ConstructSqrDiff constructs an expression for the SqrDiff operator.
+func (_f *Factory) ConstructSqrDiff(
+	input memo.GroupID,
+) memo.GroupID {
+	_sqrDiffExpr := memo.MakeSqrDiffExpr(input)
+	_group := _f.mem.GroupByFingerprint(_sqrDiffExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_sqrDiffExpr)))
+}
+
+// ConstructFinalVariance constructs an expression for the FinalVariance operator.
+func (_f *Factory) ConstructFinalVariance(
+	input memo.GroupID,
+) memo.GroupID {
+	_finalVarianceExpr := memo.MakeFinalVarianceExpr(input)
+	_group := _f.mem.GroupByFingerprint(_finalVarianceExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_finalVarianceExpr)))
+}
+
+// ConstructFinalStdDev constructs an expression for the FinalStdDev operator.
+func (_f *Factory) ConstructFinalStdDev(
+	input memo.GroupID,
+) memo.GroupID {
+	_finalStdDevExpr := memo.MakeFinalStdDevExpr(input)
+	_group := _f.mem.GroupByFingerprint(_finalStdDevExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_finalStdDevExpr)))
+}
+
+// ConstructVariance constructs an expression for the Variance operator.
+func (_f *Factory) ConstructVariance(
+	input memo.GroupID,
+) memo.GroupID {
+	_varianceExpr := memo.MakeVarianceExpr(input)
+	_group := _f.mem.GroupByFingerprint(_varianceExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_varianceExpr)))
+}
+
+// ConstructStdDev constructs an expression for the StdDev operator.
+func (_f *Factory) ConstructStdDev(
+	input memo.GroupID,
+) memo.GroupID {
+	_stdDevExpr := memo.MakeStdDevExpr(input)
+	_group := _f.mem.GroupByFingerprint(_stdDevExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_stdDevExpr)))
+}
+
+// ConstructXorAgg constructs an expression for the XorAgg operator.
+func (_f *Factory) ConstructXorAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_xorAggExpr := memo.MakeXorAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_xorAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_xorAggExpr)))
+}
+
+// ConstructJsonAgg constructs an expression for the JsonAgg operator.
+func (_f *Factory) ConstructJsonAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_jsonAggExpr := memo.MakeJsonAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_jsonAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonAggExpr)))
+}
+
+// ConstructJsonbAgg constructs an expression for the JsonbAgg operator.
+func (_f *Factory) ConstructJsonbAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_jsonbAggExpr := memo.MakeJsonbAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_jsonbAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonbAggExpr)))
+}
+
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
 
 var dynConstructLookup [opt.NumOperators]dynConstructFunc
@@ -7164,6 +7409,101 @@ func init() {
 	// UnsupportedExprOp
 	dynConstructLookup[opt.UnsupportedExprOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructUnsupportedExpr(memo.PrivateID(operands[0]))
+	}
+
+	// ArrayAggOp
+	dynConstructLookup[opt.ArrayAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructArrayAgg(memo.GroupID(operands[0]))
+	}
+
+	// AvgOp
+	dynConstructLookup[opt.AvgOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructAvg(memo.GroupID(operands[0]))
+	}
+
+	// BoolAndOp
+	dynConstructLookup[opt.BoolAndOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructBoolAnd(memo.GroupID(operands[0]))
+	}
+
+	// BoolOrOp
+	dynConstructLookup[opt.BoolOrOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructBoolOr(memo.GroupID(operands[0]))
+	}
+
+	// ConcatAggOp
+	dynConstructLookup[opt.ConcatAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructConcatAgg(memo.GroupID(operands[0]))
+	}
+
+	// CountOp
+	dynConstructLookup[opt.CountOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructCount(memo.GroupID(operands[0]))
+	}
+
+	// CountRowsOp
+	dynConstructLookup[opt.CountRowsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructCountRows()
+	}
+
+	// MaxOp
+	dynConstructLookup[opt.MaxOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructMax(memo.GroupID(operands[0]))
+	}
+
+	// MinOp
+	dynConstructLookup[opt.MinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructMin(memo.GroupID(operands[0]))
+	}
+
+	// SumIntOp
+	dynConstructLookup[opt.SumIntOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructSumInt(memo.GroupID(operands[0]))
+	}
+
+	// SumOp
+	dynConstructLookup[opt.SumOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructSum(memo.GroupID(operands[0]))
+	}
+
+	// SqrDiffOp
+	dynConstructLookup[opt.SqrDiffOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructSqrDiff(memo.GroupID(operands[0]))
+	}
+
+	// FinalVarianceOp
+	dynConstructLookup[opt.FinalVarianceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructFinalVariance(memo.GroupID(operands[0]))
+	}
+
+	// FinalStdDevOp
+	dynConstructLookup[opt.FinalStdDevOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructFinalStdDev(memo.GroupID(operands[0]))
+	}
+
+	// VarianceOp
+	dynConstructLookup[opt.VarianceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructVariance(memo.GroupID(operands[0]))
+	}
+
+	// StdDevOp
+	dynConstructLookup[opt.StdDevOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructStdDev(memo.GroupID(operands[0]))
+	}
+
+	// XorAggOp
+	dynConstructLookup[opt.XorAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructXorAgg(memo.GroupID(operands[0]))
+	}
+
+	// JsonAggOp
+	dynConstructLookup[opt.JsonAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructJsonAgg(memo.GroupID(operands[0]))
+	}
+
+	// JsonbAggOp
+	dynConstructLookup[opt.JsonbAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructJsonbAgg(memo.GroupID(operands[0]))
 	}
 
 }
