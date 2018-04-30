@@ -51,6 +51,13 @@ func (_f *Factory) InternOrdering(val memo.Ordering) memo.PrivateID {
 	return _f.mem.InternOrdering(val)
 }
 
+// InternExplainOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternExplainOpDef(val *memo.ExplainOpDef) memo.PrivateID {
+	return _f.mem.InternExplainOpDef(val)
+}
+
 // InternColumnID adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -2544,6 +2551,20 @@ func (_f *Factory) ConstructMax1Row(
 	}
 
 	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_max1RowExpr)))
+}
+
+// ConstructExplain constructs an expression for the Explain operator.
+func (_f *Factory) ConstructExplain(
+	input memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_explainExpr := memo.MakeExplainExpr(input, def)
+	_group := _f.mem.GroupByFingerprint(_explainExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_explainExpr)))
 }
 
 // ConstructSubquery constructs an expression for the Subquery operator.
@@ -7079,6 +7100,11 @@ func init() {
 	// Max1RowOp
 	dynConstructLookup[opt.Max1RowOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructMax1Row(memo.GroupID(operands[0]))
+	}
+
+	// ExplainOp
+	dynConstructLookup[opt.ExplainOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructExplain(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// SubqueryOp

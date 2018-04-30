@@ -38,6 +38,7 @@ var opLayoutTable = [...]opLayout{
 	opt.LimitOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.OffsetOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.Max1RowOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.ExplainOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.SubqueryOp:        makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AnyOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.VariableOp:        makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
@@ -156,6 +157,7 @@ var isEnforcerLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -274,6 +276,7 @@ var isRelationalLookup = [...]bool{
 	opt.LimitOp:           true,
 	opt.OffsetOp:          true,
 	opt.Max1RowOp:         true,
+	opt.ExplainOp:         true,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -392,6 +395,7 @@ var isJoinLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -510,6 +514,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -628,6 +633,7 @@ var isScalarLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        true,
 	opt.AnyOp:             true,
 	opt.VariableOp:        true,
@@ -746,6 +752,7 @@ var isConstValueLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -864,6 +871,7 @@ var isBooleanLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -982,6 +990,7 @@ var isComparisonLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1100,6 +1109,7 @@ var isBinaryLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1218,6 +1228,7 @@ var isUnaryLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1336,6 +1347,7 @@ var isAggregateLookup = [...]bool{
 	opt.LimitOp:           false,
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
+	opt.ExplainOp:         false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -2376,6 +2388,31 @@ func (e *Expr) AsMax1Row() *Max1RowExpr {
 		return nil
 	}
 	return (*Max1RowExpr)(e)
+}
+
+type ExplainExpr Expr
+
+func MakeExplainExpr(input GroupID, def PrivateID) ExplainExpr {
+	return ExplainExpr{op: opt.ExplainOp, state: exprState{uint32(input), uint32(def)}}
+}
+
+func (e *ExplainExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *ExplainExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
+}
+
+func (e *ExplainExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsExplain() *ExplainExpr {
+	if e.op != opt.ExplainOp {
+		return nil
+	}
+	return (*ExplainExpr)(e)
 }
 
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
@@ -4548,6 +4585,13 @@ func (m *Memo) InternOrdering(val Ordering) PrivateID {
 	return m.privateStorage.internOrdering(val)
 }
 
+// InternExplainOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternExplainOpDef(val *ExplainOpDef) PrivateID {
+	return m.privateStorage.internExplainOpDef(val)
+}
+
 // InternColumnID adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -4726,6 +4770,11 @@ func init() {
 	// Max1RowOp
 	makeExprLookup[opt.Max1RowOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeMax1RowExpr(GroupID(operands[0])))
+	}
+
+	// ExplainOp
+	makeExprLookup[opt.ExplainOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeExplainExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// SubqueryOp
