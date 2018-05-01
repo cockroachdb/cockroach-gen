@@ -107,7 +107,7 @@ func (_f *Factory) ConstructScan(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_scanExpr)))
+	return _f.onConstruct(memo.Expr(_scanExpr))
 }
 
 // ConstructValues constructs an expression for the Values operator.
@@ -130,7 +130,24 @@ func (_f *Factory) ConstructValues(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_valuesExpr)))
+	// [HoistValuesSubquery]
+	{
+		for _, _item := range _f.mem.LookupList(rows) {
+			item := _item
+			if _f.hasCorrelatedSubquery(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistValuesSubquery) {
+					_group = _f.hoistValuesSubquery(rows, cols)
+					_f.mem.AddAltFingerprint(_valuesExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistValuesSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	return _f.onConstruct(memo.Expr(_valuesExpr))
 }
 
 // ConstructSelect constructs an expression for the Select operator.
@@ -147,6 +164,133 @@ func (_f *Factory) ConstructSelect(
 	_group := _f.mem.GroupByFingerprint(_selectExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [NormalizeSelectAny]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				any := _item
+				_anyExpr := _f.mem.NormExpr(_item).AsAny()
+				if _anyExpr != nil {
+					_projectExpr := _f.mem.NormExpr(_anyExpr.Input()).AsProject()
+					if _projectExpr != nil {
+						projectInput := _projectExpr.Input()
+						_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
+						if _projectionsExpr != nil {
+							if _projectionsExpr.Elems().Length == 1 {
+								_item := _f.mem.LookupList(_projectionsExpr.Elems())[0]
+								condition := _item
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeSelectAny) {
+									_group = _f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.replaceListItem(list, any, _f.ConstructExists(
+												_f.ConstructSelect(
+													projectInput,
+													_f.ConstructFilters(
+														_f.mem.InternList([]memo.GroupID{condition}),
+													),
+												),
+											)),
+										),
+									)
+									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeSelectAny, _group, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectExists]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				exists := _item
+				_existsExpr := _f.mem.NormExpr(_item).AsExists()
+				if _existsExpr != nil {
+					subquery := _existsExpr.Input()
+					if _f.hasOuterCols(subquery) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
+							_group = _f.ConstructSemiJoinApply(
+								input,
+								subquery,
+								_f.ConstructFilters(
+									_f.removeListItem(list, exists),
+								),
+							)
+							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.HoistSelectExists, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectNotExists]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				exists := _item
+				_notExpr := _f.mem.NormExpr(_item).AsNot()
+				if _notExpr != nil {
+					_existsExpr := _f.mem.NormExpr(_notExpr.Input()).AsExists()
+					if _existsExpr != nil {
+						subquery := _existsExpr.Input()
+						if _f.hasOuterCols(subquery) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
+								_group = _f.ConstructAntiJoinApply(
+									_f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.removeListItem(list, exists),
+										),
+									),
+									subquery,
+									_f.ConstructTrue(),
+								)
+								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.HoistSelectNotExists, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectSubquery]
+	{
+		if _f.hasCorrelatedSubquery(filter) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectSubquery) {
+				_group = _f.hoistSelectSubquery(input, filter)
+				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistSelectSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureSelectFiltersAnd]
@@ -417,120 +561,7 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
-	// [NormalizeSelectAny]
-	{
-		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				any := _item
-				_anyExpr := _f.mem.NormExpr(_item).AsAny()
-				if _anyExpr != nil {
-					_projectExpr := _f.mem.NormExpr(_anyExpr.Input()).AsProject()
-					if _projectExpr != nil {
-						projectInput := _projectExpr.Input()
-						_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
-						if _projectionsExpr != nil {
-							if _projectionsExpr.Elems().Length == 1 {
-								_item := _f.mem.LookupList(_projectionsExpr.Elems())[0]
-								condition := _item
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeSelectAny) {
-									_group = _f.ConstructSelect(
-										input,
-										_f.ConstructFilters(
-											_f.replaceListItem(list, any, _f.ConstructExists(
-												_f.ConstructSelect(
-													projectInput,
-													_f.ConstructFilters(
-														_f.mem.InternList([]memo.GroupID{condition}),
-													),
-												),
-											)),
-										),
-									)
-									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeSelectAny, _group, 0)
-									}
-									return _group
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [HoistSelectExists]
-	{
-		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				exists := _item
-				_existsExpr := _f.mem.NormExpr(_item).AsExists()
-				if _existsExpr != nil {
-					subquery := _existsExpr.Input()
-					if _f.hasOuterCols(subquery) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
-							_group = _f.ConstructSemiJoinApply(
-								input,
-								subquery,
-								_f.ConstructFilters(
-									_f.removeListItem(list, exists),
-								),
-							)
-							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.HoistSelectExists, _group, 0)
-							}
-							return _group
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [HoistSelectNotExists]
-	{
-		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				exists := _item
-				_notExpr := _f.mem.NormExpr(_item).AsNot()
-				if _notExpr != nil {
-					_existsExpr := _f.mem.NormExpr(_notExpr.Input()).AsExists()
-					if _existsExpr != nil {
-						subquery := _existsExpr.Input()
-						if _f.hasOuterCols(subquery) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
-								_group = _f.ConstructAntiJoinApply(
-									_f.ConstructSelect(
-										input,
-										_f.ConstructFilters(
-											_f.removeListItem(list, exists),
-										),
-									),
-									subquery,
-									_f.ConstructTrue(),
-								)
-								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.HoistSelectNotExists, _group, 0)
-								}
-								return _group
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_selectExpr)))
+	return _f.onConstruct(memo.Expr(_selectExpr))
 }
 
 // ConstructProject constructs an expression for the Project operator.
@@ -547,6 +578,20 @@ func (_f *Factory) ConstructProject(
 	_group := _f.mem.GroupByFingerprint(_projectExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistProjectSubquery]
+	{
+		if _f.hasCorrelatedSubquery(projections) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSubquery) {
+				_group = _f.hoistProjectSubquery(input, projections)
+				_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistProjectSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EliminateProject]
@@ -813,7 +858,7 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_projectExpr)))
+	return _f.onConstruct(memo.Expr(_projectExpr))
 }
 
 // ConstructInnerJoin constructs an expression for the InnerJoin operator.
@@ -831,6 +876,20 @@ func (_f *Factory) ConstructInnerJoin(
 	_group := _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.InnerJoinOp, left, right, on)
+				_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -941,7 +1000,7 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_innerJoinExpr)))
+	return _f.onConstruct(memo.Expr(_innerJoinExpr))
 }
 
 // ConstructLeftJoin constructs an expression for the LeftJoin operator.
@@ -954,6 +1013,20 @@ func (_f *Factory) ConstructLeftJoin(
 	_group := _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.LeftJoinOp, left, right, on)
+				_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1032,7 +1105,7 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_leftJoinExpr)))
+	return _f.onConstruct(memo.Expr(_leftJoinExpr))
 }
 
 // ConstructRightJoin constructs an expression for the RightJoin operator.
@@ -1045,6 +1118,20 @@ func (_f *Factory) ConstructRightJoin(
 	_group := _f.mem.GroupByFingerprint(_rightJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.RightJoinOp, left, right, on)
+				_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1123,7 +1210,7 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_rightJoinExpr)))
+	return _f.onConstruct(memo.Expr(_rightJoinExpr))
 }
 
 // ConstructFullJoin constructs an expression for the FullJoin operator.
@@ -1136,6 +1223,20 @@ func (_f *Factory) ConstructFullJoin(
 	_group := _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.FullJoinOp, left, right, on)
+				_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1182,7 +1283,7 @@ func (_f *Factory) ConstructFullJoin(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_fullJoinExpr)))
+	return _f.onConstruct(memo.Expr(_fullJoinExpr))
 }
 
 // ConstructSemiJoin constructs an expression for the SemiJoin operator.
@@ -1195,6 +1296,20 @@ func (_f *Factory) ConstructSemiJoin(
 	_group := _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.SemiJoinOp, left, right, on)
+				_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1305,7 +1420,7 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_semiJoinExpr)))
+	return _f.onConstruct(memo.Expr(_semiJoinExpr))
 }
 
 // ConstructAntiJoin constructs an expression for the AntiJoin operator.
@@ -1318,6 +1433,20 @@ func (_f *Factory) ConstructAntiJoin(
 	_group := _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.AntiJoinOp, left, right, on)
+				_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1396,7 +1525,7 @@ func (_f *Factory) ConstructAntiJoin(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_antiJoinExpr)))
+	return _f.onConstruct(memo.Expr(_antiJoinExpr))
 }
 
 // ConstructLookupJoin constructs an expression for the LookupJoin operator.
@@ -1411,7 +1540,7 @@ func (_f *Factory) ConstructLookupJoin(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_lookupJoinExpr)))
+	return _f.onConstruct(memo.Expr(_lookupJoinExpr))
 }
 
 // ConstructInnerJoinApply constructs an expression for the InnerJoinApply operator.
@@ -1427,6 +1556,63 @@ func (_f *Factory) ConstructInnerJoinApply(
 	_group := _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.InnerJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		_selectExpr := _f.mem.NormExpr(right).AsSelect()
+		if _selectExpr != nil {
+			input := _selectExpr.Input()
+			filter := _selectExpr.Filter()
+			if _f.hasOuterCols(right) {
+				if !_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+						_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructInnerJoinApply(
+							left,
+							input,
+							_f.concatFilters(on, filter),
+						)
+						delete(_f.ruleCycles, _innerJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.InnerJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1537,12 +1723,27 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	return _f.onConstruct(memo.Expr(_innerJoinApplyExpr))
+}
+
+// ConstructLeftJoinApply constructs an expression for the LeftJoinApply operator.
+func (_f *Factory) ConstructLeftJoinApply(
+	left memo.GroupID,
+	right memo.GroupID,
+	on memo.GroupID,
+) memo.GroupID {
+	_leftJoinApplyExpr := memo.MakeLeftJoinApplyExpr(left, right, on)
+	_group := _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
 	// [DecorrelateJoin]
 	{
 		if !_f.isCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.removeApply(opt.InnerJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+				_group = _f.constructNonApplyJoin(opt.LeftJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
 				}
@@ -1558,17 +1759,17 @@ func (_f *Factory) ConstructInnerJoinApply(
 			input := _selectExpr.Input()
 			filter := _selectExpr.Filter()
 			if _f.hasOuterCols(right) {
-				if !_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] = true
-						_group = _f.ConstructInnerJoinApply(
+						_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructLeftJoinApply(
 							left,
 							input,
 							_f.concatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _innerJoinApplyExpr.Fingerprint())
-						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 						}
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
@@ -1580,19 +1781,18 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_innerJoinApplyExpr)))
-}
-
-// ConstructLeftJoinApply constructs an expression for the LeftJoinApply operator.
-func (_f *Factory) ConstructLeftJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_leftJoinApplyExpr := memo.MakeLeftJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.LeftJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1671,50 +1871,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.removeApply(opt.LeftJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [TryDecorrelateSelect]
-	{
-		_selectExpr := _f.mem.NormExpr(right).AsSelect()
-		if _selectExpr != nil {
-			input := _selectExpr.Input()
-			filter := _selectExpr.Filter()
-			if _f.hasOuterCols(right) {
-				if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
-						_group = _f.ConstructLeftJoinApply(
-							left,
-							input,
-							_f.concatFilters(on, filter),
-						)
-						delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
-						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_leftJoinApplyExpr)))
+	return _f.onConstruct(memo.Expr(_leftJoinApplyExpr))
 }
 
 // ConstructRightJoinApply constructs an expression for the RightJoinApply operator.
@@ -1727,6 +1884,34 @@ func (_f *Factory) ConstructRightJoinApply(
 	_group := _f.mem.GroupByFingerprint(_rightJoinApplyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.RightJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.RightJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1805,21 +1990,7 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.removeApply(opt.RightJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_rightJoinApplyExpr)))
+	return _f.onConstruct(memo.Expr(_rightJoinApplyExpr))
 }
 
 // ConstructFullJoinApply constructs an expression for the FullJoinApply operator.
@@ -1832,6 +2003,34 @@ func (_f *Factory) ConstructFullJoinApply(
 	_group := _f.mem.GroupByFingerprint(_fullJoinApplyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.FullJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.FullJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -1878,21 +2077,7 @@ func (_f *Factory) ConstructFullJoinApply(
 		}
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.removeApply(opt.FullJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_fullJoinApplyExpr)))
+	return _f.onConstruct(memo.Expr(_fullJoinApplyExpr))
 }
 
 // ConstructSemiJoinApply constructs an expression for the SemiJoinApply operator.
@@ -1905,6 +2090,63 @@ func (_f *Factory) ConstructSemiJoinApply(
 	_group := _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.SemiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		_selectExpr := _f.mem.NormExpr(right).AsSelect()
+		if _selectExpr != nil {
+			input := _selectExpr.Input()
+			filter := _selectExpr.Filter()
+			if _f.hasOuterCols(right) {
+				if !_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+						_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructSemiJoinApply(
+							left,
+							input,
+							_f.concatFilters(on, filter),
+						)
+						delete(_f.ruleCycles, _semiJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.SemiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -2015,12 +2257,27 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	return _f.onConstruct(memo.Expr(_semiJoinApplyExpr))
+}
+
+// ConstructAntiJoinApply constructs an expression for the AntiJoinApply operator.
+func (_f *Factory) ConstructAntiJoinApply(
+	left memo.GroupID,
+	right memo.GroupID,
+	on memo.GroupID,
+) memo.GroupID {
+	_antiJoinApplyExpr := memo.MakeAntiJoinApplyExpr(left, right, on)
+	_group := _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
 	// [DecorrelateJoin]
 	{
 		if !_f.isCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.removeApply(opt.SemiJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+				_group = _f.constructNonApplyJoin(opt.AntiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
 				}
@@ -2036,17 +2293,17 @@ func (_f *Factory) ConstructSemiJoinApply(
 			input := _selectExpr.Input()
 			filter := _selectExpr.Filter()
 			if _f.hasOuterCols(right) {
-				if !_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] = true
-						_group = _f.ConstructSemiJoinApply(
+						_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructAntiJoinApply(
 							left,
 							input,
 							_f.concatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _semiJoinApplyExpr.Fingerprint())
-						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						delete(_f.ruleCycles, _antiJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 						}
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
@@ -2058,19 +2315,18 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_semiJoinApplyExpr)))
-}
-
-// ConstructAntiJoinApply constructs an expression for the AntiJoinApply operator.
-func (_f *Factory) ConstructAntiJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_antiJoinApplyExpr := memo.MakeAntiJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+				_group = _f.hoistJoinSubquery(opt.AntiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -2149,50 +2405,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 		}
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.removeApply(opt.AntiJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [TryDecorrelateSelect]
-	{
-		_selectExpr := _f.mem.NormExpr(right).AsSelect()
-		if _selectExpr != nil {
-			input := _selectExpr.Input()
-			filter := _selectExpr.Filter()
-			if _f.hasOuterCols(right) {
-				if !_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] = true
-						_group = _f.ConstructAntiJoinApply(
-							left,
-							input,
-							_f.concatFilters(on, filter),
-						)
-						delete(_f.ruleCycles, _antiJoinApplyExpr.Fingerprint())
-						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_antiJoinApplyExpr)))
+	return _f.onConstruct(memo.Expr(_antiJoinApplyExpr))
 }
 
 // ConstructGroupBy constructs an expression for the GroupBy operator.
@@ -2246,7 +2459,7 @@ func (_f *Factory) ConstructGroupBy(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_groupByExpr)))
+	return _f.onConstruct(memo.Expr(_groupByExpr))
 }
 
 // ConstructUnion constructs an expression for the Union operator.
@@ -2266,7 +2479,7 @@ func (_f *Factory) ConstructUnion(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_unionExpr)))
+	return _f.onConstruct(memo.Expr(_unionExpr))
 }
 
 // ConstructIntersect constructs an expression for the Intersect operator.
@@ -2288,7 +2501,7 @@ func (_f *Factory) ConstructIntersect(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_intersectExpr)))
+	return _f.onConstruct(memo.Expr(_intersectExpr))
 }
 
 // ConstructExcept constructs an expression for the Except operator.
@@ -2309,7 +2522,7 @@ func (_f *Factory) ConstructExcept(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_exceptExpr)))
+	return _f.onConstruct(memo.Expr(_exceptExpr))
 }
 
 // ConstructUnionAll constructs an expression for the UnionAll operator.
@@ -2340,7 +2553,7 @@ func (_f *Factory) ConstructUnionAll(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_unionAllExpr)))
+	return _f.onConstruct(memo.Expr(_unionAllExpr))
 }
 
 // ConstructIntersectAll constructs an expression for the IntersectAll operator.
@@ -2373,7 +2586,7 @@ func (_f *Factory) ConstructIntersectAll(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_intersectAllExpr)))
+	return _f.onConstruct(memo.Expr(_intersectAllExpr))
 }
 
 // ConstructExceptAll constructs an expression for the ExceptAll operator.
@@ -2406,7 +2619,7 @@ func (_f *Factory) ConstructExceptAll(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_exceptAllExpr)))
+	return _f.onConstruct(memo.Expr(_exceptAllExpr))
 }
 
 // ConstructLimit constructs an expression for the Limit operator.
@@ -2473,7 +2686,7 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_limitExpr)))
+	return _f.onConstruct(memo.Expr(_limitExpr))
 }
 
 // ConstructOffset constructs an expression for the Offset operator.
@@ -2520,7 +2733,7 @@ func (_f *Factory) ConstructOffset(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_offsetExpr)))
+	return _f.onConstruct(memo.Expr(_offsetExpr))
 }
 
 // ConstructMax1Row constructs an expression for the Max1Row operator.
@@ -2550,7 +2763,7 @@ func (_f *Factory) ConstructMax1Row(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_max1RowExpr)))
+	return _f.onConstruct(memo.Expr(_max1RowExpr))
 }
 
 // ConstructExplain constructs an expression for the Explain operator.
@@ -2564,7 +2777,7 @@ func (_f *Factory) ConstructExplain(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_explainExpr)))
+	return _f.onConstruct(memo.Expr(_explainExpr))
 }
 
 // ConstructSubquery constructs an expression for the Subquery operator.
@@ -2585,56 +2798,16 @@ func (_f *Factory) ConstructExplain(
 // subquery must project exactly one output column. If the subquery returns one
 // row, then that column is bound to the single column value in that row. If the
 // subquery returns zero rows, then that column is bound to NULL.
-//
-// The Projection field contains a single expression that represents the output
-// of the Subquery operator. The expression can be of arbitrary complexity, and
-// can depend on the output column of the Input expression by using a Variable
-// operator. For example, `(SELECT 1, 'a')` would be represented by the following
-// structure:
-//
-//   (Subquery
-//     (Max1Row
-//       (Project (Values (Tuple)) (Projections (Tuple (Const 1) (Const 'a'))))
-//     )
-//     (Variable 3)
-//   )
-//
-// Here Variable 3 refers to the projection from the Input expression, which is
-// (Tuple (Const 1) (Const 'a')). Here is an example with a more complex
-// Projection field, in which the Subquery evaluates to non-NULL even though its
-// Input expression returns zero rows:
-//
-//   (Subquery
-//     (Select (Scan a) (False))
-//     (IsNull (Variable 1))
-//   )
-//
-// Since the subquery returns zero rows, (Variable 1) is bound to NULL, and so
-// the IsNull operator returns True, which then becomes the final output of the
-// Subquery operator. It is equivalent to this formulation:
-//
-//   (IsNull
-//     (Subquery
-//       (Select (Scan a) (False))
-//       (Variable 1)
-//     )
-//   )
-//
-// These behaviors may seem unnecessary or arbitrary at first glance, but they're
-// designed to allow transformation rules to easily "bubble up" a subquery to the
-// root of a scalar expression tree, so that it can then be turned into one of
-// the JoinApply operators.
 func (_f *Factory) ConstructSubquery(
 	input memo.GroupID,
-	projection memo.GroupID,
 ) memo.GroupID {
-	_subqueryExpr := memo.MakeSubqueryExpr(input, projection)
+	_subqueryExpr := memo.MakeSubqueryExpr(input)
 	_group := _f.mem.GroupByFingerprint(_subqueryExpr.Fingerprint())
 	if _group != 0 {
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_subqueryExpr)))
+	return _f.onConstruct(memo.Expr(_subqueryExpr))
 }
 
 // ConstructAny constructs an expression for the Any operator.
@@ -2672,7 +2845,7 @@ func (_f *Factory) ConstructAny(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_anyExpr)))
+	return _f.onConstruct(memo.Expr(_anyExpr))
 }
 
 // ConstructVariable constructs an expression for the Variable operator.
@@ -2687,7 +2860,7 @@ func (_f *Factory) ConstructVariable(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_variableExpr)))
+	return _f.onConstruct(memo.Expr(_variableExpr))
 }
 
 // ConstructConst constructs an expression for the Const operator.
@@ -2702,7 +2875,7 @@ func (_f *Factory) ConstructConst(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_constExpr)))
+	return _f.onConstruct(memo.Expr(_constExpr))
 }
 
 // ConstructNull constructs an expression for the Null operator.
@@ -2731,7 +2904,7 @@ func (_f *Factory) ConstructNull(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_nullExpr)))
+	return _f.onConstruct(memo.Expr(_nullExpr))
 }
 
 // ConstructTrue constructs an expression for the True operator.
@@ -2745,7 +2918,7 @@ func (_f *Factory) ConstructTrue() memo.GroupID {
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_trueExpr)))
+	return _f.onConstruct(memo.Expr(_trueExpr))
 }
 
 // ConstructFalse constructs an expression for the False operator.
@@ -2759,7 +2932,7 @@ func (_f *Factory) ConstructFalse() memo.GroupID {
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_falseExpr)))
+	return _f.onConstruct(memo.Expr(_falseExpr))
 }
 
 // ConstructPlaceholder constructs an expression for the Placeholder operator.
@@ -2772,7 +2945,7 @@ func (_f *Factory) ConstructPlaceholder(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_placeholderExpr)))
+	return _f.onConstruct(memo.Expr(_placeholderExpr))
 }
 
 // ConstructTuple constructs an expression for the Tuple operator.
@@ -2785,7 +2958,7 @@ func (_f *Factory) ConstructTuple(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_tupleExpr)))
+	return _f.onConstruct(memo.Expr(_tupleExpr))
 }
 
 // ConstructProjections constructs an expression for the Projections operator.
@@ -2803,14 +2976,17 @@ func (_f *Factory) ConstructProjections(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_projectionsExpr)))
+	return _f.onConstruct(memo.Expr(_projectionsExpr))
 }
 
 // ConstructAggregations constructs an expression for the Aggregations operator.
-// Aggregations is a set of aggregate expressions that will become output
-// columns for a containing GroupBy operator. The private Cols field contains
-// the list of column indexes returned by the expression, as an opt.ColList. It
-// is legal for Cols to be empty.
+// Aggregations is a set of aggregate expressions that will become output columns
+// for a containing GroupBy operator. The expressions can only consist of
+// aggregate functions and variable references. More complex expressions must be
+// formulated using a Project operator as input to the GroupBy operator.
+//
+// The private Cols field contains the list of column indexes returned by the
+// expression, as an opt.ColList. It is legal for Cols to be empty.
 func (_f *Factory) ConstructAggregations(
 	aggs memo.ListID,
 	cols memo.PrivateID,
@@ -2821,10 +2997,12 @@ func (_f *Factory) ConstructAggregations(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_aggregationsExpr)))
+	return _f.onConstruct(memo.Expr(_aggregationsExpr))
 }
 
 // ConstructExists constructs an expression for the Exists operator.
+// Exists takes a relational query as its input, and evaluates to true if the
+// query returns at least one row.
 func (_f *Factory) ConstructExists(
 	input memo.GroupID,
 ) memo.GroupID {
@@ -2873,7 +3051,7 @@ func (_f *Factory) ConstructExists(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_existsExpr)))
+	return _f.onConstruct(memo.Expr(_existsExpr))
 }
 
 // ConstructFilters constructs an expression for the Filters operator.
@@ -2928,7 +3106,7 @@ func (_f *Factory) ConstructFilters(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_filtersExpr)))
+	return _f.onConstruct(memo.Expr(_filtersExpr))
 }
 
 // ConstructAnd constructs an expression for the And operator.
@@ -3013,7 +3191,7 @@ func (_f *Factory) ConstructAnd(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_andExpr)))
+	return _f.onConstruct(memo.Expr(_andExpr))
 }
 
 // ConstructOr constructs an expression for the Or operator.
@@ -3098,7 +3276,7 @@ func (_f *Factory) ConstructOr(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_orExpr)))
+	return _f.onConstruct(memo.Expr(_orExpr))
 }
 
 // ConstructNot constructs an expression for the Not operator.
@@ -3185,7 +3363,7 @@ func (_f *Factory) ConstructNot(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notExpr)))
+	return _f.onConstruct(memo.Expr(_notExpr))
 }
 
 // ConstructEq constructs an expression for the Eq operator.
@@ -3386,7 +3564,7 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_eqExpr)))
+	return _f.onConstruct(memo.Expr(_eqExpr))
 }
 
 // ConstructLt constructs an expression for the Lt operator.
@@ -3561,7 +3739,7 @@ func (_f *Factory) ConstructLt(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_ltExpr)))
+	return _f.onConstruct(memo.Expr(_ltExpr))
 }
 
 // ConstructGt constructs an expression for the Gt operator.
@@ -3736,7 +3914,7 @@ func (_f *Factory) ConstructGt(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_gtExpr)))
+	return _f.onConstruct(memo.Expr(_gtExpr))
 }
 
 // ConstructLe constructs an expression for the Le operator.
@@ -3911,7 +4089,7 @@ func (_f *Factory) ConstructLe(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_leExpr)))
+	return _f.onConstruct(memo.Expr(_leExpr))
 }
 
 // ConstructGe constructs an expression for the Ge operator.
@@ -4086,7 +4264,7 @@ func (_f *Factory) ConstructGe(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_geExpr)))
+	return _f.onConstruct(memo.Expr(_geExpr))
 }
 
 // ConstructNe constructs an expression for the Ne operator.
@@ -4174,7 +4352,7 @@ func (_f *Factory) ConstructNe(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_neExpr)))
+	return _f.onConstruct(memo.Expr(_neExpr))
 }
 
 // ConstructIn constructs an expression for the In operator.
@@ -4276,7 +4454,7 @@ func (_f *Factory) ConstructIn(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_inExpr)))
+	return _f.onConstruct(memo.Expr(_inExpr))
 }
 
 // ConstructNotIn constructs an expression for the NotIn operator.
@@ -4378,7 +4556,7 @@ func (_f *Factory) ConstructNotIn(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notInExpr)))
+	return _f.onConstruct(memo.Expr(_notInExpr))
 }
 
 // ConstructLike constructs an expression for the Like operator.
@@ -4426,7 +4604,7 @@ func (_f *Factory) ConstructLike(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_likeExpr)))
+	return _f.onConstruct(memo.Expr(_likeExpr))
 }
 
 // ConstructNotLike constructs an expression for the NotLike operator.
@@ -4474,7 +4652,7 @@ func (_f *Factory) ConstructNotLike(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notLikeExpr)))
+	return _f.onConstruct(memo.Expr(_notLikeExpr))
 }
 
 // ConstructILike constructs an expression for the ILike operator.
@@ -4522,7 +4700,7 @@ func (_f *Factory) ConstructILike(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_iLikeExpr)))
+	return _f.onConstruct(memo.Expr(_iLikeExpr))
 }
 
 // ConstructNotILike constructs an expression for the NotILike operator.
@@ -4570,7 +4748,7 @@ func (_f *Factory) ConstructNotILike(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notILikeExpr)))
+	return _f.onConstruct(memo.Expr(_notILikeExpr))
 }
 
 // ConstructSimilarTo constructs an expression for the SimilarTo operator.
@@ -4618,7 +4796,7 @@ func (_f *Factory) ConstructSimilarTo(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_similarToExpr)))
+	return _f.onConstruct(memo.Expr(_similarToExpr))
 }
 
 // ConstructNotSimilarTo constructs an expression for the NotSimilarTo operator.
@@ -4666,7 +4844,7 @@ func (_f *Factory) ConstructNotSimilarTo(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notSimilarToExpr)))
+	return _f.onConstruct(memo.Expr(_notSimilarToExpr))
 }
 
 // ConstructRegMatch constructs an expression for the RegMatch operator.
@@ -4714,7 +4892,7 @@ func (_f *Factory) ConstructRegMatch(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_regMatchExpr)))
+	return _f.onConstruct(memo.Expr(_regMatchExpr))
 }
 
 // ConstructNotRegMatch constructs an expression for the NotRegMatch operator.
@@ -4762,7 +4940,7 @@ func (_f *Factory) ConstructNotRegMatch(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notRegMatchExpr)))
+	return _f.onConstruct(memo.Expr(_notRegMatchExpr))
 }
 
 // ConstructRegIMatch constructs an expression for the RegIMatch operator.
@@ -4810,7 +4988,7 @@ func (_f *Factory) ConstructRegIMatch(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_regIMatchExpr)))
+	return _f.onConstruct(memo.Expr(_regIMatchExpr))
 }
 
 // ConstructNotRegIMatch constructs an expression for the NotRegIMatch operator.
@@ -4858,7 +5036,7 @@ func (_f *Factory) ConstructNotRegIMatch(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_notRegIMatchExpr)))
+	return _f.onConstruct(memo.Expr(_notRegIMatchExpr))
 }
 
 // ConstructIs constructs an expression for the Is operator.
@@ -4972,7 +5150,7 @@ func (_f *Factory) ConstructIs(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_isExpr)))
+	return _f.onConstruct(memo.Expr(_isExpr))
 }
 
 // ConstructIsNot constructs an expression for the IsNot operator.
@@ -5086,7 +5264,7 @@ func (_f *Factory) ConstructIsNot(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_isNotExpr)))
+	return _f.onConstruct(memo.Expr(_isNotExpr))
 }
 
 // ConstructContains constructs an expression for the Contains operator.
@@ -5134,7 +5312,7 @@ func (_f *Factory) ConstructContains(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_containsExpr)))
+	return _f.onConstruct(memo.Expr(_containsExpr))
 }
 
 // ConstructJsonExists constructs an expression for the JsonExists operator.
@@ -5182,7 +5360,7 @@ func (_f *Factory) ConstructJsonExists(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonExistsExpr)))
+	return _f.onConstruct(memo.Expr(_jsonExistsExpr))
 }
 
 // ConstructJsonAllExists constructs an expression for the JsonAllExists operator.
@@ -5230,7 +5408,7 @@ func (_f *Factory) ConstructJsonAllExists(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonAllExistsExpr)))
+	return _f.onConstruct(memo.Expr(_jsonAllExistsExpr))
 }
 
 // ConstructJsonSomeExists constructs an expression for the JsonSomeExists operator.
@@ -5278,7 +5456,7 @@ func (_f *Factory) ConstructJsonSomeExists(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonSomeExistsExpr)))
+	return _f.onConstruct(memo.Expr(_jsonSomeExistsExpr))
 }
 
 // ConstructBitand constructs an expression for the Bitand operator.
@@ -5366,7 +5544,7 @@ func (_f *Factory) ConstructBitand(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_bitandExpr)))
+	return _f.onConstruct(memo.Expr(_bitandExpr))
 }
 
 // ConstructBitor constructs an expression for the Bitor operator.
@@ -5454,7 +5632,7 @@ func (_f *Factory) ConstructBitor(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_bitorExpr)))
+	return _f.onConstruct(memo.Expr(_bitorExpr))
 }
 
 // ConstructBitxor constructs an expression for the Bitxor operator.
@@ -5542,7 +5720,7 @@ func (_f *Factory) ConstructBitxor(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_bitxorExpr)))
+	return _f.onConstruct(memo.Expr(_bitxorExpr))
 }
 
 // ConstructPlus constructs an expression for the Plus operator.
@@ -5664,7 +5842,7 @@ func (_f *Factory) ConstructPlus(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_plusExpr)))
+	return _f.onConstruct(memo.Expr(_plusExpr))
 }
 
 // ConstructMinus constructs an expression for the Minus operator.
@@ -5729,7 +5907,7 @@ func (_f *Factory) ConstructMinus(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_minusExpr)))
+	return _f.onConstruct(memo.Expr(_minusExpr))
 }
 
 // ConstructMult constructs an expression for the Mult operator.
@@ -5851,7 +6029,7 @@ func (_f *Factory) ConstructMult(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_multExpr)))
+	return _f.onConstruct(memo.Expr(_multExpr))
 }
 
 // ConstructDiv constructs an expression for the Div operator.
@@ -5916,7 +6094,7 @@ func (_f *Factory) ConstructDiv(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_divExpr)))
+	return _f.onConstruct(memo.Expr(_divExpr))
 }
 
 // ConstructFloorDiv constructs an expression for the FloorDiv operator.
@@ -5981,7 +6159,7 @@ func (_f *Factory) ConstructFloorDiv(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_floorDivExpr)))
+	return _f.onConstruct(memo.Expr(_floorDivExpr))
 }
 
 // ConstructMod constructs an expression for the Mod operator.
@@ -6029,7 +6207,7 @@ func (_f *Factory) ConstructMod(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_modExpr)))
+	return _f.onConstruct(memo.Expr(_modExpr))
 }
 
 // ConstructPow constructs an expression for the Pow operator.
@@ -6077,7 +6255,7 @@ func (_f *Factory) ConstructPow(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_powExpr)))
+	return _f.onConstruct(memo.Expr(_powExpr))
 }
 
 // ConstructConcat constructs an expression for the Concat operator.
@@ -6125,7 +6303,7 @@ func (_f *Factory) ConstructConcat(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_concatExpr)))
+	return _f.onConstruct(memo.Expr(_concatExpr))
 }
 
 // ConstructLShift constructs an expression for the LShift operator.
@@ -6173,7 +6351,7 @@ func (_f *Factory) ConstructLShift(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_lShiftExpr)))
+	return _f.onConstruct(memo.Expr(_lShiftExpr))
 }
 
 // ConstructRShift constructs an expression for the RShift operator.
@@ -6221,7 +6399,7 @@ func (_f *Factory) ConstructRShift(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_rShiftExpr)))
+	return _f.onConstruct(memo.Expr(_rShiftExpr))
 }
 
 // ConstructFetchVal constructs an expression for the FetchVal operator.
@@ -6273,7 +6451,7 @@ func (_f *Factory) ConstructFetchVal(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_fetchValExpr)))
+	return _f.onConstruct(memo.Expr(_fetchValExpr))
 }
 
 // ConstructFetchText constructs an expression for the FetchText operator.
@@ -6325,7 +6503,7 @@ func (_f *Factory) ConstructFetchText(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_fetchTextExpr)))
+	return _f.onConstruct(memo.Expr(_fetchTextExpr))
 }
 
 // ConstructFetchValPath constructs an expression for the FetchValPath operator.
@@ -6377,7 +6555,7 @@ func (_f *Factory) ConstructFetchValPath(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_fetchValPathExpr)))
+	return _f.onConstruct(memo.Expr(_fetchValPathExpr))
 }
 
 // ConstructFetchTextPath constructs an expression for the FetchTextPath operator.
@@ -6429,7 +6607,7 @@ func (_f *Factory) ConstructFetchTextPath(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_fetchTextPathExpr)))
+	return _f.onConstruct(memo.Expr(_fetchTextPathExpr))
 }
 
 // ConstructUnaryMinus constructs an expression for the UnaryMinus operator.
@@ -6495,7 +6673,7 @@ func (_f *Factory) ConstructUnaryMinus(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_unaryMinusExpr)))
+	return _f.onConstruct(memo.Expr(_unaryMinusExpr))
 }
 
 // ConstructUnaryComplement constructs an expression for the UnaryComplement operator.
@@ -6523,7 +6701,7 @@ func (_f *Factory) ConstructUnaryComplement(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_unaryComplementExpr)))
+	return _f.onConstruct(memo.Expr(_unaryComplementExpr))
 }
 
 // ConstructCast constructs an expression for the Cast operator.
@@ -6568,7 +6746,7 @@ func (_f *Factory) ConstructCast(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_castExpr)))
+	return _f.onConstruct(memo.Expr(_castExpr))
 }
 
 // ConstructCase constructs an expression for the Case operator.
@@ -6598,7 +6776,7 @@ func (_f *Factory) ConstructCase(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_caseExpr)))
+	return _f.onConstruct(memo.Expr(_caseExpr))
 }
 
 // ConstructWhen constructs an expression for the When operator.
@@ -6615,7 +6793,7 @@ func (_f *Factory) ConstructWhen(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_whenExpr)))
+	return _f.onConstruct(memo.Expr(_whenExpr))
 }
 
 // ConstructArray constructs an expression for the Array operator.
@@ -6630,7 +6808,7 @@ func (_f *Factory) ConstructArray(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_arrayExpr)))
+	return _f.onConstruct(memo.Expr(_arrayExpr))
 }
 
 // ConstructFunction constructs an expression for the Function operator.
@@ -6647,7 +6825,7 @@ func (_f *Factory) ConstructFunction(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_functionExpr)))
+	return _f.onConstruct(memo.Expr(_functionExpr))
 }
 
 // ConstructCoalesce constructs an expression for the Coalesce operator.
@@ -6694,7 +6872,7 @@ func (_f *Factory) ConstructCoalesce(
 		}
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_coalesceExpr)))
+	return _f.onConstruct(memo.Expr(_coalesceExpr))
 }
 
 // ConstructUnsupportedExpr constructs an expression for the UnsupportedExpr operator.
@@ -6709,7 +6887,7 @@ func (_f *Factory) ConstructUnsupportedExpr(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_unsupportedExprExpr)))
+	return _f.onConstruct(memo.Expr(_unsupportedExprExpr))
 }
 
 // ConstructArrayAgg constructs an expression for the ArrayAgg operator.
@@ -6722,7 +6900,7 @@ func (_f *Factory) ConstructArrayAgg(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_arrayAggExpr)))
+	return _f.onConstruct(memo.Expr(_arrayAggExpr))
 }
 
 // ConstructAvg constructs an expression for the Avg operator.
@@ -6735,7 +6913,7 @@ func (_f *Factory) ConstructAvg(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_avgExpr)))
+	return _f.onConstruct(memo.Expr(_avgExpr))
 }
 
 // ConstructBoolAnd constructs an expression for the BoolAnd operator.
@@ -6748,7 +6926,7 @@ func (_f *Factory) ConstructBoolAnd(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_boolAndExpr)))
+	return _f.onConstruct(memo.Expr(_boolAndExpr))
 }
 
 // ConstructBoolOr constructs an expression for the BoolOr operator.
@@ -6761,7 +6939,7 @@ func (_f *Factory) ConstructBoolOr(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_boolOrExpr)))
+	return _f.onConstruct(memo.Expr(_boolOrExpr))
 }
 
 // ConstructConcatAgg constructs an expression for the ConcatAgg operator.
@@ -6774,7 +6952,7 @@ func (_f *Factory) ConstructConcatAgg(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_concatAggExpr)))
+	return _f.onConstruct(memo.Expr(_concatAggExpr))
 }
 
 // ConstructCount constructs an expression for the Count operator.
@@ -6787,7 +6965,7 @@ func (_f *Factory) ConstructCount(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_countExpr)))
+	return _f.onConstruct(memo.Expr(_countExpr))
 }
 
 // ConstructCountRows constructs an expression for the CountRows operator.
@@ -6798,7 +6976,7 @@ func (_f *Factory) ConstructCountRows() memo.GroupID {
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_countRowsExpr)))
+	return _f.onConstruct(memo.Expr(_countRowsExpr))
 }
 
 // ConstructMax constructs an expression for the Max operator.
@@ -6811,7 +6989,7 @@ func (_f *Factory) ConstructMax(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_maxExpr)))
+	return _f.onConstruct(memo.Expr(_maxExpr))
 }
 
 // ConstructMin constructs an expression for the Min operator.
@@ -6824,7 +7002,7 @@ func (_f *Factory) ConstructMin(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_minExpr)))
+	return _f.onConstruct(memo.Expr(_minExpr))
 }
 
 // ConstructSumInt constructs an expression for the SumInt operator.
@@ -6837,7 +7015,7 @@ func (_f *Factory) ConstructSumInt(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_sumIntExpr)))
+	return _f.onConstruct(memo.Expr(_sumIntExpr))
 }
 
 // ConstructSum constructs an expression for the Sum operator.
@@ -6850,7 +7028,7 @@ func (_f *Factory) ConstructSum(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_sumExpr)))
+	return _f.onConstruct(memo.Expr(_sumExpr))
 }
 
 // ConstructSqrDiff constructs an expression for the SqrDiff operator.
@@ -6863,7 +7041,7 @@ func (_f *Factory) ConstructSqrDiff(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_sqrDiffExpr)))
+	return _f.onConstruct(memo.Expr(_sqrDiffExpr))
 }
 
 // ConstructFinalVariance constructs an expression for the FinalVariance operator.
@@ -6876,7 +7054,7 @@ func (_f *Factory) ConstructFinalVariance(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_finalVarianceExpr)))
+	return _f.onConstruct(memo.Expr(_finalVarianceExpr))
 }
 
 // ConstructFinalStdDev constructs an expression for the FinalStdDev operator.
@@ -6889,7 +7067,7 @@ func (_f *Factory) ConstructFinalStdDev(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_finalStdDevExpr)))
+	return _f.onConstruct(memo.Expr(_finalStdDevExpr))
 }
 
 // ConstructVariance constructs an expression for the Variance operator.
@@ -6902,7 +7080,7 @@ func (_f *Factory) ConstructVariance(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_varianceExpr)))
+	return _f.onConstruct(memo.Expr(_varianceExpr))
 }
 
 // ConstructStdDev constructs an expression for the StdDev operator.
@@ -6915,7 +7093,7 @@ func (_f *Factory) ConstructStdDev(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_stdDevExpr)))
+	return _f.onConstruct(memo.Expr(_stdDevExpr))
 }
 
 // ConstructXorAgg constructs an expression for the XorAgg operator.
@@ -6928,7 +7106,7 @@ func (_f *Factory) ConstructXorAgg(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_xorAggExpr)))
+	return _f.onConstruct(memo.Expr(_xorAggExpr))
 }
 
 // ConstructJsonAgg constructs an expression for the JsonAgg operator.
@@ -6941,7 +7119,7 @@ func (_f *Factory) ConstructJsonAgg(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonAggExpr)))
+	return _f.onConstruct(memo.Expr(_jsonAggExpr))
 }
 
 // ConstructJsonbAgg constructs an expression for the JsonbAgg operator.
@@ -6954,7 +7132,7 @@ func (_f *Factory) ConstructJsonbAgg(
 		return _group
 	}
 
-	return _f.onConstruct(_f.mem.MemoizeNormExpr(_f.evalCtx, memo.Expr(_jsonbAggExpr)))
+	return _f.onConstruct(memo.Expr(_jsonbAggExpr))
 }
 
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
@@ -7109,7 +7287,7 @@ func init() {
 
 	// SubqueryOp
 	dynConstructLookup[opt.SubqueryOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSubquery(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
+		return f.ConstructSubquery(memo.GroupID(operands[0]))
 	}
 
 	// AnyOp

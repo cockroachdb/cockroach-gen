@@ -32,13 +32,20 @@ const (
 	FoldIsNotNull
 	FoldNonNullIsNotNull
 	CommuteNullIs
+	DecorrelateJoin
+	TryDecorrelateSelect
+	NormalizeSelectAny
+	HoistSelectExists
+	HoistSelectNotExists
+	HoistSelectSubquery
+	HoistProjectSubquery
+	HoistJoinSubquery
+	HoistValuesSubquery
 	EliminateDistinct
 	EnsureJoinFiltersAnd
 	EnsureJoinFilters
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
-	DecorrelateJoin
-	TryDecorrelateSelect
 	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject
@@ -88,9 +95,6 @@ const (
 	PushSelectIntoJoinRight
 	MergeSelectInnerJoin
 	PushSelectIntoGroupBy
-	NormalizeSelectAny
-	HoistSelectExists
-	HoistSelectNotExists
 
 	// ------------------------------------------------------------
 	// Explore Rule Names
