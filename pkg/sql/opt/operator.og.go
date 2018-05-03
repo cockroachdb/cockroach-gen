@@ -192,6 +192,10 @@ const (
 
 	ExplainOp
 
+	// RowNumberOp adds a column to each row in its input containing a unique,
+	// increasing number.
+	RowNumberOp
+
 	// ------------------------------------------------------------
 	// Scalar Operators
 	// ------------------------------------------------------------
@@ -491,13 +495,27 @@ const (
 
 	JsonbAggOp
 
+	// ExistsAggOp evalutes to True if there is at least one non-null value in the
+	// grouping set. Otherwise, it returns False. Its behavior is exactly equivalent
+	// to:
+	//
+	//   COUNT(c) > 0
+	//
+	// Just like COUNT(c) and the other SQL aggregates, EXISTS_AGG(c) will ignore
+	// null values. A set containing only null values is equivalent to an empty set
+	// (both yield False).
+	//
+	// ExistsAgg is not part of SQL, but it's used internally to rewrite correlated
+	// Exists subqueries into an efficient and convenient form.
+	ExistsAggOp
+
 	// NumOperators tracks the total count of operators.
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-difffinal-variancefinal-std-devvariancestd-devxor-aggjson-aggjsonb-agg"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-difffinal-variancefinal-std-devvariancestd-devxor-aggjson-aggjsonb-aggexists-agg"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 279, 287, 290, 298, 303, 307, 311, 316, 327, 332, 343, 355, 361, 368, 371, 373, 376, 378, 380, 382, 384, 386, 388, 390, 396, 400, 408, 414, 424, 434, 448, 457, 470, 481, 496, 498, 504, 512, 523, 538, 554, 560, 565, 571, 575, 580, 584, 587, 596, 599, 602, 608, 615, 622, 631, 641, 655, 670, 681, 697, 701, 705, 709, 714, 722, 730, 746, 755, 758, 766, 773, 783, 788, 798, 801, 804, 811, 814, 822, 836, 849, 857, 864, 871, 879, 888}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 279, 289, 297, 300, 308, 313, 317, 321, 326, 337, 342, 353, 365, 371, 378, 381, 383, 386, 388, 390, 392, 394, 396, 398, 400, 406, 410, 418, 424, 434, 444, 458, 467, 480, 491, 506, 508, 514, 522, 533, 548, 564, 570, 575, 581, 585, 590, 594, 597, 606, 609, 612, 618, 625, 632, 641, 651, 665, 680, 691, 707, 711, 715, 719, 724, 732, 740, 756, 765, 768, 776, 783, 793, 798, 808, 811, 814, 821, 824, 832, 846, 859, 867, 874, 881, 889, 898, 908}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -532,6 +550,7 @@ var RelationalOperators = [...]Operator{
 	OffsetOp,
 	Max1RowOp,
 	ExplainOp,
+	RowNumberOp,
 }
 
 var JoinOperators = [...]Operator{
@@ -644,6 +663,7 @@ var ScalarOperators = [...]Operator{
 	XorAggOp,
 	JsonAggOp,
 	JsonbAggOp,
+	ExistsAggOp,
 }
 
 var ConstValueOperators = [...]Operator{
@@ -734,4 +754,5 @@ var AggregateOperators = [...]Operator{
 	XorAggOp,
 	JsonAggOp,
 	JsonbAggOp,
+	ExistsAggOp,
 }

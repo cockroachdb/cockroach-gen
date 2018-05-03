@@ -34,13 +34,13 @@ const (
 	CommuteNullIs
 	DecorrelateJoin
 	TryDecorrelateSelect
-	NormalizeSelectAny
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery
 	HoistProjectSubquery
 	HoistJoinSubquery
 	HoistValuesSubquery
+	NormalizeAnyFilter
 	EliminateDistinct
 	EnsureJoinFiltersAnd
 	EnsureJoinFilters
@@ -86,9 +86,9 @@ const (
 	FoldInNull
 	EliminateExistsProject
 	EliminateExistsGroupBy
+	EliminateSelect
 	EnsureSelectFiltersAnd
 	EnsureSelectFilters
-	EliminateSelect
 	MergeSelects
 	PushSelectIntoProject
 	PushSelectIntoJoinLeft

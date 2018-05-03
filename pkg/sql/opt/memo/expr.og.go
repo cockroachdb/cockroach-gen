@@ -39,6 +39,7 @@ var opLayoutTable = [...]opLayout{
 	opt.OffsetOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.Max1RowOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ExplainOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
+	opt.RowNumberOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.SubqueryOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AnyOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.VariableOp:        makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
@@ -124,6 +125,7 @@ var opLayoutTable = [...]opLayout{
 	opt.XorAggOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonAggOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonbAggOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.ExistsAggOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -158,6 +160,7 @@ var isEnforcerLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -243,6 +246,7 @@ var isEnforcerLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -277,6 +281,7 @@ var isRelationalLookup = [...]bool{
 	opt.OffsetOp:          true,
 	opt.Max1RowOp:         true,
 	opt.ExplainOp:         true,
+	opt.RowNumberOp:       true,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -362,6 +367,7 @@ var isRelationalLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isJoinLookup = [...]bool{
@@ -396,6 +402,7 @@ var isJoinLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -481,6 +488,7 @@ var isJoinLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -515,6 +523,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -600,6 +609,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isScalarLookup = [...]bool{
@@ -634,6 +644,7 @@ var isScalarLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        true,
 	opt.AnyOp:             true,
 	opt.VariableOp:        true,
@@ -719,6 +730,7 @@ var isScalarLookup = [...]bool{
 	opt.XorAggOp:          true,
 	opt.JsonAggOp:         true,
 	opt.JsonbAggOp:        true,
+	opt.ExistsAggOp:       true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -753,6 +765,7 @@ var isConstValueLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -838,6 +851,7 @@ var isConstValueLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -872,6 +886,7 @@ var isBooleanLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -957,6 +972,7 @@ var isBooleanLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -991,6 +1007,7 @@ var isComparisonLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1076,6 +1093,7 @@ var isComparisonLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -1110,6 +1128,7 @@ var isBinaryLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1195,6 +1214,7 @@ var isBinaryLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1229,6 +1249,7 @@ var isUnaryLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1314,6 +1335,7 @@ var isUnaryLookup = [...]bool{
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
+	opt.ExistsAggOp:       false,
 }
 
 var isAggregateLookup = [...]bool{
@@ -1348,6 +1370,7 @@ var isAggregateLookup = [...]bool{
 	opt.OffsetOp:          false,
 	opt.Max1RowOp:         false,
 	opt.ExplainOp:         false,
+	opt.RowNumberOp:       false,
 	opt.SubqueryOp:        false,
 	opt.AnyOp:             false,
 	opt.VariableOp:        false,
@@ -1433,6 +1456,7 @@ var isAggregateLookup = [...]bool{
 	opt.XorAggOp:          true,
 	opt.JsonAggOp:         true,
 	opt.JsonbAggOp:        true,
+	opt.ExistsAggOp:       true,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -2413,6 +2437,33 @@ func (e *Expr) AsExplain() *ExplainExpr {
 		return nil
 	}
 	return (*ExplainExpr)(e)
+}
+
+// RowNumberExpr adds a column to each row in its input containing a unique,
+// increasing number.
+type RowNumberExpr Expr
+
+func MakeRowNumberExpr(input GroupID, def PrivateID) RowNumberExpr {
+	return RowNumberExpr{op: opt.RowNumberOp, state: exprState{uint32(input), uint32(def)}}
+}
+
+func (e *RowNumberExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *RowNumberExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
+}
+
+func (e *RowNumberExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsRowNumber() *RowNumberExpr {
+	if e.op != opt.RowNumberOp {
+		return nil
+	}
+	return (*RowNumberExpr)(e)
 }
 
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
@@ -4505,6 +4556,39 @@ func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
 	return (*JsonbAggExpr)(e)
 }
 
+// ExistsAggExpr evalutes to True if there is at least one non-null value in the
+// grouping set. Otherwise, it returns False. Its behavior is exactly equivalent
+// to:
+//
+//   COUNT(c) > 0
+//
+// Just like COUNT(c) and the other SQL aggregates, EXISTS_AGG(c) will ignore
+// null values. A set containing only null values is equivalent to an empty set
+// (both yield False).
+//
+// ExistsAgg is not part of SQL, but it's used internally to rewrite correlated
+// Exists subqueries into an efficient and convenient form.
+type ExistsAggExpr Expr
+
+func MakeExistsAggExpr(input GroupID) ExistsAggExpr {
+	return ExistsAggExpr{op: opt.ExistsAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *ExistsAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *ExistsAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsExistsAgg() *ExistsAggExpr {
+	if e.op != opt.ExistsAggOp {
+		return nil
+	}
+	return (*ExistsAggExpr)(e)
+}
+
 // InternScanOpDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -4552,6 +4636,13 @@ func (m *Memo) InternOrdering(val Ordering) PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (m *Memo) InternExplainOpDef(val *ExplainOpDef) PrivateID {
 	return m.privateStorage.internExplainOpDef(val)
+}
+
+// InternRowNumberDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternRowNumberDef(val *RowNumberDef) PrivateID {
+	return m.privateStorage.internRowNumberDef(val)
 }
 
 // InternColumnID adds the given value to the memo and returns an ID that
@@ -4737,6 +4828,11 @@ func init() {
 	// ExplainOp
 	makeExprLookup[opt.ExplainOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeExplainExpr(GroupID(operands[0]), PrivateID(operands[1])))
+	}
+
+	// RowNumberOp
+	makeExprLookup[opt.RowNumberOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeRowNumberExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// SubqueryOp
@@ -5162,6 +5258,11 @@ func init() {
 	// JsonbAggOp
 	makeExprLookup[opt.JsonbAggOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeJsonbAggExpr(GroupID(operands[0])))
+	}
+
+	// ExistsAggOp
+	makeExprLookup[opt.ExistsAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeExistsAggExpr(GroupID(operands[0])))
 	}
 
 }
