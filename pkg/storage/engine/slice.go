@@ -14,6 +14,8 @@
 
 package engine
 
+import "C"
+
 import (
 	"unsafe"
 )
@@ -24,8 +26,14 @@ func nonZeroingMakeByteSlice(len int) []byte {
 }
 
 // Replacement for C.GoBytes which does not zero initialize the returned slice
-// before overwriting it. See https://github.com/golang/go/issues/23634.
+// before overwriting it.
+//
+// TODO(peter): Remove when go1.11 is released which has a similar change to
+// C.GoBytes.
 func gobytes(ptr unsafe.Pointer, len int) []byte {
+	if len == 0 {
+		return make([]byte, 0)
+	}
 	x := nonZeroingMakeByteSlice(len)
 	src := (*[maxArrayLen]byte)(ptr)[:len:len]
 	copy(x, src)
