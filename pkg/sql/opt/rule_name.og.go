@@ -60,16 +60,17 @@ const (
 	EliminateUnaryMinus
 	EliminateProject
 	EliminateProjectProject
-	FilterUnusedProjectCols
-	FilterUnusedScanCols
-	FilterUnusedSelectCols
-	FilterUnusedLimitCols
-	FilterUnusedOffsetCols
-	FilterUnusedJoinLeftCols
-	FilterUnusedJoinRightCols
-	FilterUnusedAggCols
-	FilterUnusedGroupByCols
-	FilterUnusedValuesCols
+	PruneProjectCols
+	PruneScanCols
+	PruneSelectCols
+	PruneLimitCols
+	PruneOffsetCols
+	PruneJoinLeftCols
+	PruneJoinRightCols
+	PruneAggCols
+	PruneGroupByCols
+	PruneValuesCols
+	PruneRowNumberCols
 	CommuteVar
 	CommuteConst
 	EliminateCoalesce

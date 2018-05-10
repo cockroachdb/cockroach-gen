@@ -5,6 +5,7 @@ package norm
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -47,7 +48,7 @@ func (_f *Factory) InternSetOpColMap(val *memo.SetOpColMap) memo.PrivateID {
 // InternOrdering adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternOrdering(val memo.Ordering) memo.PrivateID {
+func (_f *Factory) InternOrdering(val props.Ordering) memo.PrivateID {
 	return _f.mem.InternOrdering(val)
 }
 
@@ -355,12 +356,15 @@ func (_f *Factory) ConstructSelect(
 					if _f.isBoundBy(condition, input) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoProject) {
 							_group = _f.ConstructSelect(
-								_f.projectNoCycle(_f.ConstructSelect(
-									input,
-									_f.ConstructFilters(
-										_f.extractBoundConditions(list, input),
+								_f.ConstructProject(
+									_f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.extractBoundConditions(list, input),
+										),
 									),
-								), projections),
+									projections,
+								),
 								_f.ConstructFilters(
 									_f.extractUnboundConditions(list, input),
 								),
@@ -601,24 +605,24 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedProjectCols]
+	// [PruneProjectCols]
 	{
 		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
 		if _projectExpr2 != nil {
 			innerInput := _projectExpr2.Input()
 			innerProjections := _projectExpr2.Projections()
-			if _f.hasUnusedColumns(innerProjections, _f.neededCols(projections)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedProjectCols) {
+			if _f.canPruneCols(innerProjections, _f.neededCols(projections)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneProjectCols) {
 					_group = _f.ConstructProject(
 						_f.ConstructProject(
 							innerInput,
-							_f.filterUnusedColumns(innerProjections, _f.neededCols(projections)),
+							_f.pruneCols(innerProjections, _f.neededCols(projections)),
 						),
 						projections,
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedProjectCols, _group, 0)
+						_f.appliedRule(opt.PruneProjectCols, _group, 0)
 					}
 					return _group
 				}
@@ -626,19 +630,19 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedScanCols]
+	// [PruneScanCols]
 	{
 		_scanExpr := _f.mem.NormExpr(input).AsScan()
 		if _scanExpr != nil {
-			if _f.hasUnusedColumns(input, _f.neededCols(projections)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedScanCols) {
+			if _f.canPruneCols(input, _f.neededCols(projections)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneScanCols) {
 					_group = _f.ConstructProject(
-						_f.filterUnusedColumns(input, _f.neededCols(projections)),
+						_f.pruneCols(input, _f.neededCols(projections)),
 						projections,
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedScanCols, _group, 0)
+						_f.appliedRule(opt.PruneScanCols, _group, 0)
 					}
 					return _group
 				}
@@ -646,19 +650,19 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedSelectCols]
+	// [PruneSelectCols]
 	{
 		_selectExpr := _f.mem.NormExpr(input).AsSelect()
 		if _selectExpr != nil {
 			input := _selectExpr.Input()
 			filter := _selectExpr.Filter()
-			if _f.hasUnusedColumns(input, _f.neededCols2(projections, filter)) {
+			if _f.canPruneCols(input, _f.neededCols2(projections, filter)) {
 				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedSelectCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PruneSelectCols) {
 						_f.ruleCycles[_projectExpr.Fingerprint()] = true
 						_group = _f.ConstructProject(
 							_f.ConstructSelect(
-								_f.filterUnusedColumns(input, _f.neededCols2(projections, filter)),
+								_f.pruneCols(input, _f.neededCols2(projections, filter)),
 								filter,
 							),
 							projections,
@@ -668,7 +672,7 @@ func (_f *Factory) ConstructProject(
 							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FilterUnusedSelectCols, _group, 0)
+							_f.appliedRule(opt.PruneSelectCols, _group, 0)
 						}
 						return _group
 					}
@@ -677,66 +681,86 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedLimitCols]
+	// [PruneLimitCols]
 	{
 		_limitExpr := _f.mem.NormExpr(input).AsLimit()
 		if _limitExpr != nil {
 			input := _limitExpr.Input()
 			limit := _limitExpr.Limit()
 			ordering := _limitExpr.Ordering()
-			if _f.hasUnusedColumns(input, _f.neededColsLimit(projections, ordering)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedLimitCols) {
-					_group = _f.ConstructProject(
-						_f.limitNoCycle(_f.filterUnusedColumns(input, _f.neededColsLimit(projections, ordering)), limit, ordering),
-						projections,
-					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedLimitCols, _group, 0)
+			if _f.canPruneCols(input, _f.neededColsLimit(projections, ordering)) {
+				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PruneLimitCols) {
+						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_group = _f.ConstructProject(
+							_f.ConstructLimit(
+								_f.pruneCols(input, _f.neededColsLimit(projections, ordering)),
+								limit,
+								ordering,
+							),
+							projections,
+						)
+						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PruneLimitCols, _group, 0)
+						}
+						return _group
 					}
-					return _group
 				}
 			}
 		}
 	}
 
-	// [FilterUnusedOffsetCols]
+	// [PruneOffsetCols]
 	{
 		_offsetExpr := _f.mem.NormExpr(input).AsOffset()
 		if _offsetExpr != nil {
 			input := _offsetExpr.Input()
 			offset := _offsetExpr.Offset()
 			ordering := _offsetExpr.Ordering()
-			if _f.hasUnusedColumns(input, _f.neededColsLimit(projections, ordering)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedOffsetCols) {
-					_group = _f.ConstructProject(
-						_f.offsetNoCycle(_f.filterUnusedColumns(input, _f.neededColsLimit(projections, ordering)), offset, ordering),
-						projections,
-					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedOffsetCols, _group, 0)
+			if _f.canPruneCols(input, _f.neededColsLimit(projections, ordering)) {
+				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PruneOffsetCols) {
+						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_group = _f.ConstructProject(
+							_f.ConstructOffset(
+								_f.pruneCols(input, _f.neededColsLimit(projections, ordering)),
+								offset,
+								ordering,
+							),
+							projections,
+						)
+						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PruneOffsetCols, _group, 0)
+						}
+						return _group
 					}
-					return _group
 				}
 			}
 		}
 	}
 
-	// [FilterUnusedJoinLeftCols]
+	// [PruneJoinLeftCols]
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.IsJoin() {
 			left := _expr.ChildGroup(_f.mem, 0)
 			right := _expr.ChildGroup(_f.mem, 1)
 			on := _expr.ChildGroup(_f.mem, 2)
-			if _f.hasUnusedColumns(left, _f.neededCols3(projections, right, on)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedJoinLeftCols) {
+			if _f.canPruneCols(left, _f.neededCols3(projections, right, on)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinLeftCols) {
 					_group = _f.ConstructProject(
 						_f.DynamicConstruct(
 							_f.mem.NormExpr(input).Operator(),
 							memo.DynamicOperands{
-								memo.DynamicID(_f.filterUnusedColumns(left, _f.neededCols3(projections, right, on))),
+								memo.DynamicID(_f.pruneCols(left, _f.neededCols3(projections, right, on))),
 								memo.DynamicID(right),
 								memo.DynamicID(on),
 							},
@@ -745,7 +769,7 @@ func (_f *Factory) ConstructProject(
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedJoinLeftCols, _group, 0)
+						_f.appliedRule(opt.PruneJoinLeftCols, _group, 0)
 					}
 					return _group
 				}
@@ -753,21 +777,21 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedJoinRightCols]
+	// [PruneJoinRightCols]
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.IsJoin() {
 			left := _expr.ChildGroup(_f.mem, 0)
 			right := _expr.ChildGroup(_f.mem, 1)
 			on := _expr.ChildGroup(_f.mem, 2)
-			if _f.hasUnusedColumns(right, _f.neededCols2(projections, on)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedJoinRightCols) {
+			if _f.canPruneCols(right, _f.neededCols2(projections, on)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
 					_group = _f.ConstructProject(
 						_f.DynamicConstruct(
 							_f.mem.NormExpr(input).Operator(),
 							memo.DynamicOperands{
 								memo.DynamicID(left),
-								memo.DynamicID(_f.filterUnusedColumns(right, _f.neededCols2(projections, on))),
+								memo.DynamicID(_f.pruneCols(right, _f.neededCols2(projections, on))),
 								memo.DynamicID(on),
 							},
 						),
@@ -775,7 +799,7 @@ func (_f *Factory) ConstructProject(
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedJoinRightCols, _group, 0)
+						_f.appliedRule(opt.PruneJoinRightCols, _group, 0)
 					}
 					return _group
 				}
@@ -783,26 +807,26 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedAggCols]
+	// [PruneAggCols]
 	{
 		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
 		if _groupByExpr != nil {
-			innerInput := _groupByExpr.Input()
+			input := _groupByExpr.Input()
 			aggregations := _groupByExpr.Aggregations()
 			groupingCols := _groupByExpr.GroupingCols()
-			if _f.hasUnusedColumns(aggregations, _f.neededCols(projections)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedAggCols) {
+			if _f.canPruneCols(aggregations, _f.neededCols(projections)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneAggCols) {
 					_group = _f.ConstructProject(
 						_f.ConstructGroupBy(
-							innerInput,
-							_f.filterUnusedColumns(aggregations, _f.neededCols(projections)),
+							input,
+							_f.pruneCols(aggregations, _f.neededCols(projections)),
 							groupingCols,
 						),
 						projections,
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedAggCols, _group, 0)
+						_f.appliedRule(opt.PruneAggCols, _group, 0)
 					}
 					return _group
 				}
@@ -810,19 +834,44 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [FilterUnusedValuesCols]
+	// [PruneValuesCols]
 	{
 		_valuesExpr := _f.mem.NormExpr(input).AsValues()
 		if _valuesExpr != nil {
-			if _f.hasUnusedColumns(input, _f.neededCols(projections)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedValuesCols) {
+			if _f.canPruneCols(input, _f.neededCols(projections)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneValuesCols) {
 					_group = _f.ConstructProject(
-						_f.filterUnusedColumns(input, _f.neededCols(projections)),
+						_f.pruneCols(input, _f.neededCols(projections)),
 						projections,
 					)
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FilterUnusedValuesCols, _group, 0)
+						_f.appliedRule(opt.PruneValuesCols, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [PruneRowNumberCols]
+	{
+		_rowNumberExpr := _f.mem.NormExpr(input).AsRowNumber()
+		if _rowNumberExpr != nil {
+			input := _rowNumberExpr.Input()
+			def := _rowNumberExpr.Def()
+			if _f.canPruneCols(input, _f.neededColsRowNumber(projections, def)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneRowNumberCols) {
+					_group = _f.ConstructProject(
+						_f.ConstructRowNumber(
+							_f.pruneCols(input, _f.neededColsRowNumber(projections, def)),
+							def,
+						),
+						projections,
+					)
+					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneRowNumberCols, _group, 0)
 					}
 					return _group
 				}
@@ -2565,18 +2614,18 @@ func (_f *Factory) ConstructGroupBy(
 		}
 	}
 
-	// [FilterUnusedGroupByCols]
+	// [PruneGroupByCols]
 	{
-		if _f.hasUnusedColumns(input, _f.neededColsGroupBy(aggregations, groupingCols)) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.FilterUnusedGroupByCols) {
+		if _f.canPruneCols(input, _f.neededColsGroupBy(aggregations, groupingCols)) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
 				_group = _f.ConstructGroupBy(
-					_f.filterUnusedColumns(input, _f.neededColsGroupBy(aggregations, groupingCols)),
+					_f.pruneCols(input, _f.neededColsGroupBy(aggregations, groupingCols)),
 					aggregations,
 					groupingCols,
 				)
 				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FilterUnusedGroupByCols, _group, 0)
+					_f.appliedRule(opt.PruneGroupByCols, _group, 0)
 				}
 				return _group
 			}
@@ -2786,26 +2835,20 @@ func (_f *Factory) ConstructLimit(
 		if _projectExpr != nil {
 			input := _projectExpr.Input()
 			projections := _projectExpr.Projections()
-			if !_f.ruleCycles[_limitExpr.Fingerprint()] {
-				if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoProject) {
-					_f.ruleCycles[_limitExpr.Fingerprint()] = true
-					_group = _f.ConstructProject(
-						_f.ConstructLimit(
-							input,
-							limit,
-							ordering,
-						),
-						projections,
-					)
-					delete(_f.ruleCycles, _limitExpr.Fingerprint())
-					if _f.mem.GroupByFingerprint(_limitExpr.Fingerprint()) == 0 {
-						_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
-					}
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PushLimitIntoProject, _group, 0)
-					}
-					return _group
+			if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoProject) {
+				_group = _f.ConstructProject(
+					_f.ConstructLimit(
+						input,
+						limit,
+						ordering,
+					),
+					projections,
+				)
+				_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PushLimitIntoProject, _group, 0)
 				}
+				return _group
 			}
 		}
 	}
@@ -2833,26 +2876,20 @@ func (_f *Factory) ConstructOffset(
 		if _projectExpr != nil {
 			input := _projectExpr.Input()
 			projections := _projectExpr.Projections()
-			if !_f.ruleCycles[_offsetExpr.Fingerprint()] {
-				if _f.matchedRule == nil || _f.matchedRule(opt.PushOffsetIntoProject) {
-					_f.ruleCycles[_offsetExpr.Fingerprint()] = true
-					_group = _f.ConstructProject(
-						_f.ConstructOffset(
-							input,
-							offset,
-							ordering,
-						),
-						projections,
-					)
-					delete(_f.ruleCycles, _offsetExpr.Fingerprint())
-					if _f.mem.GroupByFingerprint(_offsetExpr.Fingerprint()) == 0 {
-						_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
-					}
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PushOffsetIntoProject, _group, 0)
-					}
-					return _group
+			if _f.matchedRule == nil || _f.matchedRule(opt.PushOffsetIntoProject) {
+				_group = _f.ConstructProject(
+					_f.ConstructOffset(
+						input,
+						offset,
+						ordering,
+					),
+					projections,
+				)
+				_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PushOffsetIntoProject, _group, 0)
 				}
+				return _group
 			}
 		}
 	}
