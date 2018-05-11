@@ -87,6 +87,52 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 		}
 	}
 
+	// [ConstrainLookupJoinIndexScan]
+	{
+		_partlyExplored := _root.Expr < _rootState.start
+		_state := _e.exploreGroup(_rootExpr.Input())
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		for _ord := memo.ExprOrdinal(0); _ord < _state.end; _ord++ {
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
+			_lookupJoinExpr := _e.mem.Expr(_eid).AsLookupJoin()
+			if _lookupJoinExpr != nil {
+				_state := _e.exploreGroup(_lookupJoinExpr.Input())
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				start := memo.ExprOrdinal(0)
+				if _partlyExplored {
+					start = _state.start
+				}
+				for _ord := start; _ord < _state.end; _ord++ {
+					_eid := memo.ExprID{Group: _lookupJoinExpr.Input(), Expr: _ord}
+					_scanExpr := _e.mem.Expr(_eid).AsScan()
+					if _scanExpr != nil {
+						def := _scanExpr.Def()
+						if _e.canConstrainScan(def) {
+							outerdef := _lookupJoinExpr.Def()
+							filter := _rootExpr.Filter()
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainLookupJoinIndexScan) {
+								_exprs := _e.constrainLookupJoinIndexScan(filter, def, outerdef)
+								_before := _e.mem.ExprCount(_root.Group)
+								for i := range _exprs {
+									_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+								}
+								if _e.o.appliedRule != nil {
+									_after := _e.mem.ExprCount(_root.Group)
+									_e.o.appliedRule(opt.ConstrainLookupJoinIndexScan, _root.Group, _after-_before)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 

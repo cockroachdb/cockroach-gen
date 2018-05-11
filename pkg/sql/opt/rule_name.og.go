@@ -103,6 +103,7 @@ const (
 	PushLimitIntoScan
 	GenerateIndexScans
 	ConstrainScan
+	ConstrainLookupJoinIndexScan
 
 	// NumRuleNames tracks the total count of rule names.
 	NumRuleNames
