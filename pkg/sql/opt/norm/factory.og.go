@@ -537,6 +537,31 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [PushSelectIntoInlinableProject]
+	{
+		_projectExpr := _f.mem.NormExpr(input).AsProject()
+		if _projectExpr != nil {
+			input := _projectExpr.Input()
+			projections := _projectExpr.Projections()
+			if _f.canInline(projections) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoInlinableProject) {
+					_group = _f.ConstructProject(
+						_f.ConstructSelect(
+							input,
+							_f.inlineProjections(filter, projections),
+						),
+						projections,
+					)
+					_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushSelectIntoInlinableProject, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_selectExpr))
 }
 
@@ -785,23 +810,29 @@ func (_f *Factory) ConstructProject(
 			right := _expr.ChildGroup(_f.mem, 1)
 			on := _expr.ChildGroup(_f.mem, 2)
 			if _f.canPruneCols(right, _f.neededCols2(projections, on)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
-					_group = _f.ConstructProject(
-						_f.DynamicConstruct(
-							_f.mem.NormExpr(input).Operator(),
-							memo.DynamicOperands{
-								memo.DynamicID(left),
-								memo.DynamicID(_f.pruneCols(right, _f.neededCols2(projections, on))),
-								memo.DynamicID(on),
-							},
-						),
-						projections,
-					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneJoinRightCols, _group, 0)
+				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
+						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_group = _f.ConstructProject(
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(input).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(left),
+									memo.DynamicID(_f.pruneCols(right, _f.neededCols2(projections, on))),
+									memo.DynamicID(on),
+								},
+							),
+							projections,
+						)
+						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PruneJoinRightCols, _group, 0)
+						}
+						return _group
 					}
-					return _group
 				}
 			}
 		}
@@ -872,6 +903,28 @@ func (_f *Factory) ConstructProject(
 					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.PruneRowNumberCols, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [InlineProjectInProject]
+	{
+		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
+		if _projectExpr2 != nil {
+			innerInput := _projectExpr2.Input()
+			innerProjections := _projectExpr2.Projections()
+			if !_f.hasDuplicateRefs(projections) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.InlineProjectInProject) {
+					_group = _f.ConstructProject(
+						innerInput,
+						_f.inlineProjections(projections, innerProjections),
+					)
+					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.InlineProjectInProject, _group, 0)
 					}
 					return _group
 				}
@@ -1053,6 +1106,44 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [EliminateJoinNoColsLeft]
+	{
+		if _f.hasNoCols(left) {
+			if _f.hasOneRow(left) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsLeft) {
+					_group = _f.ConstructSelect(
+						right,
+						on,
+					)
+					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateJoinNoColsLeft, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinNoColsRight]
+	{
+		if _f.hasNoCols(right) {
+			if _f.hasOneRow(right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsRight) {
+					_group = _f.ConstructSelect(
+						left,
+						on,
+					)
+					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateJoinNoColsRight, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_innerJoinExpr))
 }
 
@@ -1190,6 +1281,23 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [SimplifyLeftJoin]
+	{
+		if _f.hasOneOrMoreRows(right) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+					_group = _f.constructNonLeftJoin(opt.LeftJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_leftJoinExpr))
 }
 
@@ -1298,6 +1406,23 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
+	// [SimplifyRightJoin]
+	{
+		if _f.hasOneOrMoreRows(left) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+					_group = _f.constructNonRightJoin(opt.RightJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_rightJoinExpr))
 }
 
@@ -1370,6 +1495,40 @@ func (_f *Factory) ConstructFullJoin(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [SimplifyLeftJoin]
+	{
+		if _f.hasOneOrMoreRows(right) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+					_group = _f.constructNonLeftJoin(opt.FullJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyRightJoin]
+	{
+		if _f.hasOneOrMoreRows(left) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+					_group = _f.constructNonRightJoin(opt.FullJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoin, _group, 0)
+					}
+					return _group
+				}
 			}
 		}
 	}
@@ -1543,6 +1702,23 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [EliminateSemiJoin]
+	{
+		if _f.hasOneOrMoreRows(right) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
+					_group = left
+					_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateSemiJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_semiJoinExpr))
 }
 
@@ -1676,6 +1852,20 @@ func (_f *Factory) ConstructAntiJoin(
 						return _group
 					}
 				}
+			}
+		}
+	}
+
+	// [EliminateAntiJoin]
+	{
+		if _f.hasZeroRows(right) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAntiJoin) {
+				_group = left
+				_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAntiJoin, _group, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -1881,6 +2071,44 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [EliminateJoinNoColsLeft]
+	{
+		if _f.hasNoCols(left) {
+			if _f.hasOneRow(left) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsLeft) {
+					_group = _f.ConstructSelect(
+						right,
+						on,
+					)
+					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateJoinNoColsLeft, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinNoColsRight]
+	{
+		if _f.hasNoCols(right) {
+			if _f.hasOneRow(right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsRight) {
+					_group = _f.ConstructSelect(
+						left,
+						on,
+					)
+					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateJoinNoColsRight, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_innerJoinApplyExpr))
 }
 
@@ -2032,6 +2260,23 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [SimplifyLeftJoin]
+	{
+		if _f.hasOneOrMoreRows(right) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+					_group = _f.constructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_leftJoinApplyExpr))
 }
 
@@ -2154,6 +2399,23 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
+	// [SimplifyRightJoin]
+	{
+		if _f.hasOneOrMoreRows(left) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+					_group = _f.constructNonRightJoin(opt.RightJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_rightJoinApplyExpr))
 }
 
@@ -2240,6 +2502,40 @@ func (_f *Factory) ConstructFullJoinApply(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [SimplifyLeftJoin]
+	{
+		if _f.hasOneOrMoreRows(right) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+					_group = _f.constructNonLeftJoin(opt.FullJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyRightJoin]
+	{
+		if _f.hasOneOrMoreRows(left) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+					_group = _f.constructNonRightJoin(opt.FullJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoin, _group, 0)
+					}
+					return _group
+				}
 			}
 		}
 	}
@@ -2427,6 +2723,23 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [EliminateSemiJoin]
+	{
+		if _f.hasOneOrMoreRows(right) {
+			_trueExpr := _f.mem.NormExpr(on).AsTrue()
+			if _trueExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
+					_group = left
+					_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateSemiJoin, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_semiJoinApplyExpr))
 }
 
@@ -2578,6 +2891,20 @@ func (_f *Factory) ConstructAntiJoinApply(
 		}
 	}
 
+	// [EliminateAntiJoin]
+	{
+		if _f.hasZeroRows(right) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAntiJoin) {
+				_group = left
+				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAntiJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_antiJoinApplyExpr))
 }
 
@@ -2607,6 +2934,28 @@ func (_f *Factory) ConstructGroupBy(
 					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.EliminateDistinct, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [EliminateGroupByProject]
+	{
+		_projectExpr := _f.mem.NormExpr(input).AsProject()
+		if _projectExpr != nil {
+			innerInput := _projectExpr.Input()
+			if _f.hasSubsetCols(input, innerInput) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
+					_group = _f.ConstructGroupBy(
+						innerInput,
+						aggregations,
+						groupingCols,
+					)
+					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateGroupByProject, _group, 0)
 					}
 					return _group
 				}

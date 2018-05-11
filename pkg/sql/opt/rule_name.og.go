@@ -42,10 +42,19 @@ const (
 	HoistValuesSubquery
 	NormalizeAnyFilter
 	EliminateDistinct
+	EliminateGroupByProject
+	PushSelectIntoInlinableProject
+	InlineProjectInProject
 	EnsureJoinFiltersAnd
 	EnsureJoinFilters
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
+	SimplifyLeftJoin
+	SimplifyRightJoin
+	EliminateSemiJoin
+	EliminateAntiJoin
+	EliminateJoinNoColsLeft
+	EliminateJoinNoColsRight
 	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject
