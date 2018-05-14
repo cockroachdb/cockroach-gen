@@ -219,31 +219,26 @@ const (
 	// subquery returns zero rows, then that column is bound to NULL.
 	SubqueryOp
 
-	// AnyOp is a special operator that does not exist in SQL. However, it is very
-	// similar to the SQL ANY, and can be converted to the SQL ANY operator using
-	// the following transformation:
+	// AnyOp is a SQL operator that applies a comparison to every row of an input
+	// subquery and returns true if any of the comparisons are true, else returns
+	// null if any of the comparisons are null, else returns false. The following
+	// transformations map from various SQL operators into the Any operator:
 	//
-	//   Any(<subquery>) ==> True = ANY(<subquery>)
+	//   <scalar> IN (<subquery>)
+	//   ==> (Any <subquery> <scalar> EqOp)
 	//
-	// The following transformations translate from various SQL operators into the
-	// Any operator:
+	//   <scalar> NOT IN (<subquery>)
+	//   ==> (Not (Any <subquery> <scalar> EqOp))
 	//
-	//   <var> IN (<subquery>)
-	//   ==> Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+	//   <scalar> <comp> {SOME|ANY}(<subquery>)
+	//   ==> (Any <subquery> <scalar> <comp>)
 	//
-	//   <var> NOT IN (<subquery>)
-	//   ==> NOT Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+	//   <scalar> <comp> ALL(<subquery>)
+	//   ==> (Not (Any <subquery> <scalar> <negated-comp>))
 	//
-	//   <var> <comp> {SOME|ANY}(<subquery>)
-	//   ==> Any(SELECT <var> <comp> x FROM (<subquery>) AS q(x))
-	//
-	//   <var> <comp> ALL(<subquery>)
-	//   ==> NOT Any(SELECT NOT(<var> <comp> x) FROM (<subquery>) AS q(x))
-	//
-	// Any expects the subquery to return a single boolean column. The semantics
-	// are equivalent to the SQL ANY expression above on the right: Any returns true
-	// if any of the values returned by the subquery are true, else returns NULL
-	// if any of the values are NULL, else returns false.
+	// Any expects the input subquery to return a single column of any data type. The
+	// scalar value is compared with that column using the specified comparison
+	// operator.
 	AnyOp
 
 	// VariableOp is the typed scalar value of a column in the query. The private

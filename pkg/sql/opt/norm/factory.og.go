@@ -66,6 +66,13 @@ func (_f *Factory) InternRowNumberDef(val *memo.RowNumberDef) memo.PrivateID {
 	return _f.mem.InternRowNumberDef(val)
 }
 
+// InternOperator adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternOperator(val opt.Operator) memo.PrivateID {
+	return _f.mem.InternOperator(val)
+}
+
 // InternColumnID adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -3337,35 +3344,32 @@ func (_f *Factory) ConstructSubquery(
 }
 
 // ConstructAny constructs an expression for the Any operator.
-// Any is a special operator that does not exist in SQL. However, it is very
-// similar to the SQL ANY, and can be converted to the SQL ANY operator using
-// the following transformation:
+// Any is a SQL operator that applies a comparison to every row of an input
+// subquery and returns true if any of the comparisons are true, else returns
+// null if any of the comparisons are null, else returns false. The following
+// transformations map from various SQL operators into the Any operator:
 //
-//   Any(<subquery>) ==> True = ANY(<subquery>)
+//   <scalar> IN (<subquery>)
+//   ==> (Any <subquery> <scalar> EqOp)
 //
-// The following transformations translate from various SQL operators into the
-// Any operator:
+//   <scalar> NOT IN (<subquery>)
+//   ==> (Not (Any <subquery> <scalar> EqOp))
 //
-//   <var> IN (<subquery>)
-//   ==> Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+//   <scalar> <comp> {SOME|ANY}(<subquery>)
+//   ==> (Any <subquery> <scalar> <comp>)
 //
-//   <var> NOT IN (<subquery>)
-//   ==> NOT Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+//   <scalar> <comp> ALL(<subquery>)
+//   ==> (Not (Any <subquery> <scalar> <negated-comp>))
 //
-//   <var> <comp> {SOME|ANY}(<subquery>)
-//   ==> Any(SELECT <var> <comp> x FROM (<subquery>) AS q(x))
-//
-//   <var> <comp> ALL(<subquery>)
-//   ==> NOT Any(SELECT NOT(<var> <comp> x) FROM (<subquery>) AS q(x))
-//
-// Any expects the subquery to return a single boolean column. The semantics
-// are equivalent to the SQL ANY expression above on the right: Any returns true
-// if any of the values returned by the subquery are true, else returns NULL
-// if any of the values are NULL, else returns false.
+// Any expects the input subquery to return a single column of any data type. The
+// scalar value is compared with that column using the specified comparison
+// operator.
 func (_f *Factory) ConstructAny(
 	input memo.GroupID,
+	scalar memo.GroupID,
+	cmp memo.PrivateID,
 ) memo.GroupID {
-	_anyExpr := memo.MakeAnyExpr(input)
+	_anyExpr := memo.MakeAnyExpr(input, scalar, cmp)
 	_group := _f.mem.GroupByFingerprint(_anyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -3639,32 +3643,63 @@ func (_f *Factory) ConstructFilters(
 			any := _item
 			_anyExpr := _f.mem.NormExpr(_item).AsAny()
 			if _anyExpr != nil {
-				_projectExpr := _f.mem.NormExpr(_anyExpr.Input()).AsProject()
-				if _projectExpr != nil {
-					input := _projectExpr.Input()
-					_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
-					if _projectionsExpr != nil {
-						if _projectionsExpr.Elems().Length == 1 {
-							_item := _f.mem.LookupList(_projectionsExpr.Elems())[0]
-							condition := _item
-							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeAnyFilter) {
-								_group = _f.ConstructFilters(
-									_f.replaceListItem(list, any, _f.ConstructExists(
-										_f.ConstructSelect(
-											input,
-											_f.ConstructFilters(
-												_f.mem.InternList([]memo.GroupID{condition}),
-											),
+				input := _anyExpr.Input()
+				scalar := _anyExpr.Scalar()
+				cmp := _anyExpr.Cmp()
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeAnyFilter) {
+					_group = _f.ConstructFilters(
+						_f.replaceListItem(list, any, _f.ConstructExists(
+							_f.ConstructSelect(
+								input,
+								_f.ConstructFilters(
+									_f.mem.InternList([]memo.GroupID{_f.constructAnyCondition(input, scalar, cmp)}),
+								),
+							),
+						)),
+					)
+					_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeAnyFilter, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [NormalizeNotAnyFilter]
+	{
+		list := conditions
+		for _, _item := range _f.mem.LookupList(conditions) {
+			notany := _item
+			_notExpr := _f.mem.NormExpr(_item).AsNot()
+			if _notExpr != nil {
+				_anyExpr := _f.mem.NormExpr(_notExpr.Input()).AsAny()
+				if _anyExpr != nil {
+					input := _anyExpr.Input()
+					scalar := _anyExpr.Scalar()
+					cmp := _anyExpr.Cmp()
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeNotAnyFilter) {
+						_group = _f.ConstructFilters(
+							_f.replaceListItem(list, notany, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
+												_f.constructAnyCondition(input, scalar, cmp),
+												_f.ConstructFalse(),
+											)}),
 										),
-									)),
-								)
-								_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeAnyFilter, _group, 0)
-								}
-								return _group
-							}
+									),
+								),
+							)),
+						)
+						_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeNotAnyFilter, _group, 0)
 						}
+						return _group
 					}
 				}
 			}
@@ -7887,7 +7922,7 @@ func init() {
 
 	// AnyOp
 	dynConstructLookup[opt.AnyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAny(memo.GroupID(operands[0]))
+		return f.ConstructAny(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
 	}
 
 	// VariableOp

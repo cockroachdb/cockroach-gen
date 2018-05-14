@@ -41,6 +41,7 @@ const (
 	HoistJoinSubquery
 	HoistValuesSubquery
 	NormalizeAnyFilter
+	NormalizeNotAnyFilter
 	EliminateDistinct
 	EliminateGroupByProject
 	PushSelectIntoInlinableProject

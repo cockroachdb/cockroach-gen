@@ -42,7 +42,7 @@ var opLayoutTable = [...]opLayout{
 	opt.ExplainOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.RowNumberOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.SubqueryOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AnyOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.AnyOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.VariableOp:        makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.ConstOp:           makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.NullOp:            makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
@@ -2505,39 +2505,42 @@ func (e *Expr) AsSubquery() *SubqueryExpr {
 	return (*SubqueryExpr)(e)
 }
 
-// AnyExpr is a special operator that does not exist in SQL. However, it is very
-// similar to the SQL ANY, and can be converted to the SQL ANY operator using
-// the following transformation:
+// AnyExpr is a SQL operator that applies a comparison to every row of an input
+// subquery and returns true if any of the comparisons are true, else returns
+// null if any of the comparisons are null, else returns false. The following
+// transformations map from various SQL operators into the Any operator:
 //
-//   Any(<subquery>) ==> True = ANY(<subquery>)
+//   <scalar> IN (<subquery>)
+//   ==> (Any <subquery> <scalar> EqOp)
 //
-// The following transformations translate from various SQL operators into the
-// Any operator:
+//   <scalar> NOT IN (<subquery>)
+//   ==> (Not (Any <subquery> <scalar> EqOp))
 //
-//   <var> IN (<subquery>)
-//   ==> Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+//   <scalar> <comp> {SOME|ANY}(<subquery>)
+//   ==> (Any <subquery> <scalar> <comp>)
 //
-//   <var> NOT IN (<subquery>)
-//   ==> NOT Any(SELECT <var> = x FROM (<subquery>) AS q(x))
+//   <scalar> <comp> ALL(<subquery>)
+//   ==> (Not (Any <subquery> <scalar> <negated-comp>))
 //
-//   <var> <comp> {SOME|ANY}(<subquery>)
-//   ==> Any(SELECT <var> <comp> x FROM (<subquery>) AS q(x))
-//
-//   <var> <comp> ALL(<subquery>)
-//   ==> NOT Any(SELECT NOT(<var> <comp> x) FROM (<subquery>) AS q(x))
-//
-// Any expects the subquery to return a single boolean column. The semantics
-// are equivalent to the SQL ANY expression above on the right: Any returns true
-// if any of the values returned by the subquery are true, else returns NULL
-// if any of the values are NULL, else returns false.
+// Any expects the input subquery to return a single column of any data type. The
+// scalar value is compared with that column using the specified comparison
+// operator.
 type AnyExpr Expr
 
-func MakeAnyExpr(input GroupID) AnyExpr {
-	return AnyExpr{op: opt.AnyOp, state: exprState{uint32(input)}}
+func MakeAnyExpr(input GroupID, scalar GroupID, cmp PrivateID) AnyExpr {
+	return AnyExpr{op: opt.AnyOp, state: exprState{uint32(input), uint32(scalar), uint32(cmp)}}
 }
 
 func (e *AnyExpr) Input() GroupID {
 	return GroupID(e.state[0])
+}
+
+func (e *AnyExpr) Scalar() GroupID {
+	return GroupID(e.state[1])
+}
+
+func (e *AnyExpr) Cmp() PrivateID {
+	return PrivateID(e.state[2])
 }
 
 func (e *AnyExpr) Fingerprint() Fingerprint {
@@ -4646,6 +4649,13 @@ func (m *Memo) InternRowNumberDef(val *RowNumberDef) PrivateID {
 	return m.privateStorage.internRowNumberDef(val)
 }
 
+// InternOperator adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternOperator(val opt.Operator) PrivateID {
+	return m.privateStorage.internOperator(val)
+}
+
 // InternColumnID adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -4843,7 +4853,7 @@ func init() {
 
 	// AnyOp
 	makeExprLookup[opt.AnyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAnyExpr(GroupID(operands[0])))
+		return Expr(MakeAnyExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
 	}
 
 	// VariableOp
