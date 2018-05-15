@@ -101,6 +101,13 @@ func (_f *Factory) InternTypedExpr(val tree.TypedExpr) memo.PrivateID {
 	return _f.mem.InternTypedExpr(val)
 }
 
+// InternProjectionsOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternProjectionsOpDef(val *memo.ProjectionsOpDef) memo.PrivateID {
+	return _f.mem.InternProjectionsOpDef(val)
+}
+
 // InternFuncOpDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -575,9 +582,10 @@ func (_f *Factory) ConstructSelect(
 // ConstructProject constructs an expression for the Project operator.
 // Project modifies the set of columns returned by the input result set. Columns
 // can be removed, reordered, or renamed. In addition, new columns can be
-// synthesized. Projections is a scalar Projections list operator that contains
-// the list of expressions that describe the output columns. The Cols field of
-// the Projections operator provides the indexes of each of the output columns.
+// synthesized.
+// Projections is a scalar Projections list operator that contains information
+// about the projected columns and any expressions that describe newly
+// synthesized output columns.
 func (_f *Factory) ConstructProject(
 	input memo.GroupID,
 	projections memo.GroupID,
@@ -604,14 +612,19 @@ func (_f *Factory) ConstructProject(
 
 	// [EliminateProject]
 	{
-		if _f.hasSameCols(input, projections) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProject) {
-				_group = input
-				_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateProject, _group, 0)
+		_projectionsExpr := _f.mem.NormExpr(projections).AsProjections()
+		if _projectionsExpr != nil {
+			if _projectionsExpr.Elems().Length == 0 {
+				if _f.hasSameCols(input, projections) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProject) {
+						_group = input
+						_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.EliminateProject, _group, 0)
+						}
+						return _group
+					}
 				}
-				return _group
 			}
 		}
 	}
@@ -621,17 +634,20 @@ func (_f *Factory) ConstructProject(
 		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
 		if _projectExpr2 != nil {
 			innerInput := _projectExpr2.Input()
-			if _f.hasSubsetCols(input, innerInput) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProjectProject) {
-					_group = _f.ConstructProject(
-						innerInput,
-						projections,
-					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateProjectProject, _group, 0)
+			_projectionsExpr := _f.mem.NormExpr(_projectExpr2.Projections()).AsProjections()
+			if _projectionsExpr != nil {
+				if _projectionsExpr.Elems().Length == 0 {
+					if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProjectProject) {
+						_group = _f.ConstructProject(
+							innerInput,
+							projections,
+						)
+						_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.EliminateProjectProject, _group, 0)
+						}
+						return _group
 					}
-					return _group
 				}
 			}
 		}
@@ -3493,14 +3509,20 @@ func (_f *Factory) ConstructTuple(
 
 // ConstructProjections constructs an expression for the Projections operator.
 // Projections is a set of typed scalar expressions that will become output
-// columns for a containing Project operator. The private Cols field contains
-// the list of column indexes returned by the expression, as an opt.ColList. It
-// is not legal for Cols to be empty.
+// columns for a containing Project operator.
+//
+// The private Defs field contains the list of column indexes returned by each
+// expression, and a list of pass-through columns.
+//
+// Elems cannot contain a simple VariableOp with the same ColumnID as the
+// synthesized column (in Def.SynthesizedCols); that is a pass-through column.
+// Elems can contain a VariableOp when a new ColumnID is being assigned, such as
+// in the case of an outer column reference.
 func (_f *Factory) ConstructProjections(
 	elems memo.ListID,
-	cols memo.PrivateID,
+	def memo.PrivateID,
 ) memo.GroupID {
-	_projectionsExpr := memo.MakeProjectionsExpr(elems, cols)
+	_projectionsExpr := memo.MakeProjectionsExpr(elems, def)
 	_group := _f.mem.GroupByFingerprint(_projectionsExpr.Fingerprint())
 	if _group != 0 {
 		return _group

@@ -46,9 +46,10 @@ const (
 
 	// ProjectOp modifies the set of columns returned by the input result set. Columns
 	// can be removed, reordered, or renamed. In addition, new columns can be
-	// synthesized. Projections is a scalar Projections list operator that contains
-	// the list of expressions that describe the output columns. The Cols field of
-	// the Projections operator provides the indexes of each of the output columns.
+	// synthesized.
+	// Projections is a scalar Projections list operator that contains information
+	// about the projected columns and any expressions that describe newly
+	// synthesized output columns.
 	ProjectOp
 
 	// InnerJoinOp creates a result set that combines columns from its left and right
@@ -282,9 +283,15 @@ const (
 	TupleOp
 
 	// ProjectionsOp is a set of typed scalar expressions that will become output
-	// columns for a containing Project operator. The private Cols field contains
-	// the list of column indexes returned by the expression, as an opt.ColList. It
-	// is not legal for Cols to be empty.
+	// columns for a containing Project operator.
+	//
+	// The private Defs field contains the list of column indexes returned by each
+	// expression, and a list of pass-through columns.
+	//
+	// Elems cannot contain a simple VariableOp with the same ColumnID as the
+	// synthesized column (in Def.SynthesizedCols); that is a pass-through column.
+	// Elems can contain a VariableOp when a new ColumnID is being assigned, such as
+	// in the case of an outer column reference.
 	ProjectionsOp
 
 	// AggregationsOp is a set of aggregate expressions that will become output columns

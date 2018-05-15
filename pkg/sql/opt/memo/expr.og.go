@@ -1639,9 +1639,10 @@ func (e *Expr) AsSelect() *SelectExpr {
 
 // ProjectExpr modifies the set of columns returned by the input result set. Columns
 // can be removed, reordered, or renamed. In addition, new columns can be
-// synthesized. Projections is a scalar Projections list operator that contains
-// the list of expressions that describe the output columns. The Cols field of
-// the Projections operator provides the indexes of each of the output columns.
+// synthesized.
+// Projections is a scalar Projections list operator that contains information
+// about the projected columns and any expressions that describe newly
+// synthesized output columns.
 type ProjectExpr Expr
 
 func MakeProjectExpr(input GroupID, projections GroupID) ProjectExpr {
@@ -2720,20 +2721,26 @@ func (e *Expr) AsTuple() *TupleExpr {
 }
 
 // ProjectionsExpr is a set of typed scalar expressions that will become output
-// columns for a containing Project operator. The private Cols field contains
-// the list of column indexes returned by the expression, as an opt.ColList. It
-// is not legal for Cols to be empty.
+// columns for a containing Project operator.
+//
+// The private Defs field contains the list of column indexes returned by each
+// expression, and a list of pass-through columns.
+//
+// Elems cannot contain a simple VariableOp with the same ColumnID as the
+// synthesized column (in Def.SynthesizedCols); that is a pass-through column.
+// Elems can contain a VariableOp when a new ColumnID is being assigned, such as
+// in the case of an outer column reference.
 type ProjectionsExpr Expr
 
-func MakeProjectionsExpr(elems ListID, cols PrivateID) ProjectionsExpr {
-	return ProjectionsExpr{op: opt.ProjectionsOp, state: exprState{elems.Offset, elems.Length, uint32(cols)}}
+func MakeProjectionsExpr(elems ListID, def PrivateID) ProjectionsExpr {
+	return ProjectionsExpr{op: opt.ProjectionsOp, state: exprState{elems.Offset, elems.Length, uint32(def)}}
 }
 
 func (e *ProjectionsExpr) Elems() ListID {
 	return ListID{Offset: e.state[0], Length: e.state[1]}
 }
 
-func (e *ProjectionsExpr) Cols() PrivateID {
+func (e *ProjectionsExpr) Def() PrivateID {
 	return PrivateID(e.state[2])
 }
 
@@ -4682,6 +4689,13 @@ func (m *Memo) InternType(val types.T) PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (m *Memo) InternTypedExpr(val tree.TypedExpr) PrivateID {
 	return m.privateStorage.internTypedExpr(val)
+}
+
+// InternProjectionsOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternProjectionsOpDef(val *ProjectionsOpDef) PrivateID {
+	return m.privateStorage.internProjectionsOpDef(val)
 }
 
 // InternFuncOpDef adds the given value to the memo and returns an ID that
