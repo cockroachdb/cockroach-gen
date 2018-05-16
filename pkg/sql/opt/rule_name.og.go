@@ -34,6 +34,9 @@ const (
 	CommuteNullIs
 	DecorrelateJoin
 	TryDecorrelateSelect
+	TryDecorrelateProject
+	TryDecorrelateProjectSelect
+	TryDecorrelateScalarGroupBy
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery

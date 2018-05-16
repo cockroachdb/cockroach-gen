@@ -119,14 +119,13 @@ var opLayoutTable = [...]opLayout{
 	opt.SumIntOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.SumOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.SqrDiffOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FinalVarianceOp:   makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FinalStdDevOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.VarianceOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.StdDevOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.XorAggOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonAggOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonbAggOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ExistsAggOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.AnyNotNullOp:      makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -240,14 +239,13 @@ var isEnforcerLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -361,14 +359,13 @@ var isRelationalLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isJoinLookup = [...]bool{
@@ -482,14 +479,13 @@ var isJoinLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -603,14 +599,13 @@ var isJoinApplyLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isScalarLookup = [...]bool{
@@ -724,14 +719,13 @@ var isScalarLookup = [...]bool{
 	opt.SumIntOp:          true,
 	opt.SumOp:             true,
 	opt.SqrDiffOp:         true,
-	opt.FinalVarianceOp:   true,
-	opt.FinalStdDevOp:     true,
 	opt.VarianceOp:        true,
 	opt.StdDevOp:          true,
 	opt.XorAggOp:          true,
 	opt.JsonAggOp:         true,
 	opt.JsonbAggOp:        true,
 	opt.ExistsAggOp:       true,
+	opt.AnyNotNullOp:      true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -845,14 +839,13 @@ var isConstValueLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -966,14 +959,13 @@ var isBooleanLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -1087,14 +1079,13 @@ var isComparisonLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -1208,14 +1199,13 @@ var isBinaryLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1329,14 +1319,13 @@ var isUnaryLookup = [...]bool{
 	opt.SumIntOp:          false,
 	opt.SumOp:             false,
 	opt.SqrDiffOp:         false,
-	opt.FinalVarianceOp:   false,
-	opt.FinalStdDevOp:     false,
 	opt.VarianceOp:        false,
 	opt.StdDevOp:          false,
 	opt.XorAggOp:          false,
 	opt.JsonAggOp:         false,
 	opt.JsonbAggOp:        false,
 	opt.ExistsAggOp:       false,
+	opt.AnyNotNullOp:      false,
 }
 
 var isAggregateLookup = [...]bool{
@@ -1450,14 +1439,13 @@ var isAggregateLookup = [...]bool{
 	opt.SumIntOp:          true,
 	opt.SumOp:             true,
 	opt.SqrDiffOp:         true,
-	opt.FinalVarianceOp:   true,
-	opt.FinalStdDevOp:     true,
 	opt.VarianceOp:        true,
 	opt.StdDevOp:          true,
 	opt.XorAggOp:          true,
 	opt.JsonAggOp:         true,
 	opt.JsonbAggOp:        true,
 	opt.ExistsAggOp:       true,
+	opt.AnyNotNullOp:      true,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -4420,48 +4408,6 @@ func (e *Expr) AsSqrDiff() *SqrDiffExpr {
 	return (*SqrDiffExpr)(e)
 }
 
-type FinalVarianceExpr Expr
-
-func MakeFinalVarianceExpr(input GroupID) FinalVarianceExpr {
-	return FinalVarianceExpr{op: opt.FinalVarianceOp, state: exprState{uint32(input)}}
-}
-
-func (e *FinalVarianceExpr) Input() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *FinalVarianceExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFinalVariance() *FinalVarianceExpr {
-	if e.op != opt.FinalVarianceOp {
-		return nil
-	}
-	return (*FinalVarianceExpr)(e)
-}
-
-type FinalStdDevExpr Expr
-
-func MakeFinalStdDevExpr(input GroupID) FinalStdDevExpr {
-	return FinalStdDevExpr{op: opt.FinalStdDevOp, state: exprState{uint32(input)}}
-}
-
-func (e *FinalStdDevExpr) Input() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *FinalStdDevExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFinalStdDev() *FinalStdDevExpr {
-	if e.op != opt.FinalStdDevOp {
-		return nil
-	}
-	return (*FinalStdDevExpr)(e)
-}
-
 type VarianceExpr Expr
 
 func MakeVarianceExpr(input GroupID) VarianceExpr {
@@ -4567,7 +4513,7 @@ func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
 	return (*JsonbAggExpr)(e)
 }
 
-// ExistsAggExpr evalutes to True if there is at least one non-null value in the
+// ExistsAggExpr evaluates to True if there is at least one non-null value in the
 // grouping set. Otherwise, it returns False. Its behavior is exactly equivalent
 // to:
 //
@@ -4598,6 +4544,33 @@ func (e *Expr) AsExistsAgg() *ExistsAggExpr {
 		return nil
 	}
 	return (*ExistsAggExpr)(e)
+}
+
+// AnyNotNullExpr returns any non-null value in the grouping set, or null if there
+// are no non-null values. This is particularly useful for "passing through" the
+// value of a column that is known to be constant within a grouping set.
+//
+// AnyNotNull is not part of SQL, but it's used internally to rewrite correlated
+// subqueries into an efficient and convenient form.
+type AnyNotNullExpr Expr
+
+func MakeAnyNotNullExpr(input GroupID) AnyNotNullExpr {
+	return AnyNotNullExpr{op: opt.AnyNotNullOp, state: exprState{uint32(input)}}
+}
+
+func (e *AnyNotNullExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *AnyNotNullExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsAnyNotNull() *AnyNotNullExpr {
+	if e.op != opt.AnyNotNullOp {
+		return nil
+	}
+	return (*AnyNotNullExpr)(e)
 }
 
 // InternScanOpDef adds the given value to the memo and returns an ID that
@@ -5250,16 +5223,6 @@ func init() {
 		return Expr(MakeSqrDiffExpr(GroupID(operands[0])))
 	}
 
-	// FinalVarianceOp
-	makeExprLookup[opt.FinalVarianceOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFinalVarianceExpr(GroupID(operands[0])))
-	}
-
-	// FinalStdDevOp
-	makeExprLookup[opt.FinalStdDevOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFinalStdDevExpr(GroupID(operands[0])))
-	}
-
 	// VarianceOp
 	makeExprLookup[opt.VarianceOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeVarianceExpr(GroupID(operands[0])))
@@ -5288,6 +5251,11 @@ func init() {
 	// ExistsAggOp
 	makeExprLookup[opt.ExistsAggOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeExistsAggExpr(GroupID(operands[0])))
+	}
+
+	// AnyNotNullOp
+	makeExprLookup[opt.AnyNotNullOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeAnyNotNullExpr(GroupID(operands[0])))
 	}
 
 }

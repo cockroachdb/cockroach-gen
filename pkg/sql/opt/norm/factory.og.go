@@ -1004,6 +1004,62 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [TryDecorrelateProject]
+	{
+		if _f.hasOuterCols(right) {
+			_projectExpr := _f.mem.NormExpr(right).AsProject()
+			if _projectExpr != nil {
+				input := _projectExpr.Input()
+				projections := _projectExpr.Projections()
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
+					_group = _f.ConstructSelect(
+						_f.ConstructProject(
+							_f.ConstructInnerJoin(
+								left,
+								input,
+								_f.ConstructTrue(),
+							),
+							_f.projectColsFromBoth(projections, left),
+						),
+						on,
+					)
+					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateProject, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateScalarGroupBy]
+	{
+		if _f.hasOuterCols(right) {
+			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
+			if _groupByExpr != nil {
+				input := _groupByExpr.Input()
+				aggregations := _groupByExpr.Aggregations()
+				groupingCols := _groupByExpr.GroupingCols()
+				if _f.isScalarGroupBy(groupingCols) {
+					if _f.canAggsIgnoreNulls(aggregations) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+							_group = _f.ConstructSelect(
+								_f.hoistCorrelatedScalarGroupBy(left, input, aggregations),
+								on,
+							)
+							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.hasCorrelatedSubquery(on) {
@@ -1211,6 +1267,46 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [TryDecorrelateProjectSelect]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			projectInput := _projectExpr.Input()
+			if _f.hasOuterCols(projectInput) {
+				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
+				if _selectExpr != nil {
+					selectInput := _selectExpr.Input()
+					filters := _selectExpr.Filter()
+					projections := _projectExpr.Projections()
+					if !_f.ruleCycles[_leftJoinExpr.Fingerprint()] {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
+							_f.ruleCycles[_leftJoinExpr.Fingerprint()] = true
+							_group = _f.ConstructProject(
+								_f.ConstructLeftJoin(
+									left,
+									_f.ConstructProject(
+										selectInput,
+										_f.projectColsFromBoth(projections, selectInput),
+									),
+									_f.concatFilters(on, filters),
+								),
+								_f.projectColsFromBoth(left, right),
+							)
+							delete(_f.ruleCycles, _leftJoinExpr.Fingerprint())
+							if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
+								_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+							}
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.hasCorrelatedSubquery(on) {
@@ -1336,6 +1432,35 @@ func (_f *Factory) ConstructRightJoin(
 		return _group
 	}
 
+	// [TryDecorrelateProject]
+	{
+		if _f.hasOuterCols(right) {
+			_projectExpr := _f.mem.NormExpr(right).AsProject()
+			if _projectExpr != nil {
+				input := _projectExpr.Input()
+				projections := _projectExpr.Projections()
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
+					_group = _f.ConstructSelect(
+						_f.ConstructProject(
+							_f.ConstructRightJoin(
+								left,
+								input,
+								_f.ConstructTrue(),
+							),
+							_f.projectColsFromBoth(projections, left),
+						),
+						on,
+					)
+					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateProject, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.hasCorrelatedSubquery(on) {
@@ -1459,6 +1584,46 @@ func (_f *Factory) ConstructFullJoin(
 	_group := _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [TryDecorrelateProjectSelect]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			projectInput := _projectExpr.Input()
+			if _f.hasOuterCols(projectInput) {
+				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
+				if _selectExpr != nil {
+					selectInput := _selectExpr.Input()
+					filters := _selectExpr.Filter()
+					projections := _projectExpr.Projections()
+					if !_f.ruleCycles[_fullJoinExpr.Fingerprint()] {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
+							_f.ruleCycles[_fullJoinExpr.Fingerprint()] = true
+							_group = _f.ConstructProject(
+								_f.ConstructFullJoin(
+									left,
+									_f.ConstructProject(
+										selectInput,
+										_f.projectColsFromBoth(projections, selectInput),
+									),
+									_f.concatFilters(on, filters),
+								),
+								_f.projectColsFromBoth(left, right),
+							)
+							delete(_f.ruleCycles, _fullJoinExpr.Fingerprint())
+							if _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint()) == 0 {
+								_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+							}
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// [HoistJoinSubquery]
@@ -1926,20 +2091,6 @@ func (_f *Factory) ConstructInnerJoinApply(
 		return _group
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.constructNonApplyJoin(opt.InnerJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [TryDecorrelateSelect]
 	{
 		if _f.hasOuterCols(right) {
@@ -1963,6 +2114,76 @@ func (_f *Factory) ConstructInnerJoinApply(
 							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0)
 						}
 						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.InnerJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateProject]
+	{
+		if _f.hasOuterCols(right) {
+			_projectExpr := _f.mem.NormExpr(right).AsProject()
+			if _projectExpr != nil {
+				input := _projectExpr.Input()
+				projections := _projectExpr.Projections()
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
+					_group = _f.ConstructSelect(
+						_f.ConstructProject(
+							_f.ConstructInnerJoinApply(
+								left,
+								input,
+								_f.ConstructTrue(),
+							),
+							_f.projectColsFromBoth(projections, left),
+						),
+						on,
+					)
+					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateProject, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateScalarGroupBy]
+	{
+		if _f.hasOuterCols(right) {
+			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
+			if _groupByExpr != nil {
+				input := _groupByExpr.Input()
+				aggregations := _groupByExpr.Aggregations()
+				groupingCols := _groupByExpr.GroupingCols()
+				if _f.isScalarGroupBy(groupingCols) {
+					if _f.canAggsIgnoreNulls(aggregations) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+							_group = _f.ConstructSelect(
+								_f.hoistCorrelatedScalarGroupBy(left, input, aggregations),
+								on,
+							)
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0)
+							}
+							return _group
+						}
 					}
 				}
 			}
@@ -2147,20 +2368,6 @@ func (_f *Factory) ConstructLeftJoinApply(
 		return _group
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.constructNonApplyJoin(opt.LeftJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [TryDecorrelateSelect]
 	{
 		if _f.hasOuterCols(right) {
@@ -2186,6 +2393,60 @@ func (_f *Factory) ConstructLeftJoinApply(
 						return _group
 					}
 				}
+			}
+		}
+	}
+
+	// [TryDecorrelateProjectSelect]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			projectInput := _projectExpr.Input()
+			if _f.hasOuterCols(projectInput) {
+				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
+				if _selectExpr != nil {
+					selectInput := _selectExpr.Input()
+					filters := _selectExpr.Filter()
+					projections := _projectExpr.Projections()
+					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
+							_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+							_group = _f.ConstructProject(
+								_f.ConstructLeftJoinApply(
+									left,
+									_f.ConstructProject(
+										selectInput,
+										_f.projectColsFromBoth(projections, selectInput),
+									),
+									_f.concatFilters(on, filters),
+								),
+								_f.projectColsFromBoth(left, right),
+							)
+							delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+							if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
+								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+							}
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.LeftJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -2329,6 +2590,35 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
+	// [TryDecorrelateProject]
+	{
+		if _f.hasOuterCols(right) {
+			_projectExpr := _f.mem.NormExpr(right).AsProject()
+			if _projectExpr != nil {
+				input := _projectExpr.Input()
+				projections := _projectExpr.Projections()
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
+					_group = _f.ConstructSelect(
+						_f.ConstructProject(
+							_f.ConstructRightJoinApply(
+								left,
+								input,
+								_f.ConstructTrue(),
+							),
+							_f.projectColsFromBoth(projections, left),
+						),
+						on,
+					)
+					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateProject, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.hasCorrelatedSubquery(on) {
@@ -2452,6 +2742,46 @@ func (_f *Factory) ConstructFullJoinApply(
 	_group := _f.mem.GroupByFingerprint(_fullJoinApplyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [TryDecorrelateProjectSelect]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			projectInput := _projectExpr.Input()
+			if _f.hasOuterCols(projectInput) {
+				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
+				if _selectExpr != nil {
+					selectInput := _selectExpr.Input()
+					filters := _selectExpr.Filter()
+					projections := _projectExpr.Projections()
+					if !_f.ruleCycles[_fullJoinApplyExpr.Fingerprint()] {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
+							_f.ruleCycles[_fullJoinApplyExpr.Fingerprint()] = true
+							_group = _f.ConstructProject(
+								_f.ConstructFullJoinApply(
+									left,
+									_f.ConstructProject(
+										selectInput,
+										_f.projectColsFromBoth(projections, selectInput),
+									),
+									_f.concatFilters(on, filters),
+								),
+								_f.projectColsFromBoth(left, right),
+							)
+							delete(_f.ruleCycles, _fullJoinApplyExpr.Fingerprint())
+							if _f.mem.GroupByFingerprint(_fullJoinApplyExpr.Fingerprint()) == 0 {
+								_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+							}
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// [DecorrelateJoin]
@@ -2578,20 +2908,6 @@ func (_f *Factory) ConstructSemiJoinApply(
 		return _group
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.constructNonApplyJoin(opt.SemiJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [TryDecorrelateSelect]
 	{
 		if _f.hasOuterCols(right) {
@@ -2617,6 +2933,20 @@ func (_f *Factory) ConstructSemiJoinApply(
 						return _group
 					}
 				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.SemiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -2778,20 +3108,6 @@ func (_f *Factory) ConstructAntiJoinApply(
 		return _group
 	}
 
-	// [DecorrelateJoin]
-	{
-		if !_f.isCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.constructNonApplyJoin(opt.AntiJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [TryDecorrelateSelect]
 	{
 		if _f.hasOuterCols(right) {
@@ -2817,6 +3133,20 @@ func (_f *Factory) ConstructAntiJoinApply(
 						return _group
 					}
 				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.isCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_group = _f.constructNonApplyJoin(opt.AntiJoinApplyOp, left, right, on)
+				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -7666,32 +7996,6 @@ func (_f *Factory) ConstructSqrDiff(
 	return _f.onConstruct(memo.Expr(_sqrDiffExpr))
 }
 
-// ConstructFinalVariance constructs an expression for the FinalVariance operator.
-func (_f *Factory) ConstructFinalVariance(
-	input memo.GroupID,
-) memo.GroupID {
-	_finalVarianceExpr := memo.MakeFinalVarianceExpr(input)
-	_group := _f.mem.GroupByFingerprint(_finalVarianceExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_finalVarianceExpr))
-}
-
-// ConstructFinalStdDev constructs an expression for the FinalStdDev operator.
-func (_f *Factory) ConstructFinalStdDev(
-	input memo.GroupID,
-) memo.GroupID {
-	_finalStdDevExpr := memo.MakeFinalStdDevExpr(input)
-	_group := _f.mem.GroupByFingerprint(_finalStdDevExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_finalStdDevExpr))
-}
-
 // ConstructVariance constructs an expression for the Variance operator.
 func (_f *Factory) ConstructVariance(
 	input memo.GroupID,
@@ -7758,7 +8062,7 @@ func (_f *Factory) ConstructJsonbAgg(
 }
 
 // ConstructExistsAgg constructs an expression for the ExistsAgg operator.
-// ExistsAgg evalutes to True if there is at least one non-null value in the
+// ExistsAgg evaluates to True if there is at least one non-null value in the
 // grouping set. Otherwise, it returns False. Its behavior is exactly equivalent
 // to:
 //
@@ -7780,6 +8084,25 @@ func (_f *Factory) ConstructExistsAgg(
 	}
 
 	return _f.onConstruct(memo.Expr(_existsAggExpr))
+}
+
+// ConstructAnyNotNull constructs an expression for the AnyNotNull operator.
+// AnyNotNull returns any non-null value in the grouping set, or null if there
+// are no non-null values. This is particularly useful for "passing through" the
+// value of a column that is known to be constant within a grouping set.
+//
+// AnyNotNull is not part of SQL, but it's used internally to rewrite correlated
+// subqueries into an efficient and convenient form.
+func (_f *Factory) ConstructAnyNotNull(
+	input memo.GroupID,
+) memo.GroupID {
+	_anyNotNullExpr := memo.MakeAnyNotNullExpr(input)
+	_group := _f.mem.GroupByFingerprint(_anyNotNullExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_anyNotNullExpr))
 }
 
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
@@ -8327,16 +8650,6 @@ func init() {
 		return f.ConstructSqrDiff(memo.GroupID(operands[0]))
 	}
 
-	// FinalVarianceOp
-	dynConstructLookup[opt.FinalVarianceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFinalVariance(memo.GroupID(operands[0]))
-	}
-
-	// FinalStdDevOp
-	dynConstructLookup[opt.FinalStdDevOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFinalStdDev(memo.GroupID(operands[0]))
-	}
-
 	// VarianceOp
 	dynConstructLookup[opt.VarianceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructVariance(memo.GroupID(operands[0]))
@@ -8365,6 +8678,11 @@ func init() {
 	// ExistsAggOp
 	dynConstructLookup[opt.ExistsAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructExistsAgg(memo.GroupID(operands[0]))
+	}
+
+	// AnyNotNullOp
+	dynConstructLookup[opt.AnyNotNullOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructAnyNotNull(memo.GroupID(operands[0]))
 	}
 
 }
