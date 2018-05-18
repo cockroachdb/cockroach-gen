@@ -28,7 +28,7 @@ func TestInputStatCollector(t *testing.T) {
 	const numRows = 100
 
 	isc := NewInputStatCollector(
-		NewRowBuffer(oneIntCol, makeIntRows(numRows, 1), RowBufferArgs{}), "row buffer",
+		NewRowBuffer(oneIntCol, makeIntRows(numRows, 1), RowBufferArgs{}),
 	)
 	for row, meta := isc.Next(); row != nil || meta != nil; row, meta = isc.Next() {
 	}
