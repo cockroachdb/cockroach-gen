@@ -13,7 +13,6 @@ const (
 	// be sorted by one or more of the input columns, each of which can be sorted in
 	// either ascending or descending order. See the Ordering field in the
 	// PhysicalProps struct.
-	// TODO(andyk): Add the Ordering field.
 	SortOp
 
 	// ------------------------------------------------------------
