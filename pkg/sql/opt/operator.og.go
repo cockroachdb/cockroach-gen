@@ -420,6 +420,16 @@ const (
 
 	UnaryComplementOp
 
+	// CastOp converts the input expression into an expression of the target type.
+	// While the input's type is restricted to the datum types in the types package,
+	// the target type can be any of the column types in the coltypes package. For
+	// example, this is a legal cast:
+	//
+	//   'hello'::VARCHAR(2)
+	//
+	// That expression has the effect of truncating the string to just 'he', since
+	// the target data type allows a maximum of two characters. This is one example
+	// of a "lossy" cast.
 	CastOp
 
 	// CaseOp is a CASE statement of the form:

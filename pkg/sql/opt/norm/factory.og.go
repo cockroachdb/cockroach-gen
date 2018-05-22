@@ -3,6 +3,7 @@
 package norm
 
 import (
+	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
@@ -106,6 +107,13 @@ func (_f *Factory) InternTypedExpr(val tree.TypedExpr) memo.PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (_f *Factory) InternProjectionsOpDef(val *memo.ProjectionsOpDef) memo.PrivateID {
 	return _f.mem.InternProjectionsOpDef(val)
+}
+
+// InternColType adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternColType(val coltypes.T) memo.PrivateID {
+	return _f.mem.InternColType(val)
 }
 
 // InternFuncOpDef adds the given value to the memo and returns an ID that
@@ -7657,11 +7665,21 @@ func (_f *Factory) ConstructUnaryComplement(
 }
 
 // ConstructCast constructs an expression for the Cast operator.
+// Cast converts the input expression into an expression of the target type.
+// While the input's type is restricted to the datum types in the types package,
+// the target type can be any of the column types in the coltypes package. For
+// example, this is a legal cast:
+//
+//   'hello'::VARCHAR(2)
+//
+// That expression has the effect of truncating the string to just 'he', since
+// the target data type allows a maximum of two characters. This is one example
+// of a "lossy" cast.
 func (_f *Factory) ConstructCast(
 	input memo.GroupID,
-	typ memo.PrivateID,
+	targetTyp memo.PrivateID,
 ) memo.GroupID {
-	_castExpr := memo.MakeCastExpr(input, typ)
+	_castExpr := memo.MakeCastExpr(input, targetTyp)
 	_group := _f.mem.GroupByFingerprint(_castExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -7669,7 +7687,7 @@ func (_f *Factory) ConstructCast(
 
 	// [EliminateCast]
 	{
-		if _f.hasType(input, typ) {
+		if _f.hasColType(input, targetTyp) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
 				_group = input
 				_f.mem.AddAltFingerprint(_castExpr.Fingerprint(), _group)
@@ -7687,7 +7705,7 @@ func (_f *Factory) ConstructCast(
 		if _nullExpr != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullCast) {
 				_group = _f.ConstructNull(
-					typ,
+					_f.colTypeToDatumType(targetTyp),
 				)
 				_f.mem.AddAltFingerprint(_castExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {

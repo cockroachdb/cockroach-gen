@@ -3,6 +3,7 @@
 package memo
 
 import (
+	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -3968,17 +3969,27 @@ func (e *Expr) AsUnaryComplement() *UnaryComplementExpr {
 	return (*UnaryComplementExpr)(e)
 }
 
+// CastExpr converts the input expression into an expression of the target type.
+// While the input's type is restricted to the datum types in the types package,
+// the target type can be any of the column types in the coltypes package. For
+// example, this is a legal cast:
+//
+//   'hello'::VARCHAR(2)
+//
+// That expression has the effect of truncating the string to just 'he', since
+// the target data type allows a maximum of two characters. This is one example
+// of a "lossy" cast.
 type CastExpr Expr
 
-func MakeCastExpr(input GroupID, typ PrivateID) CastExpr {
-	return CastExpr{op: opt.CastOp, state: exprState{uint32(input), uint32(typ)}}
+func MakeCastExpr(input GroupID, targetTyp PrivateID) CastExpr {
+	return CastExpr{op: opt.CastOp, state: exprState{uint32(input), uint32(targetTyp)}}
 }
 
 func (e *CastExpr) Input() GroupID {
 	return GroupID(e.state[0])
 }
 
-func (e *CastExpr) Typ() PrivateID {
+func (e *CastExpr) TargetTyp() PrivateID {
 	return PrivateID(e.state[1])
 }
 
@@ -4669,6 +4680,13 @@ func (m *Memo) InternTypedExpr(val tree.TypedExpr) PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (m *Memo) InternProjectionsOpDef(val *ProjectionsOpDef) PrivateID {
 	return m.privateStorage.internProjectionsOpDef(val)
+}
+
+// InternColType adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternColType(val coltypes.T) PrivateID {
+	return m.privateStorage.internColType(val)
 }
 
 // InternFuncOpDef adds the given value to the memo and returns an ID that
