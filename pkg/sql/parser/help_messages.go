@@ -213,7 +213,7 @@ Options:
 		Category: hCCL,
 		//line sql.y: 1647
 		Text: `
-EXPORT <format> (<datafile> [WITH <option> [= value] [,...]]) <query>
+EXPORT <format> (<datafile> [WITH <option> [= value] [,...]]) FROM <query>
 
 Formats:
    CSV
