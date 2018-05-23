@@ -60,6 +60,13 @@ func (_f *Factory) InternExplainOpDef(val *memo.ExplainOpDef) memo.PrivateID {
 	return _f.mem.InternExplainOpDef(val)
 }
 
+// InternShowTraceOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternShowTraceOpDef(val *memo.ShowTraceOpDef) memo.PrivateID {
+	return _f.mem.InternShowTraceOpDef(val)
+}
+
 // InternRowNumberDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -3608,9 +3615,9 @@ func (_f *Factory) ConstructOffset(
 }
 
 // ConstructMax1Row constructs an expression for the Max1Row operator.
-// Max1Row is an operator which enforces that its input must return at most one
-// row. It is used as input to the Subquery operator. See the comment above
-// Subquery for more details.
+// Max1Row enforces that its input must return at most one row. It is used as
+// input to the Subquery operator. See the comment above Subquery for more
+// details.
 func (_f *Factory) ConstructMax1Row(
 	input memo.GroupID,
 ) memo.GroupID {
@@ -3638,6 +3645,8 @@ func (_f *Factory) ConstructMax1Row(
 }
 
 // ConstructExplain constructs an expression for the Explain operator.
+// Explain returns information about the execution plan of the "input"
+// expression.
 func (_f *Factory) ConstructExplain(
 	input memo.GroupID,
 	def memo.PrivateID,
@@ -3649,6 +3658,36 @@ func (_f *Factory) ConstructExplain(
 	}
 
 	return _f.onConstruct(memo.Expr(_explainExpr))
+}
+
+// ConstructShowTrace constructs an expression for the ShowTrace operator.
+// ShowTrace runs the "input" expressions in a special tracing mode and returns
+// trace results.
+func (_f *Factory) ConstructShowTrace(
+	input memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_showTraceExpr := memo.MakeShowTraceExpr(input, def)
+	_group := _f.mem.GroupByFingerprint(_showTraceExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_showTraceExpr))
+}
+
+// ConstructShowTraceForSession constructs an expression for the ShowTraceForSession operator.
+// ShowTraceForSession returns the current session traces.
+func (_f *Factory) ConstructShowTraceForSession(
+	def memo.PrivateID,
+) memo.GroupID {
+	_showTraceForSessionExpr := memo.MakeShowTraceForSessionExpr(def)
+	_group := _f.mem.GroupByFingerprint(_showTraceForSessionExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_showTraceForSessionExpr))
 }
 
 // ConstructRowNumber constructs an expression for the RowNumber operator.
@@ -8271,6 +8310,16 @@ func init() {
 	// ExplainOp
 	dynConstructLookup[opt.ExplainOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructExplain(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
+	}
+
+	// ShowTraceOp
+	dynConstructLookup[opt.ShowTraceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructShowTrace(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
+	}
+
+	// ShowTraceForSessionOp
+	dynConstructLookup[opt.ShowTraceForSessionOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructShowTraceForSession(memo.PrivateID(operands[0]))
 	}
 
 	// RowNumberOp

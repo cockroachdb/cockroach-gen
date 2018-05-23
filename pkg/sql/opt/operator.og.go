@@ -185,12 +185,21 @@ const (
 	// conjunction with Limit.
 	OffsetOp
 
-	// Max1RowOp is an operator which enforces that its input must return at most one
-	// row. It is used as input to the Subquery operator. See the comment above
-	// Subquery for more details.
+	// Max1RowOp enforces that its input must return at most one row. It is used as
+	// input to the Subquery operator. See the comment above Subquery for more
+	// details.
 	Max1RowOp
 
+	// ExplainOp returns information about the execution plan of the "input"
+	// expression.
 	ExplainOp
+
+	// ShowTraceOp runs the "input" expressions in a special tracing mode and returns
+	// trace results.
+	ShowTraceOp
+
+	// ShowTraceForSessionOp returns the current session traces.
+	ShowTraceForSessionOp
 
 	// RowNumberOp adds a column to each row in its input containing a unique,
 	// increasing number.
@@ -528,9 +537,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggexists-aggany-not-null"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-traceshow-trace-for-sessionrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggexists-aggany-not-null"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 279, 289, 297, 300, 308, 313, 317, 321, 326, 337, 342, 353, 365, 371, 378, 381, 383, 386, 388, 390, 392, 394, 396, 398, 400, 406, 410, 418, 424, 434, 444, 458, 467, 480, 491, 506, 508, 514, 522, 533, 548, 564, 570, 575, 581, 585, 590, 594, 597, 606, 609, 612, 618, 625, 632, 641, 651, 665, 680, 691, 707, 711, 715, 719, 724, 732, 740, 756, 765, 768, 776, 783, 793, 798, 808, 811, 814, 821, 824, 832, 840, 847, 854, 862, 871, 881, 893}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 279, 289, 311, 321, 329, 332, 340, 345, 349, 353, 358, 369, 374, 385, 397, 403, 410, 413, 415, 418, 420, 422, 424, 426, 428, 430, 432, 438, 442, 450, 456, 466, 476, 490, 499, 512, 523, 538, 540, 546, 554, 565, 580, 596, 602, 607, 613, 617, 622, 626, 629, 638, 641, 644, 650, 657, 664, 673, 683, 697, 712, 723, 739, 743, 747, 751, 756, 764, 772, 788, 797, 800, 808, 815, 825, 830, 840, 843, 846, 853, 856, 864, 872, 879, 886, 894, 903, 913, 925}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -565,6 +574,8 @@ var RelationalOperators = [...]Operator{
 	OffsetOp,
 	Max1RowOp,
 	ExplainOp,
+	ShowTraceOp,
+	ShowTraceForSessionOp,
 	RowNumberOp,
 }
 
