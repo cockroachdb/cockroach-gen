@@ -11352,6 +11352,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
 		//line sql-gen.y:1509
 		{
+			sqlVAL.str = ""
 		}
 	case 149:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
