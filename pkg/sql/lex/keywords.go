@@ -194,6 +194,7 @@ var Keywords = map[string]struct {
 	"minute":                    {MINUTE, "U"},
 	"minvalue":                  {MINVALUE, "T"},
 	"month":                     {MONTH, "U"},
+	"mysqldump":                 {MYSQLDUMP, "U"},
 	"mysqloutfile":              {MYSQLOUTFILE, "U"},
 	"name":                      {NAME, "U"},
 	"names":                     {NAMES, "U"},
