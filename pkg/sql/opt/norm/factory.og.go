@@ -203,98 +203,6 @@ func (_f *Factory) ConstructSelect(
 		return _group
 	}
 
-	// [HoistSelectExists]
-	{
-		if _f.hasCorrelatedSubquery(filter) {
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					exists := _item
-					_existsExpr := _f.mem.NormExpr(_item).AsExists()
-					if _existsExpr != nil {
-						subquery := _existsExpr.Input()
-						if _f.hasOuterCols(subquery) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
-								_group = _f.ConstructSelect(
-									_f.ConstructSemiJoinApply(
-										input,
-										subquery,
-										_f.ConstructTrue(),
-									),
-									_f.ConstructFilters(
-										_f.removeListItem(list, exists),
-									),
-								)
-								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.HoistSelectExists, _group, 0)
-								}
-								return _group
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [HoistSelectNotExists]
-	{
-		if _f.hasCorrelatedSubquery(filter) {
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					exists := _item
-					_notExpr := _f.mem.NormExpr(_item).AsNot()
-					if _notExpr != nil {
-						_existsExpr := _f.mem.NormExpr(_notExpr.Input()).AsExists()
-						if _existsExpr != nil {
-							subquery := _existsExpr.Input()
-							if _f.hasOuterCols(subquery) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
-									_group = _f.ConstructSelect(
-										_f.ConstructAntiJoinApply(
-											input,
-											subquery,
-											_f.ConstructTrue(),
-										),
-										_f.ConstructFilters(
-											_f.removeListItem(list, exists),
-										),
-									)
-									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.HoistSelectNotExists, _group, 0)
-									}
-									return _group
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [HoistSelectSubquery]
-	{
-		if _f.hasCorrelatedSubquery(filter) {
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectSubquery) {
-					_group = _f.hoistSelectSubquery(input, filter)
-					_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistSelectSubquery, _group, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
 	// [EliminateSelect]
 	{
 		_trueExpr := _f.mem.NormExpr(filter).AsTrue()
@@ -566,6 +474,98 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [HoistSelectExists]
+	{
+		if _f.hasCorrelatedSubquery(filter) {
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				list := _filtersExpr.Conditions()
+				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+					exists := _item
+					_existsExpr := _f.mem.NormExpr(_item).AsExists()
+					if _existsExpr != nil {
+						subquery := _existsExpr.Input()
+						if _f.hasOuterCols(subquery) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
+								_group = _f.ConstructSelect(
+									_f.ConstructSemiJoinApply(
+										input,
+										subquery,
+										_f.ConstructTrue(),
+									),
+									_f.ConstructFilters(
+										_f.removeListItem(list, exists),
+									),
+								)
+								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.HoistSelectExists, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectNotExists]
+	{
+		if _f.hasCorrelatedSubquery(filter) {
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				list := _filtersExpr.Conditions()
+				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+					exists := _item
+					_notExpr := _f.mem.NormExpr(_item).AsNot()
+					if _notExpr != nil {
+						_existsExpr := _f.mem.NormExpr(_notExpr.Input()).AsExists()
+						if _existsExpr != nil {
+							subquery := _existsExpr.Input()
+							if _f.hasOuterCols(subquery) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
+									_group = _f.ConstructSelect(
+										_f.ConstructAntiJoinApply(
+											input,
+											subquery,
+											_f.ConstructTrue(),
+										),
+										_f.ConstructFilters(
+											_f.removeListItem(list, exists),
+										),
+									)
+									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.HoistSelectNotExists, _group, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistSelectSubquery]
+	{
+		if _f.hasCorrelatedSubquery(filter) {
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectSubquery) {
+					_group = _f.hoistSelectSubquery(input, filter)
+					_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistSelectSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	// [PushSelectIntoInlinableProject]
 	{
 		_projectExpr := _f.mem.NormExpr(input).AsProject()
@@ -609,20 +609,6 @@ func (_f *Factory) ConstructProject(
 	_group := _f.mem.GroupByFingerprint(_projectExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [HoistProjectSubquery]
-	{
-		if _f.hasCorrelatedSubquery(projections) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSubquery) {
-				_group = _f.hoistProjectSubquery(input, projections)
-				_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.HoistProjectSubquery, _group, 0)
-				}
-				return _group
-			}
-		}
 	}
 
 	// [EliminateProject]
@@ -948,6 +934,20 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [HoistProjectSubquery]
+	{
+		if _f.hasCorrelatedSubquery(projections) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSubquery) {
+				_group = _f.hoistProjectSubquery(input, projections)
+				_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.HoistProjectSubquery, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	// [InlineProjectInProject]
 	{
 		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
@@ -1070,23 +1070,6 @@ func (_f *Factory) ConstructInnerJoin(
 							return _group
 						}
 					}
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.InnerJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
 				}
 			}
 		}
@@ -1238,6 +1221,23 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.InnerJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_innerJoinExpr))
 }
 
@@ -1317,23 +1317,6 @@ func (_f *Factory) ConstructLeftJoin(
 							return _group
 						}
 					}
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.LeftJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
 				}
 			}
 		}
@@ -1432,6 +1415,23 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.LeftJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_leftJoinExpr))
 }
 
@@ -1469,23 +1469,6 @@ func (_f *Factory) ConstructRightJoin(
 					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.TryDecorrelateProject, _group, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.RightJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
 					}
 					return _group
 				}
@@ -1586,6 +1569,23 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.RightJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_rightJoinExpr))
 }
 
@@ -1636,23 +1636,6 @@ func (_f *Factory) ConstructFullJoin(
 							return _group
 						}
 					}
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.FullJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
 				}
 			}
 		}
@@ -1736,6 +1719,23 @@ func (_f *Factory) ConstructFullJoin(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.FullJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_fullJoinExpr))
 }
 
@@ -1775,23 +1775,6 @@ func (_f *Factory) ConstructSemiJoin(
 						}
 						return _group
 					}
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.SemiJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
 				}
 			}
 		}
@@ -1922,6 +1905,23 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.SemiJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_semiJoinExpr))
 }
 
@@ -1961,23 +1961,6 @@ func (_f *Factory) ConstructAntiJoin(
 						}
 						return _group
 					}
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.AntiJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
 				}
 			}
 		}
@@ -2069,6 +2052,23 @@ func (_f *Factory) ConstructAntiJoin(
 					_f.appliedRule(opt.EliminateAntiJoin, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.AntiJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
 			}
 		}
 	}
@@ -2205,23 +2205,6 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.InnerJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
 	// [EnsureJoinFiltersAnd]
 	{
 		_andExpr := _f.mem.NormExpr(on).AsAnd()
@@ -2368,6 +2351,23 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.InnerJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_innerJoinApplyExpr))
 }
 
@@ -2466,23 +2466,6 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.LeftJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
 	// [EnsureJoinFiltersAnd]
 	{
 		_andExpr := _f.mem.NormExpr(on).AsAnd()
@@ -2576,6 +2559,23 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.LeftJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_leftJoinApplyExpr))
 }
 
@@ -2627,23 +2627,6 @@ func (_f *Factory) ConstructRightJoinApply(
 					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.TryDecorrelateProject, _group, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.RightJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
 					}
 					return _group
 				}
@@ -2744,6 +2727,23 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.RightJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_rightJoinApplyExpr))
 }
 
@@ -2809,23 +2809,6 @@ func (_f *Factory) ConstructFullJoinApply(
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
 				}
 				return _group
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.FullJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
-				}
 			}
 		}
 	}
@@ -2908,6 +2891,23 @@ func (_f *Factory) ConstructFullJoinApply(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.FullJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_fullJoinApplyExpr))
 }
 
@@ -2962,23 +2962,6 @@ func (_f *Factory) ConstructSemiJoinApply(
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
 				}
 				return _group
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.SemiJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
-				}
 			}
 		}
 	}
@@ -3108,6 +3091,23 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.SemiJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_semiJoinApplyExpr))
 }
 
@@ -3162,23 +3162,6 @@ func (_f *Factory) ConstructAntiJoinApply(
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0)
 				}
 				return _group
-			}
-		}
-	}
-
-	// [HoistJoinSubquery]
-	{
-		if _f.hasCorrelatedSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.hoistJoinSubquery(opt.AntiJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
-					}
-					return _group
-				}
 			}
 		}
 	}
@@ -3269,6 +3252,23 @@ func (_f *Factory) ConstructAntiJoinApply(
 					_f.appliedRule(opt.EliminateAntiJoin, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [HoistJoinSubquery]
+	{
+		if _f.hasCorrelatedSubquery(on) {
+			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+			if _filtersExpr != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
+					_group = _f.hoistJoinSubquery(opt.AntiJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinSubquery, _group, 0)
+					}
+					return _group
+				}
 			}
 		}
 	}
