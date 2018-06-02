@@ -127,7 +127,6 @@ var opLayoutTable = [...]opLayout{
 	opt.XorAggOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonAggOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonbAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ExistsAggOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AnyNotNullOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
@@ -249,7 +248,6 @@ var isEnforcerLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -371,7 +369,6 @@ var isRelationalLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -493,7 +490,6 @@ var isJoinLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -615,7 +611,6 @@ var isJoinApplyLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -737,7 +732,6 @@ var isScalarLookup = [...]bool{
 	opt.XorAggOp:              true,
 	opt.JsonAggOp:             true,
 	opt.JsonbAggOp:            true,
-	opt.ExistsAggOp:           true,
 	opt.AnyNotNullOp:          true,
 }
 
@@ -859,7 +853,6 @@ var isConstValueLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -981,7 +974,6 @@ var isBooleanLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -1103,7 +1095,6 @@ var isComparisonLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -1225,7 +1216,6 @@ var isBinaryLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -1347,7 +1337,6 @@ var isUnaryLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.ExistsAggOp:           false,
 	opt.AnyNotNullOp:          false,
 }
 
@@ -1469,7 +1458,6 @@ var isAggregateLookup = [...]bool{
 	opt.XorAggOp:              true,
 	opt.JsonAggOp:             true,
 	opt.JsonbAggOp:            true,
-	opt.ExistsAggOp:           true,
 	opt.AnyNotNullOp:          true,
 }
 
@@ -4599,39 +4587,6 @@ func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
 	return (*JsonbAggExpr)(e)
 }
 
-// ExistsAggExpr evaluates to True if there is at least one non-null value in the
-// grouping set. Otherwise, it returns False. Its behavior is exactly equivalent
-// to:
-//
-//   COUNT(c) > 0
-//
-// Just like COUNT(c) and the other SQL aggregates, EXISTS_AGG(c) will ignore
-// null values. A set containing only null values is equivalent to an empty set
-// (both yield False).
-//
-// ExistsAgg is not part of SQL, but it's used internally to rewrite correlated
-// Exists subqueries into an efficient and convenient form.
-type ExistsAggExpr Expr
-
-func MakeExistsAggExpr(input GroupID) ExistsAggExpr {
-	return ExistsAggExpr{op: opt.ExistsAggOp, state: exprState{uint32(input)}}
-}
-
-func (e *ExistsAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *ExistsAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsExistsAgg() *ExistsAggExpr {
-	if e.op != opt.ExistsAggOp {
-		return nil
-	}
-	return (*ExistsAggExpr)(e)
-}
-
 // AnyNotNullExpr returns any non-null value in the grouping set, or null if there
 // are no non-null values. This is particularly useful for "passing through" the
 // value of a column that is known to be constant within a grouping set.
@@ -5356,11 +5311,6 @@ func init() {
 	// JsonbAggOp
 	makeExprLookup[opt.JsonbAggOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeJsonbAggExpr(GroupID(operands[0])))
-	}
-
-	// ExistsAggOp
-	makeExprLookup[opt.ExistsAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeExistsAggExpr(GroupID(operands[0])))
 	}
 
 	// AnyNotNullOp

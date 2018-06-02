@@ -8118,31 +8118,6 @@ func (_f *Factory) ConstructJsonbAgg(
 	return _f.onConstruct(memo.Expr(_jsonbAggExpr))
 }
 
-// ConstructExistsAgg constructs an expression for the ExistsAgg operator.
-// ExistsAgg evaluates to True if there is at least one non-null value in the
-// grouping set. Otherwise, it returns False. Its behavior is exactly equivalent
-// to:
-//
-//   COUNT(c) > 0
-//
-// Just like COUNT(c) and the other SQL aggregates, EXISTS_AGG(c) will ignore
-// null values. A set containing only null values is equivalent to an empty set
-// (both yield False).
-//
-// ExistsAgg is not part of SQL, but it's used internally to rewrite correlated
-// Exists subqueries into an efficient and convenient form.
-func (_f *Factory) ConstructExistsAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_existsAggExpr := memo.MakeExistsAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_existsAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_existsAggExpr))
-}
-
 // ConstructAnyNotNull constructs an expression for the AnyNotNull operator.
 // AnyNotNull returns any non-null value in the grouping set, or null if there
 // are no non-null values. This is particularly useful for "passing through" the
@@ -8740,11 +8715,6 @@ func init() {
 	// JsonbAggOp
 	dynConstructLookup[opt.JsonbAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructJsonbAgg(memo.GroupID(operands[0]))
-	}
-
-	// ExistsAggOp
-	dynConstructLookup[opt.ExistsAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructExistsAgg(memo.GroupID(operands[0]))
 	}
 
 	// AnyNotNullOp
