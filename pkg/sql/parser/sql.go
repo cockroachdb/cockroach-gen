@@ -14576,13 +14576,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 		//line sql-gen.y:4255
 		{
-			return unimplemented(sqllex, "index_elem func expr")
+			return unimplemented(sqllex, "index_elem func expr (computed indexes)")
 		}
 	case 738:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 		//line sql-gen.y:4256
 		{
-			return unimplemented(sqllex, "index_elem a_expr")
+			return unimplemented(sqllex, "index_elem a_expr (computed indexes)")
 		}
 	case 739:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
