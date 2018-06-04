@@ -2058,8 +2058,8 @@ func (e *Expr) AsAntiJoinApply() *AntiJoinApplyExpr {
 // operator). The arguments of the aggregations are columns from the input.
 type GroupByExpr Expr
 
-func MakeGroupByExpr(input GroupID, aggregations GroupID, groupingCols PrivateID) GroupByExpr {
-	return GroupByExpr{op: opt.GroupByOp, state: exprState{uint32(input), uint32(aggregations), uint32(groupingCols)}}
+func MakeGroupByExpr(input GroupID, aggregations GroupID, def PrivateID) GroupByExpr {
+	return GroupByExpr{op: opt.GroupByOp, state: exprState{uint32(input), uint32(aggregations), uint32(def)}}
 }
 
 func (e *GroupByExpr) Input() GroupID {
@@ -2070,7 +2070,7 @@ func (e *GroupByExpr) Aggregations() GroupID {
 	return GroupID(e.state[1])
 }
 
-func (e *GroupByExpr) GroupingCols() PrivateID {
+func (e *GroupByExpr) Def() PrivateID {
 	return PrivateID(e.state[2])
 }
 
@@ -4635,11 +4635,11 @@ func (m *Memo) InternLookupJoinDef(val *LookupJoinDef) PrivateID {
 	return m.privateStorage.internLookupJoinDef(val)
 }
 
-// InternColSet adds the given value to the memo and returns an ID that
+// InternGroupByDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternColSet(val opt.ColSet) PrivateID {
-	return m.privateStorage.internColSet(val)
+func (m *Memo) InternGroupByDef(val *GroupByDef) PrivateID {
+	return m.privateStorage.internGroupByDef(val)
 }
 
 // InternSetOpColMap adds the given value to the memo and returns an ID that

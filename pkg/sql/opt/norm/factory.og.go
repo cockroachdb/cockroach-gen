@@ -32,11 +32,11 @@ func (_f *Factory) InternLookupJoinDef(val *memo.LookupJoinDef) memo.PrivateID {
 	return _f.mem.InternLookupJoinDef(val)
 }
 
-// InternColSet adds the given value to the memo and returns an ID that
+// InternGroupByDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternColSet(val opt.ColSet) memo.PrivateID {
-	return _f.mem.InternColSet(val)
+func (_f *Factory) InternGroupByDef(val *memo.GroupByDef) memo.PrivateID {
+	return _f.mem.InternGroupByDef(val)
 }
 
 // InternSetOpColMap adds the given value to the memo and returns an ID that
@@ -437,8 +437,8 @@ func (_f *Factory) ConstructSelect(
 		if _groupByExpr != nil {
 			input := _groupByExpr.Input()
 			aggregations := _groupByExpr.Aggregations()
-			groupingCols := _groupByExpr.GroupingCols()
-			if !_f.isScalarGroupBy(groupingCols) {
+			def := _groupByExpr.Def()
+			if !_f.isScalarGroupBy(def) {
 				_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 				if _filtersExpr != nil {
 					list := _filtersExpr.Conditions()
@@ -455,7 +455,7 @@ func (_f *Factory) ConstructSelect(
 											),
 										),
 										aggregations,
-										groupingCols,
+										def,
 									),
 									_f.ConstructFilters(
 										_f.extractUnboundConditions(list, input),
@@ -868,14 +868,14 @@ func (_f *Factory) ConstructProject(
 		if _groupByExpr != nil {
 			input := _groupByExpr.Input()
 			aggregations := _groupByExpr.Aggregations()
-			groupingCols := _groupByExpr.GroupingCols()
+			def := _groupByExpr.Def()
 			if _f.canPruneCols(aggregations, _f.neededCols(projections)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneAggCols) {
 					_group = _f.ConstructProject(
 						_f.ConstructGroupBy(
 							input,
 							_f.pruneCols(aggregations, _f.neededCols(projections)),
-							groupingCols,
+							def,
 						),
 						projections,
 					)
@@ -1055,19 +1055,21 @@ func (_f *Factory) ConstructInnerJoin(
 			if _groupByExpr != nil {
 				input := _groupByExpr.Input()
 				aggregations := _groupByExpr.Aggregations()
-				groupingCols := _groupByExpr.GroupingCols()
-				if _f.isScalarGroupBy(groupingCols) {
+				def := _groupByExpr.Def()
+				if _f.isScalarGroupBy(def) {
 					if _f.canAggsIgnoreNulls(aggregations) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
-							_group = _f.ConstructSelect(
-								_f.hoistCorrelatedScalarGroupBy(left, input, aggregations),
-								on,
-							)
-							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0)
+						if _f.isUnorderedGroupBy(def) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+								_group = _f.ConstructSelect(
+									_f.hoistCorrelatedScalarGroupBy(left, input, aggregations),
+									on,
+								)
+								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0)
+								}
+								return _group
 							}
-							return _group
 						}
 					}
 				}
@@ -2185,19 +2187,21 @@ func (_f *Factory) ConstructInnerJoinApply(
 			if _groupByExpr != nil {
 				input := _groupByExpr.Input()
 				aggregations := _groupByExpr.Aggregations()
-				groupingCols := _groupByExpr.GroupingCols()
-				if _f.isScalarGroupBy(groupingCols) {
+				def := _groupByExpr.Def()
+				if _f.isScalarGroupBy(def) {
 					if _f.canAggsIgnoreNulls(aggregations) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
-							_group = _f.ConstructSelect(
-								_f.hoistCorrelatedScalarGroupBy(left, input, aggregations),
-								on,
-							)
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0)
+						if _f.isUnorderedGroupBy(def) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+								_group = _f.ConstructSelect(
+									_f.hoistCorrelatedScalarGroupBy(left, input, aggregations),
+									on,
+								)
+								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0)
+								}
+								return _group
 							}
-							return _group
 						}
 					}
 				}
@@ -3285,9 +3289,9 @@ func (_f *Factory) ConstructAntiJoinApply(
 func (_f *Factory) ConstructGroupBy(
 	input memo.GroupID,
 	aggregations memo.GroupID,
-	groupingCols memo.PrivateID,
+	def memo.PrivateID,
 ) memo.GroupID {
-	_groupByExpr := memo.MakeGroupByExpr(input, aggregations, groupingCols)
+	_groupByExpr := memo.MakeGroupByExpr(input, aggregations, def)
 	_group := _f.mem.GroupByFingerprint(_groupByExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -3296,7 +3300,7 @@ func (_f *Factory) ConstructGroupBy(
 	// [EliminateDistinct]
 	{
 		if _f.hasNoCols(aggregations) {
-			if _f.colsAreKey(groupingCols, input) {
+			if _f.colsAreKey(def, input) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
 					_group = input
 					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
@@ -3319,7 +3323,7 @@ func (_f *Factory) ConstructGroupBy(
 					_group = _f.ConstructGroupBy(
 						innerInput,
 						aggregations,
-						groupingCols,
+						def,
 					)
 					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
@@ -3333,12 +3337,12 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [PruneGroupByCols]
 	{
-		if _f.canPruneCols(input, _f.neededColsGroupBy(aggregations, groupingCols)) {
+		if _f.canPruneCols(input, _f.neededColsGroupBy(aggregations, def)) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
 				_group = _f.ConstructGroupBy(
-					_f.pruneCols(input, _f.neededColsGroupBy(aggregations, groupingCols)),
+					_f.pruneCols(input, _f.neededColsGroupBy(aggregations, def)),
 					aggregations,
-					groupingCols,
+					def,
 				)
 				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
@@ -3964,8 +3968,8 @@ func (_f *Factory) ConstructExists(
 		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
 		if _groupByExpr != nil {
 			input := _groupByExpr.Input()
-			groupingCols := _groupByExpr.GroupingCols()
-			if !_f.isScalarGroupBy(groupingCols) {
+			def := _groupByExpr.Def()
+			if !_f.isScalarGroupBy(def) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
 					_group = _f.ConstructExists(
 						input,
