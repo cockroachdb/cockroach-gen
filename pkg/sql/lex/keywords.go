@@ -234,6 +234,7 @@ var Keywords = map[string]struct {
 	"partition":                 {PARTITION, "U"},
 	"password":                  {PASSWORD, "U"},
 	"pause":                     {PAUSE, "U"},
+	"pgcopy":                    {PGCOPY, "U"},
 	"physical":                  {PHYSICAL, "U"},
 	"placing":                   {PLACING, "R"},
 	"plans":                     {PLANS, "U"},
