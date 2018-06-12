@@ -30,9 +30,9 @@ func (_e *explorer) exploreScan(_rootState *exploreState, _root memo.ExprID) (_f
 	{
 		if _root.Expr >= _rootState.start {
 			def := _rootExpr.Def()
-			if _e.canGenerateIndexScans(def) {
+			if _e.funcs.CanGenerateIndexScans(def) {
 				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateIndexScans) {
-					_exprs := _e.generateIndexScans(def)
+					_exprs := _e.funcs.GenerateIndexScans(def)
 					_before := _e.mem.ExprCount(_root.Group)
 					for i := range _exprs {
 						_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
@@ -69,10 +69,10 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 			_scanExpr := _e.mem.Expr(_eid).AsScan()
 			if _scanExpr != nil {
 				def := _scanExpr.Def()
-				if _e.canConstrainScan(def) {
+				if _e.funcs.CanConstrainScan(def) {
 					filter := _rootExpr.Filter()
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainScan) {
-						_exprs := _e.constrainScan(filter, def)
+						_exprs := _e.funcs.ConstrainScan(filter, def)
 						_before := _e.mem.ExprCount(_root.Group)
 						for i := range _exprs {
 							_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
@@ -112,11 +112,11 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 					_scanExpr := _e.mem.Expr(_eid).AsScan()
 					if _scanExpr != nil {
 						def := _scanExpr.Def()
-						if _e.canConstrainScan(def) {
+						if _e.funcs.CanConstrainScan(def) {
 							outerdef := _lookupJoinExpr.Def()
 							filter := _rootExpr.Filter()
 							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainLookupJoinIndexScan) {
-								_exprs := _e.constrainLookupJoinIndexScan(filter, def, outerdef)
+								_exprs := _e.funcs.ConstrainLookupJoinIndexScan(filter, def, outerdef)
 								_before := _e.mem.ExprCount(_root.Group)
 								for i := range _exprs {
 									_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
@@ -161,10 +161,10 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 				if _constExpr != nil {
 					limit := _constExpr.Value()
 					ordering := _rootExpr.Ordering()
-					if _e.canLimitScan(def, limit, ordering) {
+					if _e.funcs.CanLimitScan(def, limit, ordering) {
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoScan) {
 							_expr := memo.MakeScanExpr(
-								_e.limitScanDef(def, limit),
+								_e.funcs.LimitScanDef(def, limit),
 							)
 							_before := _e.mem.ExprCount(_root.Group)
 							_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
