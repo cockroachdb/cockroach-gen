@@ -3556,20 +3556,22 @@ func (_f *Factory) ConstructLimit(
 		if _projectExpr != nil {
 			input := _projectExpr.Input()
 			projections := _projectExpr.Projections()
-			if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoProject) {
-				_group = _f.ConstructProject(
-					_f.ConstructLimit(
-						input,
-						limit,
-						ordering,
-					),
-					projections,
-				)
-				_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PushLimitIntoProject, _group, 0)
+			if _f.funcs.HasColsInOrdering(input, ordering) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoProject) {
+					_group = _f.ConstructProject(
+						_f.ConstructLimit(
+							input,
+							limit,
+							ordering,
+						),
+						projections,
+					)
+					_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushLimitIntoProject, _group, 0)
+					}
+					return _group
 				}
-				return _group
 			}
 		}
 	}
@@ -3597,20 +3599,22 @@ func (_f *Factory) ConstructOffset(
 		if _projectExpr != nil {
 			input := _projectExpr.Input()
 			projections := _projectExpr.Projections()
-			if _f.matchedRule == nil || _f.matchedRule(opt.PushOffsetIntoProject) {
-				_group = _f.ConstructProject(
-					_f.ConstructOffset(
-						input,
-						offset,
-						ordering,
-					),
-					projections,
-				)
-				_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PushOffsetIntoProject, _group, 0)
+			if _f.funcs.HasColsInOrdering(input, ordering) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushOffsetIntoProject) {
+					_group = _f.ConstructProject(
+						_f.ConstructOffset(
+							input,
+							offset,
+							ordering,
+						),
+						projections,
+					)
+					_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushOffsetIntoProject, _group, 0)
+					}
+					return _group
 				}
-				return _group
 			}
 		}
 	}
