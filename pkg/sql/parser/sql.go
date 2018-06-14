@@ -17509,7 +17509,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 		//line sql-gen.y:6794
 		{
-			sqlVAL.union.val = &tree.ColumnAccessExpr{Expr: sqlDollar[2].union.expr(), Star: true}
+			sqlVAL.union.val = &tree.TupleStar{Expr: sqlDollar[2].union.expr()}
 		}
 	case 1234:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
