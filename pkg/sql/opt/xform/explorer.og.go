@@ -179,5 +179,48 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 		}
 	}
 
+	// [PushLimitIntoLookupJoin]
+	{
+		_partlyExplored := _root.Expr < _rootState.start
+		_state := _e.exploreGroup(_rootExpr.Input())
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		start := memo.ExprOrdinal(0)
+		if _partlyExplored {
+			start = _state.start
+		}
+		for _ord := start; _ord < _state.end; _ord++ {
+			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
+			_lookupJoinExpr := _e.mem.Expr(_eid).AsLookupJoin()
+			if _lookupJoinExpr != nil {
+				input := _lookupJoinExpr.Input()
+				def := _lookupJoinExpr.Def()
+				if _e.funcs.OneResultPerInput(def) {
+					limit := _rootExpr.Limit()
+					ordering := _rootExpr.Ordering()
+					if _e.funcs.HasOrderingCols(input, ordering) {
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoLookupJoin) {
+							_expr := memo.MakeLookupJoinExpr(
+								_e.f.ConstructLimit(
+									input,
+									limit,
+									ordering,
+								),
+								def,
+							)
+							_before := _e.mem.ExprCount(_root.Group)
+							_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+							if _e.o.appliedRule != nil {
+								_after := _e.mem.ExprCount(_root.Group)
+								_e.o.appliedRule(opt.PushLimitIntoLookupJoin, _root.Group, _after-_before)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }

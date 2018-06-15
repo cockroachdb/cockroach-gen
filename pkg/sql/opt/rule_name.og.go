@@ -114,6 +114,7 @@ const (
 	// Explore Rule Names
 	// ------------------------------------------------------------
 	PushLimitIntoScan
+	PushLimitIntoLookupJoin
 	GenerateIndexScans
 	ConstrainScan
 	ConstrainLookupJoinIndexScan
