@@ -87,6 +87,101 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 		}
 	}
 
+	// [PushFilterIntoLookupJoinNoRemainder]
+	{
+		_partlyExplored := _root.Expr < _rootState.start
+		_state := _e.exploreGroup(_rootExpr.Input())
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		start := memo.ExprOrdinal(0)
+		if _partlyExplored {
+			start = _state.start
+		}
+		for _ord := start; _ord < _state.end; _ord++ {
+			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
+			_lookupJoinExpr := _e.mem.Expr(_eid).AsLookupJoin()
+			if _lookupJoinExpr != nil {
+				input := _lookupJoinExpr.Input()
+				def := _lookupJoinExpr.Def()
+				filter := _rootExpr.Filter()
+				if _e.funcs.IsBoundBy(filter, input) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushFilterIntoLookupJoinNoRemainder) {
+						_expr := memo.MakeLookupJoinExpr(
+							_e.f.ConstructSelect(
+								input,
+								filter,
+							),
+							def,
+						)
+						_before := _e.mem.ExprCount(_root.Group)
+						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+						if _e.o.appliedRule != nil {
+							_after := _e.mem.ExprCount(_root.Group)
+							_e.o.appliedRule(opt.PushFilterIntoLookupJoinNoRemainder, _root.Group, _after-_before)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [PushFilterIntoLookupJoin]
+	{
+		_partlyExplored := _root.Expr < _rootState.start
+		_state := _e.exploreGroup(_rootExpr.Input())
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		start := memo.ExprOrdinal(0)
+		if _partlyExplored {
+			start = _state.start
+		}
+		for _ord := start; _ord < _state.end; _ord++ {
+			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
+			_lookupJoinExpr := _e.mem.Expr(_eid).AsLookupJoin()
+			if _lookupJoinExpr != nil {
+				input := _lookupJoinExpr.Input()
+				def := _lookupJoinExpr.Def()
+				filter := _rootExpr.Filter()
+				_eid := memo.MakeNormExprID(_rootExpr.Filter())
+				_filtersExpr := _e.mem.Expr(_eid).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _e.mem.LookupList(_filtersExpr.Conditions()) {
+						condition := _item
+						if _e.funcs.IsBoundBy(condition, input) {
+							if !_e.funcs.IsBoundBy(filter, input) {
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushFilterIntoLookupJoin) {
+									_expr := memo.MakeSelectExpr(
+										_e.f.ConstructLookupJoin(
+											_e.f.ConstructSelect(
+												input,
+												_e.f.ConstructFilters(
+													_e.funcs.ExtractBoundConditions(list, input),
+												),
+											),
+											def,
+										),
+										_e.f.ConstructFilters(
+											_e.funcs.ExtractUnboundConditions(list, input),
+										),
+									)
+									_before := _e.mem.ExprCount(_root.Group)
+									_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+									if _e.o.appliedRule != nil {
+										_after := _e.mem.ExprCount(_root.Group)
+										_e.o.appliedRule(opt.PushFilterIntoLookupJoin, _root.Group, _after-_before)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [ConstrainLookupJoinIndexScan]
 	{
 		_partlyExplored := _root.Expr < _rootState.start

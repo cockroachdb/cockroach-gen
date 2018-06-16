@@ -117,6 +117,8 @@ const (
 	PushLimitIntoLookupJoin
 	GenerateIndexScans
 	ConstrainScan
+	PushFilterIntoLookupJoinNoRemainder
+	PushFilterIntoLookupJoin
 	ConstrainLookupJoinIndexScan
 
 	// NumRuleNames tracks the total count of rule names.
