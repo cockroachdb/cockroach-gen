@@ -6,7 +6,6 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
-	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -49,7 +48,7 @@ func (_f *Factory) InternSetOpColMap(val *memo.SetOpColMap) memo.PrivateID {
 // InternOrdering adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternOrdering(val props.Ordering) memo.PrivateID {
+func (_f *Factory) InternOrdering(val opt.Ordering) memo.PrivateID {
 	return _f.mem.InternOrdering(val)
 }
 
