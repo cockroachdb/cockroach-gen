@@ -19,6 +19,8 @@ const (
 	EliminateNot
 	NegateAnd
 	NegateOr
+	ExtractRedundantClause
+	ExtractRedundantSubclause
 	CommuteVarInequality
 	CommuteConstInequality
 	NormalizeCmpPlusConst

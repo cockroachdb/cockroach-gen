@@ -4282,6 +4282,47 @@ func (_f *Factory) ConstructOr(
 		}
 	}
 
+	// [ExtractRedundantClause]
+	{
+		if conditions.Length > 0 {
+			_item := _f.mem.LookupList(conditions)[0]
+			item := _item
+			if _f.funcs.IsRedundantSubclause(conditions, item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.ExtractRedundantClause) {
+					_group = item
+					_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.ExtractRedundantClause, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [ExtractRedundantSubclause]
+	{
+		if conditions.Length > 0 {
+			_item := _f.mem.LookupList(conditions)[0]
+			_andExpr := _f.mem.NormExpr(_item).AsAnd()
+			if _andExpr != nil {
+				for _, _item := range _f.mem.LookupList(_andExpr.Conditions()) {
+					item := _item
+					if _f.funcs.IsRedundantSubclause(conditions, item) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.ExtractRedundantSubclause) {
+							_group = _f.funcs.ExtractRedundantSubclause(conditions, item)
+							_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.ExtractRedundantSubclause, _group, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_orExpr))
 }
 
