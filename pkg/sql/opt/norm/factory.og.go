@@ -3299,14 +3299,16 @@ func (_f *Factory) ConstructGroupBy(
 	// [EliminateDistinct]
 	{
 		if _f.funcs.HasNoCols(aggregations) {
-			if _f.funcs.ColsAreKey(def, input) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-					_group = input
-					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateDistinct, _group, 0)
+			if _f.funcs.GroupingColsAreKey(def, input) {
+				if !_f.funcs.IsScalarGroupBy(def) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
+						_group = input
+						_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.EliminateDistinct, _group, 0)
+						}
+						return _group
 					}
-					return _group
 				}
 			}
 		}
