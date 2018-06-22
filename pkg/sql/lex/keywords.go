@@ -98,6 +98,7 @@ var Keywords = map[string]struct {
 	"emit":                      {EMIT, "U"},
 	"encoding":                  {ENCODING, "U"},
 	"end":                       {END, "R"},
+	"escape":                    {ESCAPE, "U"},
 	"except":                    {EXCEPT, "R"},
 	"execute":                   {EXECUTE, "U"},
 	"exists":                    {EXISTS, "C"},
