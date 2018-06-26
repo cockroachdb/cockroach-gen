@@ -7733,6 +7733,23 @@ func (_f *Factory) ConstructUnaryMinus(
 		}
 	}
 
+	// [FoldUnaryMinus]
+	{
+		_constExpr := _f.mem.NormExpr(input).AsConst()
+		if _constExpr != nil {
+			if _f.funcs.CanFoldUnaryMinus(input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnaryMinus) {
+					_group = _f.funcs.NegateNumeric(input)
+					_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnaryMinus, _group, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	// [FoldNullUnary]
 	{
 		_nullExpr := _f.mem.NormExpr(input).AsNull()

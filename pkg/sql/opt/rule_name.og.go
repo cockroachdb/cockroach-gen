@@ -73,6 +73,7 @@ const (
 	FoldDivOne
 	InvertMinus
 	EliminateUnaryMinus
+	FoldUnaryMinus
 	EliminateProject
 	EliminateProjectProject
 	PruneProjectCols
