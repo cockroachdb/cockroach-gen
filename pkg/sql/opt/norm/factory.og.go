@@ -480,6 +480,42 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [RemoveNotNullCondition]
+	{
+		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_isNotExpr := _f.mem.NormExpr(_item).AsIsNot()
+				if _isNotExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_isNotExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						col := _variableExpr.Col()
+						if _f.funcs.IsColNotNull(col, input) {
+							_nullExpr := _f.mem.NormExpr(_isNotExpr.Right()).AsNull()
+							if _nullExpr != nil {
+								if _f.matchedRule == nil || _f.matchedRule(opt.RemoveNotNullCondition) {
+									_group = _f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.funcs.RemoveListItem(list, condition),
+										),
+									)
+									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.RemoveNotNullCondition, _group, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistSelectExists]
 	{
 		if _f.funcs.HasCorrelatedSubquery(filter) {

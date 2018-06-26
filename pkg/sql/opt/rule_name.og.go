@@ -112,6 +112,7 @@ const (
 	PushSelectIntoJoinRight
 	MergeSelectInnerJoin
 	PushSelectIntoGroupBy
+	RemoveNotNullCondition
 
 	// ------------------------------------------------------------
 	// Explore Rule Names
