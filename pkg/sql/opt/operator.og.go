@@ -71,6 +71,12 @@ const (
 	// LookupJoinOp represents a join between an input expression and an index.
 	LookupJoinOp
 
+	// MergeJoinOp represents a join that is executed using merge-join.
+	// MergeOn is a scalar which contains the ON condition and merge-join ordering
+	// information; see the MergeOn scalar operator.
+	// It can be any type of join (identified in the private of MergeOn).
+	MergeJoinOp
+
 	// InnerJoinApplyOp has the same join semantics as InnerJoin. However, unlike
 	// InnerJoin, it allows the right input to refer to columns projected by the
 	// left input.
@@ -519,13 +525,17 @@ const (
 	// subqueries into an efficient and convenient form.
 	AnyNotNullOp
 
+	// MergeOnOp contains the ON condition and the metadata for a merge join; it is
+	// always a child of MergeJoin.
+	MergeOnOp
+
 	// NumOperators tracks the total count of operators.
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-traceshow-trace-for-sessionrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-null"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-traceshow-trace-for-sessionrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 117, 132, 148, 163, 178, 193, 201, 206, 215, 221, 230, 243, 253, 258, 264, 272, 279, 289, 311, 321, 329, 332, 340, 345, 349, 353, 358, 369, 374, 385, 397, 403, 410, 413, 415, 418, 420, 422, 424, 426, 428, 430, 432, 438, 442, 450, 456, 466, 476, 490, 499, 512, 523, 538, 540, 546, 554, 565, 580, 596, 602, 607, 613, 617, 622, 626, 629, 638, 641, 644, 650, 657, 664, 673, 683, 697, 712, 723, 739, 743, 747, 751, 756, 764, 772, 788, 797, 800, 808, 815, 825, 830, 840, 843, 846, 853, 856, 864, 872, 879, 886, 894, 903, 915}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 111, 127, 142, 158, 173, 188, 203, 211, 216, 225, 231, 240, 253, 263, 268, 274, 282, 289, 299, 321, 331, 339, 342, 350, 355, 359, 363, 368, 379, 384, 395, 407, 413, 420, 423, 425, 428, 430, 432, 434, 436, 438, 440, 442, 448, 452, 460, 466, 476, 486, 500, 509, 522, 533, 548, 550, 556, 564, 575, 590, 606, 612, 617, 623, 627, 632, 636, 639, 648, 651, 654, 660, 667, 674, 683, 693, 707, 722, 733, 749, 753, 757, 761, 766, 774, 782, 798, 807, 810, 818, 825, 835, 840, 850, 853, 856, 863, 866, 874, 882, 889, 896, 904, 913, 925, 933}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -543,6 +553,7 @@ var RelationalOperators = [...]Operator{
 	SemiJoinOp,
 	AntiJoinOp,
 	LookupJoinOp,
+	MergeJoinOp,
 	InnerJoinApplyOp,
 	LeftJoinApplyOp,
 	RightJoinApplyOp,
@@ -578,6 +589,15 @@ var JoinOperators = [...]Operator{
 	FullJoinApplyOp,
 	SemiJoinApplyOp,
 	AntiJoinApplyOp,
+}
+
+var JoinNonApplyOperators = [...]Operator{
+	InnerJoinOp,
+	LeftJoinOp,
+	RightJoinOp,
+	FullJoinOp,
+	SemiJoinOp,
+	AntiJoinOp,
 }
 
 var JoinApplyOperators = [...]Operator{
@@ -674,6 +694,7 @@ var ScalarOperators = [...]Operator{
 	JsonAggOp,
 	JsonbAggOp,
 	AnyNotNullOp,
+	MergeOnOp,
 }
 
 var ConstValueOperators = [...]Operator{

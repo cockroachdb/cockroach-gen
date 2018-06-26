@@ -23,6 +23,7 @@ var opLayoutTable = [...]opLayout{
 	opt.SemiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AntiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.LookupJoinOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
+	opt.MergeJoinOp:           makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.InnerJoinApplyOp:      makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.LeftJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.RightJoinApplyOp:      makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -127,6 +128,7 @@ var opLayoutTable = [...]opLayout{
 	opt.JsonAggOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonbAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AnyNotNullOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.MergeOnOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -144,6 +146,7 @@ var isEnforcerLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -248,6 +251,7 @@ var isEnforcerLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -265,6 +269,7 @@ var isRelationalLookup = [...]bool{
 	opt.SemiJoinOp:            true,
 	opt.AntiJoinOp:            true,
 	opt.LookupJoinOp:          true,
+	opt.MergeJoinOp:           true,
 	opt.InnerJoinApplyOp:      true,
 	opt.LeftJoinApplyOp:       true,
 	opt.RightJoinApplyOp:      true,
@@ -369,6 +374,7 @@ var isRelationalLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isJoinLookup = [...]bool{
@@ -386,6 +392,7 @@ var isJoinLookup = [...]bool{
 	opt.SemiJoinOp:            true,
 	opt.AntiJoinOp:            true,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      true,
 	opt.LeftJoinApplyOp:       true,
 	opt.RightJoinApplyOp:      true,
@@ -490,6 +497,130 @@ var isJoinLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
+}
+
+var isJoinNonApplyLookup = [...]bool{
+	opt.UnknownOp: false,
+
+	opt.SortOp:                false,
+	opt.ScanOp:                false,
+	opt.ValuesOp:              false,
+	opt.SelectOp:              false,
+	opt.ProjectOp:             false,
+	opt.InnerJoinOp:           true,
+	opt.LeftJoinOp:            true,
+	opt.RightJoinOp:           true,
+	opt.FullJoinOp:            true,
+	opt.SemiJoinOp:            true,
+	opt.AntiJoinOp:            true,
+	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
+	opt.InnerJoinApplyOp:      false,
+	opt.LeftJoinApplyOp:       false,
+	opt.RightJoinApplyOp:      false,
+	opt.FullJoinApplyOp:       false,
+	opt.SemiJoinApplyOp:       false,
+	opt.AntiJoinApplyOp:       false,
+	opt.GroupByOp:             false,
+	opt.UnionOp:               false,
+	opt.IntersectOp:           false,
+	opt.ExceptOp:              false,
+	opt.UnionAllOp:            false,
+	opt.IntersectAllOp:        false,
+	opt.ExceptAllOp:           false,
+	opt.LimitOp:               false,
+	opt.OffsetOp:              false,
+	opt.Max1RowOp:             false,
+	opt.ExplainOp:             false,
+	opt.ShowTraceOp:           false,
+	opt.ShowTraceForSessionOp: false,
+	opt.RowNumberOp:           false,
+	opt.SubqueryOp:            false,
+	opt.AnyOp:                 false,
+	opt.VariableOp:            false,
+	opt.ConstOp:               false,
+	opt.NullOp:                false,
+	opt.TrueOp:                false,
+	opt.FalseOp:               false,
+	opt.PlaceholderOp:         false,
+	opt.TupleOp:               false,
+	opt.ProjectionsOp:         false,
+	opt.AggregationsOp:        false,
+	opt.ExistsOp:              false,
+	opt.FiltersOp:             false,
+	opt.AndOp:                 false,
+	opt.OrOp:                  false,
+	opt.NotOp:                 false,
+	opt.EqOp:                  false,
+	opt.LtOp:                  false,
+	opt.GtOp:                  false,
+	opt.LeOp:                  false,
+	opt.GeOp:                  false,
+	opt.NeOp:                  false,
+	opt.InOp:                  false,
+	opt.NotInOp:               false,
+	opt.LikeOp:                false,
+	opt.NotLikeOp:             false,
+	opt.ILikeOp:               false,
+	opt.NotILikeOp:            false,
+	opt.SimilarToOp:           false,
+	opt.NotSimilarToOp:        false,
+	opt.RegMatchOp:            false,
+	opt.NotRegMatchOp:         false,
+	opt.RegIMatchOp:           false,
+	opt.NotRegIMatchOp:        false,
+	opt.IsOp:                  false,
+	opt.IsNotOp:               false,
+	opt.ContainsOp:            false,
+	opt.JsonExistsOp:          false,
+	opt.JsonAllExistsOp:       false,
+	opt.JsonSomeExistsOp:      false,
+	opt.BitandOp:              false,
+	opt.BitorOp:               false,
+	opt.BitxorOp:              false,
+	opt.PlusOp:                false,
+	opt.MinusOp:               false,
+	opt.MultOp:                false,
+	opt.DivOp:                 false,
+	opt.FloorDivOp:            false,
+	opt.ModOp:                 false,
+	opt.PowOp:                 false,
+	opt.ConcatOp:              false,
+	opt.LShiftOp:              false,
+	opt.RShiftOp:              false,
+	opt.FetchValOp:            false,
+	opt.FetchTextOp:           false,
+	opt.FetchValPathOp:        false,
+	opt.FetchTextPathOp:       false,
+	opt.UnaryMinusOp:          false,
+	opt.UnaryComplementOp:     false,
+	opt.CastOp:                false,
+	opt.CaseOp:                false,
+	opt.WhenOp:                false,
+	opt.ArrayOp:               false,
+	opt.FunctionOp:            false,
+	opt.CoalesceOp:            false,
+	opt.UnsupportedExprOp:     false,
+	opt.ArrayAggOp:            false,
+	opt.AvgOp:                 false,
+	opt.BoolAndOp:             false,
+	opt.BoolOrOp:              false,
+	opt.ConcatAggOp:           false,
+	opt.CountOp:               false,
+	opt.CountRowsOp:           false,
+	opt.MaxOp:                 false,
+	opt.MinOp:                 false,
+	opt.SumIntOp:              false,
+	opt.SumOp:                 false,
+	opt.SqrDiffOp:             false,
+	opt.VarianceOp:            false,
+	opt.StdDevOp:              false,
+	opt.XorAggOp:              false,
+	opt.JsonAggOp:             false,
+	opt.JsonbAggOp:            false,
+	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -507,6 +638,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      true,
 	opt.LeftJoinApplyOp:       true,
 	opt.RightJoinApplyOp:      true,
@@ -611,6 +743,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isScalarLookup = [...]bool{
@@ -628,6 +761,7 @@ var isScalarLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -732,6 +866,7 @@ var isScalarLookup = [...]bool{
 	opt.JsonAggOp:             true,
 	opt.JsonbAggOp:            true,
 	opt.AnyNotNullOp:          true,
+	opt.MergeOnOp:             true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -749,6 +884,7 @@ var isConstValueLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -853,6 +989,7 @@ var isConstValueLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -870,6 +1007,7 @@ var isBooleanLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -974,6 +1112,7 @@ var isBooleanLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -991,6 +1130,7 @@ var isComparisonLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -1095,6 +1235,7 @@ var isComparisonLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -1112,6 +1253,7 @@ var isBinaryLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -1216,6 +1358,7 @@ var isBinaryLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1233,6 +1376,7 @@ var isUnaryLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -1337,6 +1481,7 @@ var isUnaryLookup = [...]bool{
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
 	opt.AnyNotNullOp:          false,
+	opt.MergeOnOp:             false,
 }
 
 var isAggregateLookup = [...]bool{
@@ -1354,6 +1499,7 @@ var isAggregateLookup = [...]bool{
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
 	opt.LookupJoinOp:          false,
+	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
 	opt.LeftJoinApplyOp:       false,
 	opt.RightJoinApplyOp:      false,
@@ -1458,6 +1604,7 @@ var isAggregateLookup = [...]bool{
 	opt.JsonAggOp:             true,
 	opt.JsonbAggOp:            true,
 	opt.AnyNotNullOp:          true,
+	opt.MergeOnOp:             false,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -1470,6 +1617,10 @@ func (ev ExprView) IsRelational() bool {
 
 func (ev ExprView) IsJoin() bool {
 	return isJoinLookup[ev.op]
+}
+
+func (ev ExprView) IsJoinNonApply() bool {
+	return isJoinNonApplyLookup[ev.op]
 }
 
 func (ev ExprView) IsJoinApply() bool {
@@ -1514,6 +1665,10 @@ func (e *Expr) IsRelational() bool {
 
 func (e *Expr) IsJoin() bool {
 	return isJoinLookup[e.op]
+}
+
+func (e *Expr) IsJoinNonApply() bool {
+	return isJoinNonApplyLookup[e.op]
 }
 
 func (e *Expr) IsJoinApply() bool {
@@ -1871,6 +2026,39 @@ func (e *Expr) AsLookupJoin() *LookupJoinExpr {
 		return nil
 	}
 	return (*LookupJoinExpr)(e)
+}
+
+// MergeJoinExpr represents a join that is executed using merge-join.
+// MergeOn is a scalar which contains the ON condition and merge-join ordering
+// information; see the MergeOn scalar operator.
+// It can be any type of join (identified in the private of MergeOn).
+type MergeJoinExpr Expr
+
+func MakeMergeJoinExpr(left GroupID, right GroupID, mergeOn GroupID) MergeJoinExpr {
+	return MergeJoinExpr{op: opt.MergeJoinOp, state: exprState{uint32(left), uint32(right), uint32(mergeOn)}}
+}
+
+func (e *MergeJoinExpr) Left() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *MergeJoinExpr) Right() GroupID {
+	return GroupID(e.state[1])
+}
+
+func (e *MergeJoinExpr) MergeOn() GroupID {
+	return GroupID(e.state[2])
+}
+
+func (e *MergeJoinExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsMergeJoin() *MergeJoinExpr {
+	if e.op != opt.MergeJoinOp {
+		return nil
+	}
+	return (*MergeJoinExpr)(e)
 }
 
 // InnerJoinApplyExpr has the same join semantics as InnerJoin. However, unlike
@@ -4613,6 +4801,33 @@ func (e *Expr) AsAnyNotNull() *AnyNotNullExpr {
 	return (*AnyNotNullExpr)(e)
 }
 
+// MergeOnExpr contains the ON condition and the metadata for a merge join; it is
+// always a child of MergeJoin.
+type MergeOnExpr Expr
+
+func MakeMergeOnExpr(on GroupID, def PrivateID) MergeOnExpr {
+	return MergeOnExpr{op: opt.MergeOnOp, state: exprState{uint32(on), uint32(def)}}
+}
+
+func (e *MergeOnExpr) On() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *MergeOnExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
+}
+
+func (e *MergeOnExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsMergeOn() *MergeOnExpr {
+	if e.op != opt.MergeOnOp {
+		return nil
+	}
+	return (*MergeOnExpr)(e)
+}
+
 // InternScanOpDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -4732,6 +4947,13 @@ func (m *Memo) InternFuncOpDef(val *FuncOpDef) PrivateID {
 	return m.privateStorage.internFuncOpDef(val)
 }
 
+// InternMergeOnDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternMergeOnDef(val *MergeOnDef) PrivateID {
+	return m.privateStorage.internMergeOnDef(val)
+}
+
 type makeExprFunc func(operands DynamicOperands) Expr
 
 var makeExprLookup [opt.NumOperators]makeExprFunc
@@ -4795,6 +5017,11 @@ func init() {
 	// LookupJoinOp
 	makeExprLookup[opt.LookupJoinOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeLookupJoinExpr(GroupID(operands[0]), PrivateID(operands[1])))
+	}
+
+	// MergeJoinOp
+	makeExprLookup[opt.MergeJoinOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeMergeJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
 	}
 
 	// InnerJoinApplyOp
@@ -5315,6 +5542,11 @@ func init() {
 	// AnyNotNullOp
 	makeExprLookup[opt.AnyNotNullOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeAnyNotNullExpr(GroupID(operands[0])))
+	}
+
+	// MergeOnOp
+	makeExprLookup[opt.MergeOnOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeMergeOnExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 }

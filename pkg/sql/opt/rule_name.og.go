@@ -115,6 +115,7 @@ const (
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------
+	GenerateMergeJoins
 	PushLimitIntoScan
 	PushLimitIntoLookupJoin
 	GenerateIndexScans

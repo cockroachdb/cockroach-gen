@@ -14,6 +14,18 @@ func (_e *explorer) exploreExpr(_state *exploreState, _eid memo.ExprID) (_fullyE
 		return _e.exploreScan(_state, _eid)
 	case opt.SelectOp:
 		return _e.exploreSelect(_state, _eid)
+	case opt.InnerJoinOp:
+		return _e.exploreInnerJoin(_state, _eid)
+	case opt.LeftJoinOp:
+		return _e.exploreLeftJoin(_state, _eid)
+	case opt.RightJoinOp:
+		return _e.exploreRightJoin(_state, _eid)
+	case opt.FullJoinOp:
+		return _e.exploreFullJoin(_state, _eid)
+	case opt.SemiJoinOp:
+		return _e.exploreSemiJoin(_state, _eid)
+	case opt.AntiJoinOp:
+		return _e.exploreAntiJoin(_state, _eid)
 	case opt.LimitOp:
 		return _e.exploreLimit(_state, _eid)
 	}
@@ -223,6 +235,168 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
+	_rootExpr := _e.mem.Expr(_root).AsInnerJoin()
+	_fullyExplored = true
+
+	// [GenerateMergeJoins]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
+				_exprs := _e.funcs.ConstructMergeJoins(opt.InnerJoinOp, left, right, on)
+				_before := _e.mem.ExprCount(_root.Group)
+				for i := range _exprs {
+					_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+				}
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
+	_rootExpr := _e.mem.Expr(_root).AsLeftJoin()
+	_fullyExplored = true
+
+	// [GenerateMergeJoins]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
+				_exprs := _e.funcs.ConstructMergeJoins(opt.LeftJoinOp, left, right, on)
+				_before := _e.mem.ExprCount(_root.Group)
+				for i := range _exprs {
+					_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+				}
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreRightJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
+	_rootExpr := _e.mem.Expr(_root).AsRightJoin()
+	_fullyExplored = true
+
+	// [GenerateMergeJoins]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
+				_exprs := _e.funcs.ConstructMergeJoins(opt.RightJoinOp, left, right, on)
+				_before := _e.mem.ExprCount(_root.Group)
+				for i := range _exprs {
+					_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+				}
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreFullJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
+	_rootExpr := _e.mem.Expr(_root).AsFullJoin()
+	_fullyExplored = true
+
+	// [GenerateMergeJoins]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
+				_exprs := _e.funcs.ConstructMergeJoins(opt.FullJoinOp, left, right, on)
+				_before := _e.mem.ExprCount(_root.Group)
+				for i := range _exprs {
+					_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+				}
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreSemiJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
+	_rootExpr := _e.mem.Expr(_root).AsSemiJoin()
+	_fullyExplored = true
+
+	// [GenerateMergeJoins]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
+				_exprs := _e.funcs.ConstructMergeJoins(opt.SemiJoinOp, left, right, on)
+				_before := _e.mem.ExprCount(_root.Group)
+				for i := range _exprs {
+					_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+				}
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreAntiJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
+	_rootExpr := _e.mem.Expr(_root).AsAntiJoin()
+	_fullyExplored = true
+
+	// [GenerateMergeJoins]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
+				_exprs := _e.funcs.ConstructMergeJoins(opt.AntiJoinOp, left, right, on)
+				_before := _e.mem.ExprCount(_root.Group)
+				for i := range _exprs {
+					_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+				}
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
 				}
 			}
 		}

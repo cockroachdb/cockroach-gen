@@ -129,6 +129,13 @@ func (_f *Factory) InternFuncOpDef(val *memo.FuncOpDef) memo.PrivateID {
 	return _f.mem.InternFuncOpDef(val)
 }
 
+// InternMergeOnDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternMergeOnDef(val *memo.MergeOnDef) memo.PrivateID {
+	return _f.mem.InternMergeOnDef(val)
+}
+
 // ConstructScan constructs an expression for the Scan operator.
 // Scan returns a result set containing every row in the specified table, by
 // scanning one of the table's indexes according to its ordering. The private
@@ -2090,6 +2097,25 @@ func (_f *Factory) ConstructLookupJoin(
 	}
 
 	return _f.onConstruct(memo.Expr(_lookupJoinExpr))
+}
+
+// ConstructMergeJoin constructs an expression for the MergeJoin operator.
+// MergeJoin represents a join that is executed using merge-join.
+// MergeOn is a scalar which contains the ON condition and merge-join ordering
+// information; see the MergeOn scalar operator.
+// It can be any type of join (identified in the private of MergeOn).
+func (_f *Factory) ConstructMergeJoin(
+	left memo.GroupID,
+	right memo.GroupID,
+	mergeOn memo.GroupID,
+) memo.GroupID {
+	_mergeJoinExpr := memo.MakeMergeJoinExpr(left, right, mergeOn)
+	_group := _f.mem.GroupByFingerprint(_mergeJoinExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_mergeJoinExpr))
 }
 
 // ConstructInnerJoinApply constructs an expression for the InnerJoinApply operator.
@@ -8187,6 +8213,22 @@ func (_f *Factory) ConstructAnyNotNull(
 	return _f.onConstruct(memo.Expr(_anyNotNullExpr))
 }
 
+// ConstructMergeOn constructs an expression for the MergeOn operator.
+// MergeOn contains the ON condition and the metadata for a merge join; it is
+// always a child of MergeJoin.
+func (_f *Factory) ConstructMergeOn(
+	on memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_mergeOnExpr := memo.MakeMergeOnExpr(on, def)
+	_group := _f.mem.GroupByFingerprint(_mergeOnExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_mergeOnExpr))
+}
+
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
 
 var dynConstructLookup [opt.NumOperators]dynConstructFunc
@@ -8250,6 +8292,11 @@ func init() {
 	// LookupJoinOp
 	dynConstructLookup[opt.LookupJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructLookupJoin(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
+	}
+
+	// MergeJoinOp
+	dynConstructLookup[opt.MergeJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructMergeJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
 	}
 
 	// InnerJoinApplyOp
@@ -8770,6 +8817,11 @@ func init() {
 	// AnyNotNullOp
 	dynConstructLookup[opt.AnyNotNullOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructAnyNotNull(memo.GroupID(operands[0]))
+	}
+
+	// MergeOnOp
+	dynConstructLookup[opt.MergeOnOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructMergeOn(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 }
