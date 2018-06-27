@@ -6,6 +6,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -45,11 +46,11 @@ func (_f *Factory) InternSetOpColMap(val *memo.SetOpColMap) memo.PrivateID {
 	return _f.mem.InternSetOpColMap(val)
 }
 
-// InternOrdering adds the given value to the memo and returns an ID that
+// InternOrderingChoice adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternOrdering(val opt.Ordering) memo.PrivateID {
-	return _f.mem.InternOrdering(val)
+func (_f *Factory) InternOrderingChoice(val *props.OrderingChoice) memo.PrivateID {
+	return _f.mem.InternOrderingChoice(val)
 }
 
 // InternExplainOpDef adds the given value to the memo and returns an ID that
@@ -3398,6 +3399,24 @@ func (_f *Factory) ConstructGroupBy(
 		}
 	}
 
+	// [SimplifyGroupByOrdering]
+	{
+		if _f.funcs.CanSimplifyGroupByOrdering(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyGroupByOrdering) {
+				_group = _f.ConstructGroupBy(
+					input,
+					aggregations,
+					_f.funcs.SimplifyGroupByOrdering(input, def),
+				)
+				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyGroupByOrdering, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	// [PruneGroupByCols]
 	{
 		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def)) {
@@ -3582,8 +3601,9 @@ func (_f *Factory) ConstructExceptAll(
 // ConstructLimit constructs an expression for the Limit operator.
 // Limit returns a limited subset of the results in the input relation.
 // The limit expression is a scalar value; the operator returns at most this many
-// rows. The private field is an opt.Ordering which indicates the desired
-// row ordering (the first rows with respect to this ordering are returned).
+// rows. The private field is a props.OrderingChoice which indicates the row
+// ordering required from the input (the first rows with respect to this ordering
+// are returned).
 func (_f *Factory) ConstructLimit(
 	input memo.GroupID,
 	limit memo.GroupID,
@@ -3639,6 +3659,24 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [SimplifyLimitOrdering]
+	{
+		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLimitOrdering) {
+				_group = _f.ConstructLimit(
+					input,
+					limit,
+					_f.funcs.SimplifyLimitOffsetOrdering(input, ordering),
+				)
+				_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyLimitOrdering, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_limitExpr))
 }
 
@@ -3678,6 +3716,24 @@ func (_f *Factory) ConstructOffset(
 					}
 					return _group
 				}
+			}
+		}
+	}
+
+	// [SimplifyOffsetOrdering]
+	{
+		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOffsetOrdering) {
+				_group = _f.ConstructOffset(
+					input,
+					offset,
+					_f.funcs.SimplifyLimitOffsetOrdering(input, ordering),
+				)
+				_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyOffsetOrdering, _group, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -3728,6 +3784,40 @@ func (_f *Factory) ConstructExplain(
 		return _group
 	}
 
+	// [SimplifyExplainOrdering]
+	{
+		if _f.funcs.CanSimplifyExplainOrdering(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyExplainOrdering) {
+				_group = _f.ConstructExplain(
+					input,
+					_f.funcs.SimplifyExplainOrdering(input, def),
+				)
+				_f.mem.AddAltFingerprint(_explainExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyExplainOrdering, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [PruneExplainCols]
+	{
+		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsExplain(def)) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneExplainCols) {
+				_group = _f.ConstructExplain(
+					_f.funcs.PruneCols(input, _f.funcs.NeededColsExplain(def)),
+					def,
+				)
+				_f.mem.AddAltFingerprint(_explainExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneExplainCols, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_explainExpr))
 }
 
@@ -3772,6 +3862,23 @@ func (_f *Factory) ConstructRowNumber(
 	_group := _f.mem.GroupByFingerprint(_rowNumberExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [SimplifyRowNumberOrdering]
+	{
+		if _f.funcs.CanSimplifyRowNumberOrdering(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRowNumberOrdering) {
+				_group = _f.ConstructRowNumber(
+					input,
+					_f.funcs.SimplifyRowNumberOrdering(input, def),
+				)
+				_f.mem.AddAltFingerprint(_rowNumberExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyRowNumberOrdering, _group, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	return _f.onConstruct(memo.Expr(_rowNumberExpr))

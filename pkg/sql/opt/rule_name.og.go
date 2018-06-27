@@ -74,6 +74,11 @@ const (
 	InvertMinus
 	EliminateUnaryMinus
 	FoldUnaryMinus
+	SimplifyLimitOrdering
+	SimplifyOffsetOrdering
+	SimplifyGroupByOrdering
+	SimplifyRowNumberOrdering
+	SimplifyExplainOrdering
 	EliminateProject
 	EliminateProjectProject
 	PruneProjectCols
@@ -87,6 +92,7 @@ const (
 	PruneGroupByCols
 	PruneValuesCols
 	PruneRowNumberCols
+	PruneExplainCols
 	CommuteVar
 	CommuteConst
 	EliminateCoalesce

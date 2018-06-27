@@ -5,6 +5,7 @@ package memo
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -2518,8 +2519,9 @@ func (e *Expr) AsExceptAll() *ExceptAllExpr {
 
 // LimitExpr returns a limited subset of the results in the input relation.
 // The limit expression is a scalar value; the operator returns at most this many
-// rows. The private field is an opt.Ordering which indicates the desired
-// row ordering (the first rows with respect to this ordering are returned).
+// rows. The private field is a props.OrderingChoice which indicates the row
+// ordering required from the input (the first rows with respect to this ordering
+// are returned).
 type LimitExpr Expr
 
 func MakeLimitExpr(input GroupID, limit GroupID, ordering PrivateID) LimitExpr {
@@ -4863,11 +4865,11 @@ func (m *Memo) InternSetOpColMap(val *SetOpColMap) PrivateID {
 	return m.privateStorage.internSetOpColMap(val)
 }
 
-// InternOrdering adds the given value to the memo and returns an ID that
+// InternOrderingChoice adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternOrdering(val opt.Ordering) PrivateID {
-	return m.privateStorage.internOrdering(val)
+func (m *Memo) InternOrderingChoice(val *props.OrderingChoice) PrivateID {
+	return m.privateStorage.internOrderingChoice(val)
 }
 
 // InternExplainOpDef adds the given value to the memo and returns an ID that

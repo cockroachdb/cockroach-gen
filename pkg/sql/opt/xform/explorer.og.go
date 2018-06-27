@@ -468,7 +468,7 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 				if _e.funcs.OneResultPerInput(def) {
 					limit := _rootExpr.Limit()
 					ordering := _rootExpr.Ordering()
-					if _e.funcs.HasOrderingCols(input, ordering) {
+					if _e.funcs.HasColsInOrdering(input, ordering) {
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoLookupJoin) {
 							_expr := memo.MakeLookupJoinExpr(
 								_e.f.ConstructLimit(

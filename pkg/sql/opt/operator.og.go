@@ -183,8 +183,9 @@ const (
 
 	// LimitOp returns a limited subset of the results in the input relation.
 	// The limit expression is a scalar value; the operator returns at most this many
-	// rows. The private field is an opt.Ordering which indicates the desired
-	// row ordering (the first rows with respect to this ordering are returned).
+	// rows. The private field is a props.OrderingChoice which indicates the row
+	// ordering required from the input (the first rows with respect to this ordering
+	// are returned).
 	LimitOp
 
 	// OffsetOp filters out the first Offset rows of the input relation; used in
