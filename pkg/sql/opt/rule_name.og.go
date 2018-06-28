@@ -123,6 +123,7 @@ const (
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------
+	ReplaceMinWithLimit
 	GenerateMergeJoins
 	PushLimitIntoScan
 	PushLimitIntoLookupJoin
