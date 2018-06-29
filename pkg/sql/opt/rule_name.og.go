@@ -53,6 +53,9 @@ const (
 	InlineProjectInProject
 	EnsureJoinFiltersAnd
 	EnsureJoinFilters
+	PushFilterIntoJoinLeftAndRight
+	MapFilterIntoJoinLeft
+	MapFilterIntoJoinRight
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
 	SimplifyLeftJoin
@@ -114,9 +117,11 @@ const (
 	EnsureSelectFilters
 	MergeSelects
 	PushSelectIntoProject
+	SimplifySelectLeftJoin
+	SimplifySelectRightJoin
+	MergeSelectInnerJoin
 	PushSelectIntoJoinLeft
 	PushSelectIntoJoinRight
-	MergeSelectInnerJoin
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
 

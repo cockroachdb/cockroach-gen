@@ -332,6 +332,83 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [SimplifySelectLeftJoin]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				if _f.funcs.HasNullRejectingFilter(filter, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectLeftJoin) {
+						_group = _f.ConstructSelect(
+							_f.funcs.ConstructNonLeftJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
+							filter,
+						)
+						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySelectLeftJoin, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [SimplifySelectRightJoin]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				if _f.funcs.HasNullRejectingFilter(filter, left) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectRightJoin) {
+						_group = _f.ConstructSelect(
+							_f.funcs.ConstructNonRightJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
+							filter,
+						)
+						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySelectRightJoin, _group, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [MergeSelectInnerJoin]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			if _f.matchedRule == nil || _f.matchedRule(opt.MergeSelectInnerJoin) {
+				_group = _f.DynamicConstruct(
+					_f.mem.NormExpr(input).Operator(),
+					memo.DynamicOperands{
+						memo.DynamicID(left),
+						memo.DynamicID(right),
+						memo.DynamicID(_f.funcs.ConcatFilters(on, filter)),
+					},
+				)
+				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.MergeSelectInnerJoin, _group, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	// [PushSelectIntoJoinLeft]
 	{
 		_expr := _f.mem.NormExpr(input)
@@ -416,31 +493,6 @@ func (_f *Factory) ConstructSelect(
 						}
 					}
 				}
-			}
-		}
-	}
-
-	// [MergeSelectInnerJoin]
-	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
-			if _f.matchedRule == nil || _f.matchedRule(opt.MergeSelectInnerJoin) {
-				_group = _f.DynamicConstruct(
-					_f.mem.NormExpr(input).Operator(),
-					memo.DynamicOperands{
-						memo.DynamicID(left),
-						memo.DynamicID(right),
-						memo.DynamicID(_f.funcs.ConcatFilters(on, filter)),
-					},
-				)
-				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.MergeSelectInnerJoin, _group, 0)
-				}
-				return _group
 			}
 		}
 	}
@@ -1171,6 +1223,148 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [PushFilterIntoJoinLeftAndRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if _f.funcs.CanMap(filters, condition, left) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
+								_group = _f.ConstructInnerJoin(
+									_f.ConstructSelect(
+										left,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, left)}),
+										),
+									),
+									_f.ConstructSelect(
+										right,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, right)}),
+										),
+									),
+									_f.ConstructFilters(
+										_f.funcs.RemoveListItem(list, condition),
+									),
+								)
+								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.PushFilterIntoJoinLeftAndRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinLeft]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(filters, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
+								_group = _f.ConstructInnerJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructInnerJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
@@ -1418,6 +1612,50 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructLeftJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinRight]
 	{
 		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
@@ -1568,6 +1806,50 @@ func (_f *Factory) ConstructRightJoin(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinLeft]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(filters, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
+								_group = _f.ConstructRightJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1876,6 +2158,148 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [PushFilterIntoJoinLeftAndRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if _f.funcs.CanMap(filters, condition, left) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
+								_group = _f.ConstructSemiJoin(
+									_f.ConstructSelect(
+										left,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, left)}),
+										),
+									),
+									_f.ConstructSelect(
+										right,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, right)}),
+										),
+									),
+									_f.ConstructFilters(
+										_f.funcs.RemoveListItem(list, condition),
+									),
+								)
+								_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.PushFilterIntoJoinLeftAndRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinLeft]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(filters, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
+								_group = _f.ConstructSemiJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructSemiJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
@@ -2058,6 +2482,50 @@ func (_f *Factory) ConstructAntiJoin(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructAntiJoin(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -2344,6 +2812,94 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [MapFilterIntoJoinLeft]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(filters, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
+								_group = _f.ConstructInnerJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructInnerJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
@@ -2605,6 +3161,50 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructLeftJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinRight]
 	{
 		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
@@ -2769,6 +3369,50 @@ func (_f *Factory) ConstructRightJoinApply(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinLeft]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(filters, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
+								_group = _f.ConstructRightJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -3105,6 +3749,94 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [MapFilterIntoJoinLeft]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(filters, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
+								_group = _f.ConstructSemiJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructSemiJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
@@ -3301,6 +4033,50 @@ func (_f *Factory) ConstructAntiJoinApply(
 					_f.appliedRule(opt.EnsureJoinFilters, _group, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [MapFilterIntoJoinRight]
+	{
+		filters := on
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_match := false
+				_eqExpr := _f.mem.NormExpr(_item).AsEq()
+				if _eqExpr != nil {
+					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+					if _variableExpr != nil {
+						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+						if _variableExpr2 != nil {
+							_match = true
+						}
+					}
+				}
+
+				if !_match {
+					if !_f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(filters, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
+								_group = _f.ConstructAntiJoinApply(
+									left,
+									right,
+									_f.ConstructFilters(
+										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
+									),
+								)
+								_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
 			}
 		}
 	}
