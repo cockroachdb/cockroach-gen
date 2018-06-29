@@ -12698,7 +12698,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:2711
 		{
-			sqlVAL.union.val = tree.SnapshotIsolation
+			sqlVAL.union.val = tree.SerializableIsolation
 		}
 	case 433:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
