@@ -126,12 +126,12 @@ const (
 	ReplaceMinWithLimit
 	GenerateMergeJoins
 	PushLimitIntoScan
-	PushLimitIntoLookupJoin
+	PushLimitIntoIndexJoin
 	GenerateIndexScans
 	ConstrainScan
-	PushFilterIntoLookupJoinNoRemainder
-	PushFilterIntoLookupJoin
-	ConstrainLookupJoinIndexScan
+	PushFilterIntoIndexJoinNoRemainder
+	PushFilterIntoIndexJoin
+	ConstrainIndexJoinScan
 
 	// NumRuleNames tracks the total count of rule names.
 	NumRuleNames

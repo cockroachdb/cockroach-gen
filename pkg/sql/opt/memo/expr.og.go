@@ -23,6 +23,7 @@ var opLayoutTable = [...]opLayout{
 	opt.FullJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.SemiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AntiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.IndexJoinOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.LookupJoinOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.MergeJoinOp:           makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.InnerJoinApplyOp:      makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -146,6 +147,7 @@ var isEnforcerLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -269,6 +271,7 @@ var isRelationalLookup = [...]bool{
 	opt.FullJoinOp:            true,
 	opt.SemiJoinOp:            true,
 	opt.AntiJoinOp:            true,
+	opt.IndexJoinOp:           true,
 	opt.LookupJoinOp:          true,
 	opt.MergeJoinOp:           true,
 	opt.InnerJoinApplyOp:      true,
@@ -392,6 +395,7 @@ var isJoinLookup = [...]bool{
 	opt.FullJoinOp:            true,
 	opt.SemiJoinOp:            true,
 	opt.AntiJoinOp:            true,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      true,
@@ -515,6 +519,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.FullJoinOp:            true,
 	opt.SemiJoinOp:            true,
 	opt.AntiJoinOp:            true,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -638,6 +643,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      true,
@@ -761,6 +767,7 @@ var isScalarLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -884,6 +891,7 @@ var isConstValueLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -1007,6 +1015,7 @@ var isBooleanLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -1130,6 +1139,7 @@ var isComparisonLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -1253,6 +1263,7 @@ var isBinaryLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -1376,6 +1387,7 @@ var isUnaryLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -1499,6 +1511,7 @@ var isAggregateLookup = [...]bool{
 	opt.FullJoinOp:            false,
 	opt.SemiJoinOp:            false,
 	opt.AntiJoinOp:            false,
+	opt.IndexJoinOp:           false,
 	opt.LookupJoinOp:          false,
 	opt.MergeJoinOp:           false,
 	opt.InnerJoinApplyOp:      false,
@@ -2003,7 +2016,40 @@ func (e *Expr) AsAntiJoin() *AntiJoinExpr {
 	return (*AntiJoinExpr)(e)
 }
 
+// IndexJoinExpr represents an inner join between an input expression and a primary
+// index. It is a special case of LookupInnerJoin where the input columns are the
+// PK columns of the table we are looking up into, and every input row results
+// in exactly one output row.
+//
+// IndexJoin operators are created from Scan operators (unlike lookup joins which
+// are created from Join operators).
+type IndexJoinExpr Expr
+
+func MakeIndexJoinExpr(input GroupID, def PrivateID) IndexJoinExpr {
+	return IndexJoinExpr{op: opt.IndexJoinOp, state: exprState{uint32(input), uint32(def)}}
+}
+
+func (e *IndexJoinExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *IndexJoinExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
+}
+
+func (e *IndexJoinExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsIndexJoin() *IndexJoinExpr {
+	if e.op != opt.IndexJoinOp {
+		return nil
+	}
+	return (*IndexJoinExpr)(e)
+}
+
 // LookupJoinExpr represents a join between an input expression and an index.
+// The type of join is in the Def private.
 type LookupJoinExpr Expr
 
 func MakeLookupJoinExpr(input GroupID, def PrivateID) LookupJoinExpr {
@@ -4844,6 +4890,13 @@ func (m *Memo) InternColList(val opt.ColList) PrivateID {
 	return m.privateStorage.internColList(val)
 }
 
+// InternIndexJoinDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternIndexJoinDef(val *IndexJoinDef) PrivateID {
+	return m.privateStorage.internIndexJoinDef(val)
+}
+
 // InternLookupJoinDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -5014,6 +5067,11 @@ func init() {
 	// AntiJoinOp
 	makeExprLookup[opt.AntiJoinOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeAntiJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
+	}
+
+	// IndexJoinOp
+	makeExprLookup[opt.IndexJoinOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeIndexJoinExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// LookupJoinOp

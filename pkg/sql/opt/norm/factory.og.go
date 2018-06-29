@@ -25,6 +25,13 @@ func (_f *Factory) InternColList(val opt.ColList) memo.PrivateID {
 	return _f.mem.InternColList(val)
 }
 
+// InternIndexJoinDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternIndexJoinDef(val *memo.IndexJoinDef) memo.PrivateID {
+	return _f.mem.InternIndexJoinDef(val)
+}
+
 // InternLookupJoinDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -2121,8 +2128,30 @@ func (_f *Factory) ConstructAntiJoin(
 	return _f.onConstruct(memo.Expr(_antiJoinExpr))
 }
 
+// ConstructIndexJoin constructs an expression for the IndexJoin operator.
+// IndexJoin represents an inner join between an input expression and a primary
+// index. It is a special case of LookupInnerJoin where the input columns are the
+// PK columns of the table we are looking up into, and every input row results
+// in exactly one output row.
+//
+// IndexJoin operators are created from Scan operators (unlike lookup joins which
+// are created from Join operators).
+func (_f *Factory) ConstructIndexJoin(
+	input memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_indexJoinExpr := memo.MakeIndexJoinExpr(input, def)
+	_group := _f.mem.GroupByFingerprint(_indexJoinExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_indexJoinExpr))
+}
+
 // ConstructLookupJoin constructs an expression for the LookupJoin operator.
 // LookupJoin represents a join between an input expression and an index.
+// The type of join is in the Def private.
 func (_f *Factory) ConstructLookupJoin(
 	input memo.GroupID,
 	def memo.PrivateID,
@@ -8447,6 +8476,11 @@ func init() {
 	// AntiJoinOp
 	dynConstructLookup[opt.AntiJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructAntiJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
+	}
+
+	// IndexJoinOp
+	dynConstructLookup[opt.IndexJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructIndexJoin(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// LookupJoinOp

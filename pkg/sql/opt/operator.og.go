@@ -68,7 +68,17 @@ const (
 
 	AntiJoinOp
 
+	// IndexJoinOp represents an inner join between an input expression and a primary
+	// index. It is a special case of LookupInnerJoin where the input columns are the
+	// PK columns of the table we are looking up into, and every input row results
+	// in exactly one output row.
+	//
+	// IndexJoin operators are created from Scan operators (unlike lookup joins which
+	// are created from Join operators).
+	IndexJoinOp
+
 	// LookupJoinOp represents a join between an input expression and an index.
+	// The type of join is in the Def private.
 	LookupJoinOp
 
 	// MergeJoinOp represents a join that is executed using merge-join.
@@ -534,9 +544,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-traceshow-trace-for-sessionrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-traceshow-trace-for-sessionrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 101, 111, 127, 142, 158, 173, 188, 203, 211, 216, 225, 231, 240, 253, 263, 268, 274, 282, 289, 299, 321, 331, 339, 342, 350, 355, 359, 363, 368, 379, 384, 395, 407, 413, 420, 423, 425, 428, 430, 432, 434, 436, 438, 440, 442, 448, 452, 460, 466, 476, 486, 500, 509, 522, 533, 548, 550, 556, 564, 575, 590, 606, 612, 617, 623, 627, 632, 636, 639, 648, 651, 654, 660, 667, 674, 683, 693, 707, 722, 733, 749, 753, 757, 761, 766, 774, 782, 798, 807, 810, 818, 825, 835, 840, 850, 853, 856, 863, 866, 874, 882, 889, 896, 904, 913, 925, 933}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 100, 111, 121, 137, 152, 168, 183, 198, 213, 221, 226, 235, 241, 250, 263, 273, 278, 284, 292, 299, 309, 331, 341, 349, 352, 360, 365, 369, 373, 378, 389, 394, 405, 417, 423, 430, 433, 435, 438, 440, 442, 444, 446, 448, 450, 452, 458, 462, 470, 476, 486, 496, 510, 519, 532, 543, 558, 560, 566, 574, 585, 600, 616, 622, 627, 633, 637, 642, 646, 649, 658, 661, 664, 670, 677, 684, 693, 703, 717, 732, 743, 759, 763, 767, 771, 776, 784, 792, 808, 817, 820, 828, 835, 845, 850, 860, 863, 866, 873, 876, 884, 892, 899, 906, 914, 923, 935, 943}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -553,6 +563,7 @@ var RelationalOperators = [...]Operator{
 	FullJoinOp,
 	SemiJoinOp,
 	AntiJoinOp,
+	IndexJoinOp,
 	LookupJoinOp,
 	MergeJoinOp,
 	InnerJoinApplyOp,
