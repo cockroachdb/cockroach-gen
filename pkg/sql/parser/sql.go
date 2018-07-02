@@ -10973,14 +10973,14 @@ sqldefault:
 		//line sql-gen.y:1260
 		{
 
-			sqlVAL.union.val = &tree.TestingRelocate{Table: sqlDollar[3].union.newNormalizableTableNameFromUnresolvedName(), Rows: sqlDollar[5].union.slct()}
+			sqlVAL.union.val = &tree.Relocate{Table: sqlDollar[3].union.newNormalizableTableNameFromUnresolvedName(), Rows: sqlDollar[5].union.slct()}
 		}
 	case 109:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 		//line sql-gen.y:1271
 		{
 
-			sqlVAL.union.val = &tree.TestingRelocate{Index: sqlDollar[3].union.newTableWithIdx(), Rows: sqlDollar[5].union.slct()}
+			sqlVAL.union.val = &tree.Relocate{Index: sqlDollar[3].union.newTableWithIdx(), Rows: sqlDollar[5].union.slct()}
 		}
 	case 110:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
