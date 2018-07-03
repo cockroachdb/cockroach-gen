@@ -1121,6 +1121,43 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_innerJoinExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_innerJoinExpr.Fingerprint()] = true
+						_group = _f.ConstructInnerJoin(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _innerJoinExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [TryDecorrelateProject]
 	{
 		if _f.funcs.HasOuterCols(right) {
@@ -1562,6 +1599,43 @@ func (_f *Factory) ConstructLeftJoin(
 							}
 							return _group
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_leftJoinExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_leftJoinExpr.Fingerprint()] = true
+						_group = _f.ConstructLeftJoin(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _leftJoinExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
 					}
 				}
 			}
@@ -2114,6 +2188,43 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_semiJoinExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_semiJoinExpr.Fingerprint()] = true
+						_group = _f.ConstructSemiJoin(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _semiJoinExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [EnsureJoinFiltersAnd]
 	{
 		_andExpr := _f.mem.NormExpr(on).AsAnd()
@@ -2442,6 +2553,43 @@ func (_f *Factory) ConstructAntiJoin(
 		}
 	}
 
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_antiJoinExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_antiJoinExpr.Fingerprint()] = true
+						_group = _f.ConstructAntiJoin(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _antiJoinExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [EnsureJoinFiltersAnd]
 	{
 		_andExpr := _f.mem.NormExpr(on).AsAnd()
@@ -2688,6 +2836,43 @@ func (_f *Factory) ConstructInnerJoinApply(
 						}
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructInnerJoinApply(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _innerJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
 						}
 						return _group
 					}
@@ -3097,6 +3282,43 @@ func (_f *Factory) ConstructLeftJoinApply(
 							}
 							return _group
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructLeftJoinApply(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
 					}
 				}
 			}
@@ -3691,6 +3913,43 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructSemiJoinApply(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _semiJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [DecorrelateJoin]
 	{
 		if !_f.funcs.IsCorrelated(right, left) {
@@ -3971,6 +4230,43 @@ func (_f *Factory) ConstructAntiJoinApply(
 						}
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] = true
+						_group = _f.ConstructAntiJoinApply(
+							left,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(innerLeft),
+									memo.DynamicID(innerRight),
+									memo.DynamicID(_f.ConstructTrue()),
+								},
+							),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						delete(_f.ruleCycles, _antiJoinApplyExpr.Fingerprint())
+						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
+							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+						}
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
 						}
 						return _group
 					}

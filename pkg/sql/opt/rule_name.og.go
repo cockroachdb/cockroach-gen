@@ -38,6 +38,7 @@ const (
 	TryDecorrelateSelect
 	TryDecorrelateProject
 	TryDecorrelateProjectSelect
+	TryDecorrelateInnerJoin
 	TryDecorrelateScalarGroupBy
 	HoistSelectExists
 	HoistSelectNotExists
