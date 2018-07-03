@@ -125,6 +125,10 @@ const (
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
 
+	// startExploreRule tracks the number of normalization rules;
+	// all rules greater than this value are exploration rules.
+	startExploreRule
+
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------

@@ -53,7 +53,7 @@ func (_e *explorer) exploreScan(_rootState *exploreState, _root memo.ExprID) (_f
 					}
 					if _e.o.appliedRule != nil {
 						_after := _e.mem.ExprCount(_root.Group)
-						_e.o.appliedRule(opt.GenerateIndexScans, _root.Group, _after-_before)
+						_e.o.appliedRule(opt.GenerateIndexScans, _root.Group, _root.Expr, _after-_before)
 					}
 				}
 			}
@@ -93,7 +93,7 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 						}
 						if _e.o.appliedRule != nil {
 							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.ConstrainScan, _root.Group, _after-_before)
+							_e.o.appliedRule(opt.ConstrainScan, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}
@@ -132,7 +132,7 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
 						if _e.o.appliedRule != nil {
 							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.PushFilterIntoIndexJoinNoRemainder, _root.Group, _after-_before)
+							_e.o.appliedRule(opt.PushFilterIntoIndexJoinNoRemainder, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}
@@ -185,7 +185,7 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 									_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
 									if _e.o.appliedRule != nil {
 										_after := _e.mem.ExprCount(_root.Group)
-										_e.o.appliedRule(opt.PushFilterIntoIndexJoin, _root.Group, _after-_before)
+										_e.o.appliedRule(opt.PushFilterIntoIndexJoin, _root.Group, _root.Expr, _after-_before)
 									}
 								}
 							}
@@ -232,7 +232,7 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 								}
 								if _e.o.appliedRule != nil {
 									_after := _e.mem.ExprCount(_root.Group)
-									_e.o.appliedRule(opt.ConstrainIndexJoinScan, _root.Group, _after-_before)
+									_e.o.appliedRule(opt.ConstrainIndexJoinScan, _root.Group, _root.Expr, _after-_before)
 								}
 							}
 						}
@@ -263,7 +263,7 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 				}
 				if _e.o.appliedRule != nil {
 					_after := _e.mem.ExprCount(_root.Group)
-					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _root.Expr, _after-_before)
 				}
 			}
 		}
@@ -290,7 +290,7 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 				}
 				if _e.o.appliedRule != nil {
 					_after := _e.mem.ExprCount(_root.Group)
-					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _root.Expr, _after-_before)
 				}
 			}
 		}
@@ -317,7 +317,7 @@ func (_e *explorer) exploreRightJoin(_rootState *exploreState, _root memo.ExprID
 				}
 				if _e.o.appliedRule != nil {
 					_after := _e.mem.ExprCount(_root.Group)
-					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _root.Expr, _after-_before)
 				}
 			}
 		}
@@ -344,7 +344,7 @@ func (_e *explorer) exploreFullJoin(_rootState *exploreState, _root memo.ExprID)
 				}
 				if _e.o.appliedRule != nil {
 					_after := _e.mem.ExprCount(_root.Group)
-					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _root.Expr, _after-_before)
 				}
 			}
 		}
@@ -371,7 +371,7 @@ func (_e *explorer) exploreSemiJoin(_rootState *exploreState, _root memo.ExprID)
 				}
 				if _e.o.appliedRule != nil {
 					_after := _e.mem.ExprCount(_root.Group)
-					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _root.Expr, _after-_before)
 				}
 			}
 		}
@@ -398,7 +398,7 @@ func (_e *explorer) exploreAntiJoin(_rootState *exploreState, _root memo.ExprID)
 				}
 				if _e.o.appliedRule != nil {
 					_after := _e.mem.ExprCount(_root.Group)
-					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _after-_before)
+					_e.o.appliedRule(opt.GenerateMergeJoins, _root.Group, _root.Expr, _after-_before)
 				}
 			}
 		}
@@ -460,7 +460,7 @@ func (_e *explorer) exploreGroupBy(_rootState *exploreState, _root memo.ExprID) 
 									_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
 									if _e.o.appliedRule != nil {
 										_after := _e.mem.ExprCount(_root.Group)
-										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root.Group, _after-_before)
+										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root.Group, _root.Expr, _after-_before)
 									}
 								}
 							}
@@ -508,7 +508,7 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 							_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
 							if _e.o.appliedRule != nil {
 								_after := _e.mem.ExprCount(_root.Group)
-								_e.o.appliedRule(opt.PushLimitIntoScan, _root.Group, _after-_before)
+								_e.o.appliedRule(opt.PushLimitIntoScan, _root.Group, _root.Expr, _after-_before)
 							}
 						}
 					}
@@ -550,7 +550,7 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
 						if _e.o.appliedRule != nil {
 							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root.Group, _after-_before)
+							_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}
