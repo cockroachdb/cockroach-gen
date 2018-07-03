@@ -133,6 +133,9 @@ const (
 	// Explore Rule Names
 	// ------------------------------------------------------------
 	ReplaceMinWithLimit
+	CommuteJoin
+	CommuteLeftJoin
+	CommuteRightJoin
 	GenerateMergeJoins
 	PushLimitIntoScan
 	PushLimitIntoIndexJoin

@@ -249,6 +249,28 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 	_rootExpr := _e.mem.Expr(_root).AsInnerJoin()
 	_fullyExplored = true
 
+	// [CommuteJoin]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
+				_expr := memo.MakeInnerJoinExpr(
+					right,
+					left,
+					on,
+				)
+				_before := _e.mem.ExprCount(_root.Group)
+				_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.CommuteJoin, _root.Group, _root.Expr, _after-_before)
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _root.Expr >= _rootState.start {
@@ -275,6 +297,28 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
 	_rootExpr := _e.mem.Expr(_root).AsLeftJoin()
 	_fullyExplored = true
+
+	// [CommuteLeftJoin]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteLeftJoin) {
+				_expr := memo.MakeRightJoinExpr(
+					right,
+					left,
+					on,
+				)
+				_before := _e.mem.ExprCount(_root.Group)
+				_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.CommuteLeftJoin, _root.Group, _root.Expr, _after-_before)
+				}
+			}
+		}
+	}
 
 	// [GenerateMergeJoins]
 	{
@@ -303,6 +347,28 @@ func (_e *explorer) exploreRightJoin(_rootState *exploreState, _root memo.ExprID
 	_rootExpr := _e.mem.Expr(_root).AsRightJoin()
 	_fullyExplored = true
 
+	// [CommuteRightJoin]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteRightJoin) {
+				_expr := memo.MakeLeftJoinExpr(
+					right,
+					left,
+					on,
+				)
+				_before := _e.mem.ExprCount(_root.Group)
+				_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.CommuteRightJoin, _root.Group, _root.Expr, _after-_before)
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _root.Expr >= _rootState.start {
@@ -329,6 +395,28 @@ func (_e *explorer) exploreRightJoin(_rootState *exploreState, _root memo.ExprID
 func (_e *explorer) exploreFullJoin(_rootState *exploreState, _root memo.ExprID) (_fullyExplored bool) {
 	_rootExpr := _e.mem.Expr(_root).AsFullJoin()
 	_fullyExplored = true
+
+	// [CommuteJoin]
+	{
+		if _root.Expr >= _rootState.start {
+			left := _rootExpr.Left()
+			right := _rootExpr.Right()
+			on := _rootExpr.On()
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
+				_expr := memo.MakeFullJoinExpr(
+					right,
+					left,
+					on,
+				)
+				_before := _e.mem.ExprCount(_root.Group)
+				_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+				if _e.o.appliedRule != nil {
+					_after := _e.mem.ExprCount(_root.Group)
+					_e.o.appliedRule(opt.CommuteJoin, _root.Group, _root.Expr, _after-_before)
+				}
+			}
+		}
+	}
 
 	// [GenerateMergeJoins]
 	{
