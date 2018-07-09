@@ -358,7 +358,7 @@ var Keywords = map[string]struct {
 	"varchar":                   {VARCHAR, "C"},
 	"variadic":                  {VARIADIC, "R"},
 	"varying":                   {VARYING, "U"},
-	"view":                      {VIEW, "R"},
+	"view":                      {VIEW, "U"},
 	"virtual":                   {VIRTUAL, "C"},
 	"when":                      {WHEN, "R"},
 	"where":                     {WHERE, "R"},
