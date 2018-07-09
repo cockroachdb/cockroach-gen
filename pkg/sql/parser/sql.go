@@ -34,7 +34,6 @@ func unimplementedWithIssue(sqllex sqlLexer, issue int) int {
 }
 
 //line sql-gen.y:56
-
 type sqlSymUnion struct {
 	val interface{}
 }
