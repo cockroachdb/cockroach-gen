@@ -43,7 +43,6 @@ var opLayoutTable = [...]opLayout{
 	opt.OffsetOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.Max1RowOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ExplainOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.ShowTraceOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.ShowTraceForSessionOp: makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.RowNumberOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.SubqueryOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -167,7 +166,6 @@ var isEnforcerLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -291,7 +289,6 @@ var isRelationalLookup = [...]bool{
 	opt.OffsetOp:              true,
 	opt.Max1RowOp:             true,
 	opt.ExplainOp:             true,
-	opt.ShowTraceOp:           true,
 	opt.ShowTraceForSessionOp: true,
 	opt.RowNumberOp:           true,
 	opt.SubqueryOp:            false,
@@ -415,7 +412,6 @@ var isJoinLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -539,7 +535,6 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -663,7 +658,6 @@ var isJoinApplyLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -787,7 +781,6 @@ var isScalarLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            true,
@@ -911,7 +904,6 @@ var isConstValueLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -1035,7 +1027,6 @@ var isBooleanLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -1159,7 +1150,6 @@ var isComparisonLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -1283,7 +1273,6 @@ var isBinaryLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -1407,7 +1396,6 @@ var isUnaryLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -1531,7 +1519,6 @@ var isAggregateLookup = [...]bool{
 	opt.OffsetOp:              false,
 	opt.Max1RowOp:             false,
 	opt.ExplainOp:             false,
-	opt.ShowTraceOp:           false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
 	opt.SubqueryOp:            false,
@@ -2677,33 +2664,6 @@ func (e *Expr) AsExplain() *ExplainExpr {
 		return nil
 	}
 	return (*ExplainExpr)(e)
-}
-
-// ShowTraceExpr runs the "input" expressions in a special tracing mode and returns
-// trace results.
-type ShowTraceExpr Expr
-
-func MakeShowTraceExpr(input GroupID, def PrivateID) ShowTraceExpr {
-	return ShowTraceExpr{op: opt.ShowTraceOp, state: exprState{uint32(input), uint32(def)}}
-}
-
-func (e *ShowTraceExpr) Input() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *ShowTraceExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
-}
-
-func (e *ShowTraceExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsShowTrace() *ShowTraceExpr {
-	if e.op != opt.ShowTraceOp {
-		return nil
-	}
-	return (*ShowTraceExpr)(e)
 }
 
 // ShowTraceForSessionExpr returns the current session traces.
@@ -5167,11 +5127,6 @@ func init() {
 	// ExplainOp
 	makeExprLookup[opt.ExplainOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeExplainExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// ShowTraceOp
-	makeExprLookup[opt.ShowTraceOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeShowTraceExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// ShowTraceForSessionOp

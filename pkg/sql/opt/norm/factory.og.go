@@ -4922,22 +4922,6 @@ func (_f *Factory) ConstructExplain(
 	return _f.onConstruct(memo.Expr(_explainExpr))
 }
 
-// ConstructShowTrace constructs an expression for the ShowTrace operator.
-// ShowTrace runs the "input" expressions in a special tracing mode and returns
-// trace results.
-func (_f *Factory) ConstructShowTrace(
-	input memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_showTraceExpr := memo.MakeShowTraceExpr(input, def)
-	_group := _f.mem.GroupByFingerprint(_showTraceExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_showTraceExpr))
-}
-
 // ConstructShowTraceForSession constructs an expression for the ShowTraceForSession operator.
 // ShowTraceForSession returns the current session traces.
 func (_f *Factory) ConstructShowTraceForSession(
@@ -9648,11 +9632,6 @@ func init() {
 	// ExplainOp
 	dynConstructLookup[opt.ExplainOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructExplain(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// ShowTraceOp
-	dynConstructLookup[opt.ShowTraceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructShowTrace(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// ShowTraceForSessionOp
