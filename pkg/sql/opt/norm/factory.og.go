@@ -2746,9 +2746,9 @@ func (_f *Factory) ConstructAntiJoin(
 
 // ConstructIndexJoin constructs an expression for the IndexJoin operator.
 // IndexJoin represents an inner join between an input expression and a primary
-// index. It is a special case of LookupInnerJoin where the input columns are the
-// PK columns of the table we are looking up into, and every input row results
-// in exactly one output row.
+// index. It is a special case of LookupJoin where the input columns are the PK
+// columns of the table we are looking up into, and every input row results in
+// exactly one output row.
 //
 // IndexJoin operators are created from Scan operators (unlike lookup joins which
 // are created from Join operators).
@@ -2770,9 +2770,10 @@ func (_f *Factory) ConstructIndexJoin(
 // The type of join is in the Def private.
 func (_f *Factory) ConstructLookupJoin(
 	input memo.GroupID,
+	on memo.GroupID,
 	def memo.PrivateID,
 ) memo.GroupID {
-	_lookupJoinExpr := memo.MakeLookupJoinExpr(input, def)
+	_lookupJoinExpr := memo.MakeLookupJoinExpr(input, on, def)
 	_group := _f.mem.GroupByFingerprint(_lookupJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -9541,7 +9542,7 @@ func init() {
 
 	// LookupJoinOp
 	dynConstructLookup[opt.LookupJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLookupJoin(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
+		return f.ConstructLookupJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
 	}
 
 	// MergeJoinOp

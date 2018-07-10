@@ -69,9 +69,9 @@ const (
 	AntiJoinOp
 
 	// IndexJoinOp represents an inner join between an input expression and a primary
-	// index. It is a special case of LookupInnerJoin where the input columns are the
-	// PK columns of the table we are looking up into, and every input row results
-	// in exactly one output row.
+	// index. It is a special case of LookupJoin where the input columns are the PK
+	// columns of the table we are looking up into, and every input row results in
+	// exactly one output row.
 	//
 	// IndexJoin operators are created from Scan operators (unlike lookup joins which
 	// are created from Join operators).

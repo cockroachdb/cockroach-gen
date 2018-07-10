@@ -24,7 +24,7 @@ var opLayoutTable = [...]opLayout{
 	opt.SemiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AntiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.IndexJoinOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.LookupJoinOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
+	opt.LookupJoinOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.MergeJoinOp:           makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.InnerJoinApplyOp:      makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.LeftJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -2004,9 +2004,9 @@ func (e *Expr) AsAntiJoin() *AntiJoinExpr {
 }
 
 // IndexJoinExpr represents an inner join between an input expression and a primary
-// index. It is a special case of LookupInnerJoin where the input columns are the
-// PK columns of the table we are looking up into, and every input row results
-// in exactly one output row.
+// index. It is a special case of LookupJoin where the input columns are the PK
+// columns of the table we are looking up into, and every input row results in
+// exactly one output row.
 //
 // IndexJoin operators are created from Scan operators (unlike lookup joins which
 // are created from Join operators).
@@ -2039,16 +2039,20 @@ func (e *Expr) AsIndexJoin() *IndexJoinExpr {
 // The type of join is in the Def private.
 type LookupJoinExpr Expr
 
-func MakeLookupJoinExpr(input GroupID, def PrivateID) LookupJoinExpr {
-	return LookupJoinExpr{op: opt.LookupJoinOp, state: exprState{uint32(input), uint32(def)}}
+func MakeLookupJoinExpr(input GroupID, on GroupID, def PrivateID) LookupJoinExpr {
+	return LookupJoinExpr{op: opt.LookupJoinOp, state: exprState{uint32(input), uint32(on), uint32(def)}}
 }
 
 func (e *LookupJoinExpr) Input() GroupID {
 	return GroupID(e.state[0])
 }
 
+func (e *LookupJoinExpr) On() GroupID {
+	return GroupID(e.state[1])
+}
+
 func (e *LookupJoinExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
+	return PrivateID(e.state[2])
 }
 
 func (e *LookupJoinExpr) Fingerprint() Fingerprint {
@@ -5036,7 +5040,7 @@ func init() {
 
 	// LookupJoinOp
 	makeExprLookup[opt.LookupJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLookupJoinExpr(GroupID(operands[0]), PrivateID(operands[1])))
+		return Expr(MakeLookupJoinExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
 	}
 
 	// MergeJoinOp

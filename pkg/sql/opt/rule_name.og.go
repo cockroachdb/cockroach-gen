@@ -138,6 +138,8 @@ const (
 	CommuteLeftJoin
 	CommuteRightJoin
 	GenerateMergeJoins
+	GenerateLookupJoin
+	GenerateLookupJoinWithFilter
 	PushLimitIntoScan
 	PushLimitIntoIndexJoin
 	GenerateIndexScans
