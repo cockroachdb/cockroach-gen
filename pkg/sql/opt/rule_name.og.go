@@ -134,6 +134,7 @@ const (
 	// Explore Rule Names
 	// ------------------------------------------------------------
 	ReplaceMinWithLimit
+	ReplaceMaxWithLimit
 	CommuteJoin
 	CommuteLeftJoin
 	CommuteRightJoin

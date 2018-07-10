@@ -698,7 +698,7 @@ func (_e *explorer) exploreGroupBy(_rootState *exploreState, _root memo.ExprID) 
 												),
 											),
 											_e.funcs.MakeOne(),
-											_e.funcs.MakeAscOrderingChoiceFromColumn(col),
+											_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
 										),
 										_e.f.ConstructAggregations(
 											_e.mem.InternList([]memo.GroupID{_e.f.ConstructAnyNotNull(
@@ -713,6 +713,66 @@ func (_e *explorer) exploreGroupBy(_rootState *exploreState, _root memo.ExprID) 
 									if _e.o.appliedRule != nil {
 										_after := _e.mem.ExprCount(_root.Group)
 										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root.Group, _root.Expr, _after-_before)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [ReplaceMaxWithLimit]
+	{
+		if _root.Expr >= _rootState.start {
+			input := _rootExpr.Input()
+			_eid := memo.MakeNormExprID(_rootExpr.Aggregations())
+			_aggregationsExpr := _e.mem.Expr(_eid).AsAggregations()
+			if _aggregationsExpr != nil {
+				if _aggregationsExpr.Aggs().Length == 1 {
+					_item := _e.mem.LookupList(_aggregationsExpr.Aggs())[0]
+					_eid := memo.MakeNormExprID(_item)
+					_maxExpr := _e.mem.Expr(_eid).AsMax()
+					if _maxExpr != nil {
+						variable := _maxExpr.Input()
+						_eid := memo.MakeNormExprID(_maxExpr.Input())
+						_variableExpr := _e.mem.Expr(_eid).AsVariable()
+						if _variableExpr != nil {
+							col := _variableExpr.Col()
+							cols := _aggregationsExpr.Cols()
+							def := _rootExpr.Def()
+							if _e.funcs.IsScalarGroupBy(def) {
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
+									_expr := memo.MakeGroupByExpr(
+										_e.f.ConstructLimit(
+											_e.f.ConstructSelect(
+												input,
+												_e.f.ConstructFilters(
+													_e.mem.InternList([]memo.GroupID{_e.f.ConstructIsNot(
+														variable,
+														_e.f.ConstructNull(
+															_e.funcs.AnyType(),
+														),
+													)}),
+												),
+											),
+											_e.funcs.MakeOne(),
+											_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
+										),
+										_e.f.ConstructAggregations(
+											_e.mem.InternList([]memo.GroupID{_e.f.ConstructAnyNotNull(
+												variable,
+											)}),
+											cols,
+										),
+										def,
+									)
+									_before := _e.mem.ExprCount(_root.Group)
+									_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+									if _e.o.appliedRule != nil {
+										_after := _e.mem.ExprCount(_root.Group)
+										_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root.Group, _root.Expr, _after-_before)
 									}
 								}
 							}
