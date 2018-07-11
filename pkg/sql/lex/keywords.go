@@ -180,6 +180,7 @@ var Keywords = map[string]struct {
 	"lc_collate":                {LC_COLLATE, "U"},
 	"lc_ctype":                  {LC_CTYPE, "U"},
 	"leading":                   {LEADING, "R"},
+	"lease":                     {LEASE, "U"},
 	"least":                     {LEAST, "C"},
 	"left":                      {LEFT, "T"},
 	"less":                      {LESS, "U"},
