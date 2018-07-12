@@ -1187,6 +1187,42 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [TryDecorrelateGroupBy]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
+			if _groupByExpr != nil {
+				input := _groupByExpr.Input()
+				aggregations := _groupByExpr.Aggregations()
+				def := _groupByExpr.Def()
+				if !_f.funcs.IsScalarGroupBy(def) {
+					if _f.funcs.IsUnorderedGroupBy(def) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
+							newLeft := _f.funcs.EnsureKey(left)
+							_group = _f.ConstructSelect(
+								_f.ConstructGroupBy(
+									_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										_f.ConstructTrue(),
+									),
+									_f.funcs.AppendNonKeyCols(newLeft, aggregations),
+									_f.funcs.GroupByUnionKey(newLeft, def),
+								),
+								on,
+							)
+							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [TryDecorrelateScalarGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
@@ -1199,8 +1235,18 @@ func (_f *Factory) ConstructInnerJoin(
 					if _f.funcs.CanAggsIgnoreNulls(aggregations) {
 						if _f.funcs.IsUnorderedGroupBy(def) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+								newLeft := _f.funcs.EnsureKey(left)
+								newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
 								_group = _f.ConstructSelect(
-									_f.funcs.HoistCorrelatedScalarGroupBy(left, input, aggregations),
+									_f.ConstructGroupBy(
+										_f.ConstructLeftJoinApply(
+											newLeft,
+											newRight,
+											_f.ConstructTrue(),
+										),
+										_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
+										_f.funcs.GroupByKey(newLeft),
+									),
 									on,
 								)
 								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
@@ -2925,6 +2971,42 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [TryDecorrelateGroupBy]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
+			if _groupByExpr != nil {
+				input := _groupByExpr.Input()
+				aggregations := _groupByExpr.Aggregations()
+				def := _groupByExpr.Def()
+				if !_f.funcs.IsScalarGroupBy(def) {
+					if _f.funcs.IsUnorderedGroupBy(def) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
+							newLeft := _f.funcs.EnsureKey(left)
+							_group = _f.ConstructSelect(
+								_f.ConstructGroupBy(
+									_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										_f.ConstructTrue(),
+									),
+									_f.funcs.AppendNonKeyCols(newLeft, aggregations),
+									_f.funcs.GroupByUnionKey(newLeft, def),
+								),
+								on,
+							)
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [TryDecorrelateScalarGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
@@ -2937,8 +3019,18 @@ func (_f *Factory) ConstructInnerJoinApply(
 					if _f.funcs.CanAggsIgnoreNulls(aggregations) {
 						if _f.funcs.IsUnorderedGroupBy(def) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+								newLeft := _f.funcs.EnsureKey(left)
+								newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
 								_group = _f.ConstructSelect(
-									_f.funcs.HoistCorrelatedScalarGroupBy(left, input, aggregations),
+									_f.ConstructGroupBy(
+										_f.ConstructLeftJoinApply(
+											newLeft,
+											newRight,
+											_f.ConstructTrue(),
+										),
+										_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
+										_f.funcs.GroupByKey(newLeft),
+									),
 									on,
 								)
 								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
