@@ -122,6 +122,8 @@ const (
 	SimplifySelectLeftJoin
 	SimplifySelectRightJoin
 	MergeSelectInnerJoin
+	PushSelectCondLeftIntoJoinLeftAndRight
+	PushSelectCondRightIntoJoinLeftAndRight
 	PushSelectIntoJoinLeft
 	PushSelectIntoJoinRight
 	PushSelectIntoGroupBy

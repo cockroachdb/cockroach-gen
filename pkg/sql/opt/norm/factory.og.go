@@ -409,6 +409,108 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [PushSelectCondLeftIntoJoinLeftAndRight]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.SemiJoinOp || _expr.Operator() == opt.SemiJoinApplyOp || _expr.Operator() == opt.AntiJoinOp || _expr.Operator() == opt.AntiJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				list := _filtersExpr.Conditions()
+				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+					condition := _item
+					if _f.funcs.IsBoundBy(condition, left) {
+						if _f.funcs.CanMap(on, condition, right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight) {
+								_group = _f.ConstructSelect(
+									_f.DynamicConstruct(
+										_f.mem.NormExpr(input).Operator(),
+										memo.DynamicOperands{
+											memo.DynamicID(_f.ConstructSelect(
+												left,
+												_f.ConstructFilters(
+													_f.mem.InternList([]memo.GroupID{condition}),
+												),
+											)),
+											memo.DynamicID(_f.ConstructSelect(
+												right,
+												_f.ConstructFilters(
+													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(on, condition, right)}),
+												),
+											)),
+											memo.DynamicID(on),
+										},
+									),
+									_f.ConstructFilters(
+										_f.funcs.RemoveListItem(list, condition),
+									),
+								)
+								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight, _group, 0, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [PushSelectCondRightIntoJoinLeftAndRight]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				list := _filtersExpr.Conditions()
+				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+					condition := _item
+					if _f.funcs.IsBoundBy(condition, right) {
+						if _f.funcs.CanMap(on, condition, left) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
+								_group = _f.ConstructSelect(
+									_f.DynamicConstruct(
+										_f.mem.NormExpr(input).Operator(),
+										memo.DynamicOperands{
+											memo.DynamicID(_f.ConstructSelect(
+												left,
+												_f.ConstructFilters(
+													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(on, condition, left)}),
+												),
+											)),
+											memo.DynamicID(_f.ConstructSelect(
+												right,
+												_f.ConstructFilters(
+													_f.mem.InternList([]memo.GroupID{condition}),
+												),
+											)),
+											memo.DynamicID(on),
+										},
+									),
+									_f.ConstructFilters(
+										_f.funcs.RemoveListItem(list, condition),
+									),
+								)
+								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.PushSelectCondRightIntoJoinLeftAndRight, _group, 0, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushSelectIntoJoinLeft]
 	{
 		_expr := _f.mem.NormExpr(input)
