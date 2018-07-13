@@ -843,11 +843,12 @@ func (_f *Factory) ConstructProject(
 				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneLimitCols) {
 						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering))
 						_group = _f.ConstructProject(
 							_f.ConstructLimit(
-								_f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering)),
+								newInput,
 								limit,
-								ordering,
+								_f.funcs.ProjectOrdering(newInput, ordering),
 							),
 							projections,
 						)
@@ -876,11 +877,12 @@ func (_f *Factory) ConstructProject(
 				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneOffsetCols) {
 						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering))
 						_group = _f.ConstructProject(
 							_f.ConstructOffset(
-								_f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering)),
+								newInput,
 								offset,
-								ordering,
+								_f.funcs.ProjectOrdering(newInput, ordering),
 							),
 							projections,
 						)
@@ -1019,10 +1021,11 @@ func (_f *Factory) ConstructProject(
 			def := _rowNumberExpr.Def()
 			if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsRowNumber(projections, def)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneRowNumberCols) {
+					newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsRowNumber(projections, def))
 					_group = _f.ConstructProject(
 						_f.ConstructRowNumber(
-							_f.funcs.PruneCols(input, _f.funcs.NeededColsRowNumber(projections, def)),
-							def,
+							newInput,
+							_f.funcs.ProjectOrderingRowNumber(newInput, def),
 						),
 						projections,
 					)
@@ -4615,10 +4618,11 @@ func (_f *Factory) ConstructGroupBy(
 	{
 		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def)) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
+				newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def))
 				_group = _f.ConstructGroupBy(
-					_f.funcs.PruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def)),
+					newInput,
 					aggregations,
-					def,
+					_f.funcs.ProjectOrderingGroupBy(newInput, def),
 				)
 				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
@@ -4839,7 +4843,7 @@ func (_f *Factory) ConstructLimit(
 						_f.ConstructLimit(
 							input,
 							limit,
-							ordering,
+							_f.funcs.ProjectOrdering(input, ordering),
 						),
 						projections,
 					)
@@ -4900,7 +4904,7 @@ func (_f *Factory) ConstructOffset(
 						_f.ConstructOffset(
 							input,
 							offset,
-							ordering,
+							_f.funcs.ProjectOrdering(input, ordering),
 						),
 						projections,
 					)
