@@ -848,7 +848,7 @@ func (_f *Factory) ConstructProject(
 							_f.ConstructLimit(
 								newInput,
 								limit,
-								_f.funcs.ProjectOrdering(newInput, ordering),
+								_f.funcs.PruneOrdering(newInput, ordering),
 							),
 							projections,
 						)
@@ -882,7 +882,7 @@ func (_f *Factory) ConstructProject(
 							_f.ConstructOffset(
 								newInput,
 								offset,
-								_f.funcs.ProjectOrdering(newInput, ordering),
+								_f.funcs.PruneOrdering(newInput, ordering),
 							),
 							projections,
 						)
@@ -1025,7 +1025,7 @@ func (_f *Factory) ConstructProject(
 					_group = _f.ConstructProject(
 						_f.ConstructRowNumber(
 							newInput,
-							_f.funcs.ProjectOrderingRowNumber(newInput, def),
+							_f.funcs.PruneOrderingRowNumber(newInput, def),
 						),
 						projections,
 					)
@@ -4622,7 +4622,7 @@ func (_f *Factory) ConstructGroupBy(
 				_group = _f.ConstructGroupBy(
 					newInput,
 					aggregations,
-					_f.funcs.ProjectOrderingGroupBy(newInput, def),
+					_f.funcs.PruneOrderingGroupBy(newInput, def),
 				)
 				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
@@ -4843,7 +4843,7 @@ func (_f *Factory) ConstructLimit(
 						_f.ConstructLimit(
 							input,
 							limit,
-							_f.funcs.ProjectOrdering(input, ordering),
+							_f.funcs.PruneOrdering(input, ordering),
 						),
 						projections,
 					)
@@ -4904,7 +4904,7 @@ func (_f *Factory) ConstructOffset(
 						_f.ConstructOffset(
 							input,
 							offset,
-							_f.funcs.ProjectOrdering(input, ordering),
+							_f.funcs.PruneOrdering(input, ordering),
 						),
 						projections,
 					)
