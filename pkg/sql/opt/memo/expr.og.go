@@ -53,7 +53,7 @@ var opLayoutTable = [...]opLayout{
 	opt.TrueOp:                makeOpLayout(0 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.FalseOp:               makeOpLayout(0 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.PlaceholderOp:         makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.TupleOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
+	opt.TupleOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.ProjectionsOp:         makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.AggregationsOp:        makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.ExistsOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -2952,12 +2952,16 @@ func (e *Expr) AsPlaceholder() *PlaceholderExpr {
 
 type TupleExpr Expr
 
-func MakeTupleExpr(elems ListID) TupleExpr {
-	return TupleExpr{op: opt.TupleOp, state: exprState{elems.Offset, elems.Length}}
+func MakeTupleExpr(elems ListID, typ PrivateID) TupleExpr {
+	return TupleExpr{op: opt.TupleOp, state: exprState{elems.Offset, elems.Length, uint32(typ)}}
 }
 
 func (e *TupleExpr) Elems() ListID {
 	return ListID{Offset: e.state[0], Length: e.state[1]}
+}
+
+func (e *TupleExpr) Typ() PrivateID {
+	return PrivateID(e.state[2])
 }
 
 func (e *TupleExpr) Fingerprint() Fingerprint {
@@ -5185,7 +5189,7 @@ func init() {
 
 	// TupleOp
 	makeExprLookup[opt.TupleOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeTupleExpr(operands[0].ListID()))
+		return Expr(MakeTupleExpr(operands[0].ListID(), PrivateID(operands[1])))
 	}
 
 	// ProjectionsOp

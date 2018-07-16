@@ -5336,8 +5336,9 @@ func (_f *Factory) ConstructPlaceholder(
 // ConstructTuple constructs an expression for the Tuple operator.
 func (_f *Factory) ConstructTuple(
 	elems memo.ListID,
+	typ memo.PrivateID,
 ) memo.GroupID {
-	_tupleExpr := memo.MakeTupleExpr(elems)
+	_tupleExpr := memo.MakeTupleExpr(elems, typ)
 	_group := _f.mem.GroupByFingerprint(_tupleExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -9885,7 +9886,7 @@ func init() {
 
 	// TupleOp
 	dynConstructLookup[opt.TupleOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructTuple(operands[0].ListID())
+		return f.ConstructTuple(operands[0].ListID(), memo.PrivateID(operands[1]))
 	}
 
 	// ProjectionsOp
