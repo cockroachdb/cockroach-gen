@@ -45,6 +45,7 @@ var opLayoutTable = [...]opLayout{
 	opt.ExplainOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.ShowTraceForSessionOp: makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.RowNumberOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
+	opt.ZipOp:                 makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.SubqueryOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AnyOp:                 makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.VariableOp:            makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
@@ -168,6 +169,7 @@ var isEnforcerLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -291,6 +293,7 @@ var isRelationalLookup = [...]bool{
 	opt.ExplainOp:             true,
 	opt.ShowTraceForSessionOp: true,
 	opt.RowNumberOp:           true,
+	opt.ZipOp:                 true,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -414,6 +417,7 @@ var isJoinLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -537,6 +541,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -660,6 +665,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -783,6 +789,7 @@ var isScalarLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            true,
 	opt.AnyOp:                 true,
 	opt.VariableOp:            true,
@@ -906,6 +913,7 @@ var isConstValueLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -1029,6 +1037,7 @@ var isBooleanLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -1152,6 +1161,7 @@ var isComparisonLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -1275,6 +1285,7 @@ var isBinaryLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -1398,6 +1409,7 @@ var isUnaryLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -1521,6 +1533,7 @@ var isAggregateLookup = [...]bool{
 	opt.ExplainOp:             false,
 	opt.ShowTraceForSessionOp: false,
 	opt.RowNumberOp:           false,
+	opt.ZipOp:                 false,
 	opt.SubqueryOp:            false,
 	opt.AnyOp:                 false,
 	opt.VariableOp:            false,
@@ -2717,6 +2730,51 @@ func (e *Expr) AsRowNumber() *RowNumberExpr {
 		return nil
 	}
 	return (*RowNumberExpr)(e)
+}
+
+// ZipExpr represents a functional zip over generators a,b,c, which returns tuples of
+// values from a,b,c picked "simultaneously". NULLs are used when a generator is
+// "shorter" than another. In SQL, these generators can be either a generator
+// function such as generate_series(), or a scalar function such as
+// upper(). For example, consider this query:
+//
+//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
+//
+// It is equivalent to (Zip [(Function generate_series), (Function upper)]).
+// It produces:
+//
+//     generate_series | upper
+//    -----------------+-------
+//                   0 | ABC
+//                   1 | NULL
+//
+// In the Zip operation, Funcs represents the list of functions, and Cols
+// represents the columns output by the functions. Funcs and Cols might not be
+// the same length since a single function may output multiple columns
+// (e.g., pg_get_keywords() outputs three columns).
+type ZipExpr Expr
+
+func MakeZipExpr(funcs ListID, cols PrivateID) ZipExpr {
+	return ZipExpr{op: opt.ZipOp, state: exprState{funcs.Offset, funcs.Length, uint32(cols)}}
+}
+
+func (e *ZipExpr) Funcs() ListID {
+	return ListID{Offset: e.state[0], Length: e.state[1]}
+}
+
+func (e *ZipExpr) Cols() PrivateID {
+	return PrivateID(e.state[2])
+}
+
+func (e *ZipExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsZip() *ZipExpr {
+	if e.op != opt.ZipOp {
+		return nil
+	}
+	return (*ZipExpr)(e)
 }
 
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
@@ -5145,6 +5203,11 @@ func init() {
 	// RowNumberOp
 	makeExprLookup[opt.RowNumberOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeRowNumberExpr(GroupID(operands[0]), PrivateID(operands[1])))
+	}
+
+	// ZipOp
+	makeExprLookup[opt.ZipOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeZipExpr(operands[0].ListID(), PrivateID(operands[1])))
 	}
 
 	// SubqueryOp

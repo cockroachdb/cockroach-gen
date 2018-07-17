@@ -218,6 +218,28 @@ const (
 	// increasing number.
 	RowNumberOp
 
+	// ZipOp represents a functional zip over generators a,b,c, which returns tuples of
+	// values from a,b,c picked "simultaneously". NULLs are used when a generator is
+	// "shorter" than another. In SQL, these generators can be either a generator
+	// function such as generate_series(), or a scalar function such as
+	// upper(). For example, consider this query:
+	//
+	//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
+	//
+	// It is equivalent to (Zip [(Function generate_series), (Function upper)]).
+	// It produces:
+	//
+	//     generate_series | upper
+	//    -----------------+-------
+	//                   0 | ABC
+	//                   1 | NULL
+	//
+	// In the Zip operation, Funcs represents the list of functions, and Cols
+	// represents the columns output by the functions. Funcs and Cols might not be
+	// the same length since a single function may output multiple columns
+	// (e.g., pg_get_keywords() outputs three columns).
+	ZipOp
+
 	// ------------------------------------------------------------
 	// Scalar Operators
 	// ------------------------------------------------------------
@@ -540,9 +562,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numbersubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 100, 111, 121, 137, 152, 168, 183, 198, 213, 221, 226, 235, 241, 250, 263, 273, 278, 284, 292, 299, 321, 331, 339, 342, 350, 355, 359, 363, 368, 379, 384, 395, 407, 413, 420, 423, 425, 428, 430, 432, 434, 436, 438, 440, 442, 448, 452, 460, 466, 476, 486, 500, 509, 522, 533, 548, 550, 556, 564, 575, 590, 606, 612, 617, 623, 627, 632, 636, 639, 648, 651, 654, 660, 667, 674, 683, 693, 707, 722, 733, 749, 753, 757, 761, 766, 774, 782, 798, 807, 810, 818, 825, 835, 840, 850, 853, 856, 863, 866, 874, 882, 889, 896, 904, 913, 925, 933}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 100, 111, 121, 137, 152, 168, 183, 198, 213, 221, 226, 235, 241, 250, 263, 273, 278, 284, 292, 299, 321, 331, 334, 342, 345, 353, 358, 362, 366, 371, 382, 387, 398, 410, 416, 423, 426, 428, 431, 433, 435, 437, 439, 441, 443, 445, 451, 455, 463, 469, 479, 489, 503, 512, 525, 536, 551, 553, 559, 567, 578, 593, 609, 615, 620, 626, 630, 635, 639, 642, 651, 654, 657, 663, 670, 677, 686, 696, 710, 725, 736, 752, 756, 760, 764, 769, 777, 785, 801, 810, 813, 821, 828, 838, 843, 853, 856, 859, 866, 869, 877, 885, 892, 899, 907, 916, 928, 936}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -581,6 +603,7 @@ var RelationalOperators = [...]Operator{
 	ExplainOp,
 	ShowTraceForSessionOp,
 	RowNumberOp,
+	ZipOp,
 }
 
 var JoinOperators = [...]Operator{

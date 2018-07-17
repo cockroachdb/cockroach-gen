@@ -5168,6 +5168,40 @@ func (_f *Factory) ConstructRowNumber(
 	return _f.onConstruct(memo.Expr(_rowNumberExpr))
 }
 
+// ConstructZip constructs an expression for the Zip operator.
+// Zip represents a functional zip over generators a,b,c, which returns tuples of
+// values from a,b,c picked "simultaneously". NULLs are used when a generator is
+// "shorter" than another. In SQL, these generators can be either a generator
+// function such as generate_series(), or a scalar function such as
+// upper(). For example, consider this query:
+//
+//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
+//
+// It is equivalent to (Zip [(Function generate_series), (Function upper)]).
+// It produces:
+//
+//     generate_series | upper
+//    -----------------+-------
+//                   0 | ABC
+//                   1 | NULL
+//
+// In the Zip operation, Funcs represents the list of functions, and Cols
+// represents the columns output by the functions. Funcs and Cols might not be
+// the same length since a single function may output multiple columns
+// (e.g., pg_get_keywords() outputs three columns).
+func (_f *Factory) ConstructZip(
+	funcs memo.ListID,
+	cols memo.PrivateID,
+) memo.GroupID {
+	_zipExpr := memo.MakeZipExpr(funcs, cols)
+	_group := _f.mem.GroupByFingerprint(_zipExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_zipExpr))
+}
+
 // ConstructSubquery constructs an expression for the Subquery operator.
 // Subquery is a subquery in a single-row context. Here are some examples:
 //
@@ -9842,6 +9876,11 @@ func init() {
 	// RowNumberOp
 	dynConstructLookup[opt.RowNumberOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructRowNumber(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
+	}
+
+	// ZipOp
+	dynConstructLookup[opt.ZipOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructZip(operands[0].ListID(), memo.PrivateID(operands[1]))
 	}
 
 	// SubqueryOp
