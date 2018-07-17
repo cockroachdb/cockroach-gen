@@ -137,6 +137,13 @@ func (_f *Factory) InternFuncOpDef(val *memo.FuncOpDef) memo.PrivateID {
 	return _f.mem.InternFuncOpDef(val)
 }
 
+// InternTupleOrdinal adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternTupleOrdinal(val memo.TupleOrdinal) memo.PrivateID {
+	return _f.mem.InternTupleOrdinal(val)
+}
+
 // InternMergeOnDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -9439,6 +9446,23 @@ func (_f *Factory) ConstructCoalesce(
 	return _f.onConstruct(memo.Expr(_coalesceExpr))
 }
 
+// ConstructColumnAccess constructs an expression for the ColumnAccess operator.
+// ColumnAccess is a scalar expression that returns a column from the given
+// input expression (which is assumed to be of type Tuple). Idx is the ordinal
+// index of the column in Input.
+func (_f *Factory) ConstructColumnAccess(
+	input memo.GroupID,
+	idx memo.PrivateID,
+) memo.GroupID {
+	_columnAccessExpr := memo.MakeColumnAccessExpr(input, idx)
+	_group := _f.mem.GroupByFingerprint(_columnAccessExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_columnAccessExpr))
+}
+
 // ConstructUnsupportedExpr constructs an expression for the UnsupportedExpr operator.
 // UnsupportedExpr is used for interfacing with the old planner code. It can
 // encapsulate a TypedExpr that is otherwise not supported by the optimizer.
@@ -10206,6 +10230,11 @@ func init() {
 	// CoalesceOp
 	dynConstructLookup[opt.CoalesceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructCoalesce(operands[0].ListID())
+	}
+
+	// ColumnAccessOp
+	dynConstructLookup[opt.ColumnAccessOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructColumnAccess(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// UnsupportedExprOp

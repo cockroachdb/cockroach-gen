@@ -508,6 +508,11 @@ const (
 
 	CoalesceOp
 
+	// ColumnAccessOp is a scalar expression that returns a column from the given
+	// input expression (which is assumed to be of type Tuple). Idx is the ordinal
+	// index of the column in Input.
+	ColumnAccessOp
+
 	// UnsupportedExprOp is used for interfacing with the old planner code. It can
 	// encapsulate a TypedExpr that is otherwise not supported by the optimizer.
 	UnsupportedExprOp
@@ -562,9 +567,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalesceunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
+const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 100, 111, 121, 137, 152, 168, 183, 198, 213, 221, 226, 235, 241, 250, 263, 273, 278, 284, 292, 299, 321, 331, 334, 342, 345, 353, 358, 362, 366, 371, 382, 387, 398, 410, 416, 423, 426, 428, 431, 433, 435, 437, 439, 441, 443, 445, 451, 455, 463, 469, 479, 489, 503, 512, 525, 536, 551, 553, 559, 567, 578, 593, 609, 615, 620, 626, 630, 635, 639, 642, 651, 654, 657, 663, 670, 677, 686, 696, 710, 725, 736, 752, 756, 760, 764, 769, 777, 785, 801, 810, 813, 821, 828, 838, 843, 853, 856, 859, 866, 869, 877, 885, 892, 899, 907, 916, 928, 936}
+var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 100, 111, 121, 137, 152, 168, 183, 198, 213, 221, 226, 235, 241, 250, 263, 273, 278, 284, 292, 299, 321, 331, 334, 342, 345, 353, 358, 362, 366, 371, 382, 387, 398, 410, 416, 423, 426, 428, 431, 433, 435, 437, 439, 441, 443, 445, 451, 455, 463, 469, 479, 489, 503, 512, 525, 536, 551, 553, 559, 567, 578, 593, 609, 615, 620, 626, 630, 635, 639, 642, 651, 654, 657, 663, 670, 677, 686, 696, 710, 725, 736, 752, 756, 760, 764, 769, 777, 785, 798, 814, 823, 826, 834, 841, 851, 856, 866, 869, 872, 879, 882, 890, 898, 905, 912, 920, 929, 941, 949}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -705,6 +710,7 @@ var ScalarOperators = [...]Operator{
 	ArrayOp,
 	FunctionOp,
 	CoalesceOp,
+	ColumnAccessOp,
 	UnsupportedExprOp,
 	ArrayAggOp,
 	AvgOp,

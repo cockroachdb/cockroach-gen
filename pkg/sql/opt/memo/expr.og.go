@@ -111,6 +111,7 @@ var opLayoutTable = [...]opLayout{
 	opt.ArrayOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.FunctionOp:            makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.CoalesceOp:            makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
+	opt.ColumnAccessOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.UnsupportedExprOp:     makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.ArrayAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AvgOp:                 makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -235,6 +236,7 @@ var isEnforcerLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -359,6 +361,7 @@ var isRelationalLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -483,6 +486,7 @@ var isJoinLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -607,6 +611,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -731,6 +736,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -855,6 +861,7 @@ var isScalarLookup = [...]bool{
 	opt.ArrayOp:               true,
 	opt.FunctionOp:            true,
 	opt.CoalesceOp:            true,
+	opt.ColumnAccessOp:        true,
 	opt.UnsupportedExprOp:     true,
 	opt.ArrayAggOp:            true,
 	opt.AvgOp:                 true,
@@ -979,6 +986,7 @@ var isConstValueLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -1103,6 +1111,7 @@ var isBooleanLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -1227,6 +1236,7 @@ var isComparisonLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -1351,6 +1361,7 @@ var isBinaryLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -1475,6 +1486,7 @@ var isUnaryLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            false,
 	opt.AvgOp:                 false,
@@ -1599,6 +1611,7 @@ var isAggregateLookup = [...]bool{
 	opt.ArrayOp:               false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
+	opt.ColumnAccessOp:        false,
 	opt.UnsupportedExprOp:     false,
 	opt.ArrayAggOp:            true,
 	opt.AvgOp:                 true,
@@ -4472,6 +4485,34 @@ func (e *Expr) AsCoalesce() *CoalesceExpr {
 	return (*CoalesceExpr)(e)
 }
 
+// ColumnAccessExpr is a scalar expression that returns a column from the given
+// input expression (which is assumed to be of type Tuple). Idx is the ordinal
+// index of the column in Input.
+type ColumnAccessExpr Expr
+
+func MakeColumnAccessExpr(input GroupID, idx PrivateID) ColumnAccessExpr {
+	return ColumnAccessExpr{op: opt.ColumnAccessOp, state: exprState{uint32(input), uint32(idx)}}
+}
+
+func (e *ColumnAccessExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *ColumnAccessExpr) Idx() PrivateID {
+	return PrivateID(e.state[1])
+}
+
+func (e *ColumnAccessExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsColumnAccess() *ColumnAccessExpr {
+	if e.op != opt.ColumnAccessOp {
+		return nil
+	}
+	return (*ColumnAccessExpr)(e)
+}
+
 // UnsupportedExprExpr is used for interfacing with the old planner code. It can
 // encapsulate a TypedExpr that is otherwise not supported by the optimizer.
 type UnsupportedExprExpr Expr
@@ -5028,6 +5069,13 @@ func (m *Memo) InternFuncOpDef(val *FuncOpDef) PrivateID {
 	return m.privateStorage.internFuncOpDef(val)
 }
 
+// InternTupleOrdinal adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternTupleOrdinal(val TupleOrdinal) PrivateID {
+	return m.privateStorage.internTupleOrdinal(val)
+}
+
 // InternMergeOnDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -5533,6 +5581,11 @@ func init() {
 	// CoalesceOp
 	makeExprLookup[opt.CoalesceOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeCoalesceExpr(operands[0].ListID()))
+	}
+
+	// ColumnAccessOp
+	makeExprLookup[opt.ColumnAccessOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeColumnAccessExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// UnsupportedExprOp
