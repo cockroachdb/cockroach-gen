@@ -19,11 +19,24 @@ const (
 	// Relational Operators
 	// ------------------------------------------------------------
 
-	// ScanOp returns a result set containing every row in the specified table, by
-	// scanning one of the table's indexes according to its ordering. The private
-	// Def field is an *opt.ScanOpDef that identifies the table and index to scan,
-	// as well as the subset of columns to project from it.
+	// ScanOp returns a result set containing every row in a table by scanning one of
+	// the table's indexes according to its ordering. The private Def field is an
+	// *opt.ScanOpDef that identifies the table and index to scan, as well as the
+	// subset of columns to project from it.
 	ScanOp
+
+	// VirtualScanOp returns a result set containing every row in a virtual table.
+	// Virtual tables are system tables that are populated "on the fly" with rows
+	// synthesized from system metadata and other state. An example is the
+	// "information_schema.tables" virtual table which returns one row for each
+	// accessible system or user table.
+	//
+	// VirtualScan has many of the same characteristics as the Scan operator.
+	// However, virtual tables do not have indexes or keys, and the physical operator
+	// used to scan virtual tables does not support limits or constraints. Therefore,
+	// nearly all the rules that apply to Scan do not apply to VirtualScan, so it
+	// makes sense to have a separate operator.
+	VirtualScanOp
 
 	// ValuesOp returns a manufactured result set containing a constant number of rows.
 	// specified by the Rows list field. Each row must contain the same set of
@@ -567,9 +580,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 21, 27, 34, 44, 53, 63, 72, 81, 90, 100, 111, 121, 137, 152, 168, 183, 198, 213, 221, 226, 235, 241, 250, 263, 273, 278, 284, 292, 299, 321, 331, 334, 342, 345, 353, 358, 362, 366, 371, 382, 387, 398, 410, 416, 423, 426, 428, 431, 433, 435, 437, 439, 441, 443, 445, 451, 455, 463, 469, 479, 489, 503, 512, 525, 536, 551, 553, 559, 567, 578, 593, 609, 615, 620, 626, 630, 635, 639, 642, 651, 654, 657, 663, 670, 677, 686, 696, 710, 725, 736, 752, 756, 760, 764, 769, 777, 785, 798, 814, 823, 826, 834, 841, 851, 856, 866, 869, 872, 879, 882, 890, 898, 905, 912, 920, 929, 941, 949}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 238, 247, 253, 262, 275, 285, 290, 296, 304, 311, 333, 343, 346, 354, 357, 365, 370, 374, 378, 383, 394, 399, 410, 422, 428, 435, 438, 440, 443, 445, 447, 449, 451, 453, 455, 457, 463, 467, 475, 481, 491, 501, 515, 524, 537, 548, 563, 565, 571, 579, 590, 605, 621, 627, 632, 638, 642, 647, 651, 654, 663, 666, 669, 675, 682, 689, 698, 708, 722, 737, 748, 764, 768, 772, 776, 781, 789, 797, 810, 826, 835, 838, 846, 853, 863, 868, 878, 881, 884, 891, 894, 902, 910, 917, 924, 932, 941, 953, 961}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -577,6 +590,7 @@ var EnforcerOperators = [...]Operator{
 
 var RelationalOperators = [...]Operator{
 	ScanOp,
+	VirtualScanOp,
 	ValuesOp,
 	SelectOp,
 	ProjectOp,

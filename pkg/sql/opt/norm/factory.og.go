@@ -18,6 +18,13 @@ func (_f *Factory) InternScanOpDef(val *memo.ScanOpDef) memo.PrivateID {
 	return _f.mem.InternScanOpDef(val)
 }
 
+// InternVirtualScanOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternVirtualScanOpDef(val *memo.VirtualScanOpDef) memo.PrivateID {
+	return _f.mem.InternVirtualScanOpDef(val)
+}
+
 // InternColList adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -152,10 +159,10 @@ func (_f *Factory) InternMergeOnDef(val *memo.MergeOnDef) memo.PrivateID {
 }
 
 // ConstructScan constructs an expression for the Scan operator.
-// Scan returns a result set containing every row in the specified table, by
-// scanning one of the table's indexes according to its ordering. The private
-// Def field is an *opt.ScanOpDef that identifies the table and index to scan,
-// as well as the subset of columns to project from it.
+// Scan returns a result set containing every row in a table by scanning one of
+// the table's indexes according to its ordering. The private Def field is an
+// *opt.ScanOpDef that identifies the table and index to scan, as well as the
+// subset of columns to project from it.
 func (_f *Factory) ConstructScan(
 	def memo.PrivateID,
 ) memo.GroupID {
@@ -166,6 +173,30 @@ func (_f *Factory) ConstructScan(
 	}
 
 	return _f.onConstruct(memo.Expr(_scanExpr))
+}
+
+// ConstructVirtualScan constructs an expression for the VirtualScan operator.
+// VirtualScan returns a result set containing every row in a virtual table.
+// Virtual tables are system tables that are populated "on the fly" with rows
+// synthesized from system metadata and other state. An example is the
+// "information_schema.tables" virtual table which returns one row for each
+// accessible system or user table.
+//
+// VirtualScan has many of the same characteristics as the Scan operator.
+// However, virtual tables do not have indexes or keys, and the physical operator
+// used to scan virtual tables does not support limits or constraints. Therefore,
+// nearly all the rules that apply to Scan do not apply to VirtualScan, so it
+// makes sense to have a separate operator.
+func (_f *Factory) ConstructVirtualScan(
+	def memo.PrivateID,
+) memo.GroupID {
+	_virtualScanExpr := memo.MakeVirtualScanExpr(def)
+	_group := _f.mem.GroupByFingerprint(_virtualScanExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_virtualScanExpr))
 }
 
 // ConstructValues constructs an expression for the Values operator.
@@ -9785,6 +9816,11 @@ func init() {
 	// ScanOp
 	dynConstructLookup[opt.ScanOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructScan(memo.PrivateID(operands[0]))
+	}
+
+	// VirtualScanOp
+	dynConstructLookup[opt.VirtualScanOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructVirtualScan(memo.PrivateID(operands[0]))
 	}
 
 	// ValuesOp

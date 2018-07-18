@@ -14,6 +14,7 @@ var opLayoutTable = [...]opLayout{
 	opt.UnknownOp:             0xFF, // will cause a crash if used
 	opt.SortOp:                makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ScanOp:                makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
+	opt.VirtualScanOp:         makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.ValuesOp:              makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.SelectOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ProjectOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -139,6 +140,7 @@ var isEnforcerLookup = [...]bool{
 
 	opt.SortOp:                true,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -264,6 +266,7 @@ var isRelationalLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                true,
+	opt.VirtualScanOp:         true,
 	opt.ValuesOp:              true,
 	opt.SelectOp:              true,
 	opt.ProjectOp:             true,
@@ -389,6 +392,7 @@ var isJoinLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -514,6 +518,7 @@ var isJoinNonApplyLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -639,6 +644,7 @@ var isJoinApplyLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -764,6 +770,7 @@ var isScalarLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -889,6 +896,7 @@ var isConstValueLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -1014,6 +1022,7 @@ var isBooleanLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -1139,6 +1148,7 @@ var isComparisonLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -1264,6 +1274,7 @@ var isBinaryLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -1389,6 +1400,7 @@ var isUnaryLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -1514,6 +1526,7 @@ var isAggregateLookup = [...]bool{
 
 	opt.SortOp:                false,
 	opt.ScanOp:                false,
+	opt.VirtualScanOp:         false,
 	opt.ValuesOp:              false,
 	opt.SelectOp:              false,
 	opt.ProjectOp:             false,
@@ -1730,10 +1743,10 @@ func (e *Expr) IsAggregate() bool {
 	return isAggregateLookup[e.op]
 }
 
-// ScanExpr returns a result set containing every row in the specified table, by
-// scanning one of the table's indexes according to its ordering. The private
-// Def field is an *opt.ScanOpDef that identifies the table and index to scan,
-// as well as the subset of columns to project from it.
+// ScanExpr returns a result set containing every row in a table by scanning one of
+// the table's indexes according to its ordering. The private Def field is an
+// *opt.ScanOpDef that identifies the table and index to scan, as well as the
+// subset of columns to project from it.
 type ScanExpr Expr
 
 func MakeScanExpr(def PrivateID) ScanExpr {
@@ -1753,6 +1766,38 @@ func (e *Expr) AsScan() *ScanExpr {
 		return nil
 	}
 	return (*ScanExpr)(e)
+}
+
+// VirtualScanExpr returns a result set containing every row in a virtual table.
+// Virtual tables are system tables that are populated "on the fly" with rows
+// synthesized from system metadata and other state. An example is the
+// "information_schema.tables" virtual table which returns one row for each
+// accessible system or user table.
+//
+// VirtualScan has many of the same characteristics as the Scan operator.
+// However, virtual tables do not have indexes or keys, and the physical operator
+// used to scan virtual tables does not support limits or constraints. Therefore,
+// nearly all the rules that apply to Scan do not apply to VirtualScan, so it
+// makes sense to have a separate operator.
+type VirtualScanExpr Expr
+
+func MakeVirtualScanExpr(def PrivateID) VirtualScanExpr {
+	return VirtualScanExpr{op: opt.VirtualScanOp, state: exprState{uint32(def)}}
+}
+
+func (e *VirtualScanExpr) Def() PrivateID {
+	return PrivateID(e.state[0])
+}
+
+func (e *VirtualScanExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsVirtualScan() *VirtualScanExpr {
+	if e.op != opt.VirtualScanOp {
+		return nil
+	}
+	return (*VirtualScanExpr)(e)
 }
 
 // ValuesExpr returns a manufactured result set containing a constant number of rows.
@@ -4950,6 +4995,13 @@ func (m *Memo) InternScanOpDef(val *ScanOpDef) PrivateID {
 	return m.privateStorage.internScanOpDef(val)
 }
 
+// InternVirtualScanOpDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternVirtualScanOpDef(val *VirtualScanOpDef) PrivateID {
+	return m.privateStorage.internVirtualScanOpDef(val)
+}
+
 // InternColList adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -5096,6 +5148,11 @@ func init() {
 	// ScanOp
 	makeExprLookup[opt.ScanOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeScanExpr(PrivateID(operands[0])))
+	}
+
+	// VirtualScanOp
+	makeExprLookup[opt.VirtualScanOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeVirtualScanExpr(PrivateID(operands[0])))
 	}
 
 	// ValuesOp
