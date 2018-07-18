@@ -6179,6 +6179,37 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [NormalizeJSONFieldAccess]
+	{
+		_fetchValExpr := _f.mem.NormExpr(left).AsFetchVal()
+		if _fetchValExpr != nil {
+			val := _fetchValExpr.Json()
+			key := _fetchValExpr.Index()
+			_constExpr := _f.mem.NormExpr(_fetchValExpr.Index()).AsConst()
+			if _constExpr != nil {
+				_nullExpr := _f.mem.NormExpr(_fetchValExpr.Index()).AsNull()
+				if _nullExpr == nil {
+					if _f.funcs.IsString(key) {
+						_constExpr2 := _f.mem.NormExpr(right).AsConst()
+						if _constExpr2 != nil {
+							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONFieldAccess) {
+								_group = _f.ConstructContains(
+									val,
+									_f.funcs.MakeSingleKeyJSONObject(key, right),
+								)
+								_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.NormalizeJSONFieldAccess, _group, 0, 0)
+								}
+								return _group
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_eqExpr))
 }
 
@@ -7923,6 +7954,39 @@ func (_f *Factory) ConstructContains(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [NormalizeJSONContains]
+	{
+		_fetchValExpr := _f.mem.NormExpr(left).AsFetchVal()
+		if _fetchValExpr != nil {
+			val := _fetchValExpr.Json()
+			key := _fetchValExpr.Index()
+			_constExpr := _f.mem.NormExpr(_fetchValExpr.Index()).AsConst()
+			if _constExpr != nil {
+				_nullExpr := _f.mem.NormExpr(_fetchValExpr.Index()).AsNull()
+				if _nullExpr == nil {
+					if _f.funcs.IsString(key) {
+						_constExpr2 := _f.mem.NormExpr(right).AsConst()
+						if _constExpr2 != nil {
+							if !_f.funcs.IsJSONScalar(right) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONContains) {
+									_group = _f.ConstructContains(
+										val,
+										_f.funcs.MakeSingleKeyJSONObject(key, right),
+									)
+									_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeJSONContains, _group, 0, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

@@ -117,6 +117,8 @@ const (
 	FoldInNull
 	EliminateExistsProject
 	EliminateExistsGroupBy
+	NormalizeJSONFieldAccess
+	NormalizeJSONContains
 	EliminateSelect
 	EnsureSelectFiltersAnd
 	EnsureSelectFilters
