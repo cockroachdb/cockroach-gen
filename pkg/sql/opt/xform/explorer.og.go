@@ -242,6 +242,40 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 		}
 	}
 
+	// [GenerateInvertedIndexScans]
+	{
+		_partlyExplored := _root.Expr < _rootState.start
+		_state := _e.exploreGroup(_rootExpr.Input())
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		start := memo.ExprOrdinal(0)
+		if _partlyExplored {
+			start = _state.start
+		}
+		for _ord := start; _ord < _state.end; _ord++ {
+			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
+			_scanExpr := _e.mem.Expr(_eid).AsScan()
+			if _scanExpr != nil {
+				def := _scanExpr.Def()
+				if _e.funcs.CanGenerateInvertedIndexScans(def) {
+					filter := _rootExpr.Filter()
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedIndexScans) {
+						_exprs := _e.funcs.GenerateInvertedIndexScans(def, filter)
+						_before := _e.mem.ExprCount(_root.Group)
+						for i := range _exprs {
+							_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+						}
+						if _e.o.appliedRule != nil {
+							_after := _e.mem.ExprCount(_root.Group)
+							_e.o.appliedRule(opt.GenerateInvertedIndexScans, _root.Group, _root.Expr, _after-_before)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 

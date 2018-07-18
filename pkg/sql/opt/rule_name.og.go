@@ -151,6 +151,7 @@ const (
 	PushFilterIntoIndexJoinNoRemainder
 	PushFilterIntoIndexJoin
 	ConstrainIndexJoinScan
+	GenerateInvertedIndexScans
 
 	// NumRuleNames tracks the total count of rule names.
 	NumRuleNames
