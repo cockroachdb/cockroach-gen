@@ -98,6 +98,9 @@ const (
 	PruneValuesCols
 	PruneRowNumberCols
 	PruneExplainCols
+	RejectNullsLeftJoin
+	RejectNullsRightJoin
+	RejectNullsGroupBy
 	CommuteVar
 	CommuteConst
 	EliminateCoalesce
@@ -119,8 +122,6 @@ const (
 	EnsureSelectFilters
 	MergeSelects
 	PushSelectIntoProject
-	SimplifySelectLeftJoin
-	SimplifySelectRightJoin
 	MergeSelectInnerJoin
 	PushSelectCondLeftIntoJoinLeftAndRight
 	PushSelectCondRightIntoJoinLeftAndRight

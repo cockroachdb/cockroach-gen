@@ -224,6 +224,58 @@ func (_f *Factory) ConstructSelect(
 		return _group
 	}
 
+	// [RejectNullsLeftJoin]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.OutputCols(right)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsLeftJoin) {
+						_group = _f.ConstructSelect(
+							_f.funcs.ConstructNonLeftJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
+							filter,
+						)
+						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.RejectNullsLeftJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [RejectNullsRightJoin]
+	{
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
+			left := _expr.ChildGroup(_f.mem, 0)
+			right := _expr.ChildGroup(_f.mem, 1)
+			on := _expr.ChildGroup(_f.mem, 2)
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.OutputCols(left)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsRightJoin) {
+						_group = _f.ConstructSelect(
+							_f.funcs.ConstructNonRightJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
+							filter,
+						)
+						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.RejectNullsRightJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [EliminateSelect]
 	{
 		_trueExpr := _f.mem.NormExpr(filter).AsTrue()
@@ -333,58 +385,6 @@ func (_f *Factory) ConstructSelect(
 							}
 							return _group
 						}
-					}
-				}
-			}
-		}
-	}
-
-	// [SimplifySelectLeftJoin]
-	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				if _f.funcs.HasNullRejectingFilter(filter, right) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectLeftJoin) {
-						_group = _f.ConstructSelect(
-							_f.funcs.ConstructNonLeftJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
-							filter,
-						)
-						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifySelectLeftJoin, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	// [SimplifySelectRightJoin]
-	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				if _f.funcs.HasNullRejectingFilter(filter, left) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectRightJoin) {
-						_group = _f.ConstructSelect(
-							_f.funcs.ConstructNonRightJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
-							filter,
-						)
-						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifySelectRightJoin, _group, 0, 0)
-						}
-						return _group
 					}
 				}
 			}
@@ -797,6 +797,46 @@ func (_f *Factory) ConstructSelect(
 						_f.appliedRule(opt.PushSelectIntoInlinableProject, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [RejectNullsGroupBy]
+	{
+		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
+		if _groupByExpr != nil {
+			innerInput := _groupByExpr.Input()
+			aggregations := _groupByExpr.Aggregations()
+			def := _groupByExpr.Def()
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.NullRejectCols(input)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
+						_group = _f.ConstructSelect(
+							_f.ConstructGroupBy(
+								_f.ConstructSelect(
+									innerInput,
+									_f.ConstructFilters(
+										_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
+											_f.funcs.NullRejectAggVar(aggregations),
+											_f.ConstructNull(
+												_f.funcs.AnyType(),
+											),
+										)}),
+									),
+								),
+								aggregations,
+								def,
+							),
+							filter,
+						)
+						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.RejectNullsGroupBy, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
