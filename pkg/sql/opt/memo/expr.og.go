@@ -34,6 +34,7 @@ var opLayoutTable = [...]opLayout{
 	opt.SemiJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AntiJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.GroupByOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
+	opt.ScalarGroupByOp:       makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.UnionOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.IntersectOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.ExceptOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
@@ -160,6 +161,7 @@ var isEnforcerLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -286,6 +288,7 @@ var isRelationalLookup = [...]bool{
 	opt.SemiJoinApplyOp:       true,
 	opt.AntiJoinApplyOp:       true,
 	opt.GroupByOp:             true,
+	opt.ScalarGroupByOp:       true,
 	opt.UnionOp:               true,
 	opt.IntersectOp:           true,
 	opt.ExceptOp:              true,
@@ -412,6 +415,7 @@ var isJoinLookup = [...]bool{
 	opt.SemiJoinApplyOp:       true,
 	opt.AntiJoinApplyOp:       true,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -538,6 +542,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -664,6 +669,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.SemiJoinApplyOp:       true,
 	opt.AntiJoinApplyOp:       true,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -790,6 +796,7 @@ var isScalarLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -916,6 +923,7 @@ var isConstValueLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1042,6 +1050,7 @@ var isBooleanLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1168,6 +1177,7 @@ var isComparisonLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1294,6 +1304,7 @@ var isBinaryLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1420,6 +1431,7 @@ var isUnaryLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1546,6 +1558,7 @@ var isAggregateLookup = [...]bool{
 	opt.SemiJoinApplyOp:       false,
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
+	opt.ScalarGroupByOp:       false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -2347,11 +2360,14 @@ func (e *Expr) AsAntiJoinApply() *AntiJoinApplyExpr {
 	return (*AntiJoinApplyExpr)(e)
 }
 
-// GroupByExpr is an operator that is used for performing aggregations (for queries
-// with aggregate functions, HAVING clauses and/or group by expressions). It
-// groups results that are equal on the grouping columns and computes
-// aggregations as described by Aggregations (which is always an Aggregations
-// operator). The arguments of the aggregations are columns from the input.
+// GroupByExpr computes aggregate functions over groups of input rows. Input rows
+// that are equal on the grouping columns are grouped together. The set of
+// computed aggregate functions is described by the Aggregations field (which is
+// always an Aggregations operator). The arguments of the aggregate functions are
+// columns from the input. If the set of input rows is empty, then the output of
+// the GroupBy operator will also be empty. If the grouping columns are empty,
+// then all input rows form a single group. GroupBy is used for queries with
+// aggregate functions, HAVING clauses and/or GROUP BY expressions.
 type GroupByExpr Expr
 
 func MakeGroupByExpr(input GroupID, aggregations GroupID, def PrivateID) GroupByExpr {
@@ -2379,6 +2395,46 @@ func (e *Expr) AsGroupBy() *GroupByExpr {
 		return nil
 	}
 	return (*GroupByExpr)(e)
+}
+
+// ScalarGroupByExpr computes aggregate functions over the complete set of input
+// rows. This is similar to GroupBy with empty grouping columns, where all input
+// rows form a single group. However, there is an important difference. If the
+// input set is empty, then the output of the ScalarGroupBy operator will have a
+// single row containing default values for each aggregate function (typically
+// null or zero, depending on the function). ScalarGroupBy always returns exactly
+// one row - either the single-group aggregates or the default aggregate values.
+//
+// ScalarGroupBy uses the same GroupByDef private so that it's possible to treat
+// both operators polymorphically. In the ScalarGroupBy case, the grouping column
+// field in GroupByDef is always empty.
+type ScalarGroupByExpr Expr
+
+func MakeScalarGroupByExpr(input GroupID, aggregations GroupID, def PrivateID) ScalarGroupByExpr {
+	return ScalarGroupByExpr{op: opt.ScalarGroupByOp, state: exprState{uint32(input), uint32(aggregations), uint32(def)}}
+}
+
+func (e *ScalarGroupByExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *ScalarGroupByExpr) Aggregations() GroupID {
+	return GroupID(e.state[1])
+}
+
+func (e *ScalarGroupByExpr) Def() PrivateID {
+	return PrivateID(e.state[2])
+}
+
+func (e *ScalarGroupByExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsScalarGroupBy() *ScalarGroupByExpr {
+	if e.op != opt.ScalarGroupByOp {
+		return nil
+	}
+	return (*ScalarGroupByExpr)(e)
 }
 
 // UnionExpr is an operator used to combine the Left and Right input relations into
@@ -5248,6 +5304,11 @@ func init() {
 	// GroupByOp
 	makeExprLookup[opt.GroupByOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeGroupByExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
+	}
+
+	// ScalarGroupByOp
+	makeExprLookup[opt.ScalarGroupByOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeScalarGroupByExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
 	}
 
 	// UnionOp

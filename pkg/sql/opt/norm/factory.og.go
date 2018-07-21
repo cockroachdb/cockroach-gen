@@ -644,35 +644,33 @@ func (_f *Factory) ConstructSelect(
 			input := _groupByExpr.Input()
 			aggregations := _groupByExpr.Aggregations()
 			def := _groupByExpr.Def()
-			if !_f.funcs.IsScalarGroupBy(def) {
-				_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						condition := _item
-						if _f.funcs.IsBoundBy(condition, input) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
-								_group = _f.ConstructSelect(
-									_f.ConstructGroupBy(
-										_f.ConstructSelect(
-											input,
-											_f.ConstructFilters(
-												_f.funcs.ExtractBoundConditions(list, input),
-											),
+			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
+			if _filtersExpr != nil {
+				list := _filtersExpr.Conditions()
+				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+					condition := _item
+					if _f.funcs.IsBoundBy(condition, input) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
+							_group = _f.ConstructSelect(
+								_f.ConstructGroupBy(
+									_f.ConstructSelect(
+										input,
+										_f.ConstructFilters(
+											_f.funcs.ExtractBoundConditions(list, input),
 										),
-										aggregations,
-										def,
 									),
-									_f.ConstructFilters(
-										_f.funcs.ExtractUnboundConditions(list, input),
-									),
-								)
-								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.PushSelectIntoGroupBy, _group, 0, 0)
-								}
-								return _group
+									aggregations,
+									def,
+								),
+								_f.ConstructFilters(
+									_f.funcs.ExtractUnboundConditions(list, input),
+								),
+							)
+							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushSelectIntoGroupBy, _group, 0, 0)
 							}
+							return _group
 						}
 					}
 				}
@@ -1148,18 +1146,21 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneAggCols]
 	{
-		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
-		if _groupByExpr != nil {
-			input := _groupByExpr.Input()
-			aggregations := _groupByExpr.Aggregations()
-			def := _groupByExpr.Def()
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp {
+			innerInput := _expr.ChildGroup(_f.mem, 0)
+			aggregations := _expr.ChildGroup(_f.mem, 1)
+			def := _expr.PrivateID()
 			if _f.funcs.CanPruneCols(aggregations, _f.funcs.NeededCols(projections)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneAggCols) {
 					_group = _f.ConstructProject(
-						_f.ConstructGroupBy(
-							input,
-							_f.funcs.PruneCols(aggregations, _f.funcs.NeededCols(projections)),
-							def,
+						_f.DynamicConstruct(
+							_f.mem.NormExpr(input).Operator(),
+							memo.DynamicOperands{
+								memo.DynamicID(innerInput),
+								memo.DynamicID(_f.funcs.PruneCols(aggregations, _f.funcs.NeededCols(projections))),
+								memo.DynamicID(def),
+							},
 						),
 						projections,
 					)
@@ -1378,28 +1379,26 @@ func (_f *Factory) ConstructInnerJoin(
 				input := _groupByExpr.Input()
 				aggregations := _groupByExpr.Aggregations()
 				def := _groupByExpr.Def()
-				if !_f.funcs.IsScalarGroupBy(def) {
-					if _f.funcs.IsUnorderedGroupBy(def) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
-							newLeft := _f.funcs.EnsureKey(left)
-							_group = _f.ConstructSelect(
-								_f.ConstructGroupBy(
-									_f.ConstructInnerJoinApply(
-										newLeft,
-										input,
-										_f.ConstructTrue(),
-									),
-									_f.funcs.AppendNonKeyCols(newLeft, aggregations),
-									_f.funcs.GroupByUnionKey(newLeft, def),
+				if _f.funcs.IsUnorderedGroupBy(def) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_group = _f.ConstructSelect(
+							_f.ConstructGroupBy(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									_f.ConstructTrue(),
 								),
-								on,
-							)
-							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
-							}
-							return _group
+								_f.funcs.AppendNonKeyCols(newLeft, aggregations),
+								_f.funcs.GroupByUnionKey(newLeft, def),
+							),
+							on,
+						)
+						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
 						}
+						return _group
 					}
 				}
 			}
@@ -1409,35 +1408,33 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateScalarGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
-			if _groupByExpr != nil {
-				input := _groupByExpr.Input()
-				aggregations := _groupByExpr.Aggregations()
-				def := _groupByExpr.Def()
-				if _f.funcs.IsScalarGroupBy(def) {
-					if _f.funcs.CanAggsIgnoreNulls(aggregations) {
-						if _f.funcs.IsUnorderedGroupBy(def) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
-								newLeft := _f.funcs.EnsureKey(left)
-								newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
-								_group = _f.ConstructSelect(
-									_f.ConstructGroupBy(
-										_f.ConstructLeftJoinApply(
-											newLeft,
-											newRight,
-											_f.ConstructTrue(),
-										),
-										_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
-										_f.funcs.GroupByKey(newLeft),
+			_scalarGroupByExpr := _f.mem.NormExpr(right).AsScalarGroupBy()
+			if _scalarGroupByExpr != nil {
+				input := _scalarGroupByExpr.Input()
+				aggregations := _scalarGroupByExpr.Aggregations()
+				def := _scalarGroupByExpr.Def()
+				if _f.funcs.CanAggsIgnoreNulls(aggregations) {
+					if _f.funcs.IsUnorderedGroupBy(def) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+							newLeft := _f.funcs.EnsureKey(left)
+							newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
+							_group = _f.ConstructSelect(
+								_f.ConstructGroupBy(
+									_f.ConstructLeftJoinApply(
+										newLeft,
+										newRight,
+										_f.ConstructTrue(),
 									),
-									on,
-								)
-								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
-								}
-								return _group
+									_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
+									_f.funcs.GroupByKey(newLeft),
+								),
+								on,
+							)
+							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
 							}
+							return _group
 						}
 					}
 				}
@@ -3162,28 +3159,26 @@ func (_f *Factory) ConstructInnerJoinApply(
 				input := _groupByExpr.Input()
 				aggregations := _groupByExpr.Aggregations()
 				def := _groupByExpr.Def()
-				if !_f.funcs.IsScalarGroupBy(def) {
-					if _f.funcs.IsUnorderedGroupBy(def) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
-							newLeft := _f.funcs.EnsureKey(left)
-							_group = _f.ConstructSelect(
-								_f.ConstructGroupBy(
-									_f.ConstructInnerJoinApply(
-										newLeft,
-										input,
-										_f.ConstructTrue(),
-									),
-									_f.funcs.AppendNonKeyCols(newLeft, aggregations),
-									_f.funcs.GroupByUnionKey(newLeft, def),
+				if _f.funcs.IsUnorderedGroupBy(def) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_group = _f.ConstructSelect(
+							_f.ConstructGroupBy(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									_f.ConstructTrue(),
 								),
-								on,
-							)
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
-							}
-							return _group
+								_f.funcs.AppendNonKeyCols(newLeft, aggregations),
+								_f.funcs.GroupByUnionKey(newLeft, def),
+							),
+							on,
+						)
+						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
 						}
+						return _group
 					}
 				}
 			}
@@ -3193,35 +3188,33 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateScalarGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
-			if _groupByExpr != nil {
-				input := _groupByExpr.Input()
-				aggregations := _groupByExpr.Aggregations()
-				def := _groupByExpr.Def()
-				if _f.funcs.IsScalarGroupBy(def) {
-					if _f.funcs.CanAggsIgnoreNulls(aggregations) {
-						if _f.funcs.IsUnorderedGroupBy(def) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
-								newLeft := _f.funcs.EnsureKey(left)
-								newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
-								_group = _f.ConstructSelect(
-									_f.ConstructGroupBy(
-										_f.ConstructLeftJoinApply(
-											newLeft,
-											newRight,
-											_f.ConstructTrue(),
-										),
-										_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
-										_f.funcs.GroupByKey(newLeft),
+			_scalarGroupByExpr := _f.mem.NormExpr(right).AsScalarGroupBy()
+			if _scalarGroupByExpr != nil {
+				input := _scalarGroupByExpr.Input()
+				aggregations := _scalarGroupByExpr.Aggregations()
+				def := _scalarGroupByExpr.Def()
+				if _f.funcs.CanAggsIgnoreNulls(aggregations) {
+					if _f.funcs.IsUnorderedGroupBy(def) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+							newLeft := _f.funcs.EnsureKey(left)
+							newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
+							_group = _f.ConstructSelect(
+								_f.ConstructGroupBy(
+									_f.ConstructLeftJoinApply(
+										newLeft,
+										newRight,
+										_f.ConstructTrue(),
 									),
-									on,
-								)
-								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
-								}
-								return _group
+									_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
+									_f.funcs.GroupByKey(newLeft),
+								),
+								on,
+							)
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
 							}
+							return _group
 						}
 					}
 				}
@@ -4720,11 +4713,14 @@ func (_f *Factory) ConstructAntiJoinApply(
 }
 
 // ConstructGroupBy constructs an expression for the GroupBy operator.
-// GroupBy is an operator that is used for performing aggregations (for queries
-// with aggregate functions, HAVING clauses and/or group by expressions). It
-// groups results that are equal on the grouping columns and computes
-// aggregations as described by Aggregations (which is always an Aggregations
-// operator). The arguments of the aggregations are columns from the input.
+// GroupBy computes aggregate functions over groups of input rows. Input rows
+// that are equal on the grouping columns are grouped together. The set of
+// computed aggregate functions is described by the Aggregations field (which is
+// always an Aggregations operator). The arguments of the aggregate functions are
+// columns from the input. If the set of input rows is empty, then the output of
+// the GroupBy operator will also be empty. If the grouping columns are empty,
+// then all input rows form a single group. GroupBy is used for queries with
+// aggregate functions, HAVING clauses and/or GROUP BY expressions.
 func (_f *Factory) ConstructGroupBy(
 	input memo.GroupID,
 	aggregations memo.GroupID,
@@ -4740,15 +4736,13 @@ func (_f *Factory) ConstructGroupBy(
 	{
 		if _f.funcs.HasNoCols(aggregations) {
 			if _f.funcs.GroupingColsAreKey(def, input) {
-				if !_f.funcs.IsScalarGroupBy(def) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-						_group = input
-						_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.EliminateDistinct, _group, 0, 0)
-						}
-						return _group
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
+					_group = input
+					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateDistinct, _group, 0, 0)
 					}
+					return _group
 				}
 			}
 		}
@@ -4772,6 +4766,24 @@ func (_f *Factory) ConstructGroupBy(
 					}
 					return _group
 				}
+			}
+		}
+	}
+
+	// [ReduceGroupingCols]
+	{
+		if _f.funcs.CanReduceGroupingCols(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceGroupingCols) {
+				_group = _f.ConstructGroupBy(
+					input,
+					_f.funcs.AppendReducedGroupingCols(input, aggregations, def),
+					_f.funcs.ReduceGroupingCols(input, def),
+				)
+				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ReduceGroupingCols, _group, 0, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -4814,6 +4826,72 @@ func (_f *Factory) ConstructGroupBy(
 	}
 
 	return _f.onConstruct(memo.Expr(_groupByExpr))
+}
+
+// ConstructScalarGroupBy constructs an expression for the ScalarGroupBy operator.
+// ScalarGroupBy computes aggregate functions over the complete set of input
+// rows. This is similar to GroupBy with empty grouping columns, where all input
+// rows form a single group. However, there is an important difference. If the
+// input set is empty, then the output of the ScalarGroupBy operator will have a
+// single row containing default values for each aggregate function (typically
+// null or zero, depending on the function). ScalarGroupBy always returns exactly
+// one row - either the single-group aggregates or the default aggregate values.
+//
+// ScalarGroupBy uses the same GroupByDef private so that it's possible to treat
+// both operators polymorphically. In the ScalarGroupBy case, the grouping column
+// field in GroupByDef is always empty.
+func (_f *Factory) ConstructScalarGroupBy(
+	input memo.GroupID,
+	aggregations memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_scalarGroupByExpr := memo.MakeScalarGroupByExpr(input, aggregations, def)
+	_group := _f.mem.GroupByFingerprint(_scalarGroupByExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	// [EliminateGroupByProject]
+	{
+		_projectExpr := _f.mem.NormExpr(input).AsProject()
+		if _projectExpr != nil {
+			innerInput := _projectExpr.Input()
+			if _f.funcs.HasSubsetCols(input, innerInput) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
+					_group = _f.ConstructScalarGroupBy(
+						innerInput,
+						aggregations,
+						def,
+					)
+					_f.mem.AddAltFingerprint(_scalarGroupByExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateGroupByProject, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyGroupByOrdering]
+	{
+		if _f.funcs.CanSimplifyGroupByOrdering(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyGroupByOrdering) {
+				_group = _f.ConstructScalarGroupBy(
+					input,
+					aggregations,
+					_f.funcs.SimplifyGroupByOrdering(input, def),
+				)
+				_f.mem.AddAltFingerprint(_scalarGroupByExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyGroupByOrdering, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	return _f.onConstruct(memo.Expr(_scalarGroupByExpr))
 }
 
 // ConstructUnion constructs an expression for the Union operator.
@@ -5539,18 +5617,15 @@ func (_f *Factory) ConstructExists(
 		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
 		if _groupByExpr != nil {
 			input := _groupByExpr.Input()
-			def := _groupByExpr.Def()
-			if !_f.funcs.IsScalarGroupBy(def) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
-					_group = _f.ConstructExists(
-						input,
-					)
-					_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateExistsGroupBy, _group, 0, 0)
-					}
-					return _group
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
+				_group = _f.ConstructExists(
+					input,
+				)
+				_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateExistsGroupBy, _group, 0, 0)
 				}
+				return _group
 			}
 		}
 	}
@@ -9980,6 +10055,11 @@ func init() {
 	// GroupByOp
 	dynConstructLookup[opt.GroupByOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructGroupBy(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
+	}
+
+	// ScalarGroupByOp
+	dynConstructLookup[opt.ScalarGroupByOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructScalarGroupBy(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
 	}
 
 	// UnionOp

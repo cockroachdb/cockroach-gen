@@ -115,12 +115,28 @@ const (
 
 	AntiJoinApplyOp
 
-	// GroupByOp is an operator that is used for performing aggregations (for queries
-	// with aggregate functions, HAVING clauses and/or group by expressions). It
-	// groups results that are equal on the grouping columns and computes
-	// aggregations as described by Aggregations (which is always an Aggregations
-	// operator). The arguments of the aggregations are columns from the input.
+	// GroupByOp computes aggregate functions over groups of input rows. Input rows
+	// that are equal on the grouping columns are grouped together. The set of
+	// computed aggregate functions is described by the Aggregations field (which is
+	// always an Aggregations operator). The arguments of the aggregate functions are
+	// columns from the input. If the set of input rows is empty, then the output of
+	// the GroupBy operator will also be empty. If the grouping columns are empty,
+	// then all input rows form a single group. GroupBy is used for queries with
+	// aggregate functions, HAVING clauses and/or GROUP BY expressions.
 	GroupByOp
+
+	// ScalarGroupByOp computes aggregate functions over the complete set of input
+	// rows. This is similar to GroupBy with empty grouping columns, where all input
+	// rows form a single group. However, there is an important difference. If the
+	// input set is empty, then the output of the ScalarGroupBy operator will have a
+	// single row containing default values for each aggregate function (typically
+	// null or zero, depending on the function). ScalarGroupBy always returns exactly
+	// one row - either the single-group aggregates or the default aggregate values.
+	//
+	// ScalarGroupBy uses the same GroupByDef private so that it's possible to treat
+	// both operators polymorphically. In the ScalarGroupBy case, the grouping column
+	// field in GroupByDef is always empty.
+	ScalarGroupByOp
 
 	// UnionOp is an operator used to combine the Left and Right input relations into
 	// a single set containing rows from both inputs. Duplicate rows are discarded.
@@ -580,9 +596,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 238, 247, 253, 262, 275, 285, 290, 296, 304, 311, 333, 343, 346, 354, 357, 365, 370, 374, 378, 383, 394, 399, 410, 422, 428, 435, 438, 440, 443, 445, 447, 449, 451, 453, 455, 457, 463, 467, 475, 481, 491, 501, 515, 524, 537, 548, 563, 565, 571, 579, 590, 605, 621, 627, 632, 638, 642, 647, 651, 654, 663, 666, 669, 675, 682, 689, 698, 708, 722, 737, 748, 764, 768, 772, 776, 781, 789, 797, 810, 826, 835, 838, 846, 853, 863, 868, 878, 881, 884, 891, 894, 902, 910, 917, 924, 932, 941, 953, 961}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 253, 262, 268, 277, 290, 300, 305, 311, 319, 326, 348, 358, 361, 369, 372, 380, 385, 389, 393, 398, 409, 414, 425, 437, 443, 450, 453, 455, 458, 460, 462, 464, 466, 468, 470, 472, 478, 482, 490, 496, 506, 516, 530, 539, 552, 563, 578, 580, 586, 594, 605, 620, 636, 642, 647, 653, 657, 662, 666, 669, 678, 681, 684, 690, 697, 704, 713, 723, 737, 752, 763, 779, 783, 787, 791, 796, 804, 812, 825, 841, 850, 853, 861, 868, 878, 883, 893, 896, 899, 906, 909, 917, 925, 932, 939, 947, 956, 968, 976}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -610,6 +626,7 @@ var RelationalOperators = [...]Operator{
 	SemiJoinApplyOp,
 	AntiJoinApplyOp,
 	GroupByOp,
+	ScalarGroupByOp,
 	UnionOp,
 	IntersectOp,
 	ExceptOp,

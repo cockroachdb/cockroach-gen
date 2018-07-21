@@ -51,6 +51,7 @@ const (
 	NormalizeNotAnyFilter
 	EliminateDistinct
 	EliminateGroupByProject
+	ReduceGroupingCols
 	PushSelectIntoInlinableProject
 	InlineProjectInProject
 	EnsureJoinFiltersAnd
