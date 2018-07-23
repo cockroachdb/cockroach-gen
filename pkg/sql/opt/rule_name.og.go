@@ -38,9 +38,11 @@ const (
 	TryDecorrelateSelect
 	TryDecorrelateProject
 	TryDecorrelateProjectSelect
+	TryDecorrelateProjectInnerJoin
 	TryDecorrelateInnerJoin
 	TryDecorrelateGroupBy
 	TryDecorrelateScalarGroupBy
+	TryDecorrelateSemiJoin
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery

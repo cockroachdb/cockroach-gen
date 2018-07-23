@@ -1389,7 +1389,7 @@ func (_f *Factory) ConstructInnerJoin(
 									input,
 									_f.ConstructTrue(),
 								),
-								_f.funcs.AppendNonKeyCols(newLeft, aggregations),
+								_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft),
 								_f.funcs.GroupByUnionKey(newLeft, def),
 							),
 							on,
@@ -1425,7 +1425,7 @@ func (_f *Factory) ConstructInnerJoin(
 										newRight,
 										_f.ConstructTrue(),
 									),
-									_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
+									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.TranslateCountRows(newRight, aggregations), newLeft),
 									_f.funcs.GroupByKey(newLeft),
 								),
 								on,
@@ -1791,46 +1791,6 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
-	// [TryDecorrelateProjectSelect]
-	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			projectInput := _projectExpr.Input()
-			if _f.funcs.HasOuterCols(projectInput) {
-				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
-				if _selectExpr != nil {
-					selectInput := _selectExpr.Input()
-					filters := _selectExpr.Filter()
-					projections := _projectExpr.Projections()
-					if !_f.ruleCycles[_leftJoinExpr.Fingerprint()] {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
-							_f.ruleCycles[_leftJoinExpr.Fingerprint()] = true
-							_group = _f.ConstructProject(
-								_f.ConstructLeftJoin(
-									left,
-									_f.ConstructProject(
-										selectInput,
-										_f.funcs.ProjectColsFromBoth(projections, selectInput),
-									),
-									_f.funcs.ConcatFilters(on, filters),
-								),
-								_f.funcs.ProjectColsFromBoth(left, right),
-							)
-							delete(_f.ruleCycles, _leftJoinExpr.Fingerprint())
-							if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
-								_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-							}
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0, 0)
-							}
-							return _group
-						}
-					}
-				}
-			}
-		}
-	}
-
 	// [TryDecorrelateInnerJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
@@ -1990,7 +1950,7 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [SimplifyLeftJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(right) {
+		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
@@ -2035,35 +1995,6 @@ func (_f *Factory) ConstructRightJoin(
 	_group := _f.mem.GroupByFingerprint(_rightJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [TryDecorrelateProject]
-	{
-		if _f.funcs.HasOuterCols(right) {
-			_projectExpr := _f.mem.NormExpr(right).AsProject()
-			if _projectExpr != nil {
-				input := _projectExpr.Input()
-				projections := _projectExpr.Projections()
-				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
-					_group = _f.ConstructSelect(
-						_f.ConstructProject(
-							_f.ConstructRightJoin(
-								left,
-								input,
-								_f.ConstructTrue(),
-							),
-							_f.funcs.ProjectColsFromBoth(projections, left),
-						),
-						on,
-					)
-					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.TryDecorrelateProject, _group, 0, 0)
-					}
-					return _group
-				}
-			}
-		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -2188,7 +2119,7 @@ func (_f *Factory) ConstructRightJoin(
 
 	// [SimplifyRightJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(left) {
+		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
@@ -2233,46 +2164,6 @@ func (_f *Factory) ConstructFullJoin(
 	_group := _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [TryDecorrelateProjectSelect]
-	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			projectInput := _projectExpr.Input()
-			if _f.funcs.HasOuterCols(projectInput) {
-				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
-				if _selectExpr != nil {
-					selectInput := _selectExpr.Input()
-					filters := _selectExpr.Filter()
-					projections := _projectExpr.Projections()
-					if !_f.ruleCycles[_fullJoinExpr.Fingerprint()] {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
-							_f.ruleCycles[_fullJoinExpr.Fingerprint()] = true
-							_group = _f.ConstructProject(
-								_f.ConstructFullJoin(
-									left,
-									_f.ConstructProject(
-										selectInput,
-										_f.funcs.ProjectColsFromBoth(projections, selectInput),
-									),
-									_f.funcs.ConcatFilters(on, filters),
-								),
-								_f.funcs.ProjectColsFromBoth(left, right),
-							)
-							delete(_f.ruleCycles, _fullJoinExpr.Fingerprint())
-							if _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint()) == 0 {
-								_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
-							}
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0, 0)
-							}
-							return _group
-						}
-					}
-				}
-			}
-		}
 	}
 
 	// [EnsureJoinFiltersAnd]
@@ -2321,7 +2212,7 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [SimplifyLeftJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(right) {
+		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
@@ -2338,7 +2229,7 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [SimplifyRightJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(left) {
+		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
@@ -2443,6 +2334,34 @@ func (_f *Factory) ConstructSemiJoin(
 						}
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateSemiJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			if _f.funcs.CanHaveZeroRows(right) {
+				_expr := _f.mem.NormExpr(right)
+				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ProjectOp {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_group = _f.ConstructGroupBy(
+							_f.ConstructInnerJoinApply(
+								newLeft,
+								right,
+								on,
+							),
+							_f.funcs.AggregateNonKeyCols(newLeft),
+							_f.funcs.GroupByKey(newLeft),
+						)
+						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSemiJoin, _group, 0, 0)
 						}
 						return _group
 					}
@@ -2703,7 +2622,7 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [EliminateSemiJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(right) {
+		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
@@ -3169,7 +3088,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 									input,
 									_f.ConstructTrue(),
 								),
-								_f.funcs.AppendNonKeyCols(newLeft, aggregations),
+								_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft),
 								_f.funcs.GroupByUnionKey(newLeft, def),
 							),
 							on,
@@ -3205,7 +3124,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 										newRight,
 										_f.ConstructTrue(),
 									),
-									_f.funcs.AppendNonKeyCols(newLeft, _f.funcs.TranslateCountRows(newRight, aggregations)),
+									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.TranslateCountRows(newRight, aggregations), newLeft),
 									_f.funcs.GroupByKey(newLeft),
 								),
 								on,
@@ -3521,12 +3440,11 @@ func (_f *Factory) ConstructLeftJoinApply(
 	{
 		_projectExpr := _f.mem.NormExpr(right).AsProject()
 		if _projectExpr != nil {
-			projectInput := _projectExpr.Input()
-			if _f.funcs.HasOuterCols(projectInput) {
-				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
-				if _selectExpr != nil {
-					selectInput := _selectExpr.Input()
-					filters := _selectExpr.Filter()
+			_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
+			if _selectExpr != nil {
+				selectInput := _selectExpr.Input()
+				filters := _selectExpr.Filter()
+				if !_f.funcs.IsBoundBy(filters, selectInput) {
 					projections := _projectExpr.Projections()
 					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
@@ -3548,6 +3466,54 @@ func (_f *Factory) ConstructLeftJoinApply(
 							}
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateProjectInnerJoin]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			join := _projectExpr.Input()
+			_expr := _f.mem.NormExpr(_projectExpr.Input())
+			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
+				innerLeft := _expr.ChildGroup(_f.mem, 0)
+				innerRight := _expr.ChildGroup(_f.mem, 1)
+				innerOn := _expr.ChildGroup(_f.mem, 2)
+				if !_f.funcs.IsBoundBy2(innerOn, innerLeft, innerRight) {
+					projections := _projectExpr.Projections()
+					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectInnerJoin) {
+							_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+							_group = _f.ConstructProject(
+								_f.ConstructLeftJoinApply(
+									left,
+									_f.ConstructProject(
+										_f.DynamicConstruct(
+											_f.mem.NormExpr(join).Operator(),
+											memo.DynamicOperands{
+												memo.DynamicID(innerLeft),
+												memo.DynamicID(innerRight),
+												memo.DynamicID(_f.ConstructTrue()),
+											},
+										),
+										_f.funcs.ProjectColsFromBoth(projections, join),
+									),
+									_f.funcs.ConcatFilters(on, innerOn),
+								),
+								_f.funcs.ProjectColsFromBoth(left, right),
+							)
+							delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+							if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
+								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+							}
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateProjectInnerJoin, _group, 0, 0)
 							}
 							return _group
 						}
@@ -3730,7 +3696,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [SimplifyLeftJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(right) {
+		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
@@ -3787,35 +3753,6 @@ func (_f *Factory) ConstructRightJoinApply(
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
 				}
 				return _group
-			}
-		}
-	}
-
-	// [TryDecorrelateProject]
-	{
-		if _f.funcs.HasOuterCols(right) {
-			_projectExpr := _f.mem.NormExpr(right).AsProject()
-			if _projectExpr != nil {
-				input := _projectExpr.Input()
-				projections := _projectExpr.Projections()
-				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
-					_group = _f.ConstructSelect(
-						_f.ConstructProject(
-							_f.ConstructRightJoinApply(
-								left,
-								input,
-								_f.ConstructTrue(),
-							),
-							_f.funcs.ProjectColsFromBoth(projections, left),
-						),
-						on,
-					)
-					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.TryDecorrelateProject, _group, 0, 0)
-					}
-					return _group
-				}
 			}
 		}
 	}
@@ -3942,7 +3879,7 @@ func (_f *Factory) ConstructRightJoinApply(
 
 	// [SimplifyRightJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(left) {
+		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
@@ -3987,46 +3924,6 @@ func (_f *Factory) ConstructFullJoinApply(
 	_group := _f.mem.GroupByFingerprint(_fullJoinApplyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [TryDecorrelateProjectSelect]
-	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			projectInput := _projectExpr.Input()
-			if _f.funcs.HasOuterCols(projectInput) {
-				_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
-				if _selectExpr != nil {
-					selectInput := _selectExpr.Input()
-					filters := _selectExpr.Filter()
-					projections := _projectExpr.Projections()
-					if !_f.ruleCycles[_fullJoinApplyExpr.Fingerprint()] {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
-							_f.ruleCycles[_fullJoinApplyExpr.Fingerprint()] = true
-							_group = _f.ConstructProject(
-								_f.ConstructFullJoinApply(
-									left,
-									_f.ConstructProject(
-										selectInput,
-										_f.funcs.ProjectColsFromBoth(projections, selectInput),
-									),
-									_f.funcs.ConcatFilters(on, filters),
-								),
-								_f.funcs.ProjectColsFromBoth(left, right),
-							)
-							delete(_f.ruleCycles, _fullJoinApplyExpr.Fingerprint())
-							if _f.mem.GroupByFingerprint(_fullJoinApplyExpr.Fingerprint()) == 0 {
-								_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
-							}
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0, 0)
-							}
-							return _group
-						}
-					}
-				}
-			}
-		}
 	}
 
 	// [DecorrelateJoin]
@@ -4089,7 +3986,7 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [SimplifyLeftJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(right) {
+		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
@@ -4106,7 +4003,7 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [SimplifyRightJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(left) {
+		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
@@ -4229,6 +4126,34 @@ func (_f *Factory) ConstructSemiJoinApply(
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [TryDecorrelateSemiJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			if _f.funcs.CanHaveZeroRows(right) {
+				_expr := _f.mem.NormExpr(right)
+				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ProjectOp {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_group = _f.ConstructGroupBy(
+							_f.ConstructInnerJoinApply(
+								newLeft,
+								right,
+								on,
+							),
+							_f.funcs.AggregateNonKeyCols(newLeft),
+							_f.funcs.GroupByKey(newLeft),
+						)
+						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateSemiJoin, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -4431,7 +4356,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [EliminateSemiJoin]
 	{
-		if _f.funcs.HasOneOrMoreRows(right) {
+		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
