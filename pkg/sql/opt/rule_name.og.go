@@ -63,8 +63,10 @@ const (
 	MapFilterIntoJoinRight
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
-	SimplifyLeftJoin
-	SimplifyRightJoin
+	SimplifyLeftJoinWithoutFilters
+	SimplifyRightJoinWithoutFilters
+	SimplifyLeftJoinWithFilters
+	SimplifyRightJoinWithFilters
 	EliminateSemiJoin
 	EliminateAntiJoin
 	EliminateJoinNoColsLeft

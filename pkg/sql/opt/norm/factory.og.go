@@ -1948,16 +1948,33 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
-	// [SimplifyLeftJoin]
+	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on)
 					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyLeftJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -2117,16 +2134,33 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
-	// [SimplifyRightJoin]
+	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on)
 					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyRightJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
+					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -2210,16 +2244,16 @@ func (_f *Factory) ConstructFullJoin(
 		}
 	}
 
-	// [SimplifyLeftJoin]
+	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on)
 					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -2227,16 +2261,50 @@ func (_f *Factory) ConstructFullJoin(
 		}
 	}
 
-	// [SimplifyRightJoin]
+	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on)
 					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyLeftJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyRightJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
+					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -3694,16 +3762,33 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
-	// [SimplifyLeftJoin]
+	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on)
 					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyLeftJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -3877,16 +3962,33 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
-	// [SimplifyRightJoin]
+	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinApplyOp, left, right, on)
 					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyRightJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
+					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -3984,16 +4086,16 @@ func (_f *Factory) ConstructFullJoinApply(
 		}
 	}
 
-	// [SimplifyLeftJoin]
+	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinApplyOp, left, right, on)
 					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
 					}
 					return _group
 				}
@@ -4001,16 +4103,50 @@ func (_f *Factory) ConstructFullJoinApply(
 		}
 	}
 
-	// [SimplifyRightJoin]
+	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
 			_trueExpr := _f.mem.NormExpr(on).AsTrue()
 			if _trueExpr != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoin) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
 					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinApplyOp, left, right, on)
 					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoin, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyLeftJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyRightJoinWithFilters]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
+					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinApplyOp, left, right, on)
+					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
 					}
 					return _group
 				}
