@@ -59,6 +59,7 @@ var opLayoutTable = [...]opLayout{
 	opt.TupleOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.ProjectionsOp:         makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.AggregationsOp:        makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
+	opt.MergeOnOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.ExistsOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.FiltersOp:             makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
 	opt.AndOp:                 makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
@@ -132,8 +133,8 @@ var opLayoutTable = [...]opLayout{
 	opt.XorAggOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonAggOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonbAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AnyNotNullOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.MergeOnOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
+	opt.ConstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.ConstNotNullAggOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -186,6 +187,7 @@ var isEnforcerLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -259,8 +261,8 @@ var isEnforcerLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -313,6 +315,7 @@ var isRelationalLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -386,8 +389,8 @@ var isRelationalLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isJoinLookup = [...]bool{
@@ -440,6 +443,7 @@ var isJoinLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -513,8 +517,8 @@ var isJoinLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isJoinNonApplyLookup = [...]bool{
@@ -567,6 +571,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -640,8 +645,8 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -694,6 +699,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -767,8 +773,8 @@ var isJoinApplyLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isScalarLookup = [...]bool{
@@ -821,6 +827,7 @@ var isScalarLookup = [...]bool{
 	opt.TupleOp:               true,
 	opt.ProjectionsOp:         true,
 	opt.AggregationsOp:        true,
+	opt.MergeOnOp:             true,
 	opt.ExistsOp:              true,
 	opt.FiltersOp:             true,
 	opt.AndOp:                 true,
@@ -894,8 +901,8 @@ var isScalarLookup = [...]bool{
 	opt.XorAggOp:              true,
 	opt.JsonAggOp:             true,
 	opt.JsonbAggOp:            true,
-	opt.AnyNotNullOp:          true,
-	opt.MergeOnOp:             true,
+	opt.ConstAggOp:            true,
+	opt.ConstNotNullAggOp:     true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -948,6 +955,7 @@ var isConstValueLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -1021,8 +1029,8 @@ var isConstValueLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -1075,6 +1083,7 @@ var isBooleanLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             true,
 	opt.AndOp:                 true,
@@ -1148,8 +1157,8 @@ var isBooleanLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -1202,6 +1211,7 @@ var isComparisonLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -1275,8 +1285,8 @@ var isComparisonLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -1329,6 +1339,7 @@ var isBinaryLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -1402,8 +1413,8 @@ var isBinaryLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1456,6 +1467,7 @@ var isUnaryLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -1529,8 +1541,8 @@ var isUnaryLookup = [...]bool{
 	opt.XorAggOp:              false,
 	opt.JsonAggOp:             false,
 	opt.JsonbAggOp:            false,
-	opt.AnyNotNullOp:          false,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            false,
+	opt.ConstNotNullAggOp:     false,
 }
 
 var isAggregateLookup = [...]bool{
@@ -1583,6 +1595,7 @@ var isAggregateLookup = [...]bool{
 	opt.TupleOp:               false,
 	opt.ProjectionsOp:         false,
 	opt.AggregationsOp:        false,
+	opt.MergeOnOp:             false,
 	opt.ExistsOp:              false,
 	opt.FiltersOp:             false,
 	opt.AndOp:                 false,
@@ -1656,8 +1669,8 @@ var isAggregateLookup = [...]bool{
 	opt.XorAggOp:              true,
 	opt.JsonAggOp:             true,
 	opt.JsonbAggOp:            true,
-	opt.AnyNotNullOp:          true,
-	opt.MergeOnOp:             false,
+	opt.ConstAggOp:            true,
+	opt.ConstNotNullAggOp:     true,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -3212,6 +3225,33 @@ func (e *Expr) AsAggregations() *AggregationsExpr {
 		return nil
 	}
 	return (*AggregationsExpr)(e)
+}
+
+// MergeOnExpr contains the ON condition and the metadata for a merge join; it is
+// always a child of MergeJoin.
+type MergeOnExpr Expr
+
+func MakeMergeOnExpr(on GroupID, def PrivateID) MergeOnExpr {
+	return MergeOnExpr{op: opt.MergeOnOp, state: exprState{uint32(on), uint32(def)}}
+}
+
+func (e *MergeOnExpr) On() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *MergeOnExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
+}
+
+func (e *MergeOnExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsMergeOn() *MergeOnExpr {
+	if e.op != opt.MergeOnOp {
+		return nil
+	}
+	return (*MergeOnExpr)(e)
 }
 
 // ExistsExpr takes a relational query as its input, and evaluates to true if the
@@ -4990,58 +5030,60 @@ func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
 	return (*JsonbAggExpr)(e)
 }
 
-// AnyNotNullExpr returns any non-null value in the grouping set, or null if there
-// are no non-null values. This is particularly useful for "passing through" the
-// value of a column that is known to be constant within a grouping set.
+// ConstAggExpr is used in the special case when the value of a column is known to be
+// constant within a grouping set; it returns that value. If there are no rows
+// in the grouping set, then ConstAgg returns NULL.
 //
-// AnyNotNull is not part of SQL, but it's used internally to rewrite correlated
+// ConstAgg is not part of SQL, but it's used internally to rewrite correlated
 // subqueries into an efficient and convenient form.
-type AnyNotNullExpr Expr
+type ConstAggExpr Expr
 
-func MakeAnyNotNullExpr(input GroupID) AnyNotNullExpr {
-	return AnyNotNullExpr{op: opt.AnyNotNullOp, state: exprState{uint32(input)}}
+func MakeConstAggExpr(input GroupID) ConstAggExpr {
+	return ConstAggExpr{op: opt.ConstAggOp, state: exprState{uint32(input)}}
 }
 
-func (e *AnyNotNullExpr) Input() GroupID {
+func (e *ConstAggExpr) Input() GroupID {
 	return GroupID(e.state[0])
 }
 
-func (e *AnyNotNullExpr) Fingerprint() Fingerprint {
+func (e *ConstAggExpr) Fingerprint() Fingerprint {
 	return Fingerprint(*e)
 }
 
-func (e *Expr) AsAnyNotNull() *AnyNotNullExpr {
-	if e.op != opt.AnyNotNullOp {
+func (e *Expr) AsConstAgg() *ConstAggExpr {
+	if e.op != opt.ConstAggOp {
 		return nil
 	}
-	return (*AnyNotNullExpr)(e)
+	return (*ConstAggExpr)(e)
 }
 
-// MergeOnExpr contains the ON condition and the metadata for a merge join; it is
-// always a child of MergeJoin.
-type MergeOnExpr Expr
+// ConstNotNullAggExpr is used in the special case when the value of a column is
+// known to be constant within a grouping set, except on some rows where it can
+// have a NULL value; it returns the non-NULL constant value. If there are no
+// rows in the grouping set, or all rows have a NULL value, then ConstNotNullAgg
+// returns NULL.
+//
+// ConstNotNullAgg is not part of SQL, but it's used internally to rewrite
+// correlated subqueries into an efficient and convenient form.
+type ConstNotNullAggExpr Expr
 
-func MakeMergeOnExpr(on GroupID, def PrivateID) MergeOnExpr {
-	return MergeOnExpr{op: opt.MergeOnOp, state: exprState{uint32(on), uint32(def)}}
+func MakeConstNotNullAggExpr(input GroupID) ConstNotNullAggExpr {
+	return ConstNotNullAggExpr{op: opt.ConstNotNullAggOp, state: exprState{uint32(input)}}
 }
 
-func (e *MergeOnExpr) On() GroupID {
+func (e *ConstNotNullAggExpr) Input() GroupID {
 	return GroupID(e.state[0])
 }
 
-func (e *MergeOnExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
-}
-
-func (e *MergeOnExpr) Fingerprint() Fingerprint {
+func (e *ConstNotNullAggExpr) Fingerprint() Fingerprint {
 	return Fingerprint(*e)
 }
 
-func (e *Expr) AsMergeOn() *MergeOnExpr {
-	if e.op != opt.MergeOnOp {
+func (e *Expr) AsConstNotNullAgg() *ConstNotNullAggExpr {
+	if e.op != opt.ConstNotNullAggOp {
 		return nil
 	}
-	return (*MergeOnExpr)(e)
+	return (*ConstNotNullAggExpr)(e)
 }
 
 // InternScanOpDef adds the given value to the memo and returns an ID that
@@ -5163,6 +5205,13 @@ func (m *Memo) InternProjectionsOpDef(val *ProjectionsOpDef) PrivateID {
 	return m.privateStorage.internProjectionsOpDef(val)
 }
 
+// InternMergeOnDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternMergeOnDef(val *MergeOnDef) PrivateID {
+	return m.privateStorage.internMergeOnDef(val)
+}
+
 // InternColType adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -5182,13 +5231,6 @@ func (m *Memo) InternFuncOpDef(val *FuncOpDef) PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (m *Memo) InternTupleOrdinal(val TupleOrdinal) PrivateID {
 	return m.privateStorage.internTupleOrdinal(val)
-}
-
-// InternMergeOnDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternMergeOnDef(val *MergeOnDef) PrivateID {
-	return m.privateStorage.internMergeOnDef(val)
 }
 
 type makeExprFunc func(operands DynamicOperands) Expr
@@ -5429,6 +5471,11 @@ func init() {
 	// AggregationsOp
 	makeExprLookup[opt.AggregationsOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeAggregationsExpr(operands[0].ListID(), PrivateID(operands[1])))
+	}
+
+	// MergeOnOp
+	makeExprLookup[opt.MergeOnOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeMergeOnExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// ExistsOp
@@ -5796,14 +5843,14 @@ func init() {
 		return Expr(MakeJsonbAggExpr(GroupID(operands[0])))
 	}
 
-	// AnyNotNullOp
-	makeExprLookup[opt.AnyNotNullOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAnyNotNullExpr(GroupID(operands[0])))
+	// ConstAggOp
+	makeExprLookup[opt.ConstAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeConstAggExpr(GroupID(operands[0])))
 	}
 
-	// MergeOnOp
-	makeExprLookup[opt.MergeOnOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMergeOnExpr(GroupID(operands[0]), PrivateID(operands[1])))
+	// ConstNotNullAggOp
+	makeExprLookup[opt.ConstNotNullAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeConstNotNullAggExpr(GroupID(operands[0])))
 	}
 
 }

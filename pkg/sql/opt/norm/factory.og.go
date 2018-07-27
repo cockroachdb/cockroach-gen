@@ -130,6 +130,13 @@ func (_f *Factory) InternProjectionsOpDef(val *memo.ProjectionsOpDef) memo.Priva
 	return _f.mem.InternProjectionsOpDef(val)
 }
 
+// InternMergeOnDef adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternMergeOnDef(val *memo.MergeOnDef) memo.PrivateID {
+	return _f.mem.InternMergeOnDef(val)
+}
+
 // InternColType adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -149,13 +156,6 @@ func (_f *Factory) InternFuncOpDef(val *memo.FuncOpDef) memo.PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (_f *Factory) InternTupleOrdinal(val memo.TupleOrdinal) memo.PrivateID {
 	return _f.mem.InternTupleOrdinal(val)
-}
-
-// InternMergeOnDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternMergeOnDef(val *memo.MergeOnDef) memo.PrivateID {
-	return _f.mem.InternMergeOnDef(val)
 }
 
 // ConstructScan constructs an expression for the Scan operator.
@@ -1425,7 +1425,7 @@ func (_f *Factory) ConstructInnerJoin(
 										newRight,
 										_f.ConstructTrue(),
 									),
-									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.TranslateCountRows(newRight, aggregations), newLeft),
+									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), newLeft),
 									_f.funcs.GroupByKey(newLeft),
 								),
 								on,
@@ -3192,7 +3192,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 										newRight,
 										_f.ConstructTrue(),
 									),
-									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.TranslateCountRows(newRight, aggregations), newLeft),
+									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), newLeft),
 									_f.funcs.GroupByKey(newLeft),
 								),
 								on,
@@ -5641,6 +5641,22 @@ func (_f *Factory) ConstructAggregations(
 	}
 
 	return _f.onConstruct(memo.Expr(_aggregationsExpr))
+}
+
+// ConstructMergeOn constructs an expression for the MergeOn operator.
+// MergeOn contains the ON condition and the metadata for a merge join; it is
+// always a child of MergeJoin.
+func (_f *Factory) ConstructMergeOn(
+	on memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_mergeOnExpr := memo.MakeMergeOnExpr(on, def)
+	_group := _f.mem.GroupByFingerprint(_mergeOnExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_mergeOnExpr))
 }
 
 // ConstructExists constructs an expression for the Exists operator.
@@ -9962,39 +9978,44 @@ func (_f *Factory) ConstructJsonbAgg(
 	return _f.onConstruct(memo.Expr(_jsonbAggExpr))
 }
 
-// ConstructAnyNotNull constructs an expression for the AnyNotNull operator.
-// AnyNotNull returns any non-null value in the grouping set, or null if there
-// are no non-null values. This is particularly useful for "passing through" the
-// value of a column that is known to be constant within a grouping set.
+// ConstructConstAgg constructs an expression for the ConstAgg operator.
+// ConstAgg is used in the special case when the value of a column is known to be
+// constant within a grouping set; it returns that value. If there are no rows
+// in the grouping set, then ConstAgg returns NULL.
 //
-// AnyNotNull is not part of SQL, but it's used internally to rewrite correlated
+// ConstAgg is not part of SQL, but it's used internally to rewrite correlated
 // subqueries into an efficient and convenient form.
-func (_f *Factory) ConstructAnyNotNull(
+func (_f *Factory) ConstructConstAgg(
 	input memo.GroupID,
 ) memo.GroupID {
-	_anyNotNullExpr := memo.MakeAnyNotNullExpr(input)
-	_group := _f.mem.GroupByFingerprint(_anyNotNullExpr.Fingerprint())
+	_constAggExpr := memo.MakeConstAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_constAggExpr.Fingerprint())
 	if _group != 0 {
 		return _group
 	}
 
-	return _f.onConstruct(memo.Expr(_anyNotNullExpr))
+	return _f.onConstruct(memo.Expr(_constAggExpr))
 }
 
-// ConstructMergeOn constructs an expression for the MergeOn operator.
-// MergeOn contains the ON condition and the metadata for a merge join; it is
-// always a child of MergeJoin.
-func (_f *Factory) ConstructMergeOn(
-	on memo.GroupID,
-	def memo.PrivateID,
+// ConstructConstNotNullAgg constructs an expression for the ConstNotNullAgg operator.
+// ConstNotNullAgg is used in the special case when the value of a column is
+// known to be constant within a grouping set, except on some rows where it can
+// have a NULL value; it returns the non-NULL constant value. If there are no
+// rows in the grouping set, or all rows have a NULL value, then ConstNotNullAgg
+// returns NULL.
+//
+// ConstNotNullAgg is not part of SQL, but it's used internally to rewrite
+// correlated subqueries into an efficient and convenient form.
+func (_f *Factory) ConstructConstNotNullAgg(
+	input memo.GroupID,
 ) memo.GroupID {
-	_mergeOnExpr := memo.MakeMergeOnExpr(on, def)
-	_group := _f.mem.GroupByFingerprint(_mergeOnExpr.Fingerprint())
+	_constNotNullAggExpr := memo.MakeConstNotNullAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_constNotNullAggExpr.Fingerprint())
 	if _group != 0 {
 		return _group
 	}
 
-	return _f.onConstruct(memo.Expr(_mergeOnExpr))
+	return _f.onConstruct(memo.Expr(_constNotNullAggExpr))
 }
 
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
@@ -10235,6 +10256,11 @@ func init() {
 	// AggregationsOp
 	dynConstructLookup[opt.AggregationsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructAggregations(operands[0].ListID(), memo.PrivateID(operands[1]))
+	}
+
+	// MergeOnOp
+	dynConstructLookup[opt.MergeOnOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructMergeOn(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// ExistsOp
@@ -10602,14 +10628,14 @@ func init() {
 		return f.ConstructJsonbAgg(memo.GroupID(operands[0]))
 	}
 
-	// AnyNotNullOp
-	dynConstructLookup[opt.AnyNotNullOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAnyNotNull(memo.GroupID(operands[0]))
+	// ConstAggOp
+	dynConstructLookup[opt.ConstAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructConstAgg(memo.GroupID(operands[0]))
 	}
 
-	// MergeOnOp
-	dynConstructLookup[opt.MergeOnOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMergeOn(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
+	// ConstNotNullAggOp
+	dynConstructLookup[opt.ConstNotNullAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructConstNotNullAgg(memo.GroupID(operands[0]))
 	}
 
 }

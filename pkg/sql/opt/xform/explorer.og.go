@@ -734,7 +734,7 @@ func (_e *explorer) exploreScalarGroupBy(_rootState *exploreState, _root memo.Ex
 										_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
 									),
 									_e.f.ConstructAggregations(
-										_e.mem.InternList([]memo.GroupID{_e.f.ConstructAnyNotNull(
+										_e.mem.InternList([]memo.GroupID{_e.f.ConstructConstAgg(
 											variable,
 										)}),
 										cols,
@@ -792,7 +792,7 @@ func (_e *explorer) exploreScalarGroupBy(_rootState *exploreState, _root memo.Ex
 										_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
 									),
 									_e.f.ConstructAggregations(
-										_e.mem.InternList([]memo.GroupID{_e.f.ConstructAnyNotNull(
+										_e.mem.InternList([]memo.GroupID{_e.f.ConstructConstAgg(
 											variable,
 										)}),
 										cols,

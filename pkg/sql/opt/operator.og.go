@@ -375,6 +375,10 @@ const (
 	// expression, as an opt.ColList. It is legal for Cols to be empty.
 	AggregationsOp
 
+	// MergeOnOp contains the ON condition and the metadata for a merge join; it is
+	// always a child of MergeJoin.
+	MergeOnOp
+
 	// ExistsOp takes a relational query as its input, and evaluates to true if the
 	// query returns at least one row.
 	ExistsOp
@@ -580,25 +584,31 @@ const (
 
 	JsonbAggOp
 
-	// AnyNotNullOp returns any non-null value in the grouping set, or null if there
-	// are no non-null values. This is particularly useful for "passing through" the
-	// value of a column that is known to be constant within a grouping set.
+	// ConstAggOp is used in the special case when the value of a column is known to be
+	// constant within a grouping set; it returns that value. If there are no rows
+	// in the grouping set, then ConstAgg returns NULL.
 	//
-	// AnyNotNull is not part of SQL, but it's used internally to rewrite correlated
+	// ConstAgg is not part of SQL, but it's used internally to rewrite correlated
 	// subqueries into an efficient and convenient form.
-	AnyNotNullOp
+	ConstAggOp
 
-	// MergeOnOp contains the ON condition and the metadata for a merge join; it is
-	// always a child of MergeJoin.
-	MergeOnOp
+	// ConstNotNullAggOp is used in the special case when the value of a column is
+	// known to be constant within a grouping set, except on some rows where it can
+	// have a NULL value; it returns the non-NULL constant value. If there are no
+	// rows in the grouping set, or all rows have a NULL value, then ConstNotNullAgg
+	// returns NULL.
+	//
+	// ConstNotNullAgg is not part of SQL, but it's used internally to rewrite
+	// correlated subqueries into an efficient and convenient form.
+	ConstNotNullAggOp
 
 	// NumOperators tracks the total count of operators.
 	NumOperators
 )
 
-const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggany-not-nullmerge-on"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-agg"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 253, 262, 268, 277, 290, 300, 305, 311, 319, 326, 348, 358, 361, 369, 372, 380, 385, 389, 393, 398, 409, 414, 425, 437, 443, 450, 453, 455, 458, 460, 462, 464, 466, 468, 470, 472, 478, 482, 490, 496, 506, 516, 530, 539, 552, 563, 578, 580, 586, 594, 605, 620, 636, 642, 647, 653, 657, 662, 666, 669, 678, 681, 684, 690, 697, 704, 713, 723, 737, 752, 763, 779, 783, 787, 791, 796, 804, 812, 825, 841, 850, 853, 861, 868, 878, 883, 893, 896, 899, 906, 909, 917, 925, 932, 939, 947, 956, 968, 976}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 253, 262, 268, 277, 290, 300, 305, 311, 319, 326, 348, 358, 361, 369, 372, 380, 385, 389, 393, 398, 409, 414, 425, 437, 445, 451, 458, 461, 463, 466, 468, 470, 472, 474, 476, 478, 480, 486, 490, 498, 504, 514, 524, 538, 547, 560, 571, 586, 588, 594, 602, 613, 628, 644, 650, 655, 661, 665, 670, 674, 677, 686, 689, 692, 698, 705, 712, 721, 731, 745, 760, 771, 787, 791, 795, 799, 804, 812, 820, 833, 849, 858, 861, 869, 876, 886, 891, 901, 904, 907, 914, 917, 925, 933, 940, 947, 955, 964, 973, 991}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -687,6 +697,7 @@ var ScalarOperators = [...]Operator{
 	TupleOp,
 	ProjectionsOp,
 	AggregationsOp,
+	MergeOnOp,
 	ExistsOp,
 	FiltersOp,
 	AndOp,
@@ -760,8 +771,8 @@ var ScalarOperators = [...]Operator{
 	XorAggOp,
 	JsonAggOp,
 	JsonbAggOp,
-	AnyNotNullOp,
-	MergeOnOp,
+	ConstAggOp,
+	ConstNotNullAggOp,
 }
 
 var ConstValueOperators = [...]Operator{
@@ -850,5 +861,6 @@ var AggregateOperators = [...]Operator{
 	XorAggOp,
 	JsonAggOp,
 	JsonbAggOp,
-	AnyNotNullOp,
+	ConstAggOp,
+	ConstNotNullAggOp,
 }
