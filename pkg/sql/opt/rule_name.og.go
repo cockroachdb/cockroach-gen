@@ -152,6 +152,8 @@ const (
 	GenerateMergeJoins
 	GenerateLookupJoin
 	GenerateLookupJoinWithFilter
+	PushJoinThroughIndexJoin
+	PushJoinThroughIndexJoinWithExtraFilter
 	PushLimitIntoScan
 	PushLimitIntoIndexJoin
 	GenerateIndexScans
