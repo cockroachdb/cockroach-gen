@@ -223,7 +223,7 @@ func (_f *Factory) ConstructValues(
 	{
 		for _, _item := range _f.mem.LookupList(rows) {
 			item := _item
-			if _f.funcs.HasCorrelatedSubquery(item) {
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistValuesSubquery) {
 					_group = _f.funcs.HoistValuesSubquery(rows, cols)
 					_f.mem.AddAltFingerprint(_valuesExpr.Fingerprint(), _group)
@@ -716,7 +716,7 @@ func (_f *Factory) ConstructSelect(
 
 	// [HoistSelectExists]
 	{
-		if _f.funcs.HasCorrelatedSubquery(filter) {
+		if _f.funcs.HasHoistableSubquery(filter) {
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -752,7 +752,7 @@ func (_f *Factory) ConstructSelect(
 
 	// [HoistSelectNotExists]
 	{
-		if _f.funcs.HasCorrelatedSubquery(filter) {
+		if _f.funcs.HasHoistableSubquery(filter) {
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -791,7 +791,7 @@ func (_f *Factory) ConstructSelect(
 
 	// [HoistSelectSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(filter) {
+		if _f.funcs.HasHoistableSubquery(filter) {
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectSubquery) {
@@ -840,7 +840,7 @@ func (_f *Factory) ConstructSelect(
 			def := _groupByExpr.Def()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
-				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.NullRejectCols(input)) {
+				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.RejectNullCols(input)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
 						_group = _f.ConstructSelect(
 							_f.ConstructGroupBy(
@@ -1222,7 +1222,7 @@ func (_f *Factory) ConstructProject(
 
 	// [HoistProjectSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(projections) {
+		if _f.funcs.HasHoistableSubquery(projections) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSubquery) {
 				_group = _f.funcs.HoistProjectSubquery(input, projections)
 				_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
@@ -1732,7 +1732,7 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -1984,7 +1984,7 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -2170,7 +2170,7 @@ func (_f *Factory) ConstructRightJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -2314,7 +2314,7 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -2707,7 +2707,7 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -2939,7 +2939,7 @@ func (_f *Factory) ConstructAntiJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -3445,7 +3445,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -3798,7 +3798,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -3998,7 +3998,7 @@ func (_f *Factory) ConstructRightJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -4156,7 +4156,7 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -4509,7 +4509,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
@@ -4755,7 +4755,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasCorrelatedSubquery(on) {
+		if _f.funcs.HasHoistableSubquery(on) {
 			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
 			if _filtersExpr != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
