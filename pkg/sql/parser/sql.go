@@ -13793,8 +13793,8 @@ sqldefault:
 		{
 			sqlVAL.union.val = tree.RangePartition{
 				Name:         tree.UnrestrictedName(sqlDollar[1].str),
-				From:         &tree.Tuple{Exprs: sqlDollar[5].union.exprs()},
-				To:           &tree.Tuple{Exprs: sqlDollar[9].union.exprs()},
+				From:         sqlDollar[5].union.exprs(),
+				To:           sqlDollar[9].union.exprs(),
 				Subpartition: sqlDollar[11].union.partitionBy(),
 			}
 		}
