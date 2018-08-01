@@ -394,20 +394,21 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if _f.funcs.IsBoundBy(condition, input) {
+					inputCols := _f.funcs.OutputCols(input)
+					if _f.funcs.IsBoundBy(condition, inputCols) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoProject) {
 							_group = _f.ConstructSelect(
 								_f.ConstructProject(
 									_f.ConstructSelect(
 										input,
 										_f.ConstructFilters(
-											_f.funcs.ExtractBoundConditions(list, input),
+											_f.funcs.ExtractBoundConditions(list, inputCols),
 										),
 									),
 									projections,
 								),
 								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, input),
+									_f.funcs.ExtractUnboundConditions(list, inputCols),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -459,7 +460,7 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if _f.funcs.IsBoundBy(condition, left) {
+					if _f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(on, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight) {
 								_group = _f.ConstructSelect(
@@ -510,7 +511,7 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if _f.funcs.IsBoundBy(condition, right) {
+					if _f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(on, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
 								_group = _f.ConstructSelect(
@@ -561,7 +562,8 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if _f.funcs.IsBoundBy(condition, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					if _f.funcs.IsBoundBy(condition, leftCols) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinLeft) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
@@ -570,7 +572,7 @@ func (_f *Factory) ConstructSelect(
 										memo.DynamicID(_f.ConstructSelect(
 											left,
 											_f.ConstructFilters(
-												_f.funcs.ExtractBoundConditions(list, left),
+												_f.funcs.ExtractBoundConditions(list, leftCols),
 											),
 										)),
 										memo.DynamicID(right),
@@ -578,7 +580,7 @@ func (_f *Factory) ConstructSelect(
 									},
 								),
 								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, left),
+									_f.funcs.ExtractUnboundConditions(list, leftCols),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -605,7 +607,8 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if _f.funcs.IsBoundBy(condition, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if _f.funcs.IsBoundBy(condition, rightCols) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinRight) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
@@ -615,14 +618,14 @@ func (_f *Factory) ConstructSelect(
 										memo.DynamicID(_f.ConstructSelect(
 											right,
 											_f.ConstructFilters(
-												_f.funcs.ExtractBoundConditions(list, right),
+												_f.funcs.ExtractBoundConditions(list, rightCols),
 											),
 										)),
 										memo.DynamicID(on),
 									},
 								),
 								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, right),
+									_f.funcs.ExtractUnboundConditions(list, rightCols),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -649,21 +652,22 @@ func (_f *Factory) ConstructSelect(
 				list := _filtersExpr.Conditions()
 				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 					condition := _item
-					if _f.funcs.IsBoundBy(condition, input) {
+					passthroughCols := _f.funcs.GroupingAndConstCols(def, aggregations)
+					if _f.funcs.IsBoundBy(condition, passthroughCols) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
 							_group = _f.ConstructSelect(
 								_f.ConstructGroupBy(
 									_f.ConstructSelect(
 										input,
 										_f.ConstructFilters(
-											_f.funcs.ExtractBoundConditions(list, input),
+											_f.funcs.ExtractBoundConditions(list, passthroughCols),
 										),
 									),
 									aggregations,
 									def,
 								),
 								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, input),
+									_f.funcs.ExtractUnboundConditions(list, passthroughCols),
 								),
 							)
 							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
@@ -1561,7 +1565,7 @@ func (_f *Factory) ConstructInnerJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, left) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(filters, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_group = _f.ConstructInnerJoin(
@@ -1605,7 +1609,7 @@ func (_f *Factory) ConstructInnerJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructInnerJoin(
@@ -1635,18 +1639,19 @@ func (_f *Factory) ConstructInnerJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, left) {
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(condition, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructInnerJoin(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, left),
+									_f.funcs.ExtractBoundConditions(list, leftCols),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, left),
+								_f.funcs.ExtractUnboundConditions(list, leftCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
@@ -1667,18 +1672,19 @@ func (_f *Factory) ConstructInnerJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructInnerJoin(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
@@ -1893,7 +1899,7 @@ func (_f *Factory) ConstructLeftJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructLeftJoin(
@@ -1923,18 +1929,19 @@ func (_f *Factory) ConstructLeftJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructLeftJoin(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
@@ -2079,7 +2086,7 @@ func (_f *Factory) ConstructRightJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, left) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(filters, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_group = _f.ConstructRightJoin(
@@ -2109,18 +2116,19 @@ func (_f *Factory) ConstructRightJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, left) {
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(condition, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructRightJoin(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, left),
+									_f.funcs.ExtractBoundConditions(list, leftCols),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, left),
+								_f.funcs.ExtractUnboundConditions(list, leftCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
@@ -2557,7 +2565,7 @@ func (_f *Factory) ConstructSemiJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, left) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(filters, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_group = _f.ConstructSemiJoin(
@@ -2601,7 +2609,7 @@ func (_f *Factory) ConstructSemiJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructSemiJoin(
@@ -2631,18 +2639,19 @@ func (_f *Factory) ConstructSemiJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, left) {
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(condition, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructSemiJoin(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, left),
+									_f.funcs.ExtractBoundConditions(list, leftCols),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, left),
+								_f.funcs.ExtractUnboundConditions(list, leftCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
@@ -2663,18 +2672,19 @@ func (_f *Factory) ConstructSemiJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructSemiJoin(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
@@ -2868,7 +2878,7 @@ func (_f *Factory) ConstructAntiJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructAntiJoin(
@@ -2898,18 +2908,19 @@ func (_f *Factory) ConstructAntiJoin(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructAntiJoin(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
@@ -3274,7 +3285,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, left) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(filters, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_group = _f.ConstructInnerJoinApply(
@@ -3318,7 +3329,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructInnerJoinApply(
@@ -3348,18 +3359,19 @@ func (_f *Factory) ConstructInnerJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, left) {
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(condition, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructInnerJoinApply(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, left),
+									_f.funcs.ExtractBoundConditions(list, leftCols),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, left),
+								_f.funcs.ExtractUnboundConditions(list, leftCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
@@ -3380,18 +3392,19 @@ func (_f *Factory) ConstructInnerJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructInnerJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
@@ -3512,7 +3525,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 			if _selectExpr != nil {
 				selectInput := _selectExpr.Input()
 				filters := _selectExpr.Filter()
-				if !_f.funcs.IsBoundBy(filters, selectInput) {
+				if !_f.funcs.IsBoundBy(filters, _f.funcs.OutputCols(selectInput)) {
 					projections := _projectExpr.Projections()
 					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
@@ -3553,7 +3566,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.funcs.IsBoundBy2(innerOn, innerLeft, innerRight) {
+				if !_f.funcs.IsBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					projections := _projectExpr.Projections()
 					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectInnerJoin) {
@@ -3707,7 +3720,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructLeftJoinApply(
@@ -3737,18 +3750,19 @@ func (_f *Factory) ConstructLeftJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructLeftJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
@@ -3907,7 +3921,7 @@ func (_f *Factory) ConstructRightJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, left) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(filters, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_group = _f.ConstructRightJoinApply(
@@ -3937,18 +3951,19 @@ func (_f *Factory) ConstructRightJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, left) {
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(condition, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructRightJoinApply(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, left),
+									_f.funcs.ExtractBoundConditions(list, leftCols),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, left),
+								_f.funcs.ExtractUnboundConditions(list, leftCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
@@ -4359,7 +4374,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, left) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
 						if _f.funcs.CanMap(filters, condition, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_group = _f.ConstructSemiJoinApply(
@@ -4403,7 +4418,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructSemiJoinApply(
@@ -4433,18 +4448,19 @@ func (_f *Factory) ConstructSemiJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, left) {
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(condition, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
 						_group = _f.ConstructSemiJoinApply(
 							_f.ConstructSelect(
 								left,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, left),
+									_f.funcs.ExtractBoundConditions(list, leftCols),
 								),
 							),
 							right,
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, left),
+								_f.funcs.ExtractUnboundConditions(list, leftCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
@@ -4465,18 +4481,19 @@ func (_f *Factory) ConstructSemiJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructSemiJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
@@ -4684,7 +4701,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, right) {
+					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
 						if _f.funcs.CanMap(filters, condition, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_group = _f.ConstructAntiJoinApply(
@@ -4714,18 +4731,19 @@ func (_f *Factory) ConstructAntiJoinApply(
 			list := _filtersExpr.Conditions()
 			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
 				condition := _item
-				if _f.funcs.IsBoundBy(condition, right) {
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(condition, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
 						_group = _f.ConstructAntiJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
 								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, right),
+									_f.funcs.ExtractBoundConditions(list, rightCols),
 								),
 							),
 							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, right),
+								_f.funcs.ExtractUnboundConditions(list, rightCols),
 							),
 						)
 						_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)

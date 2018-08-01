@@ -119,7 +119,7 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 				input := _indexJoinExpr.Input()
 				def := _indexJoinExpr.Def()
 				filter := _rootExpr.Filter()
-				if _e.funcs.IsBoundBy(filter, input) {
+				if _e.funcs.IsBoundBy(filter, _e.funcs.OutputCols(input)) {
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushFilterIntoIndexJoinNoRemainder) {
 						_expr := memo.MakeIndexJoinExpr(
 							_e.f.ConstructSelect(
@@ -164,21 +164,22 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 					list := _filtersExpr.Conditions()
 					for _, _item := range _e.mem.LookupList(_filtersExpr.Conditions()) {
 						condition := _item
-						if _e.funcs.IsBoundBy(condition, input) {
-							if !_e.funcs.IsBoundBy(filter, input) {
+						inputCols := _e.funcs.OutputCols(input)
+						if _e.funcs.IsBoundBy(condition, inputCols) {
+							if !_e.funcs.IsBoundBy(filter, inputCols) {
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushFilterIntoIndexJoin) {
 									_expr := memo.MakeSelectExpr(
 										_e.f.ConstructIndexJoin(
 											_e.f.ConstructSelect(
 												input,
 												_e.f.ConstructFilters(
-													_e.funcs.ExtractBoundConditions(list, input),
+													_e.funcs.ExtractBoundConditions(list, inputCols),
 												),
 											),
 											def,
 										),
 										_e.f.ConstructFilters(
-											_e.funcs.ExtractUnboundConditions(list, input),
+											_e.funcs.ExtractUnboundConditions(list, inputCols),
 										),
 									)
 									_before := _e.mem.ExprCount(_root.Group)
@@ -426,7 +427,7 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 				right := _indexJoinExpr.Input()
 				indexJoinDef := _indexJoinExpr.Def()
 				on := _rootExpr.On()
-				if _e.funcs.IsBoundBy2(on, left, right) {
+				if _e.funcs.IsBoundBy(on, _e.funcs.OutputCols2(left, right)) {
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinThroughIndexJoin) {
 						newJoin := _e.f.ConstructInnerJoin(
 							left,
@@ -469,26 +470,27 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 				right := _indexJoinExpr.Input()
 				indexJoinDef := _indexJoinExpr.Def()
 				on := _rootExpr.On()
-				if !_e.funcs.IsBoundBy2(on, left, right) {
+				innerCols := _e.funcs.OutputCols2(left, right)
+				if !_e.funcs.IsBoundBy(on, innerCols) {
 					_eid := memo.MakeNormExprID(_rootExpr.On())
 					_filtersExpr := _e.mem.Expr(_eid).AsFilters()
 					if _filtersExpr != nil {
 						onList := _filtersExpr.Conditions()
 						for _, _item := range _e.mem.LookupList(_filtersExpr.Conditions()) {
 							condition := _item
-							if _e.funcs.IsBoundBy2(condition, left, right) {
+							if _e.funcs.IsBoundBy(condition, innerCols) {
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinThroughIndexJoinWithExtraFilter) {
 									newJoin := _e.f.ConstructInnerJoin(
 										left,
 										right,
 										_e.f.ConstructFilters(
-											_e.funcs.ExtractBoundConditions2(onList, left, right),
+											_e.funcs.ExtractBoundConditions(onList, innerCols),
 										),
 									)
 									_expr := memo.MakeLookupJoinExpr(
 										newJoin,
 										_e.f.ConstructFilters(
-											_e.funcs.ExtractUnboundConditions(onList, newJoin),
+											_e.funcs.ExtractUnboundConditions(onList, innerCols),
 										),
 										_e.funcs.HoistIndexJoinDef(indexJoinDef, newJoin, opt.InnerJoinOp),
 									)
@@ -657,7 +659,7 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 				right := _indexJoinExpr.Input()
 				indexJoinDef := _indexJoinExpr.Def()
 				on := _rootExpr.On()
-				if _e.funcs.IsBoundBy2(on, left, right) {
+				if _e.funcs.IsBoundBy(on, _e.funcs.OutputCols2(left, right)) {
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinThroughIndexJoin) {
 						newJoin := _e.f.ConstructLeftJoin(
 							left,
