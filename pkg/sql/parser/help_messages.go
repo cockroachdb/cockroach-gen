@@ -1262,24 +1262,24 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
 		SeeAlso: `SELECT, VALUES, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 5122
+	//line sql.y: 5126
 	`VALUES`: {
 		ShortDescription: `select a given set of values`,
-		//line sql.y: 5123
+		//line sql.y: 5127
 		Category: hDML,
-		//line sql.y: 5124
+		//line sql.y: 5128
 		Text: `VALUES ( <exprs...> ) [, ...]
 `,
-		//line sql.y: 5125
+		//line sql.y: 5129
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 5226
+	//line sql.y: 5230
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 5227
+		//line sql.y: 5231
 		Category: hDML,
-		//line sql.y: 5228
+		//line sql.y: 5232
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexhint> } ]
@@ -1299,7 +1299,7 @@ Index hints:
   '{' NO_INDEX_JOIN [, ...] '}'
 
 `,
-		//line sql.y: 5246
+		//line sql.y: 5250
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},
