@@ -642,11 +642,12 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectIntoGroupBy]
 	{
-		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
-		if _groupByExpr != nil {
-			input := _groupByExpr.Input()
-			aggregations := _groupByExpr.Aggregations()
-			def := _groupByExpr.Def()
+		groupOp := input
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
+			input := _expr.ChildGroup(_f.mem, 0)
+			aggregations := _expr.ChildGroup(_f.mem, 1)
+			def := _expr.PrivateID()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -656,15 +657,18 @@ func (_f *Factory) ConstructSelect(
 					if _f.funcs.IsBoundBy(condition, passthroughCols) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
 							_group = _f.ConstructSelect(
-								_f.ConstructGroupBy(
-									_f.ConstructSelect(
-										input,
-										_f.ConstructFilters(
-											_f.funcs.ExtractBoundConditions(list, passthroughCols),
-										),
-									),
-									aggregations,
-									def,
+								_f.DynamicConstruct(
+									_f.mem.NormExpr(groupOp).Operator(),
+									memo.DynamicOperands{
+										memo.DynamicID(_f.ConstructSelect(
+											input,
+											_f.ConstructFilters(
+												_f.funcs.ExtractBoundConditions(list, passthroughCols),
+											),
+										)),
+										memo.DynamicID(aggregations),
+										memo.DynamicID(def),
+									},
 								),
 								_f.ConstructFilters(
 									_f.funcs.ExtractUnboundConditions(list, passthroughCols),
@@ -837,30 +841,33 @@ func (_f *Factory) ConstructSelect(
 
 	// [RejectNullsGroupBy]
 	{
-		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
-		if _groupByExpr != nil {
-			innerInput := _groupByExpr.Input()
-			aggregations := _groupByExpr.Aggregations()
-			def := _groupByExpr.Def()
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
+			innerInput := _expr.ChildGroup(_f.mem, 0)
+			aggregations := _expr.ChildGroup(_f.mem, 1)
+			def := _expr.PrivateID()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.RejectNullCols(input)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
 						_group = _f.ConstructSelect(
-							_f.ConstructGroupBy(
-								_f.ConstructSelect(
-									innerInput,
-									_f.ConstructFilters(
-										_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-											_f.funcs.NullRejectAggVar(aggregations),
-											_f.ConstructNull(
-												_f.funcs.AnyType(),
-											),
-										)}),
-									),
-								),
-								aggregations,
-								def,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(input).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(_f.ConstructSelect(
+										innerInput,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
+												_f.funcs.NullRejectAggVar(aggregations),
+												_f.ConstructNull(
+													_f.funcs.AnyType(),
+												),
+											)}),
+										),
+									)),
+									memo.DynamicID(aggregations),
+									memo.DynamicID(def),
+								},
 							),
 							filter,
 						)
@@ -1151,7 +1158,7 @@ func (_f *Factory) ConstructProject(
 	// [PruneAggCols]
 	{
 		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp {
+		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp || _expr.Operator() == opt.DistinctOnOp {
 			innerInput := _expr.ChildGroup(_f.mem, 0)
 			aggregations := _expr.ChildGroup(_f.mem, 1)
 			def := _expr.PrivateID()
@@ -1378,23 +1385,26 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
-			if _groupByExpr != nil {
-				input := _groupByExpr.Input()
-				aggregations := _groupByExpr.Aggregations()
-				def := _groupByExpr.Def()
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
+				input := _expr.ChildGroup(_f.mem, 0)
+				aggregations := _expr.ChildGroup(_f.mem, 1)
+				def := _expr.PrivateID()
 				if _f.funcs.IsUnorderedGroupBy(def) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_group = _f.ConstructSelect(
-							_f.ConstructGroupBy(
-								_f.ConstructInnerJoinApply(
-									newLeft,
-									input,
-									_f.ConstructTrue(),
-								),
-								_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft),
-								_f.funcs.GroupByUnionKey(newLeft, def),
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										_f.ConstructTrue(),
+									)),
+									memo.DynamicID(_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft)),
+									memo.DynamicID(_f.funcs.GroupByUnionKey(newLeft, def)),
+								},
 							),
 							on,
 						)
@@ -2423,7 +2433,7 @@ func (_f *Factory) ConstructSemiJoin(
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
 				_expr := _f.mem.NormExpr(right)
-				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ProjectOp {
+				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp || _expr.Operator() == opt.ProjectOp {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_group = _f.ConstructGroupBy(
@@ -3152,23 +3162,26 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_groupByExpr := _f.mem.NormExpr(right).AsGroupBy()
-			if _groupByExpr != nil {
-				input := _groupByExpr.Input()
-				aggregations := _groupByExpr.Aggregations()
-				def := _groupByExpr.Def()
+			_expr := _f.mem.NormExpr(right)
+			if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
+				input := _expr.ChildGroup(_f.mem, 0)
+				aggregations := _expr.ChildGroup(_f.mem, 1)
+				def := _expr.PrivateID()
 				if _f.funcs.IsUnorderedGroupBy(def) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_group = _f.ConstructSelect(
-							_f.ConstructGroupBy(
-								_f.ConstructInnerJoinApply(
-									newLeft,
-									input,
-									_f.ConstructTrue(),
-								),
-								_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft),
-								_f.funcs.GroupByUnionKey(newLeft, def),
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(right).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										_f.ConstructTrue(),
+									)),
+									memo.DynamicID(_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft)),
+									memo.DynamicID(_f.funcs.GroupByUnionKey(newLeft, def)),
+								},
 							),
 							on,
 						)
@@ -4286,7 +4299,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
 				_expr := _f.mem.NormExpr(right)
-				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ProjectOp {
+				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp || _expr.Operator() == opt.ProjectOp {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_group = _f.ConstructGroupBy(
@@ -4811,18 +4824,20 @@ func (_f *Factory) ConstructGroupBy(
 		return _group
 	}
 
-	// [EliminateDistinct]
+	// [ConvertGroupByToDistinct]
 	{
 		if _f.funcs.HasNoCols(aggregations) {
-			if _f.funcs.GroupingColsAreKey(def, input) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-					_group = input
-					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateDistinct, _group, 0, 0)
-					}
-					return _group
+			if _f.matchedRule == nil || _f.matchedRule(opt.ConvertGroupByToDistinct) {
+				_group = _f.ConstructDistinctOn(
+					input,
+					aggregations,
+					def,
+				)
+				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ConvertGroupByToDistinct, _group, 0, 0)
 				}
+				return _group
 			}
 		}
 	}
@@ -4916,9 +4931,9 @@ func (_f *Factory) ConstructGroupBy(
 // null or zero, depending on the function). ScalarGroupBy always returns exactly
 // one row - either the single-group aggregates or the default aggregate values.
 //
-// ScalarGroupBy uses the same GroupByDef private so that it's possible to treat
-// both operators polymorphically. In the ScalarGroupBy case, the grouping column
-// field in GroupByDef is always empty.
+// ScalarGroupBy uses the same GroupByDef private so that it's polymorphic with
+// GroupBy and can be used in the same rules (when appropriate). In the
+// ScalarGroupBy case, the grouping column field in GroupByDef is always empty.
 func (_f *Factory) ConstructScalarGroupBy(
 	input memo.GroupID,
 	aggregations memo.GroupID,
@@ -4971,6 +4986,127 @@ func (_f *Factory) ConstructScalarGroupBy(
 	}
 
 	return _f.onConstruct(memo.Expr(_scalarGroupByExpr))
+}
+
+// ConstructDistinctOn constructs an expression for the DistinctOn operator.
+// DistinctOn filters out rows that are identical on the set of grouping columns;
+// only the first row (according to an ordering) is kept for each set of possible
+// values. It is roughly equivalent with a GroupBy on the same grouping columns
+// except that it uses FirstAgg functions that ensure the value on the first row
+// is chosen (across all aggregations).
+//
+// In addition, the value on that first row must be chosen for all the grouping
+// columns as well; this is relevant in the case of equal but non-identical
+// values, like decimals. For example, if we have rows (1, 2.0) and (1.0, 2) and
+// we are grouping on these two columns, the values output can be either (1, 2.0)
+// or (1.0, 2), but not (1.0, 2.0).
+//
+// DistinctOn uses an Aggregations child and the GroupByDef private so that it's
+// polymorphic with GroupBy and can be used in the same rules (when appropriate).
+// In the DistinctOn case, the aggregations can be only FirstAgg or ConstAgg.
+func (_f *Factory) ConstructDistinctOn(
+	input memo.GroupID,
+	aggregations memo.GroupID,
+	def memo.PrivateID,
+) memo.GroupID {
+	_distinctOnExpr := memo.MakeDistinctOnExpr(input, aggregations, def)
+	_group := _f.mem.GroupByFingerprint(_distinctOnExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	// [EliminateDistinct]
+	{
+		if _f.funcs.GroupingColsAreKey(def, input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
+				_group = input
+				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinct, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [EliminateGroupByProject]
+	{
+		_projectExpr := _f.mem.NormExpr(input).AsProject()
+		if _projectExpr != nil {
+			innerInput := _projectExpr.Input()
+			if _f.funcs.HasSubsetCols(input, innerInput) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
+					_group = _f.ConstructDistinctOn(
+						innerInput,
+						aggregations,
+						def,
+					)
+					_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateGroupByProject, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [ReduceGroupingCols]
+	{
+		if _f.funcs.CanReduceGroupingCols(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceGroupingCols) {
+				_group = _f.ConstructDistinctOn(
+					input,
+					_f.funcs.AppendReducedGroupingCols(input, aggregations, def),
+					_f.funcs.ReduceGroupingCols(input, def),
+				)
+				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ReduceGroupingCols, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [SimplifyGroupByOrdering]
+	{
+		if _f.funcs.CanSimplifyGroupByOrdering(input, def) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyGroupByOrdering) {
+				_group = _f.ConstructDistinctOn(
+					input,
+					aggregations,
+					_f.funcs.SimplifyGroupByOrdering(input, def),
+				)
+				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyGroupByOrdering, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [PruneGroupByCols]
+	{
+		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def)) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
+				newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def))
+				_group = _f.ConstructDistinctOn(
+					newInput,
+					aggregations,
+					_f.funcs.PruneOrderingGroupBy(newInput, def),
+				)
+				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneGroupByCols, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	return _f.onConstruct(memo.Expr(_distinctOnExpr))
 }
 
 // ConstructUnion constructs an expression for the Union operator.
@@ -5709,9 +5845,9 @@ func (_f *Factory) ConstructExists(
 
 	// [EliminateExistsGroupBy]
 	{
-		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
-		if _groupByExpr != nil {
-			input := _groupByExpr.Input()
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
+			input := _expr.ChildGroup(_f.mem, 0)
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
 				_group = _f.ConstructExists(
 					input,
@@ -10036,6 +10172,23 @@ func (_f *Factory) ConstructConstNotNullAgg(
 	return _f.onConstruct(memo.Expr(_constNotNullAggExpr))
 }
 
+// ConstructFirstAgg constructs an expression for the FirstAgg operator.
+// FirstAgg is used only by DistinctOn; it returns the value on the first row
+// according to an ordering; if the ordering is unspecified (or partially
+// specified), it is an arbitrary ordering but it must be the same across all
+// FirstAggs in a DistinctOn.
+func (_f *Factory) ConstructFirstAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_firstAggExpr := memo.MakeFirstAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_firstAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_firstAggExpr))
+}
+
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
 
 var dynConstructLookup [opt.NumOperators]dynConstructFunc
@@ -10154,6 +10307,11 @@ func init() {
 	// ScalarGroupByOp
 	dynConstructLookup[opt.ScalarGroupByOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructScalarGroupBy(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
+	}
+
+	// DistinctOnOp
+	dynConstructLookup[opt.DistinctOnOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructDistinctOn(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
 	}
 
 	// UnionOp
@@ -10654,6 +10812,11 @@ func init() {
 	// ConstNotNullAggOp
 	dynConstructLookup[opt.ConstNotNullAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructConstNotNullAgg(memo.GroupID(operands[0]))
+	}
+
+	// FirstAggOp
+	dynConstructLookup[opt.FirstAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructFirstAgg(memo.GroupID(operands[0]))
 	}
 
 }

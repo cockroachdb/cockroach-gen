@@ -133,10 +133,27 @@ const (
 	// null or zero, depending on the function). ScalarGroupBy always returns exactly
 	// one row - either the single-group aggregates or the default aggregate values.
 	//
-	// ScalarGroupBy uses the same GroupByDef private so that it's possible to treat
-	// both operators polymorphically. In the ScalarGroupBy case, the grouping column
-	// field in GroupByDef is always empty.
+	// ScalarGroupBy uses the same GroupByDef private so that it's polymorphic with
+	// GroupBy and can be used in the same rules (when appropriate). In the
+	// ScalarGroupBy case, the grouping column field in GroupByDef is always empty.
 	ScalarGroupByOp
+
+	// DistinctOnOp filters out rows that are identical on the set of grouping columns;
+	// only the first row (according to an ordering) is kept for each set of possible
+	// values. It is roughly equivalent with a GroupBy on the same grouping columns
+	// except that it uses FirstAgg functions that ensure the value on the first row
+	// is chosen (across all aggregations).
+	//
+	// In addition, the value on that first row must be chosen for all the grouping
+	// columns as well; this is relevant in the case of equal but non-identical
+	// values, like decimals. For example, if we have rows (1, 2.0) and (1.0, 2) and
+	// we are grouping on these two columns, the values output can be either (1, 2.0)
+	// or (1.0, 2), but not (1.0, 2.0).
+	//
+	// DistinctOn uses an Aggregations child and the GroupByDef private so that it's
+	// polymorphic with GroupBy and can be used in the same rules (when appropriate).
+	// In the DistinctOn case, the aggregations can be only FirstAgg or ConstAgg.
+	DistinctOnOp
 
 	// UnionOp is an operator used to combine the Left and Right input relations into
 	// a single set containing rows from both inputs. Duplicate rows are discarded.
@@ -602,13 +619,19 @@ const (
 	// correlated subqueries into an efficient and convenient form.
 	ConstNotNullAggOp
 
+	// FirstAggOp is used only by DistinctOn; it returns the value on the first row
+	// according to an ordering; if the ordering is unspecified (or partially
+	// specified), it is an arbitrary ordering but it must be the same across all
+	// FirstAggs in a DistinctOn.
+	FirstAggOp
+
 	// NumOperators tracks the total count of operators.
 	NumOperators
 )
 
-const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-byunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-agg"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggfirst-agg"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 253, 262, 268, 277, 290, 300, 305, 311, 319, 326, 348, 358, 361, 369, 372, 380, 385, 389, 393, 398, 409, 414, 425, 437, 445, 451, 458, 461, 463, 466, 468, 470, 472, 474, 476, 478, 480, 486, 490, 498, 504, 514, 524, 538, 547, 560, 571, 586, 588, 594, 602, 613, 628, 644, 650, 655, 661, 665, 670, 674, 677, 686, 689, 692, 698, 705, 712, 721, 731, 745, 760, 771, 787, 791, 795, 799, 804, 812, 820, 833, 849, 858, 861, 869, 876, 886, 891, 901, 904, 907, 914, 917, 925, 933, 940, 947, 955, 964, 973, 991}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 661, 666, 672, 676, 681, 685, 688, 697, 700, 703, 709, 716, 723, 732, 742, 756, 771, 782, 798, 802, 806, 810, 815, 823, 831, 844, 860, 869, 872, 880, 887, 897, 902, 912, 915, 918, 925, 928, 936, 944, 951, 958, 966, 975, 984, 1002, 1011}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -637,6 +660,7 @@ var RelationalOperators = [...]Operator{
 	AntiJoinApplyOp,
 	GroupByOp,
 	ScalarGroupByOp,
+	DistinctOnOp,
 	UnionOp,
 	IntersectOp,
 	ExceptOp,
@@ -773,6 +797,7 @@ var ScalarOperators = [...]Operator{
 	JsonbAggOp,
 	ConstAggOp,
 	ConstNotNullAggOp,
+	FirstAggOp,
 }
 
 var ConstValueOperators = [...]Operator{
@@ -863,4 +888,5 @@ var AggregateOperators = [...]Operator{
 	JsonbAggOp,
 	ConstAggOp,
 	ConstNotNullAggOp,
+	FirstAggOp,
 }

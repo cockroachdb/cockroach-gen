@@ -51,6 +51,7 @@ const (
 	HoistValuesSubquery
 	NormalizeAnyFilter
 	NormalizeNotAnyFilter
+	ConvertGroupByToDistinct
 	EliminateDistinct
 	EliminateGroupByProject
 	ReduceGroupingCols

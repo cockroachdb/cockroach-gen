@@ -35,6 +35,7 @@ var opLayoutTable = [...]opLayout{
 	opt.AntiJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.GroupByOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.ScalarGroupByOp:       makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
+	opt.DistinctOnOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.UnionOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.IntersectOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.ExceptOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
@@ -135,6 +136,7 @@ var opLayoutTable = [...]opLayout{
 	opt.JsonbAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ConstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ConstNotNullAggOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.FirstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -163,6 +165,7 @@ var isEnforcerLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -263,6 +266,7 @@ var isEnforcerLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -291,6 +295,7 @@ var isRelationalLookup = [...]bool{
 	opt.AntiJoinApplyOp:       true,
 	opt.GroupByOp:             true,
 	opt.ScalarGroupByOp:       true,
+	opt.DistinctOnOp:          true,
 	opt.UnionOp:               true,
 	opt.IntersectOp:           true,
 	opt.ExceptOp:              true,
@@ -391,6 +396,7 @@ var isRelationalLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isJoinLookup = [...]bool{
@@ -419,6 +425,7 @@ var isJoinLookup = [...]bool{
 	opt.AntiJoinApplyOp:       true,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -519,6 +526,7 @@ var isJoinLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isJoinNonApplyLookup = [...]bool{
@@ -547,6 +555,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -647,6 +656,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -675,6 +685,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.AntiJoinApplyOp:       true,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -775,6 +786,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isScalarLookup = [...]bool{
@@ -803,6 +815,7 @@ var isScalarLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -903,6 +916,7 @@ var isScalarLookup = [...]bool{
 	opt.JsonbAggOp:            true,
 	opt.ConstAggOp:            true,
 	opt.ConstNotNullAggOp:     true,
+	opt.FirstAggOp:            true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -931,6 +945,7 @@ var isConstValueLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1031,6 +1046,7 @@ var isConstValueLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -1059,6 +1075,7 @@ var isBooleanLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1159,6 +1176,7 @@ var isBooleanLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -1187,6 +1205,7 @@ var isComparisonLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1287,6 +1306,7 @@ var isComparisonLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -1315,6 +1335,7 @@ var isBinaryLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1415,6 +1436,7 @@ var isBinaryLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1443,6 +1465,7 @@ var isUnaryLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1543,6 +1566,7 @@ var isUnaryLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.FirstAggOp:            false,
 }
 
 var isAggregateLookup = [...]bool{
@@ -1571,6 +1595,7 @@ var isAggregateLookup = [...]bool{
 	opt.AntiJoinApplyOp:       false,
 	opt.GroupByOp:             false,
 	opt.ScalarGroupByOp:       false,
+	opt.DistinctOnOp:          false,
 	opt.UnionOp:               false,
 	opt.IntersectOp:           false,
 	opt.ExceptOp:              false,
@@ -1671,6 +1696,7 @@ var isAggregateLookup = [...]bool{
 	opt.JsonbAggOp:            true,
 	opt.ConstAggOp:            true,
 	opt.ConstNotNullAggOp:     true,
+	opt.FirstAggOp:            true,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -2418,9 +2444,9 @@ func (e *Expr) AsGroupBy() *GroupByExpr {
 // null or zero, depending on the function). ScalarGroupBy always returns exactly
 // one row - either the single-group aggregates or the default aggregate values.
 //
-// ScalarGroupBy uses the same GroupByDef private so that it's possible to treat
-// both operators polymorphically. In the ScalarGroupBy case, the grouping column
-// field in GroupByDef is always empty.
+// ScalarGroupBy uses the same GroupByDef private so that it's polymorphic with
+// GroupBy and can be used in the same rules (when appropriate). In the
+// ScalarGroupBy case, the grouping column field in GroupByDef is always empty.
 type ScalarGroupByExpr Expr
 
 func MakeScalarGroupByExpr(input GroupID, aggregations GroupID, def PrivateID) ScalarGroupByExpr {
@@ -2448,6 +2474,50 @@ func (e *Expr) AsScalarGroupBy() *ScalarGroupByExpr {
 		return nil
 	}
 	return (*ScalarGroupByExpr)(e)
+}
+
+// DistinctOnExpr filters out rows that are identical on the set of grouping columns;
+// only the first row (according to an ordering) is kept for each set of possible
+// values. It is roughly equivalent with a GroupBy on the same grouping columns
+// except that it uses FirstAgg functions that ensure the value on the first row
+// is chosen (across all aggregations).
+//
+// In addition, the value on that first row must be chosen for all the grouping
+// columns as well; this is relevant in the case of equal but non-identical
+// values, like decimals. For example, if we have rows (1, 2.0) and (1.0, 2) and
+// we are grouping on these two columns, the values output can be either (1, 2.0)
+// or (1.0, 2), but not (1.0, 2.0).
+//
+// DistinctOn uses an Aggregations child and the GroupByDef private so that it's
+// polymorphic with GroupBy and can be used in the same rules (when appropriate).
+// In the DistinctOn case, the aggregations can be only FirstAgg or ConstAgg.
+type DistinctOnExpr Expr
+
+func MakeDistinctOnExpr(input GroupID, aggregations GroupID, def PrivateID) DistinctOnExpr {
+	return DistinctOnExpr{op: opt.DistinctOnOp, state: exprState{uint32(input), uint32(aggregations), uint32(def)}}
+}
+
+func (e *DistinctOnExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *DistinctOnExpr) Aggregations() GroupID {
+	return GroupID(e.state[1])
+}
+
+func (e *DistinctOnExpr) Def() PrivateID {
+	return PrivateID(e.state[2])
+}
+
+func (e *DistinctOnExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsDistinctOn() *DistinctOnExpr {
+	if e.op != opt.DistinctOnOp {
+		return nil
+	}
+	return (*DistinctOnExpr)(e)
 }
 
 // UnionExpr is an operator used to combine the Left and Right input relations into
@@ -5086,6 +5156,31 @@ func (e *Expr) AsConstNotNullAgg() *ConstNotNullAggExpr {
 	return (*ConstNotNullAggExpr)(e)
 }
 
+// FirstAggExpr is used only by DistinctOn; it returns the value on the first row
+// according to an ordering; if the ordering is unspecified (or partially
+// specified), it is an arbitrary ordering but it must be the same across all
+// FirstAggs in a DistinctOn.
+type FirstAggExpr Expr
+
+func MakeFirstAggExpr(input GroupID) FirstAggExpr {
+	return FirstAggExpr{op: opt.FirstAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *FirstAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *FirstAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsFirstAgg() *FirstAggExpr {
+	if e.op != opt.FirstAggOp {
+		return nil
+	}
+	return (*FirstAggExpr)(e)
+}
+
 // InternScanOpDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -5351,6 +5446,11 @@ func init() {
 	// ScalarGroupByOp
 	makeExprLookup[opt.ScalarGroupByOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeScalarGroupByExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
+	}
+
+	// DistinctOnOp
+	makeExprLookup[opt.DistinctOnOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeDistinctOnExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
 	}
 
 	// UnionOp
@@ -5851,6 +5951,11 @@ func init() {
 	// ConstNotNullAggOp
 	makeExprLookup[opt.ConstNotNullAggOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeConstNotNullAggExpr(GroupID(operands[0])))
+	}
+
+	// FirstAggOp
+	makeExprLookup[opt.FirstAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeFirstAggExpr(GroupID(operands[0])))
 	}
 
 }
