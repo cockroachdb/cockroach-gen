@@ -11512,7 +11512,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[3].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[3].union.expr()}}},
 				},
 				Command: tree.CancelJob,
 			}
@@ -11541,7 +11541,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.CancelQueries{
 				Queries: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[3].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[3].union.expr()}}},
 				},
 				IfExists: false,
 			}
@@ -11552,7 +11552,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.CancelQueries{
 				Queries: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[5].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[5].union.expr()}}},
 				},
 				IfExists: true,
 			}
@@ -11587,7 +11587,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.CancelSessions{
 				Sessions: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[3].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[3].union.expr()}}},
 				},
 				IfExists: false,
 			}
@@ -11598,7 +11598,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.CancelSessions{
 				Sessions: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[5].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[5].union.expr()}}},
 				},
 				IfExists: true,
 			}
@@ -13544,7 +13544,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[3].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[3].union.expr()}}},
 				},
 				Command: tree.PauseJob,
 			}
@@ -14667,7 +14667,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
-					Select: &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: tree.Exprs{sqlDollar[3].union.expr()}}}},
+					Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[3].union.expr()}}},
 				},
 				Command: tree.ResumeJob,
 			}
@@ -15687,7 +15687,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 		//line sql-gen.y:5385
 		{
-			sqlVAL.union.val = &tree.ValuesClause{Tuples: []*tree.Tuple{{Exprs: sqlDollar[3].union.exprs()}}}
+			sqlVAL.union.val = &tree.ValuesClause{Rows: []tree.Exprs{sqlDollar[3].union.exprs()}}
 		}
 	case 948:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
@@ -15700,7 +15700,7 @@ sqldefault:
 		//line sql-gen.y:5390
 		{
 			valNode := sqlDollar[1].union.selectStmt().(*tree.ValuesClause)
-			valNode.Tuples = append(valNode.Tuples, &tree.Tuple{Exprs: sqlDollar[4].union.exprs()})
+			valNode.Rows = append(valNode.Rows, sqlDollar[4].union.exprs())
 			sqlVAL.union.val = valNode
 		}
 	case 950:
