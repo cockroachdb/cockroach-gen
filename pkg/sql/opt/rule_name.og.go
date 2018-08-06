@@ -40,15 +40,18 @@ const (
 	TryDecorrelateProjectSelect
 	TryDecorrelateProjectInnerJoin
 	TryDecorrelateInnerJoin
+	TryDecorrelateInnerLeftJoin
 	TryDecorrelateGroupBy
 	TryDecorrelateScalarGroupBy
 	TryDecorrelateSemiJoin
+	TryDecorrelateZip
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery
 	HoistProjectSubquery
 	HoistJoinSubquery
 	HoistValuesSubquery
+	HoistZipSubquery
 	NormalizeAnyFilter
 	NormalizeNotAnyFilter
 	ConvertGroupByToDistinct
