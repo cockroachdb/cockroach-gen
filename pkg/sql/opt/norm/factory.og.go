@@ -841,33 +841,30 @@ func (_f *Factory) ConstructSelect(
 
 	// [RejectNullsGroupBy]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			innerInput := _expr.ChildGroup(_f.mem, 0)
-			aggregations := _expr.ChildGroup(_f.mem, 1)
-			def := _expr.PrivateID()
+		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
+		if _groupByExpr != nil {
+			innerInput := _groupByExpr.Input()
+			aggregations := _groupByExpr.Aggregations()
+			def := _groupByExpr.Def()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.RejectNullCols(input)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
 						_group = _f.ConstructSelect(
-							_f.DynamicConstruct(
-								_f.mem.NormExpr(input).Operator(),
-								memo.DynamicOperands{
-									memo.DynamicID(_f.ConstructSelect(
-										innerInput,
-										_f.ConstructFilters(
-											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-												_f.funcs.NullRejectAggVar(aggregations),
-												_f.ConstructNull(
-													_f.funcs.AnyType(),
-												),
-											)}),
-										),
-									)),
-									memo.DynamicID(aggregations),
-									memo.DynamicID(def),
-								},
+							_f.ConstructGroupBy(
+								_f.ConstructSelect(
+									innerInput,
+									_f.ConstructFilters(
+										_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
+											_f.funcs.NullRejectAggVar(aggregations),
+											_f.ConstructNull(
+												_f.funcs.AnyType(),
+											),
+										)}),
+									),
+								),
+								aggregations,
+								def,
 							),
 							filter,
 						)
@@ -5089,6 +5086,19 @@ func (_f *Factory) ConstructScalarGroupBy(
 // values, like decimals. For example, if we have rows (1, 2.0) and (1.0, 2) and
 // we are grouping on these two columns, the values output can be either (1, 2.0)
 // or (1.0, 2), but not (1.0, 2.0).
+//
+// The execution of DistinctOn resembles that of Select more than that of
+// GroupBy: each row is tested against a map of what groups we have seen already,
+// and is either passed through or discarded. In particular, note that this
+// preserves the input ordering.
+//
+// The ordering in the private will be required of the input; it determines which
+// row can get "chosen" for each group of values on the grouping columns.
+// There is no restriction on the ordering; but note that grouping columns are
+// inconsequential - they can appear anywhere in the ordering and they won't
+// change the results (other than the result ordering).
+//
+// TODO(radu): actually set grouping columns as optional cols in Ordering.
 //
 // DistinctOn uses an Aggregations child and the GroupByDef private so that it's
 // polymorphic with GroupBy and can be used in the same rules (when appropriate).
