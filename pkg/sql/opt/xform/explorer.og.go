@@ -5,6 +5,7 @@ package xform
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
 func (_e *explorer) exploreExpr(_state *exploreState, _eid memo.ExprID) (_fullyExplored bool) {
@@ -875,7 +876,9 @@ func (_e *explorer) exploreScalarGroupBy(_rootState *exploreState, _root memo.Ex
 												)}),
 											),
 										),
-										_e.funcs.MakeOne(),
+										_e.f.ConstructConst(
+											_e.mem.InternDatum(tree.NewDInt(1)),
+										),
 										_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
 									),
 									_e.f.ConstructAggregations(
@@ -933,7 +936,9 @@ func (_e *explorer) exploreScalarGroupBy(_rootState *exploreState, _root memo.Ex
 												)}),
 											),
 										),
-										_e.funcs.MakeOne(),
+										_e.f.ConstructConst(
+											_e.mem.InternDatum(tree.NewDInt(1)),
+										),
 										_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
 									),
 									_e.f.ConstructAggregations(

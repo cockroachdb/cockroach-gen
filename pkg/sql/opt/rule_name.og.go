@@ -44,6 +44,7 @@ const (
 	TryDecorrelateGroupBy
 	TryDecorrelateScalarGroupBy
 	TryDecorrelateSemiJoin
+	TryDecorrelateLimitOne
 	TryDecorrelateZip
 	HoistSelectExists
 	HoistSelectNotExists
@@ -75,6 +76,7 @@ const (
 	EliminateAntiJoin
 	EliminateJoinNoColsLeft
 	EliminateJoinNoColsRight
+	HoistJoinProject
 	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject

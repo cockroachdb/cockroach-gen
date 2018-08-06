@@ -1429,8 +1429,8 @@ func (_f *Factory) ConstructInnerJoin(
 										input,
 										_f.ConstructTrue(),
 									)),
-									memo.DynamicID(_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft)),
-									memo.DynamicID(_f.funcs.GroupByUnionKey(newLeft, def)),
+									memo.DynamicID(_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))),
+									memo.DynamicID(_f.funcs.AddColsToGroupByDef(def, _f.funcs.KeyCols(newLeft))),
 								},
 							),
 							on,
@@ -1466,14 +1466,47 @@ func (_f *Factory) ConstructInnerJoin(
 										newRight,
 										_f.ConstructTrue(),
 									),
-									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), newLeft),
-									_f.funcs.GroupByKey(newLeft),
+									_f.funcs.AppendAggCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
+									_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
 								),
 								on,
 							)
 							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateLimitOne]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_limitExpr := _f.mem.NormExpr(right).AsLimit()
+			if _limitExpr != nil {
+				input := _limitExpr.Input()
+				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
+				if _constExpr != nil {
+					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+						ordering := _limitExpr.Ordering()
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
+							newLeft := _f.funcs.EnsureKey(left)
+							_group = _f.ConstructDistinctOn(
+								_f.ConstructInnerJoin(
+									newLeft,
+									input,
+									on,
+								),
+								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+							)
+							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
 							}
 							return _group
 						}
@@ -1773,6 +1806,34 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [HoistJoinProject]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			input := _projectExpr.Input()
+			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
+			if _projectionsExpr != nil {
+				if _projectionsExpr.Elems().Length == 0 {
+					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+						_group = _f.ConstructProject(
+							_f.ConstructInnerJoin(
+								left,
+								input,
+								on,
+							),
+							_f.funcs.ProjectColsFromBoth(left, right),
+						)
+						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -1865,6 +1926,39 @@ func (_f *Factory) ConstructLeftJoin(
 							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
 						}
 						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateLimitOne]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_limitExpr := _f.mem.NormExpr(right).AsLimit()
+			if _limitExpr != nil {
+				input := _limitExpr.Input()
+				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
+				if _constExpr != nil {
+					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+						ordering := _limitExpr.Ordering()
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
+							newLeft := _f.funcs.EnsureKey(left)
+							_group = _f.ConstructDistinctOn(
+								_f.ConstructLeftJoin(
+									newLeft,
+									input,
+									on,
+								),
+								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+							)
+							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
+							}
+							return _group
+						}
 					}
 				}
 			}
@@ -2021,6 +2115,34 @@ func (_f *Factory) ConstructLeftJoin(
 						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [HoistJoinProject]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			input := _projectExpr.Input()
+			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
+			if _projectionsExpr != nil {
+				if _projectionsExpr.Elems().Length == 0 {
+					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+						_group = _f.ConstructProject(
+							_f.ConstructLeftJoin(
+								left,
+								input,
+								on,
+							),
+							_f.funcs.ProjectColsFromBoth(left, right),
+						)
+						_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -2469,8 +2591,8 @@ func (_f *Factory) ConstructSemiJoin(
 								right,
 								on,
 							),
-							_f.funcs.AggregateNonKeyCols(newLeft),
-							_f.funcs.GroupByKey(newLeft),
+							_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
+							_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
 						)
 						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
@@ -3236,8 +3358,8 @@ func (_f *Factory) ConstructInnerJoinApply(
 										input,
 										_f.ConstructTrue(),
 									)),
-									memo.DynamicID(_f.funcs.AppendAggregatedNonKeyCols(aggregations, newLeft)),
-									memo.DynamicID(_f.funcs.GroupByUnionKey(newLeft, def)),
+									memo.DynamicID(_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))),
+									memo.DynamicID(_f.funcs.AddColsToGroupByDef(def, _f.funcs.KeyCols(newLeft))),
 								},
 							),
 							on,
@@ -3273,14 +3395,47 @@ func (_f *Factory) ConstructInnerJoinApply(
 										newRight,
 										_f.ConstructTrue(),
 									),
-									_f.funcs.AppendAggregatedNonKeyCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), newLeft),
-									_f.funcs.GroupByKey(newLeft),
+									_f.funcs.AppendAggCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
+									_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
 								),
 								on,
 							)
 							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateLimitOne]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_limitExpr := _f.mem.NormExpr(right).AsLimit()
+			if _limitExpr != nil {
+				input := _limitExpr.Input()
+				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
+				if _constExpr != nil {
+					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+						ordering := _limitExpr.Ordering()
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
+							newLeft := _f.funcs.EnsureKey(left)
+							_group = _f.ConstructDistinctOn(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									on,
+								),
+								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+							)
+							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
 							}
 							return _group
 						}
@@ -3555,6 +3710,34 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [HoistJoinProject]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			input := _projectExpr.Input()
+			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
+			if _projectionsExpr != nil {
+				if _projectionsExpr.Elems().Length == 0 {
+					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+						_group = _f.ConstructProject(
+							_f.ConstructInnerJoinApply(
+								left,
+								input,
+								on,
+							),
+							_f.funcs.ProjectColsFromBoth(left, right),
+						)
+						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -3754,6 +3937,39 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [TryDecorrelateLimitOne]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_limitExpr := _f.mem.NormExpr(right).AsLimit()
+			if _limitExpr != nil {
+				input := _limitExpr.Input()
+				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
+				if _constExpr != nil {
+					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+						ordering := _limitExpr.Ordering()
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
+							newLeft := _f.funcs.EnsureKey(left)
+							_group = _f.ConstructDistinctOn(
+								_f.ConstructLeftJoinApply(
+									newLeft,
+									input,
+									on,
+								),
+								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+							)
+							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [EnsureJoinFiltersAnd]
 	{
 		_andExpr := _f.mem.NormExpr(on).AsAnd()
@@ -3904,6 +4120,34 @@ func (_f *Factory) ConstructLeftJoinApply(
 						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [HoistJoinProject]
+	{
+		_projectExpr := _f.mem.NormExpr(right).AsProject()
+		if _projectExpr != nil {
+			input := _projectExpr.Input()
+			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
+			if _projectionsExpr != nil {
+				if _projectionsExpr.Elems().Length == 0 {
+					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+						_group = _f.ConstructProject(
+							_f.ConstructLeftJoinApply(
+								left,
+								input,
+								on,
+							),
+							_f.funcs.ProjectColsFromBoth(left, right),
+						)
+						_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -4394,8 +4638,8 @@ func (_f *Factory) ConstructSemiJoinApply(
 								right,
 								on,
 							),
-							_f.funcs.AggregateNonKeyCols(newLeft),
-							_f.funcs.GroupByKey(newLeft),
+							_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
+							_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
 						)
 						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
@@ -8833,7 +9077,7 @@ func (_f *Factory) ConstructPlus(
 	{
 		_constExpr := _f.mem.NormExpr(right).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsZero(right) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldPlusZero) {
 					_group = left
 					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
@@ -8850,7 +9094,7 @@ func (_f *Factory) ConstructPlus(
 	{
 		_constExpr := _f.mem.NormExpr(left).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsZero(left) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldZeroPlus) {
 					_group = right
 					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
@@ -8955,7 +9199,7 @@ func (_f *Factory) ConstructMinus(
 	{
 		_constExpr := _f.mem.NormExpr(right).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsZero(right) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
 					_group = left
 					_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
@@ -9020,7 +9264,7 @@ func (_f *Factory) ConstructMult(
 	{
 		_constExpr := _f.mem.NormExpr(right).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsOne(right) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMultOne) {
 					_group = left
 					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
@@ -9037,7 +9281,7 @@ func (_f *Factory) ConstructMult(
 	{
 		_constExpr := _f.mem.NormExpr(left).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsOne(left) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldOneMult) {
 					_group = right
 					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
@@ -9142,7 +9386,7 @@ func (_f *Factory) ConstructDiv(
 	{
 		_constExpr := _f.mem.NormExpr(right).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsOne(right) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_group = left
 					_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
@@ -9207,7 +9451,7 @@ func (_f *Factory) ConstructFloorDiv(
 	{
 		_constExpr := _f.mem.NormExpr(right).AsConst()
 		if _constExpr != nil {
-			if _f.funcs.IsOne(right) {
+			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_group = left
 					_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
