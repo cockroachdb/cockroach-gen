@@ -5143,6 +5143,12 @@ func (_f *Factory) ConstructAntiJoinApply(
 // the GroupBy operator will also be empty. If the grouping columns are empty,
 // then all input rows form a single group. GroupBy is used for queries with
 // aggregate functions, HAVING clauses and/or GROUP BY expressions.
+//
+// The Def private contains an ordering; this ordering is used to determine
+// intra-group ordering and is only useful if there is an order-dependent
+// aggregation (like ARRAY_AGG). Grouping columns are inconsequential in this
+// ordering; we currently set all grouping columns as optional in this ordering
+// (but note that this is not required by the operator).
 func (_f *Factory) ConstructGroupBy(
 	input memo.GroupID,
 	aggregations memo.GroupID,
@@ -5342,7 +5348,12 @@ func (_f *Factory) ConstructScalarGroupBy(
 // inconsequential - they can appear anywhere in the ordering and they won't
 // change the results (other than the result ordering).
 //
-// TODO(radu): actually set grouping columns as optional cols in Ordering.
+// Currently when we build DistinctOn, we set all grouping columns as optional
+// cols in Ordering (but this is not required by the operator).
+//
+// TODO(radu): in the future we may want an exploration transform to try out more
+// specific interesting orderings because execution is more efficient when we can
+// rely on an ordering on the grouping columns (or a subset of them).
 //
 // DistinctOn uses an Aggregations child and the GroupByDef private so that it's
 // polymorphic with GroupBy and can be used in the same rules (when appropriate).
