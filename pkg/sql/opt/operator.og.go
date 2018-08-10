@@ -118,11 +118,15 @@ const (
 	// GroupByOp computes aggregate functions over groups of input rows. Input rows
 	// that are equal on the grouping columns are grouped together. The set of
 	// computed aggregate functions is described by the Aggregations field (which is
-	// always an Aggregations operator). The arguments of the aggregate functions are
-	// columns from the input. If the set of input rows is empty, then the output of
-	// the GroupBy operator will also be empty. If the grouping columns are empty,
-	// then all input rows form a single group. GroupBy is used for queries with
-	// aggregate functions, HAVING clauses and/or GROUP BY expressions.
+	// always an Aggregations operator).
+	//
+	// The arguments of the aggregate functions are columns from the input
+	// (i.e. Variables), possibly wrapped in aggregate modifiers like AggDistinct.
+	//
+	// If the set of input rows is empty, then the output of the GroupBy operator
+	// will also be empty. If the grouping columns are empty, then all input rows
+	// form a single group. GroupBy is used for queries with aggregate functions,
+	// HAVING clauses and/or GROUP BY expressions.
 	//
 	// The Def private contains an ordering; this ordering is used to determine
 	// intra-group ordering and is only useful if there is an order-dependent
@@ -409,8 +413,13 @@ const (
 
 	// AggregationsOp is a set of aggregate expressions that will become output columns
 	// for a containing GroupBy operator. The expressions can only consist of
-	// aggregate functions and variable references. More complex expressions must be
-	// formulated using a Project operator as input to the GroupBy operator.
+	// aggregate functions, variable references, and modifiers like AggDistinct.
+	// Examples of valid expressions:
+	//   (Min (Variable 1))
+	//   (Count (AggDistinct (Variable 1)))
+	//
+	// More complex arguments must be formulated using a Project operator as input to
+	// the GroupBy operator.
 	//
 	// The private Cols field contains the list of column indexes returned by the
 	// expression, as an opt.ColList. It is legal for Cols to be empty.
@@ -649,13 +658,18 @@ const (
 	// FirstAggs in a DistinctOn.
 	FirstAggOp
 
+	// AggDistinctOp is used as a modifier that wraps the input of an aggregate
+	// function. It causes the respective aggregation to only process each distinct
+	// value once.
+	AggDistinctOp
+
 	// NumOperators tracks the total count of operators.
 	NumOperators
 )
 
-const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggfirst-agg"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggfirst-aggagg-distinct"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 661, 666, 672, 676, 681, 685, 688, 697, 700, 703, 709, 716, 723, 732, 742, 756, 771, 782, 798, 802, 806, 810, 815, 823, 831, 844, 860, 869, 872, 880, 887, 897, 902, 912, 915, 918, 925, 928, 936, 944, 951, 958, 966, 975, 984, 1002, 1011}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 661, 666, 672, 676, 681, 685, 688, 697, 700, 703, 709, 716, 723, 732, 742, 756, 771, 782, 798, 802, 806, 810, 815, 823, 831, 844, 860, 869, 872, 880, 887, 897, 902, 912, 915, 918, 925, 928, 936, 944, 951, 958, 966, 975, 984, 1002, 1011, 1023}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -822,6 +836,7 @@ var ScalarOperators = [...]Operator{
 	ConstAggOp,
 	ConstNotNullAggOp,
 	FirstAggOp,
+	AggDistinctOp,
 }
 
 var ConstValueOperators = [...]Operator{

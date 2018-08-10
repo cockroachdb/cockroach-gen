@@ -137,6 +137,7 @@ var opLayoutTable = [...]opLayout{
 	opt.ConstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ConstNotNullAggOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.FirstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.AggDistinctOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
 
 var isEnforcerLookup = [...]bool{
@@ -267,6 +268,7 @@ var isEnforcerLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isRelationalLookup = [...]bool{
@@ -397,6 +399,7 @@ var isRelationalLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isJoinLookup = [...]bool{
@@ -527,6 +530,7 @@ var isJoinLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isJoinNonApplyLookup = [...]bool{
@@ -657,6 +661,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isJoinApplyLookup = [...]bool{
@@ -787,6 +792,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isScalarLookup = [...]bool{
@@ -917,6 +923,7 @@ var isScalarLookup = [...]bool{
 	opt.ConstAggOp:            true,
 	opt.ConstNotNullAggOp:     true,
 	opt.FirstAggOp:            true,
+	opt.AggDistinctOp:         true,
 }
 
 var isConstValueLookup = [...]bool{
@@ -1047,6 +1054,7 @@ var isConstValueLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isBooleanLookup = [...]bool{
@@ -1177,6 +1185,7 @@ var isBooleanLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isComparisonLookup = [...]bool{
@@ -1307,6 +1316,7 @@ var isComparisonLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isBinaryLookup = [...]bool{
@@ -1437,6 +1447,7 @@ var isBinaryLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isUnaryLookup = [...]bool{
@@ -1567,6 +1578,7 @@ var isUnaryLookup = [...]bool{
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
 	opt.FirstAggOp:            false,
+	opt.AggDistinctOp:         false,
 }
 
 var isAggregateLookup = [...]bool{
@@ -1697,6 +1709,7 @@ var isAggregateLookup = [...]bool{
 	opt.ConstAggOp:            true,
 	opt.ConstNotNullAggOp:     true,
 	opt.FirstAggOp:            true,
+	opt.AggDistinctOp:         false,
 }
 
 func (ev ExprView) IsEnforcer() bool {
@@ -2402,11 +2415,15 @@ func (e *Expr) AsAntiJoinApply() *AntiJoinApplyExpr {
 // GroupByExpr computes aggregate functions over groups of input rows. Input rows
 // that are equal on the grouping columns are grouped together. The set of
 // computed aggregate functions is described by the Aggregations field (which is
-// always an Aggregations operator). The arguments of the aggregate functions are
-// columns from the input. If the set of input rows is empty, then the output of
-// the GroupBy operator will also be empty. If the grouping columns are empty,
-// then all input rows form a single group. GroupBy is used for queries with
-// aggregate functions, HAVING clauses and/or GROUP BY expressions.
+// always an Aggregations operator).
+//
+// The arguments of the aggregate functions are columns from the input
+// (i.e. Variables), possibly wrapped in aggregate modifiers like AggDistinct.
+//
+// If the set of input rows is empty, then the output of the GroupBy operator
+// will also be empty. If the grouping columns are empty, then all input rows
+// form a single group. GroupBy is used for queries with aggregate functions,
+// HAVING clauses and/or GROUP BY expressions.
 //
 // The Def private contains an ordering; this ordering is used to determine
 // intra-group ordering and is only useful if there is an order-dependent
@@ -3291,8 +3308,13 @@ func (e *Expr) AsProjections() *ProjectionsExpr {
 
 // AggregationsExpr is a set of aggregate expressions that will become output columns
 // for a containing GroupBy operator. The expressions can only consist of
-// aggregate functions and variable references. More complex expressions must be
-// formulated using a Project operator as input to the GroupBy operator.
+// aggregate functions, variable references, and modifiers like AggDistinct.
+// Examples of valid expressions:
+//   (Min (Variable 1))
+//   (Count (AggDistinct (Variable 1)))
+//
+// More complex arguments must be formulated using a Project operator as input to
+// the GroupBy operator.
 //
 // The private Cols field contains the list of column indexes returned by the
 // expression, as an opt.ColList. It is legal for Cols to be empty.
@@ -5205,6 +5227,30 @@ func (e *Expr) AsFirstAgg() *FirstAggExpr {
 	return (*FirstAggExpr)(e)
 }
 
+// AggDistinctExpr is used as a modifier that wraps the input of an aggregate
+// function. It causes the respective aggregation to only process each distinct
+// value once.
+type AggDistinctExpr Expr
+
+func MakeAggDistinctExpr(input GroupID) AggDistinctExpr {
+	return AggDistinctExpr{op: opt.AggDistinctOp, state: exprState{uint32(input)}}
+}
+
+func (e *AggDistinctExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *AggDistinctExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsAggDistinct() *AggDistinctExpr {
+	if e.op != opt.AggDistinctOp {
+		return nil
+	}
+	return (*AggDistinctExpr)(e)
+}
+
 // InternScanOpDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
@@ -5980,6 +6026,11 @@ func init() {
 	// FirstAggOp
 	makeExprLookup[opt.FirstAggOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeFirstAggExpr(GroupID(operands[0])))
+	}
+
+	// AggDistinctOp
+	makeExprLookup[opt.AggDistinctOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeAggDistinctExpr(GroupID(operands[0])))
 	}
 
 }

@@ -5138,11 +5138,15 @@ func (_f *Factory) ConstructAntiJoinApply(
 // GroupBy computes aggregate functions over groups of input rows. Input rows
 // that are equal on the grouping columns are grouped together. The set of
 // computed aggregate functions is described by the Aggregations field (which is
-// always an Aggregations operator). The arguments of the aggregate functions are
-// columns from the input. If the set of input rows is empty, then the output of
-// the GroupBy operator will also be empty. If the grouping columns are empty,
-// then all input rows form a single group. GroupBy is used for queries with
-// aggregate functions, HAVING clauses and/or GROUP BY expressions.
+// always an Aggregations operator).
+//
+// The arguments of the aggregate functions are columns from the input
+// (i.e. Variables), possibly wrapped in aggregate modifiers like AggDistinct.
+//
+// If the set of input rows is empty, then the output of the GroupBy operator
+// will also be empty. If the grouping columns are empty, then all input rows
+// form a single group. GroupBy is used for queries with aggregate functions,
+// HAVING clauses and/or GROUP BY expressions.
 //
 // The Def private contains an ordering; this ordering is used to determine
 // intra-group ordering and is only useful if there is an order-dependent
@@ -5212,6 +5216,24 @@ func (_f *Factory) ConstructGroupBy(
 				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.ReduceGroupingCols, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [EliminateAggDistinctForKeys]
+	{
+		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, def, input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
+				_group = _f.ConstructGroupBy(
+					input,
+					_f.funcs.RemoveAggDistinctForKeys(aggregations, def, input),
+					def,
+				)
+				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinctForKeys, _group, 0, 0)
 				}
 				return _group
 			}
@@ -5299,6 +5321,24 @@ func (_f *Factory) ConstructScalarGroupBy(
 					}
 					return _group
 				}
+			}
+		}
+	}
+
+	// [EliminateAggDistinctForKeys]
+	{
+		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, def, input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
+				_group = _f.ConstructScalarGroupBy(
+					input,
+					_f.funcs.RemoveAggDistinctForKeys(aggregations, def, input),
+					def,
+				)
+				_f.mem.AddAltFingerprint(_scalarGroupByExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinctForKeys, _group, 0, 0)
+				}
+				return _group
 			}
 		}
 	}
@@ -6150,8 +6190,13 @@ func (_f *Factory) ConstructProjections(
 // ConstructAggregations constructs an expression for the Aggregations operator.
 // Aggregations is a set of aggregate expressions that will become output columns
 // for a containing GroupBy operator. The expressions can only consist of
-// aggregate functions and variable references. More complex expressions must be
-// formulated using a Project operator as input to the GroupBy operator.
+// aggregate functions, variable references, and modifiers like AggDistinct.
+// Examples of valid expressions:
+//   (Min (Variable 1))
+//   (Count (AggDistinct (Variable 1)))
+//
+// More complex arguments must be formulated using a Project operator as input to
+// the GroupBy operator.
 //
 // The private Cols field contains the list of column indexes returned by the
 // expression, as an opt.ColList. It is legal for Cols to be empty.
@@ -10320,6 +10365,24 @@ func (_f *Factory) ConstructBoolAnd(
 		return _group
 	}
 
+	// [EliminateAggDistinct]
+	{
+		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
+		if _aggDistinctExpr != nil {
+			in := _aggDistinctExpr.Input()
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
+				_group = _f.ConstructBoolAnd(
+					in,
+				)
+				_f.mem.AddAltFingerprint(_boolAndExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_boolAndExpr))
 }
 
@@ -10331,6 +10394,24 @@ func (_f *Factory) ConstructBoolOr(
 	_group := _f.mem.GroupByFingerprint(_boolOrExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [EliminateAggDistinct]
+	{
+		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
+		if _aggDistinctExpr != nil {
+			in := _aggDistinctExpr.Input()
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
+				_group = _f.ConstructBoolOr(
+					in,
+				)
+				_f.mem.AddAltFingerprint(_boolOrExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	return _f.onConstruct(memo.Expr(_boolOrExpr))
@@ -10383,6 +10464,24 @@ func (_f *Factory) ConstructMax(
 		return _group
 	}
 
+	// [EliminateAggDistinct]
+	{
+		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
+		if _aggDistinctExpr != nil {
+			in := _aggDistinctExpr.Input()
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
+				_group = _f.ConstructMax(
+					in,
+				)
+				_f.mem.AddAltFingerprint(_maxExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_maxExpr))
 }
 
@@ -10394,6 +10493,24 @@ func (_f *Factory) ConstructMin(
 	_group := _f.mem.GroupByFingerprint(_minExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [EliminateAggDistinct]
+	{
+		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
+		if _aggDistinctExpr != nil {
+			in := _aggDistinctExpr.Input()
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
+				_group = _f.ConstructMin(
+					in,
+				)
+				_f.mem.AddAltFingerprint(_minExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+				}
+				return _group
+			}
+		}
 	}
 
 	return _f.onConstruct(memo.Expr(_minExpr))
@@ -10558,6 +10675,22 @@ func (_f *Factory) ConstructFirstAgg(
 	}
 
 	return _f.onConstruct(memo.Expr(_firstAggExpr))
+}
+
+// ConstructAggDistinct constructs an expression for the AggDistinct operator.
+// AggDistinct is used as a modifier that wraps the input of an aggregate
+// function. It causes the respective aggregation to only process each distinct
+// value once.
+func (_f *Factory) ConstructAggDistinct(
+	input memo.GroupID,
+) memo.GroupID {
+	_aggDistinctExpr := memo.MakeAggDistinctExpr(input)
+	_group := _f.mem.GroupByFingerprint(_aggDistinctExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_aggDistinctExpr))
 }
 
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
@@ -11188,6 +11321,11 @@ func init() {
 	// FirstAggOp
 	dynConstructLookup[opt.FirstAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructFirstAgg(memo.GroupID(operands[0]))
+	}
+
+	// AggDistinctOp
+	dynConstructLookup[opt.AggDistinctOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructAggDistinct(memo.GroupID(operands[0]))
 	}
 
 }

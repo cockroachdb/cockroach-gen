@@ -8,6 +8,7 @@ const (
 	// ------------------------------------------------------------
 	// Normalize Rule Names
 	// ------------------------------------------------------------
+	EliminateAggDistinct
 	EliminateEmptyAnd
 	EliminateEmptyOr
 	EliminateSingletonAndOr
@@ -59,6 +60,7 @@ const (
 	EliminateDistinct
 	EliminateGroupByProject
 	ReduceGroupingCols
+	EliminateAggDistinctForKeys
 	PushSelectIntoInlinableProject
 	InlineProjectInProject
 	EnsureJoinFiltersAnd
