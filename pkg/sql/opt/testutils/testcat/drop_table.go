@@ -15,8 +15,6 @@
 package testcat
 
 import (
-	"fmt"
-
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
@@ -30,12 +28,11 @@ func (tc *Catalog) DropTable(stmt *tree.DropTable) {
 
 		// Update the table name to include catalog and schema if not provided.
 		tc.qualifyTableName(tn)
-		fq := tn.FQString()
-		if _, ok := tc.tables[fq]; !ok {
-			panic(fmt.Sprintf("cannot find table %q", tree.ErrString(tn)))
-		}
+
+		// Ensure that table with that name exists.
+		tc.Table(tn)
 
 		// Remove the table from the catalog.
-		delete(tc.tables, fq)
+		delete(tc.dataSources, tn.FQString())
 	}
 }
