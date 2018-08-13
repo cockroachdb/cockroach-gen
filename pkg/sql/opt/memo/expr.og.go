@@ -90,6 +90,7 @@ var opLayoutTable = [...]opLayout{
 	opt.JsonExistsOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonAllExistsOp:       makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.JsonSomeExistsOp:      makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.AnyScalarOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.BitandOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.BitorOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.BitxorOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
@@ -221,6 +222,7 @@ var isEnforcerLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -352,6 +354,7 @@ var isRelationalLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -483,6 +486,7 @@ var isJoinLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -614,6 +618,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -745,6 +750,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -876,6 +882,7 @@ var isScalarLookup = [...]bool{
 	opt.JsonExistsOp:          true,
 	opt.JsonAllExistsOp:       true,
 	opt.JsonSomeExistsOp:      true,
+	opt.AnyScalarOp:           true,
 	opt.BitandOp:              true,
 	opt.BitorOp:               true,
 	opt.BitxorOp:              true,
@@ -1007,6 +1014,7 @@ var isConstValueLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -1138,6 +1146,7 @@ var isBooleanLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -1269,6 +1278,7 @@ var isComparisonLookup = [...]bool{
 	opt.JsonExistsOp:          true,
 	opt.JsonAllExistsOp:       true,
 	opt.JsonSomeExistsOp:      true,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -1400,6 +1410,7 @@ var isBinaryLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              true,
 	opt.BitorOp:               true,
 	opt.BitxorOp:              true,
@@ -1531,6 +1542,7 @@ var isUnaryLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -1662,6 +1674,7 @@ var isAggregateLookup = [...]bool{
 	opt.JsonExistsOp:          false,
 	opt.JsonAllExistsOp:       false,
 	opt.JsonSomeExistsOp:      false,
+	opt.AnyScalarOp:           false,
 	opt.BitandOp:              false,
 	opt.BitorOp:               false,
 	opt.BitxorOp:              false,
@@ -4096,6 +4109,35 @@ func (e *Expr) AsJsonSomeExists() *JsonSomeExistsExpr {
 	return (*JsonSomeExistsExpr)(e)
 }
 
+type AnyScalarExpr Expr
+
+func MakeAnyScalarExpr(left GroupID, right GroupID, cmp PrivateID) AnyScalarExpr {
+	return AnyScalarExpr{op: opt.AnyScalarOp, state: exprState{uint32(left), uint32(right), uint32(cmp)}}
+}
+
+func (e *AnyScalarExpr) Left() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *AnyScalarExpr) Right() GroupID {
+	return GroupID(e.state[1])
+}
+
+func (e *AnyScalarExpr) Cmp() PrivateID {
+	return PrivateID(e.state[2])
+}
+
+func (e *AnyScalarExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsAnyScalar() *AnyScalarExpr {
+	if e.op != opt.AnyScalarOp {
+		return nil
+	}
+	return (*AnyScalarExpr)(e)
+}
+
 type BitandExpr Expr
 
 func MakeBitandExpr(left GroupID, right GroupID) BitandExpr {
@@ -5791,6 +5833,11 @@ func init() {
 	// JsonSomeExistsOp
 	makeExprLookup[opt.JsonSomeExistsOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeJsonSomeExistsExpr(GroupID(operands[0]), GroupID(operands[1])))
+	}
+
+	// AnyScalarOp
+	makeExprLookup[opt.AnyScalarOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeAnyScalarExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
 	}
 
 	// BitandOp

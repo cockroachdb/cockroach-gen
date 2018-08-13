@@ -8854,6 +8854,21 @@ func (_f *Factory) ConstructJsonSomeExists(
 	return _f.onConstruct(memo.Expr(_jsonSomeExistsExpr))
 }
 
+// ConstructAnyScalar constructs an expression for the AnyScalar operator.
+func (_f *Factory) ConstructAnyScalar(
+	left memo.GroupID,
+	right memo.GroupID,
+	cmp memo.PrivateID,
+) memo.GroupID {
+	_anyScalarExpr := memo.MakeAnyScalarExpr(left, right, cmp)
+	_group := _f.mem.GroupByFingerprint(_anyScalarExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_anyScalarExpr))
+}
+
 // ConstructBitand constructs an expression for the Bitand operator.
 func (_f *Factory) ConstructBitand(
 	left memo.GroupID,
@@ -11086,6 +11101,11 @@ func init() {
 	// JsonSomeExistsOp
 	dynConstructLookup[opt.JsonSomeExistsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructJsonSomeExists(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
+	}
+
+	// AnyScalarOp
+	dynConstructLookup[opt.AnyScalarOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructAnyScalar(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
 	}
 
 	// BitandOp
