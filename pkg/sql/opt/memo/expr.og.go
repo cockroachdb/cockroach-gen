@@ -1825,6 +1825,10 @@ func (e *Expr) IsAggregate() bool {
 // the table's indexes according to its ordering. The private Def field is an
 // *opt.ScanOpDef that identifies the table and index to scan, as well as the
 // subset of columns to project from it.
+//
+// The scan can be constrained and/or have an internal row limit. A scan can be
+// executed either as a forward or as a reverse scan (except when it has a limit,
+// in which case the direction is fixed).
 type ScanExpr Expr
 
 func MakeScanExpr(def PrivateID) ScanExpr {

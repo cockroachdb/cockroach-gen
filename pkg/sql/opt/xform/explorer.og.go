@@ -994,7 +994,7 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 					if _e.funcs.CanLimitScan(def, limit, ordering) {
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoScan) {
 							_expr := memo.MakeScanExpr(
-								_e.funcs.LimitScanDef(def, limit),
+								_e.funcs.LimitScanDef(def, limit, ordering),
 							)
 							_before := _e.mem.ExprCount(_root.Group)
 							_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
