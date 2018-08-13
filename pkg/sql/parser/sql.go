@@ -16718,13 +16718,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:6188
 		{
-			sqlVAL.union.val = coltypes.TimeTZ
+			return unimplementedWithIssue(sqllex, 26097)
 		}
 	case 1102:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 		//line sql-gen.y:6192
 		{
-			sqlVAL.union.val = coltypes.TimeTZ
+			return unimplementedWithIssue(sqllex, 26097)
 		}
 	case 1103:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -17810,7 +17810,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:7008
 		{
-			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
+			return unimplementedWithIssue(sqllex, 26097)
 		}
 	case 1285:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -17936,7 +17936,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 		//line sql-gen.y:7088
 		{
-			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
+			return unimplementedWithIssue(sqllex, 26097)
 		}
 	case 1307:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
