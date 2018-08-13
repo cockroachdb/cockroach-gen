@@ -84,8 +84,8 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 			_scanExpr := _e.mem.Expr(_eid).AsScan()
 			if _scanExpr != nil {
 				def := _scanExpr.Def()
-				if _e.funcs.CanConstrainScan(def) {
-					filter := _rootExpr.Filter()
+				filter := _rootExpr.Filter()
+				if _e.funcs.CanConstrainScan(def, filter) {
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainScan) {
 						_exprs := _e.funcs.ConstrainScan(filter, def)
 						_before := _e.mem.ExprCount(_root.Group)
@@ -223,9 +223,9 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 					_scanExpr := _e.mem.Expr(_eid).AsScan()
 					if _scanExpr != nil {
 						scanDef := _scanExpr.Def()
-						if _e.funcs.CanConstrainScan(scanDef) {
-							indexJoinDef := _indexJoinExpr.Def()
-							filter := _rootExpr.Filter()
+						indexJoinDef := _indexJoinExpr.Def()
+						filter := _rootExpr.Filter()
+						if _e.funcs.CanConstrainScan(scanDef, filter) {
 							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainIndexJoinScan) {
 								_exprs := _e.funcs.ConstrainIndexJoinScan(filter, scanDef, indexJoinDef)
 								_before := _e.mem.ExprCount(_root.Group)
