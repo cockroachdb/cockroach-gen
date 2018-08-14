@@ -137,6 +137,7 @@ var opLayoutTable = [...]opLayout{
 	opt.JsonbAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ConstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ConstNotNullAggOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.AnyNotNullAggOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.FirstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.AggDistinctOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
 }
@@ -269,6 +270,7 @@ var isEnforcerLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -401,6 +403,7 @@ var isRelationalLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -533,6 +536,7 @@ var isJoinLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -665,6 +669,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -797,6 +802,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -929,6 +935,7 @@ var isScalarLookup = [...]bool{
 	opt.JsonbAggOp:            true,
 	opt.ConstAggOp:            true,
 	opt.ConstNotNullAggOp:     true,
+	opt.AnyNotNullAggOp:       true,
 	opt.FirstAggOp:            true,
 	opt.AggDistinctOp:         true,
 }
@@ -1061,6 +1068,7 @@ var isConstValueLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -1193,6 +1201,7 @@ var isBooleanLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -1325,6 +1334,7 @@ var isComparisonLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -1457,6 +1467,7 @@ var isBinaryLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -1589,6 +1600,7 @@ var isUnaryLookup = [...]bool{
 	opt.JsonbAggOp:            false,
 	opt.ConstAggOp:            false,
 	opt.ConstNotNullAggOp:     false,
+	opt.AnyNotNullAggOp:       false,
 	opt.FirstAggOp:            false,
 	opt.AggDistinctOp:         false,
 }
@@ -1721,6 +1733,7 @@ var isAggregateLookup = [...]bool{
 	opt.JsonbAggOp:            true,
 	opt.ConstAggOp:            true,
 	opt.ConstNotNullAggOp:     true,
+	opt.AnyNotNullAggOp:       true,
 	opt.FirstAggOp:            true,
 	opt.AggDistinctOp:         false,
 }
@@ -5248,6 +5261,32 @@ func (e *Expr) AsConstNotNullAgg() *ConstNotNullAggExpr {
 	return (*ConstNotNullAggExpr)(e)
 }
 
+// AnyNotNullAggExpr returns any non-NULL value it receives, with no other guarantees.
+// If it does not receive any values, it returns NULL.
+//
+// AnyNotNullAgg is not part of SQL, but it's used internally to rewrite
+// correlated subqueries into an efficient and convenient form.
+type AnyNotNullAggExpr Expr
+
+func MakeAnyNotNullAggExpr(input GroupID) AnyNotNullAggExpr {
+	return AnyNotNullAggExpr{op: opt.AnyNotNullAggOp, state: exprState{uint32(input)}}
+}
+
+func (e *AnyNotNullAggExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *AnyNotNullAggExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsAnyNotNullAgg() *AnyNotNullAggExpr {
+	if e.op != opt.AnyNotNullAggOp {
+		return nil
+	}
+	return (*AnyNotNullAggExpr)(e)
+}
+
 // FirstAggExpr is used only by DistinctOn; it returns the value on the first row
 // according to an ordering; if the ordering is unspecified (or partially
 // specified), it is an arbitrary ordering but it must be the same across all
@@ -6072,6 +6111,11 @@ func init() {
 	// ConstNotNullAggOp
 	makeExprLookup[opt.ConstNotNullAggOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeConstNotNullAggExpr(GroupID(operands[0])))
+	}
+
+	// AnyNotNullAggOp
+	makeExprLookup[opt.AnyNotNullAggOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeAnyNotNullAggExpr(GroupID(operands[0])))
 	}
 
 	// FirstAggOp

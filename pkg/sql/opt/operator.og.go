@@ -658,6 +658,13 @@ const (
 	// correlated subqueries into an efficient and convenient form.
 	ConstNotNullAggOp
 
+	// AnyNotNullAggOp returns any non-NULL value it receives, with no other guarantees.
+	// If it does not receive any values, it returns NULL.
+	//
+	// AnyNotNullAgg is not part of SQL, but it's used internally to rewrite
+	// correlated subqueries into an efficient and convenient form.
+	AnyNotNullAggOp
+
 	// FirstAggOp is used only by DistinctOn; it returns the value on the first row
 	// according to an ordering; if the ordering is unspecified (or partially
 	// specified), it is an arbitrary ordering but it must be the same across all
@@ -673,9 +680,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsany-scalarbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggfirst-aggagg-distinct"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsany-scalarbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggany-not-null-aggfirst-aggagg-distinct"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 665, 671, 676, 682, 686, 691, 695, 698, 707, 710, 713, 719, 726, 733, 742, 752, 766, 781, 792, 808, 812, 816, 820, 825, 833, 841, 854, 870, 879, 882, 890, 897, 907, 912, 922, 925, 928, 935, 938, 946, 954, 961, 968, 976, 985, 994, 1012, 1021, 1033}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 665, 671, 676, 682, 686, 691, 695, 698, 707, 710, 713, 719, 726, 733, 742, 752, 766, 781, 792, 808, 812, 816, 820, 825, 833, 841, 854, 870, 879, 882, 890, 897, 907, 912, 922, 925, 928, 935, 938, 946, 954, 961, 968, 976, 985, 994, 1012, 1028, 1037, 1049}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -842,6 +849,7 @@ var ScalarOperators = [...]Operator{
 	JsonbAggOp,
 	ConstAggOp,
 	ConstNotNullAggOp,
+	AnyNotNullAggOp,
 	FirstAggOp,
 	AggDistinctOp,
 }
@@ -934,5 +942,6 @@ var AggregateOperators = [...]Operator{
 	JsonbAggOp,
 	ConstAggOp,
 	ConstNotNullAggOp,
+	AnyNotNullAggOp,
 	FirstAggOp,
 }

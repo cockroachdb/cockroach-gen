@@ -1476,29 +1476,29 @@ func (_f *Factory) ConstructInnerJoin(
 				input := _scalarGroupByExpr.Input()
 				aggregations := _scalarGroupByExpr.Aggregations()
 				def := _scalarGroupByExpr.Def()
-				if _f.funcs.CanAggsIgnoreNulls(aggregations) {
-					if _f.funcs.IsUnorderedGroupBy(def) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
-							newLeft := _f.funcs.EnsureKey(left)
-							newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
-							_group = _f.ConstructSelect(
-								_f.ConstructGroupBy(
-									_f.ConstructLeftJoinApply(
-										newLeft,
-										newRight,
-										_f.ConstructTrue(),
-									),
-									_f.funcs.AppendAggCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-									_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
+				if _f.funcs.AggsCanBeDecorrelated(aggregations) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+						leftWithKey := _f.funcs.EnsureKey(left)
+						canaryCol := _f.funcs.EnsureCanaryCol(input, aggregations)
+						rightWithCanary := _f.funcs.EnsureCanary(input, canaryCol)
+						translatedAggs := _f.funcs.EnsureAggsCanIgnoreNulls(rightWithCanary, aggregations)
+						_group = _f.ConstructSelect(
+							_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
+								_f.ConstructLeftJoinApply(
+									leftWithKey,
+									rightWithCanary,
+									_f.ConstructTrue(),
 								),
-								on,
-							)
-							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
-							}
-							return _group
+								_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
+								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupByOrdering(def)),
+							), translatedAggs, rightWithCanary, aggregations, canaryCol),
+							on,
+						)
+						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
 						}
+						return _group
 					}
 				}
 			}
@@ -3405,29 +3405,29 @@ func (_f *Factory) ConstructInnerJoinApply(
 				input := _scalarGroupByExpr.Input()
 				aggregations := _scalarGroupByExpr.Aggregations()
 				def := _scalarGroupByExpr.Def()
-				if _f.funcs.CanAggsIgnoreNulls(aggregations) {
-					if _f.funcs.IsUnorderedGroupBy(def) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
-							newLeft := _f.funcs.EnsureKey(left)
-							newRight := _f.funcs.EnsureNotNullIfCountRows(input, aggregations)
-							_group = _f.ConstructSelect(
-								_f.ConstructGroupBy(
-									_f.ConstructLeftJoinApply(
-										newLeft,
-										newRight,
-										_f.ConstructTrue(),
-									),
-									_f.funcs.AppendAggCols(_f.funcs.EnsureAggsIgnoreNulls(newRight, aggregations), opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-									_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
+				if _f.funcs.AggsCanBeDecorrelated(aggregations) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
+						leftWithKey := _f.funcs.EnsureKey(left)
+						canaryCol := _f.funcs.EnsureCanaryCol(input, aggregations)
+						rightWithCanary := _f.funcs.EnsureCanary(input, canaryCol)
+						translatedAggs := _f.funcs.EnsureAggsCanIgnoreNulls(rightWithCanary, aggregations)
+						_group = _f.ConstructSelect(
+							_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
+								_f.ConstructLeftJoinApply(
+									leftWithKey,
+									rightWithCanary,
+									_f.ConstructTrue(),
 								),
-								on,
-							)
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
-							}
-							return _group
+								_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
+								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupByOrdering(def)),
+							), translatedAggs, rightWithCanary, aggregations, canaryCol),
+							on,
+						)
+						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
 						}
+						return _group
 					}
 				}
 			}
@@ -10697,6 +10697,24 @@ func (_f *Factory) ConstructConstNotNullAgg(
 	return _f.onConstruct(memo.Expr(_constNotNullAggExpr))
 }
 
+// ConstructAnyNotNullAgg constructs an expression for the AnyNotNullAgg operator.
+// AnyNotNullAgg returns any non-NULL value it receives, with no other guarantees.
+// If it does not receive any values, it returns NULL.
+//
+// AnyNotNullAgg is not part of SQL, but it's used internally to rewrite
+// correlated subqueries into an efficient and convenient form.
+func (_f *Factory) ConstructAnyNotNullAgg(
+	input memo.GroupID,
+) memo.GroupID {
+	_anyNotNullAggExpr := memo.MakeAnyNotNullAggExpr(input)
+	_group := _f.mem.GroupByFingerprint(_anyNotNullAggExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_anyNotNullAggExpr))
+}
+
 // ConstructFirstAgg constructs an expression for the FirstAgg operator.
 // FirstAgg is used only by DistinctOn; it returns the value on the first row
 // according to an ordering; if the ordering is unspecified (or partially
@@ -11358,6 +11376,11 @@ func init() {
 	// ConstNotNullAggOp
 	dynConstructLookup[opt.ConstNotNullAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructConstNotNullAgg(memo.GroupID(operands[0]))
+	}
+
+	// AnyNotNullAggOp
+	dynConstructLookup[opt.AnyNotNullAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructAnyNotNullAgg(memo.GroupID(operands[0]))
 	}
 
 	// FirstAggOp
