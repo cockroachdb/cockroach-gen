@@ -134,6 +134,7 @@ var Keywords = map[string]struct {
 	"greatest":                  {GREATEST, "C"},
 	"group":                     {GROUP, "R"},
 	"grouping":                  {GROUPING, "C"},
+	"groups":                    {GROUPS, "U"},
 	"having":                    {HAVING, "R"},
 	"high":                      {HIGH, "U"},
 	"histogram":                 {HISTOGRAM, "U"},
