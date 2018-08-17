@@ -16599,7 +16599,7 @@ sqldefault:
 		{
 
 			if sqlDollar[1].str == "char" {
-				sqlVAL.union.val = coltypes.Char
+				sqlVAL.union.val = coltypes.QChar
 			} else {
 				var err error
 				sqlVAL.union.val, err = coltypes.TypeForNonKeywordTypeName(sqlDollar[1].str)
