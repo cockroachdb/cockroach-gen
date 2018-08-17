@@ -1016,9 +1016,9 @@ func (_f *Factory) ConstructProject(
 			input := _selectExpr.Input()
 			filter := _selectExpr.Filter()
 			if _f.funcs.CanPruneCols(input, _f.funcs.NeededCols2(projections, filter)) {
-				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneSelectCols) {
-						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_projectExpr.Fingerprint())
 						_group = _f.ConstructProject(
 							_f.ConstructSelect(
 								_f.funcs.PruneCols(input, _f.funcs.NeededCols2(projections, filter)),
@@ -1026,7 +1026,7 @@ func (_f *Factory) ConstructProject(
 							),
 							projections,
 						)
-						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 						}
@@ -1048,9 +1048,9 @@ func (_f *Factory) ConstructProject(
 			limit := _limitExpr.Limit()
 			ordering := _limitExpr.Ordering()
 			if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsLimit(projections, ordering)) {
-				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneLimitCols) {
-						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_projectExpr.Fingerprint())
 						newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering))
 						_group = _f.ConstructProject(
 							_f.ConstructLimit(
@@ -1060,7 +1060,7 @@ func (_f *Factory) ConstructProject(
 							),
 							projections,
 						)
-						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 						}
@@ -1082,9 +1082,9 @@ func (_f *Factory) ConstructProject(
 			offset := _offsetExpr.Offset()
 			ordering := _offsetExpr.Ordering()
 			if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsLimit(projections, ordering)) {
-				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneOffsetCols) {
-						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_projectExpr.Fingerprint())
 						newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering))
 						_group = _f.ConstructProject(
 							_f.ConstructOffset(
@@ -1094,7 +1094,7 @@ func (_f *Factory) ConstructProject(
 							),
 							projections,
 						)
-						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 						}
@@ -1146,9 +1146,9 @@ func (_f *Factory) ConstructProject(
 			right := _expr.ChildGroup(_f.mem, 1)
 			on := _expr.ChildGroup(_f.mem, 2)
 			if _f.funcs.CanPruneCols(right, _f.funcs.NeededCols2(projections, on)) {
-				if !_f.ruleCycles[_projectExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
-						_f.ruleCycles[_projectExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_projectExpr.Fingerprint())
 						_group = _f.ConstructProject(
 							_f.DynamicConstruct(
 								_f.mem.NormExpr(input).Operator(),
@@ -1160,7 +1160,7 @@ func (_f *Factory) ConstructProject(
 							),
 							projections,
 						)
-						delete(_f.ruleCycles, _projectExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 						}
@@ -1313,15 +1313,15 @@ func (_f *Factory) ConstructInnerJoin(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_innerJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_innerJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_innerJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_innerJoinExpr.Fingerprint())
 						_group = _f.ConstructInnerJoin(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _innerJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						}
@@ -1343,9 +1343,9 @@ func (_f *Factory) ConstructInnerJoin(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_innerJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_innerJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_innerJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_innerJoinExpr.Fingerprint())
 						_group = _f.ConstructInnerJoin(
 							left,
 							_f.DynamicConstruct(
@@ -1358,7 +1358,7 @@ func (_f *Factory) ConstructInnerJoin(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _innerJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						}
@@ -1895,15 +1895,15 @@ func (_f *Factory) ConstructLeftJoin(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_leftJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_leftJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_leftJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_leftJoinExpr.Fingerprint())
 						_group = _f.ConstructLeftJoin(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _leftJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
 						}
@@ -1925,9 +1925,9 @@ func (_f *Factory) ConstructLeftJoin(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_leftJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_leftJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_leftJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_leftJoinExpr.Fingerprint())
 						_group = _f.ConstructLeftJoin(
 							left,
 							_f.DynamicConstruct(
@@ -1940,7 +1940,7 @@ func (_f *Factory) ConstructLeftJoin(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _leftJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
 						}
@@ -2540,15 +2540,15 @@ func (_f *Factory) ConstructSemiJoin(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_semiJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_semiJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_semiJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_semiJoinExpr.Fingerprint())
 						_group = _f.ConstructSemiJoin(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _semiJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 						}
@@ -2570,9 +2570,9 @@ func (_f *Factory) ConstructSemiJoin(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_semiJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_semiJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_semiJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_semiJoinExpr.Fingerprint())
 						_group = _f.ConstructSemiJoin(
 							left,
 							_f.DynamicConstruct(
@@ -2585,7 +2585,7 @@ func (_f *Factory) ConstructSemiJoin(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _semiJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 						}
@@ -2935,15 +2935,15 @@ func (_f *Factory) ConstructAntiJoin(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_antiJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_antiJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_antiJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_antiJoinExpr.Fingerprint())
 						_group = _f.ConstructAntiJoin(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _antiJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
 						}
@@ -2965,9 +2965,9 @@ func (_f *Factory) ConstructAntiJoin(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_antiJoinExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_antiJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_antiJoinExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_antiJoinExpr.Fingerprint())
 						_group = _f.ConstructAntiJoin(
 							left,
 							_f.DynamicConstruct(
@@ -2980,7 +2980,7 @@ func (_f *Factory) ConstructAntiJoin(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _antiJoinExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
 						}
@@ -3228,15 +3228,15 @@ func (_f *Factory) ConstructInnerJoinApply(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_innerJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_innerJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructInnerJoinApply(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _innerJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -3258,9 +3258,9 @@ func (_f *Factory) ConstructInnerJoinApply(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_innerJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_innerJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_innerJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructInnerJoinApply(
 							left,
 							_f.DynamicConstruct(
@@ -3273,7 +3273,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _innerJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -3799,15 +3799,15 @@ func (_f *Factory) ConstructLeftJoinApply(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructLeftJoinApply(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -3831,9 +3831,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 				filters := _selectExpr.Filter()
 				if !_f.funcs.IsBoundBy(filters, _f.funcs.OutputCols(selectInput)) {
 					projections := _projectExpr.Projections()
-					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+					if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
-							_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+							_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
 							_group = _f.ConstructProject(
 								_f.ConstructLeftJoinApply(
 									left,
@@ -3845,7 +3845,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 								),
 								_f.funcs.ProjectColsFromBoth(left, right),
 							)
-							delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+							_f.ruleCycles.pop()
 							if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
 								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 							}
@@ -3872,9 +3872,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 				innerOn := _expr.ChildGroup(_f.mem, 2)
 				if !_f.funcs.IsBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					projections := _projectExpr.Projections()
-					if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+					if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectInnerJoin) {
-							_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+							_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
 							_group = _f.ConstructProject(
 								_f.ConstructLeftJoinApply(
 									left,
@@ -3893,7 +3893,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 								),
 								_f.funcs.ProjectColsFromBoth(left, right),
 							)
-							delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+							_f.ruleCycles.pop()
 							if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
 								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 							}
@@ -3916,9 +3916,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_leftJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructLeftJoinApply(
 							left,
 							_f.DynamicConstruct(
@@ -3931,7 +3931,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _leftJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -4573,15 +4573,15 @@ func (_f *Factory) ConstructSemiJoinApply(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_semiJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_semiJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructSemiJoinApply(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _semiJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -4603,9 +4603,9 @@ func (_f *Factory) ConstructSemiJoinApply(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_semiJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_semiJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_semiJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructSemiJoinApply(
 							left,
 							_f.DynamicConstruct(
@@ -4618,7 +4618,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _semiJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -4928,15 +4928,15 @@ func (_f *Factory) ConstructAntiJoinApply(
 			if _selectExpr != nil {
 				input := _selectExpr.Input()
 				filter := _selectExpr.Filter()
-				if !_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_antiJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_antiJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructAntiJoinApply(
 							left,
 							input,
 							_f.funcs.ConcatFilters(on, filter),
 						)
-						delete(_f.ruleCycles, _antiJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 						}
@@ -4958,9 +4958,9 @@ func (_f *Factory) ConstructAntiJoinApply(
 				innerLeft := _expr.ChildGroup(_f.mem, 0)
 				innerRight := _expr.ChildGroup(_f.mem, 1)
 				innerOn := _expr.ChildGroup(_f.mem, 2)
-				if !_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] {
+				if !_f.ruleCycles.detectCycle(_antiJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles[_antiJoinApplyExpr.Fingerprint()] = true
+						_f.ruleCycles.push(_antiJoinApplyExpr.Fingerprint())
 						_group = _f.ConstructAntiJoinApply(
 							left,
 							_f.DynamicConstruct(
@@ -4973,7 +4973,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 							),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						delete(_f.ruleCycles, _antiJoinApplyExpr.Fingerprint())
+						_f.ruleCycles.pop()
 						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
 							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 						}
