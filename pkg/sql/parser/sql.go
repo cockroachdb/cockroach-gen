@@ -16501,7 +16501,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:5902
 		{
-			sqlVAL.union.val = coltypes.Blob
+			sqlVAL.union.val = coltypes.Bytes
 		}
 	case 1045:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -16513,7 +16513,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:5910
 		{
-			sqlVAL.union.val = coltypes.Bytea
+			sqlVAL.union.val = coltypes.Bytes
 		}
 	case 1047:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -16748,7 +16748,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:6086
 		{
-			sqlVAL.union.val = coltypes.Boolean
+			sqlVAL.union.val = coltypes.Bool
 		}
 	case 1081:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
