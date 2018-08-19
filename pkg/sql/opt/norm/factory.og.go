@@ -863,30 +863,33 @@ func (_f *Factory) ConstructSelect(
 
 	// [RejectNullsGroupBy]
 	{
-		_groupByExpr := _f.mem.NormExpr(input).AsGroupBy()
-		if _groupByExpr != nil {
-			innerInput := _groupByExpr.Input()
-			aggregations := _groupByExpr.Aggregations()
-			def := _groupByExpr.Def()
+		_expr := _f.mem.NormExpr(input)
+		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp {
+			innerInput := _expr.ChildGroup(_f.mem, 0)
+			aggregations := _expr.ChildGroup(_f.mem, 1)
+			def := _expr.PrivateID()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.RejectNullCols(input)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
 						_group = _f.ConstructSelect(
-							_f.ConstructGroupBy(
-								_f.ConstructSelect(
-									innerInput,
-									_f.ConstructFilters(
-										_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-											_f.funcs.NullRejectAggVar(aggregations),
-											_f.ConstructNull(
-												_f.funcs.AnyType(),
-											),
-										)}),
-									),
-								),
-								aggregations,
-								def,
+							_f.DynamicConstruct(
+								_f.mem.NormExpr(input).Operator(),
+								memo.DynamicOperands{
+									memo.DynamicID(_f.ConstructSelect(
+										innerInput,
+										_f.ConstructFilters(
+											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
+												_f.funcs.NullRejectAggVar(aggregations),
+												_f.ConstructNull(
+													_f.funcs.AnyType(),
+												),
+											)}),
+										),
+									)),
+									memo.DynamicID(aggregations),
+									memo.DynamicID(def),
+								},
 							),
 							filter,
 						)
