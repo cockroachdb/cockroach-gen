@@ -843,19 +843,21 @@ func (_f *Factory) ConstructSelect(
 			input := _projectExpr.Input()
 			projections := _projectExpr.Projections()
 			if _f.funcs.CanInline(projections) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoInlinableProject) {
-					_group = _f.ConstructProject(
-						_f.ConstructSelect(
-							input,
-							_f.funcs.InlineProjections(filter, projections),
-						),
-						projections,
-					)
-					_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PushSelectIntoInlinableProject, _group, 0, 0)
+				if !_f.funcs.HasCorrelatedSubquery(filter) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoInlinableProject) {
+						_group = _f.ConstructProject(
+							_f.ConstructSelect(
+								input,
+								_f.funcs.InlineProjections(filter, projections),
+							),
+							projections,
+						)
+						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoInlinableProject, _group, 0, 0)
+						}
+						return _group
 					}
-					return _group
 				}
 			}
 		}
