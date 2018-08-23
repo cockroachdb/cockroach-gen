@@ -16607,7 +16607,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 		//line sql-gen.y:5923
 		{
-			sqlVAL.union.val = coltypes.Text
+			sqlVAL.union.val = coltypes.String
 		}
 	case 1050:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
