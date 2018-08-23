@@ -436,7 +436,7 @@ func (_f *Factory) ConstructSelect(
 			on := _expr.ChildGroup(_f.mem, 2)
 			if _f.matchedRule == nil || _f.matchedRule(opt.MergeSelectInnerJoin) {
 				_group = _f.DynamicConstruct(
-					_f.mem.NormExpr(input).Operator(),
+					_f.mem.NormOp(input),
 					memo.DynamicOperands{
 						memo.DynamicID(left),
 						memo.DynamicID(right),
@@ -469,7 +469,7 @@ func (_f *Factory) ConstructSelect(
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight) {
 								_group = _f.ConstructSelect(
 									_f.DynamicConstruct(
-										_f.mem.NormExpr(input).Operator(),
+										_f.mem.NormOp(input),
 										memo.DynamicOperands{
 											memo.DynamicID(_f.ConstructSelect(
 												left,
@@ -520,7 +520,7 @@ func (_f *Factory) ConstructSelect(
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
 								_group = _f.ConstructSelect(
 									_f.DynamicConstruct(
-										_f.mem.NormExpr(input).Operator(),
+										_f.mem.NormOp(input),
 										memo.DynamicOperands{
 											memo.DynamicID(_f.ConstructSelect(
 												left,
@@ -571,7 +571,7 @@ func (_f *Factory) ConstructSelect(
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinLeft) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
-									_f.mem.NormExpr(input).Operator(),
+									_f.mem.NormOp(input),
 									memo.DynamicOperands{
 										memo.DynamicID(_f.ConstructSelect(
 											left,
@@ -616,7 +616,7 @@ func (_f *Factory) ConstructSelect(
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinRight) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
-									_f.mem.NormExpr(input).Operator(),
+									_f.mem.NormOp(input),
 									memo.DynamicOperands{
 										memo.DynamicID(left),
 										memo.DynamicID(_f.ConstructSelect(
@@ -662,7 +662,7 @@ func (_f *Factory) ConstructSelect(
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
 							_group = _f.ConstructSelect(
 								_f.DynamicConstruct(
-									_f.mem.NormExpr(groupOp).Operator(),
+									_f.mem.NormOp(groupOp),
 									memo.DynamicOperands{
 										memo.DynamicID(_f.ConstructSelect(
 											input,
@@ -876,7 +876,7 @@ func (_f *Factory) ConstructSelect(
 					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
 						_group = _f.ConstructSelect(
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(input).Operator(),
+								_f.mem.NormOp(input),
 								memo.DynamicOperands{
 									memo.DynamicID(_f.ConstructSelect(
 										innerInput,
@@ -1124,7 +1124,7 @@ func (_f *Factory) ConstructProject(
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinLeftCols) {
 					_group = _f.ConstructProject(
 						_f.DynamicConstruct(
-							_f.mem.NormExpr(input).Operator(),
+							_f.mem.NormOp(input),
 							memo.DynamicOperands{
 								memo.DynamicID(_f.funcs.PruneCols(left, _f.funcs.NeededCols3(projections, right, on))),
 								memo.DynamicID(right),
@@ -1156,7 +1156,7 @@ func (_f *Factory) ConstructProject(
 						_f.ruleCycles.push(_projectExpr.Fingerprint())
 						_group = _f.ConstructProject(
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(input).Operator(),
+								_f.mem.NormOp(input),
 								memo.DynamicOperands{
 									memo.DynamicID(left),
 									memo.DynamicID(_f.funcs.PruneCols(right, _f.funcs.NeededCols2(projections, on))),
@@ -1190,7 +1190,7 @@ func (_f *Factory) ConstructProject(
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneAggCols) {
 					_group = _f.ConstructProject(
 						_f.DynamicConstruct(
-							_f.mem.NormExpr(input).Operator(),
+							_f.mem.NormOp(input),
 							memo.DynamicOperands{
 								memo.DynamicID(innerInput),
 								memo.DynamicID(_f.funcs.PruneCols(aggregations, _f.funcs.NeededCols(projections))),
@@ -1354,7 +1354,7 @@ func (_f *Factory) ConstructInnerJoin(
 						_group = _f.ConstructInnerJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -1449,7 +1449,7 @@ func (_f *Factory) ConstructInnerJoin(
 						newLeft := _f.funcs.EnsureKey(left)
 						_group = _f.ConstructSelect(
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(_f.ConstructInnerJoinApply(
 										newLeft,
@@ -1940,7 +1940,7 @@ func (_f *Factory) ConstructLeftJoin(
 						_group = _f.ConstructLeftJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -2585,7 +2585,7 @@ func (_f *Factory) ConstructSemiJoin(
 						_group = _f.ConstructSemiJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -2984,7 +2984,7 @@ func (_f *Factory) ConstructAntiJoin(
 						_group = _f.ConstructAntiJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -3277,7 +3277,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 						_group = _f.ConstructInnerJoinApply(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -3386,7 +3386,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 						newLeft := _f.funcs.EnsureKey(left)
 						_group = _f.ConstructSelect(
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(_f.ConstructInnerJoinApply(
 										newLeft,
@@ -3893,7 +3893,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 									left,
 									_f.ConstructProject(
 										_f.DynamicConstruct(
-											_f.mem.NormExpr(join).Operator(),
+											_f.mem.NormOp(join),
 											memo.DynamicOperands{
 												memo.DynamicID(innerLeft),
 												memo.DynamicID(innerRight),
@@ -3935,7 +3935,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 						_group = _f.ConstructLeftJoinApply(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -4622,7 +4622,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 						_group = _f.ConstructSemiJoinApply(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),
@@ -4977,7 +4977,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 						_group = _f.ConstructAntiJoinApply(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormExpr(right).Operator(),
+								_f.mem.NormOp(right),
 								memo.DynamicOperands{
 									memo.DynamicID(innerLeft),
 									memo.DynamicID(innerRight),

@@ -163,13 +163,11 @@ const (
 	GenerateLookupJoinWithFilter
 	PushJoinThroughIndexJoin
 	PushJoinThroughIndexJoinWithExtraFilter
-	PushLimitIntoScan
+	GenerateLimitedScans
+	PushLimitIntoConstrainedScan
 	PushLimitIntoIndexJoin
 	GenerateIndexScans
-	ConstrainScan
-	PushFilterIntoIndexJoinNoRemainder
-	PushFilterIntoIndexJoin
-	ConstrainIndexJoinScan
+	GenerateConstrainedScans
 	GenerateInvertedIndexScans
 
 	// NumRuleNames tracks the total count of rule names.

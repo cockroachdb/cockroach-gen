@@ -45,7 +45,7 @@ func (_e *explorer) exploreScan(_rootState *exploreState, _root memo.ExprID) (_f
 	{
 		if _root.Expr >= _rootState.start {
 			def := _rootExpr.Def()
-			if _e.funcs.CanGenerateIndexScans(def) {
+			if _e.funcs.IsCanonicalScan(def) {
 				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateIndexScans) {
 					_exprs := _e.funcs.GenerateIndexScans(def)
 					_before := _e.mem.ExprCount(_root.Group)
@@ -68,7 +68,7 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 	_rootExpr := _e.mem.Expr(_root).AsSelect()
 	_fullyExplored = true
 
-	// [ConstrainScan]
+	// [GenerateConstrainedScans]
 	{
 		_partlyExplored := _root.Expr < _rootState.start
 		_state := _e.exploreGroup(_rootExpr.Input())
@@ -84,159 +84,17 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 			_scanExpr := _e.mem.Expr(_eid).AsScan()
 			if _scanExpr != nil {
 				def := _scanExpr.Def()
-				filter := _rootExpr.Filter()
-				if _e.funcs.CanConstrainScan(def, filter) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainScan) {
-						_exprs := _e.funcs.ConstrainScan(filter, def)
+				if _e.funcs.IsCanonicalScan(def) {
+					filter := _rootExpr.Filter()
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateConstrainedScans) {
+						_exprs := _e.funcs.GenerateConstrainedScans(def, filter)
 						_before := _e.mem.ExprCount(_root.Group)
 						for i := range _exprs {
 							_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
 						}
 						if _e.o.appliedRule != nil {
 							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.ConstrainScan, _root.Group, _root.Expr, _after-_before)
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [PushFilterIntoIndexJoinNoRemainder]
-	{
-		_partlyExplored := _root.Expr < _rootState.start
-		_state := _e.exploreGroup(_rootExpr.Input())
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		start := memo.ExprOrdinal(0)
-		if _partlyExplored {
-			start = _state.start
-		}
-		for _ord := start; _ord < _state.end; _ord++ {
-			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
-			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
-			if _indexJoinExpr != nil {
-				input := _indexJoinExpr.Input()
-				def := _indexJoinExpr.Def()
-				filter := _rootExpr.Filter()
-				if _e.funcs.IsBoundBy(filter, _e.funcs.OutputCols(input)) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushFilterIntoIndexJoinNoRemainder) {
-						_expr := memo.MakeIndexJoinExpr(
-							_e.f.ConstructSelect(
-								input,
-								filter,
-							),
-							def,
-						)
-						_before := _e.mem.ExprCount(_root.Group)
-						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-						if _e.o.appliedRule != nil {
-							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.PushFilterIntoIndexJoinNoRemainder, _root.Group, _root.Expr, _after-_before)
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [PushFilterIntoIndexJoin]
-	{
-		_partlyExplored := _root.Expr < _rootState.start
-		_state := _e.exploreGroup(_rootExpr.Input())
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		start := memo.ExprOrdinal(0)
-		if _partlyExplored {
-			start = _state.start
-		}
-		for _ord := start; _ord < _state.end; _ord++ {
-			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
-			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
-			if _indexJoinExpr != nil {
-				input := _indexJoinExpr.Input()
-				def := _indexJoinExpr.Def()
-				filter := _rootExpr.Filter()
-				_eid := memo.MakeNormExprID(_rootExpr.Filter())
-				_filtersExpr := _e.mem.Expr(_eid).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _e.mem.LookupList(_filtersExpr.Conditions()) {
-						condition := _item
-						inputCols := _e.funcs.OutputCols(input)
-						if _e.funcs.IsBoundBy(condition, inputCols) {
-							if !_e.funcs.IsBoundBy(filter, inputCols) {
-								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushFilterIntoIndexJoin) {
-									_expr := memo.MakeSelectExpr(
-										_e.f.ConstructIndexJoin(
-											_e.f.ConstructSelect(
-												input,
-												_e.f.ConstructFilters(
-													_e.funcs.ExtractBoundConditions(list, inputCols),
-												),
-											),
-											def,
-										),
-										_e.f.ConstructFilters(
-											_e.funcs.ExtractUnboundConditions(list, inputCols),
-										),
-									)
-									_before := _e.mem.ExprCount(_root.Group)
-									_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-									if _e.o.appliedRule != nil {
-										_after := _e.mem.ExprCount(_root.Group)
-										_e.o.appliedRule(opt.PushFilterIntoIndexJoin, _root.Group, _root.Expr, _after-_before)
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [ConstrainIndexJoinScan]
-	{
-		_partlyExplored := _root.Expr < _rootState.start
-		_state := _e.exploreGroup(_rootExpr.Input())
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		for _ord := memo.ExprOrdinal(0); _ord < _state.end; _ord++ {
-			_partlyExplored := _partlyExplored && _ord < _state.start
-			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
-			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
-			if _indexJoinExpr != nil {
-				_state := _e.exploreGroup(_indexJoinExpr.Input())
-				if !_state.fullyExplored {
-					_fullyExplored = false
-				}
-				start := memo.ExprOrdinal(0)
-				if _partlyExplored {
-					start = _state.start
-				}
-				for _ord := start; _ord < _state.end; _ord++ {
-					_eid := memo.ExprID{Group: _indexJoinExpr.Input(), Expr: _ord}
-					_scanExpr := _e.mem.Expr(_eid).AsScan()
-					if _scanExpr != nil {
-						scanDef := _scanExpr.Def()
-						indexJoinDef := _indexJoinExpr.Def()
-						filter := _rootExpr.Filter()
-						if _e.funcs.CanConstrainScan(scanDef, filter) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConstrainIndexJoinScan) {
-								_exprs := _e.funcs.ConstrainIndexJoinScan(filter, scanDef, indexJoinDef)
-								_before := _e.mem.ExprCount(_root.Group)
-								for i := range _exprs {
-									_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
-								}
-								if _e.o.appliedRule != nil {
-									_after := _e.mem.ExprCount(_root.Group)
-									_e.o.appliedRule(opt.ConstrainIndexJoinScan, _root.Group, _root.Expr, _after-_before)
-								}
-							}
+							_e.o.appliedRule(opt.GenerateConstrainedScans, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}
@@ -260,17 +118,19 @@ func (_e *explorer) exploreSelect(_rootState *exploreState, _root memo.ExprID) (
 			_scanExpr := _e.mem.Expr(_eid).AsScan()
 			if _scanExpr != nil {
 				def := _scanExpr.Def()
-				if _e.funcs.CanGenerateInvertedIndexScans(def) {
-					filter := _rootExpr.Filter()
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedIndexScans) {
-						_exprs := _e.funcs.GenerateInvertedIndexScans(def, filter)
-						_before := _e.mem.ExprCount(_root.Group)
-						for i := range _exprs {
-							_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
-						}
-						if _e.o.appliedRule != nil {
-							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.GenerateInvertedIndexScans, _root.Group, _root.Expr, _after-_before)
+				if _e.funcs.IsCanonicalScan(def) {
+					if _e.funcs.HasInvertedIndexes(def) {
+						filter := _rootExpr.Filter()
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedIndexScans) {
+							_exprs := _e.funcs.GenerateInvertedIndexScans(def, filter)
+							_before := _e.mem.ExprCount(_root.Group)
+							for i := range _exprs {
+								_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+							}
+							if _e.o.appliedRule != nil {
+								_after := _e.mem.ExprCount(_root.Group)
+								_e.o.appliedRule(opt.GenerateInvertedIndexScans, _root.Group, _root.Expr, _after-_before)
+							}
 						}
 					}
 				}
@@ -970,7 +830,48 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 	_rootExpr := _e.mem.Expr(_root).AsLimit()
 	_fullyExplored = true
 
-	// [PushLimitIntoScan]
+	// [GenerateLimitedScans]
+	{
+		_partlyExplored := _root.Expr < _rootState.start
+		_state := _e.exploreGroup(_rootExpr.Input())
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		start := memo.ExprOrdinal(0)
+		if _partlyExplored {
+			start = _state.start
+		}
+		for _ord := start; _ord < _state.end; _ord++ {
+			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
+			_scanExpr := _e.mem.Expr(_eid).AsScan()
+			if _scanExpr != nil {
+				def := _scanExpr.Def()
+				if _e.funcs.IsCanonicalScan(def) {
+					_eid := memo.MakeNormExprID(_rootExpr.Limit())
+					_constExpr := _e.mem.Expr(_eid).AsConst()
+					if _constExpr != nil {
+						limit := _constExpr.Value()
+						if _e.funcs.IsPositiveLimit(limit) {
+							ordering := _rootExpr.Ordering()
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLimitedScans) {
+								_exprs := _e.funcs.GenerateLimitedScans(def, limit, ordering)
+								_before := _e.mem.ExprCount(_root.Group)
+								for i := range _exprs {
+									_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
+								}
+								if _e.o.appliedRule != nil {
+									_after := _e.mem.ExprCount(_root.Group)
+									_e.o.appliedRule(opt.GenerateLimitedScans, _root.Group, _root.Expr, _after-_before)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [PushLimitIntoConstrainedScan]
 	{
 		_partlyExplored := _root.Expr < _rootState.start
 		_state := _e.exploreGroup(_rootExpr.Input())
@@ -990,17 +891,19 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 				_constExpr := _e.mem.Expr(_eid).AsConst()
 				if _constExpr != nil {
 					limit := _constExpr.Value()
-					ordering := _rootExpr.Ordering()
-					if _e.funcs.CanLimitScan(def, limit, ordering) {
-						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoScan) {
-							_expr := memo.MakeScanExpr(
-								_e.funcs.LimitScanDef(def, limit, ordering),
-							)
-							_before := _e.mem.ExprCount(_root.Group)
-							_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-							if _e.o.appliedRule != nil {
-								_after := _e.mem.ExprCount(_root.Group)
-								_e.o.appliedRule(opt.PushLimitIntoScan, _root.Group, _root.Expr, _after-_before)
+					if _e.funcs.IsPositiveLimit(limit) {
+						ordering := _rootExpr.Ordering()
+						if _e.funcs.CanLimitConstrainedScan(def, ordering) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoConstrainedScan) {
+								_expr := memo.MakeScanExpr(
+									_e.funcs.LimitScanDef(def, limit, ordering),
+								)
+								_before := _e.mem.ExprCount(_root.Group)
+								_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+								if _e.o.appliedRule != nil {
+									_after := _e.mem.ExprCount(_root.Group)
+									_e.o.appliedRule(opt.PushLimitIntoConstrainedScan, _root.Group, _root.Expr, _after-_before)
+								}
 							}
 						}
 					}
@@ -1016,33 +919,48 @@ func (_e *explorer) exploreLimit(_rootState *exploreState, _root memo.ExprID) (_
 		if !_state.fullyExplored {
 			_fullyExplored = false
 		}
-		start := memo.ExprOrdinal(0)
-		if _partlyExplored {
-			start = _state.start
-		}
-		for _ord := start; _ord < _state.end; _ord++ {
+		for _ord := memo.ExprOrdinal(0); _ord < _state.end; _ord++ {
+			_partlyExplored := _partlyExplored && _ord < _state.start
 			_eid := memo.ExprID{Group: _rootExpr.Input(), Expr: _ord}
 			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
 			if _indexJoinExpr != nil {
-				input := _indexJoinExpr.Input()
-				def := _indexJoinExpr.Def()
-				limit := _rootExpr.Limit()
-				ordering := _rootExpr.Ordering()
-				if _e.funcs.HasColsInOrdering(input, ordering) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoIndexJoin) {
-						_expr := memo.MakeIndexJoinExpr(
-							_e.f.ConstructLimit(
-								input,
-								limit,
-								ordering,
-							),
-							def,
-						)
-						_before := _e.mem.ExprCount(_root.Group)
-						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-						if _e.o.appliedRule != nil {
-							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root.Group, _root.Expr, _after-_before)
+				_state := _e.exploreGroup(_indexJoinExpr.Input())
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				start := memo.ExprOrdinal(0)
+				if _partlyExplored {
+					start = _state.start
+				}
+				for _ord := start; _ord < _state.end; _ord++ {
+					_eid := memo.ExprID{Group: _indexJoinExpr.Input(), Expr: _ord}
+					_scanExpr := _e.mem.Expr(_eid).AsScan()
+					if _scanExpr != nil {
+						scanDef := _scanExpr.Def()
+						indexJoinDef := _indexJoinExpr.Def()
+						_eid := memo.MakeNormExprID(_rootExpr.Limit())
+						_constExpr := _e.mem.Expr(_eid).AsConst()
+						if _constExpr != nil {
+							limit := _constExpr.Value()
+							if _e.funcs.IsPositiveLimit(limit) {
+								ordering := _rootExpr.Ordering()
+								if _e.funcs.CanLimitConstrainedScan(scanDef, ordering) {
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoIndexJoin) {
+										_expr := memo.MakeIndexJoinExpr(
+											_e.f.ConstructScan(
+												_e.funcs.LimitScanDef(scanDef, limit, ordering),
+											),
+											indexJoinDef,
+										)
+										_before := _e.mem.ExprCount(_root.Group)
+										_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
+										if _e.o.appliedRule != nil {
+											_after := _e.mem.ExprCount(_root.Group)
+											_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root.Group, _root.Expr, _after-_before)
+										}
+									}
+								}
+							}
 						}
 					}
 				}
