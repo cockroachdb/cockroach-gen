@@ -187,7 +187,7 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 		}
 	}
 
-	// [GenerateLookupJoin]
+	// [GenerateLookupJoins]
 	{
 		_partlyExplored := _root.Expr < _rootState.start
 		left := _rootExpr.Left()
@@ -204,17 +204,17 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 			_scanExpr := _e.mem.Expr(_eid).AsScan()
 			if _scanExpr != nil {
 				scanDef := _scanExpr.Def()
-				on := _rootExpr.On()
-				if _e.funcs.CanUseLookupJoin(left, scanDef, on) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoin) {
-						_exprs := _e.funcs.ConstructLookupJoin(opt.InnerJoinOp, left, scanDef, on)
+				if _e.funcs.IsCanonicalScan(scanDef) {
+					on := _rootExpr.On()
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoins) {
+						_exprs := _e.funcs.GenerateLookupJoins(opt.InnerJoinOp, left, scanDef, on)
 						_before := _e.mem.ExprCount(_root.Group)
 						for i := range _exprs {
 							_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
 						}
 						if _e.o.appliedRule != nil {
 							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.GenerateLookupJoin, _root.Group, _root.Expr, _after-_before)
+							_e.o.appliedRule(opt.GenerateLookupJoins, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}
@@ -222,7 +222,7 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 		}
 	}
 
-	// [GenerateLookupJoinWithFilter]
+	// [GenerateLookupJoinsWithFilter]
 	{
 		_partlyExplored := _root.Expr < _rootState.start
 		left := _rootExpr.Left()
@@ -248,119 +248,18 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 					_scanExpr := _e.mem.Expr(_eid).AsScan()
 					if _scanExpr != nil {
 						scanDef := _scanExpr.Def()
-						filter := _selectExpr.Filter()
-						on := _rootExpr.On()
-						if _e.funcs.CanUseLookupJoin(left, scanDef, on) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinWithFilter) {
-								_exprs := _e.funcs.ConstructLookupJoin(opt.InnerJoinOp, left, scanDef, _e.funcs.ConcatFilters(on, filter))
+						if _e.funcs.IsCanonicalScan(scanDef) {
+							filter := _selectExpr.Filter()
+							on := _rootExpr.On()
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithFilter) {
+								_exprs := _e.funcs.GenerateLookupJoins(opt.InnerJoinOp, left, scanDef, _e.funcs.ConcatFilters(on, filter))
 								_before := _e.mem.ExprCount(_root.Group)
 								for i := range _exprs {
 									_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
 								}
 								if _e.o.appliedRule != nil {
 									_after := _e.mem.ExprCount(_root.Group)
-									_e.o.appliedRule(opt.GenerateLookupJoinWithFilter, _root.Group, _root.Expr, _after-_before)
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [PushJoinThroughIndexJoin]
-	{
-		_partlyExplored := _root.Expr < _rootState.start
-		left := _rootExpr.Left()
-		_state := _e.exploreGroup(_rootExpr.Right())
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		start := memo.ExprOrdinal(0)
-		if _partlyExplored {
-			start = _state.start
-		}
-		for _ord := start; _ord < _state.end; _ord++ {
-			_eid := memo.ExprID{Group: _rootExpr.Right(), Expr: _ord}
-			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
-			if _indexJoinExpr != nil {
-				right := _indexJoinExpr.Input()
-				indexJoinDef := _indexJoinExpr.Def()
-				on := _rootExpr.On()
-				if _e.funcs.IsBoundBy(on, _e.funcs.OutputCols2(left, right)) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinThroughIndexJoin) {
-						newJoin := _e.f.ConstructInnerJoin(
-							left,
-							right,
-							on,
-						)
-						_expr := memo.MakeLookupJoinExpr(
-							newJoin,
-							_e.f.ConstructTrue(),
-							_e.funcs.HoistIndexJoinDef(indexJoinDef, newJoin, opt.InnerJoinOp),
-						)
-						_before := _e.mem.ExprCount(_root.Group)
-						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-						if _e.o.appliedRule != nil {
-							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.PushJoinThroughIndexJoin, _root.Group, _root.Expr, _after-_before)
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [PushJoinThroughIndexJoinWithExtraFilter]
-	{
-		_partlyExplored := _root.Expr < _rootState.start
-		left := _rootExpr.Left()
-		_state := _e.exploreGroup(_rootExpr.Right())
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		start := memo.ExprOrdinal(0)
-		if _partlyExplored {
-			start = _state.start
-		}
-		for _ord := start; _ord < _state.end; _ord++ {
-			_eid := memo.ExprID{Group: _rootExpr.Right(), Expr: _ord}
-			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
-			if _indexJoinExpr != nil {
-				right := _indexJoinExpr.Input()
-				indexJoinDef := _indexJoinExpr.Def()
-				on := _rootExpr.On()
-				innerCols := _e.funcs.OutputCols2(left, right)
-				if !_e.funcs.IsBoundBy(on, innerCols) {
-					_eid := memo.MakeNormExprID(_rootExpr.On())
-					_filtersExpr := _e.mem.Expr(_eid).AsFilters()
-					if _filtersExpr != nil {
-						onList := _filtersExpr.Conditions()
-						for _, _item := range _e.mem.LookupList(_filtersExpr.Conditions()) {
-							condition := _item
-							if _e.funcs.IsBoundBy(condition, innerCols) {
-								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinThroughIndexJoinWithExtraFilter) {
-									newJoin := _e.f.ConstructInnerJoin(
-										left,
-										right,
-										_e.f.ConstructFilters(
-											_e.funcs.ExtractBoundConditions(onList, innerCols),
-										),
-									)
-									_expr := memo.MakeLookupJoinExpr(
-										newJoin,
-										_e.f.ConstructFilters(
-											_e.funcs.ExtractUnboundConditions(onList, innerCols),
-										),
-										_e.funcs.HoistIndexJoinDef(indexJoinDef, newJoin, opt.InnerJoinOp),
-									)
-									_before := _e.mem.ExprCount(_root.Group)
-									_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-									if _e.o.appliedRule != nil {
-										_after := _e.mem.ExprCount(_root.Group)
-										_e.o.appliedRule(opt.PushJoinThroughIndexJoinWithExtraFilter, _root.Group, _root.Expr, _after-_before)
-									}
+									_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root.Group, _root.Expr, _after-_before)
 								}
 							}
 						}
@@ -419,7 +318,7 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 		}
 	}
 
-	// [GenerateLookupJoin]
+	// [GenerateLookupJoins]
 	{
 		_partlyExplored := _root.Expr < _rootState.start
 		left := _rootExpr.Left()
@@ -436,17 +335,17 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 			_scanExpr := _e.mem.Expr(_eid).AsScan()
 			if _scanExpr != nil {
 				scanDef := _scanExpr.Def()
-				on := _rootExpr.On()
-				if _e.funcs.CanUseLookupJoin(left, scanDef, on) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoin) {
-						_exprs := _e.funcs.ConstructLookupJoin(opt.LeftJoinOp, left, scanDef, on)
+				if _e.funcs.IsCanonicalScan(scanDef) {
+					on := _rootExpr.On()
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoins) {
+						_exprs := _e.funcs.GenerateLookupJoins(opt.LeftJoinOp, left, scanDef, on)
 						_before := _e.mem.ExprCount(_root.Group)
 						for i := range _exprs {
 							_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
 						}
 						if _e.o.appliedRule != nil {
 							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.GenerateLookupJoin, _root.Group, _root.Expr, _after-_before)
+							_e.o.appliedRule(opt.GenerateLookupJoins, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}
@@ -454,7 +353,7 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 		}
 	}
 
-	// [GenerateLookupJoinWithFilter]
+	// [GenerateLookupJoinsWithFilter]
 	{
 		_partlyExplored := _root.Expr < _rootState.start
 		left := _rootExpr.Left()
@@ -480,63 +379,20 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 					_scanExpr := _e.mem.Expr(_eid).AsScan()
 					if _scanExpr != nil {
 						scanDef := _scanExpr.Def()
-						filter := _selectExpr.Filter()
-						on := _rootExpr.On()
-						if _e.funcs.CanUseLookupJoin(left, scanDef, on) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinWithFilter) {
-								_exprs := _e.funcs.ConstructLookupJoin(opt.LeftJoinOp, left, scanDef, _e.funcs.ConcatFilters(on, filter))
+						if _e.funcs.IsCanonicalScan(scanDef) {
+							filter := _selectExpr.Filter()
+							on := _rootExpr.On()
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithFilter) {
+								_exprs := _e.funcs.GenerateLookupJoins(opt.LeftJoinOp, left, scanDef, _e.funcs.ConcatFilters(on, filter))
 								_before := _e.mem.ExprCount(_root.Group)
 								for i := range _exprs {
 									_e.mem.MemoizeDenormExpr(_root.Group, _exprs[i])
 								}
 								if _e.o.appliedRule != nil {
 									_after := _e.mem.ExprCount(_root.Group)
-									_e.o.appliedRule(opt.GenerateLookupJoinWithFilter, _root.Group, _root.Expr, _after-_before)
+									_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root.Group, _root.Expr, _after-_before)
 								}
 							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [PushJoinThroughIndexJoin]
-	{
-		_partlyExplored := _root.Expr < _rootState.start
-		left := _rootExpr.Left()
-		_state := _e.exploreGroup(_rootExpr.Right())
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		start := memo.ExprOrdinal(0)
-		if _partlyExplored {
-			start = _state.start
-		}
-		for _ord := start; _ord < _state.end; _ord++ {
-			_eid := memo.ExprID{Group: _rootExpr.Right(), Expr: _ord}
-			_indexJoinExpr := _e.mem.Expr(_eid).AsIndexJoin()
-			if _indexJoinExpr != nil {
-				right := _indexJoinExpr.Input()
-				indexJoinDef := _indexJoinExpr.Def()
-				on := _rootExpr.On()
-				if _e.funcs.IsBoundBy(on, _e.funcs.OutputCols2(left, right)) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinThroughIndexJoin) {
-						newJoin := _e.f.ConstructLeftJoin(
-							left,
-							right,
-							on,
-						)
-						_expr := memo.MakeLookupJoinExpr(
-							newJoin,
-							_e.f.ConstructTrue(),
-							_e.funcs.HoistIndexJoinDef(indexJoinDef, newJoin, opt.LeftJoinOp),
-						)
-						_before := _e.mem.ExprCount(_root.Group)
-						_e.mem.MemoizeDenormExpr(_root.Group, memo.Expr(_expr))
-						if _e.o.appliedRule != nil {
-							_after := _e.mem.ExprCount(_root.Group)
-							_e.o.appliedRule(opt.PushJoinThroughIndexJoin, _root.Group, _root.Expr, _after-_before)
 						}
 					}
 				}

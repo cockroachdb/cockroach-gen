@@ -159,10 +159,8 @@ const (
 	CommuteLeftJoin
 	CommuteRightJoin
 	GenerateMergeJoins
-	GenerateLookupJoin
-	GenerateLookupJoinWithFilter
-	PushJoinThroughIndexJoin
-	PushJoinThroughIndexJoinWithExtraFilter
+	GenerateLookupJoins
+	GenerateLookupJoinsWithFilter
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan
 	PushLimitIntoIndexJoin
