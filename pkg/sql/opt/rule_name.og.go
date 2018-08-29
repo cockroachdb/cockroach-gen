@@ -9,8 +9,7 @@ const (
 	// Normalize Rule Names
 	// ------------------------------------------------------------
 	EliminateAggDistinct
-	EliminateEmptyAnd
-	EliminateEmptyOr
+	EliminateEmptyFilters
 	EliminateSingletonAndOr
 	SimplifyAnd
 	SimplifyOr
@@ -63,8 +62,6 @@ const (
 	EliminateAggDistinctForKeys
 	PushSelectIntoInlinableProject
 	InlineProjectInProject
-	EnsureJoinFiltersAnd
-	EnsureJoinFilters
 	PushFilterIntoJoinLeftAndRight
 	MapFilterIntoJoinLeft
 	MapFilterIntoJoinRight
@@ -133,7 +130,6 @@ const (
 	NormalizeJSONFieldAccess
 	NormalizeJSONContains
 	EliminateSelect
-	EnsureSelectFiltersAnd
 	EnsureSelectFilters
 	MergeSelects
 	PushSelectIntoProject

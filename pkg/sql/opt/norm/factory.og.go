@@ -326,27 +326,6 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
-	// [EnsureSelectFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(filter).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureSelectFiltersAnd) {
-				_group = _f.ConstructSelect(
-					input,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureSelectFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [EnsureSelectFilters]
 	{
 		_expr := _f.mem.NormExpr(filter)
@@ -1543,50 +1522,6 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructInnerJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructInnerJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [PushFilterIntoJoinLeftAndRight]
 	{
 		if !_f.funcs.HasOuterCols(left) {
@@ -1996,50 +1931,6 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructLeftJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructLeftJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [MapFilterIntoJoinRight]
 	{
 		filters := on
@@ -2211,50 +2102,6 @@ func (_f *Factory) ConstructRightJoin(
 		return _group
 	}
 
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructRightJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructRightJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [MapFilterIntoJoinLeft]
 	{
 		filters := on
@@ -2396,50 +2243,6 @@ func (_f *Factory) ConstructFullJoin(
 	_group := _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructFullJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructFullJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
 	}
 
 	// [SimplifyLeftJoinWithoutFilters]
@@ -2632,50 +2435,6 @@ func (_f *Factory) ConstructSemiJoin(
 						return _group
 					}
 				}
-			}
-		}
-	}
-
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructSemiJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructSemiJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
 			}
 		}
 	}
@@ -3003,50 +2762,6 @@ func (_f *Factory) ConstructAntiJoin(
 						return _group
 					}
 				}
-			}
-		}
-	}
-
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructAntiJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructAntiJoin(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
 			}
 		}
 	}
@@ -3509,50 +3224,6 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructInnerJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructInnerJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [MapFilterIntoJoinLeft]
 	{
 		filters := on
@@ -4005,50 +3676,6 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructLeftJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructLeftJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [MapFilterIntoJoinRight]
 	{
 		filters := on
@@ -4234,50 +3861,6 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructRightJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructRightJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [MapFilterIntoJoinLeft]
 	{
 		filters := on
@@ -4429,50 +4012,6 @@ func (_f *Factory) ConstructFullJoinApply(
 				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructFullJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructFullJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
 				}
 				return _group
 			}
@@ -4683,50 +4222,6 @@ func (_f *Factory) ConstructSemiJoinApply(
 						return _group
 					}
 				}
-			}
-		}
-	}
-
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructSemiJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructSemiJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
-				}
-				return _group
 			}
 		}
 	}
@@ -5008,50 +4503,6 @@ func (_f *Factory) ConstructAntiJoinApply(
 				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFiltersAnd]
-	{
-		_andExpr := _f.mem.NormExpr(on).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFiltersAnd) {
-				_group = _f.ConstructAntiJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						conditions,
-					),
-				)
-				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFiltersAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EnsureJoinFilters]
-	{
-		filter := on
-		_expr := _f.mem.NormExpr(on)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureJoinFilters) {
-				_group = _f.ConstructAntiJoinApply(
-					left,
-					right,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureJoinFilters, _group, 0, 0)
 				}
 				return _group
 			}
@@ -6336,14 +5787,14 @@ func (_f *Factory) ConstructFilters(
 		return _group
 	}
 
-	// [EliminateEmptyAnd]
+	// [EliminateEmptyFilters]
 	{
 		if conditions.Length == 0 {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEmptyAnd) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEmptyFilters) {
 				_group = _f.ConstructTrue()
 				_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateEmptyAnd, _group, 0, 0)
+					_f.appliedRule(opt.EliminateEmptyFilters, _group, 0, 0)
 				}
 				return _group
 			}
@@ -6453,20 +5904,6 @@ func (_f *Factory) ConstructAnd(
 		return _group
 	}
 
-	// [EliminateEmptyAnd]
-	{
-		if conditions.Length == 0 {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEmptyAnd) {
-				_group = _f.ConstructTrue()
-				_f.mem.AddAltFingerprint(_andExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateEmptyAnd, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [EliminateSingletonAndOr]
 	{
 		if conditions.Length == 1 {
@@ -6536,20 +5973,6 @@ func (_f *Factory) ConstructOr(
 	_group := _f.mem.GroupByFingerprint(_orExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [EliminateEmptyOr]
-	{
-		if conditions.Length == 0 {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEmptyOr) {
-				_group = _f.ConstructFalse()
-				_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateEmptyOr, _group, 0, 0)
-				}
-				return _group
-			}
-		}
 	}
 
 	// [EliminateSingletonAndOr]
