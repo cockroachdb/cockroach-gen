@@ -356,6 +356,7 @@ var Keywords = map[string]struct {
 	"validate":                  {VALIDATE, "U"},
 	"value":                     {VALUE, "U"},
 	"values":                    {VALUES, "C"},
+	"varbit":                    {VARBIT, "C"},
 	"varchar":                   {VARCHAR, "C"},
 	"variadic":                  {VARIADIC, "R"},
 	"varying":                   {VARYING, "U"},
