@@ -263,9 +263,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.OutputCols(right)) {
@@ -289,9 +289,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.OutputCols(left)) {
@@ -410,9 +410,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			if _f.matchedRule == nil || _f.matchedRule(opt.MergeSelectInnerJoin) {
 				_group = _f.DynamicConstruct(
 					_f.mem.NormOp(input),
@@ -435,9 +435,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.SemiJoinOp || _expr.Operator() == opt.SemiJoinApplyOp || _expr.Operator() == opt.AntiJoinOp || _expr.Operator() == opt.AntiJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -486,9 +486,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -537,9 +537,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.SemiJoinOp || _expr.Operator() == opt.SemiJoinApplyOp || _expr.Operator() == opt.AntiJoinOp || _expr.Operator() == opt.AntiJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -582,9 +582,9 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
 				list := _filtersExpr.Conditions()
@@ -628,8 +628,8 @@ func (_f *Factory) ConstructSelect(
 		groupOp := input
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			input := _expr.ChildGroup(_f.mem, 0)
-			aggregations := _expr.ChildGroup(_f.mem, 1)
+			input := _expr.ChildGroup(_f.Memo(), 0)
+			aggregations := _expr.ChildGroup(_f.Memo(), 1)
 			def := _expr.PrivateID()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
@@ -846,8 +846,8 @@ func (_f *Factory) ConstructSelect(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp {
-			innerInput := _expr.ChildGroup(_f.mem, 0)
-			aggregations := _expr.ChildGroup(_f.mem, 1)
+			innerInput := _expr.ChildGroup(_f.Memo(), 0)
+			aggregations := _expr.ChildGroup(_f.Memo(), 1)
 			def := _expr.PrivateID()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
@@ -1096,9 +1096,9 @@ func (_f *Factory) ConstructProject(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.IsJoin() {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			if _f.funcs.CanPruneCols(left, _f.funcs.NeededCols3(projections, right, on)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinLeftCols) {
 					_group = _f.ConstructProject(
@@ -1126,9 +1126,9 @@ func (_f *Factory) ConstructProject(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.IsJoin() {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
-			on := _expr.ChildGroup(_f.mem, 2)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
+			on := _expr.ChildGroup(_f.Memo(), 2)
 			if _f.funcs.CanPruneCols(right, _f.funcs.NeededCols2(projections, on)) {
 				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
@@ -1162,8 +1162,8 @@ func (_f *Factory) ConstructProject(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			innerInput := _expr.ChildGroup(_f.mem, 0)
-			aggregations := _expr.ChildGroup(_f.mem, 1)
+			innerInput := _expr.ChildGroup(_f.Memo(), 0)
+			aggregations := _expr.ChildGroup(_f.Memo(), 1)
 			def := _expr.PrivateID()
 			if _f.funcs.CanPruneCols(aggregations, _f.funcs.NeededCols(projections)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneAggCols) {
@@ -1324,9 +1324,9 @@ func (_f *Factory) ConstructInnerJoin(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_innerJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_innerJoinExpr.Fingerprint())
@@ -1420,8 +1420,8 @@ func (_f *Factory) ConstructInnerJoin(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-				input := _expr.ChildGroup(_f.mem, 0)
-				aggregations := _expr.ChildGroup(_f.mem, 1)
+				input := _expr.ChildGroup(_f.Memo(), 0)
+				aggregations := _expr.ChildGroup(_f.Memo(), 1)
 				def := _expr.PrivateID()
 				if _f.funcs.IsUnorderedGroupBy(def) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
@@ -1866,9 +1866,9 @@ func (_f *Factory) ConstructLeftJoin(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_leftJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_leftJoinExpr.Fingerprint())
@@ -2379,9 +2379,9 @@ func (_f *Factory) ConstructSemiJoin(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_semiJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_semiJoinExpr.Fingerprint())
@@ -2734,9 +2734,9 @@ func (_f *Factory) ConstructAntiJoin(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_antiJoinExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_antiJoinExpr.Fingerprint())
@@ -2983,9 +2983,9 @@ func (_f *Factory) ConstructInnerJoinApply(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_innerJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_innerJoinApplyExpr.Fingerprint())
@@ -3093,8 +3093,8 @@ func (_f *Factory) ConstructInnerJoinApply(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-				input := _expr.ChildGroup(_f.mem, 0)
-				aggregations := _expr.ChildGroup(_f.mem, 1)
+				input := _expr.ChildGroup(_f.Memo(), 0)
+				aggregations := _expr.ChildGroup(_f.Memo(), 1)
 				def := _expr.PrivateID()
 				if _f.funcs.IsUnorderedGroupBy(def) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
@@ -3551,9 +3551,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 			join := _projectExpr.Input()
 			_expr := _f.mem.NormExpr(_projectExpr.Input())
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.funcs.IsBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					projections := _projectExpr.Projections()
 					if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
@@ -3597,9 +3597,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
@@ -4152,9 +4152,9 @@ func (_f *Factory) ConstructSemiJoinApply(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_semiJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_semiJoinApplyExpr.Fingerprint())
@@ -4463,9 +4463,9 @@ func (_f *Factory) ConstructAntiJoinApply(
 		if _f.funcs.HasOuterCols(right) {
 			_expr := _f.mem.NormExpr(right)
 			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.mem, 0)
-				innerRight := _expr.ChildGroup(_f.mem, 1)
-				innerOn := _expr.ChildGroup(_f.mem, 2)
+				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
+				innerRight := _expr.ChildGroup(_f.Memo(), 1)
+				innerOn := _expr.ChildGroup(_f.Memo(), 2)
 				if !_f.ruleCycles.detectCycle(_antiJoinApplyExpr.Fingerprint()) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
 						_f.ruleCycles.push(_antiJoinApplyExpr.Fingerprint())
@@ -5749,7 +5749,7 @@ func (_f *Factory) ConstructExists(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			input := _expr.ChildGroup(_f.mem, 0)
+			input := _expr.ChildGroup(_f.Memo(), 0)
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
 				_group = _f.ConstructExists(
 					input,
@@ -6090,8 +6090,8 @@ func (_f *Factory) ConstructNot(
 	{
 		_expr := _f.mem.NormExpr(input)
 		if _expr.IsComparison() {
-			left := _expr.ChildGroup(_f.mem, 0)
-			right := _expr.ChildGroup(_f.mem, 1)
+			left := _expr.ChildGroup(_f.Memo(), 0)
+			right := _expr.ChildGroup(_f.Memo(), 1)
 			_expr2 := _f.mem.NormExpr(input)
 			if !(_expr2.Operator() == opt.ContainsOp || _expr2.Operator() == opt.JsonExistsOp || _expr2.Operator() == opt.JsonSomeExistsOp || _expr2.Operator() == opt.JsonAllExistsOp) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NegateComparison) {
