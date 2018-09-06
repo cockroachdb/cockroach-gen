@@ -8,6 +8,7 @@ var expectedHelpStrings = []string{
 	"<SOURCE>",
 	"ALTER DATABASE",
 	"ALTER INDEX",
+	"ALTER RANGE",
 	"ALTER SEQUENCE",
 	"ALTER TABLE",
 	"ALTER USER",
