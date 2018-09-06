@@ -49,7 +49,7 @@ var opLayoutTable = [...]opLayout{
 	opt.ShowTraceForSessionOp: makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.RowNumberOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.ZipOp:                 makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.SubqueryOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.SubqueryOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.AnyOp:                 makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
 	opt.VariableOp:            makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
 	opt.ConstOp:               makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
@@ -61,7 +61,7 @@ var opLayoutTable = [...]opLayout{
 	opt.ProjectionsOp:         makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.AggregationsOp:        makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.MergeOnOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.ExistsOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+	opt.ExistsOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
 	opt.FiltersOp:             makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
 	opt.AndOp:                 makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
 	opt.OrOp:                  makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
@@ -3064,12 +3064,16 @@ func (e *Expr) AsZip() *ZipExpr {
 // subquery returns zero rows, then that column is bound to NULL.
 type SubqueryExpr Expr
 
-func MakeSubqueryExpr(input GroupID) SubqueryExpr {
-	return SubqueryExpr{op: opt.SubqueryOp, state: exprState{uint32(input)}}
+func MakeSubqueryExpr(input GroupID, def PrivateID) SubqueryExpr {
+	return SubqueryExpr{op: opt.SubqueryOp, state: exprState{uint32(input), uint32(def)}}
 }
 
 func (e *SubqueryExpr) Input() GroupID {
 	return GroupID(e.state[0])
+}
+
+func (e *SubqueryExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
 }
 
 func (e *SubqueryExpr) Fingerprint() Fingerprint {
@@ -3105,8 +3109,8 @@ func (e *Expr) AsSubquery() *SubqueryExpr {
 // operator.
 type AnyExpr Expr
 
-func MakeAnyExpr(input GroupID, scalar GroupID, cmp PrivateID) AnyExpr {
-	return AnyExpr{op: opt.AnyOp, state: exprState{uint32(input), uint32(scalar), uint32(cmp)}}
+func MakeAnyExpr(input GroupID, scalar GroupID, def PrivateID) AnyExpr {
+	return AnyExpr{op: opt.AnyOp, state: exprState{uint32(input), uint32(scalar), uint32(def)}}
 }
 
 func (e *AnyExpr) Input() GroupID {
@@ -3117,7 +3121,7 @@ func (e *AnyExpr) Scalar() GroupID {
 	return GroupID(e.state[1])
 }
 
-func (e *AnyExpr) Cmp() PrivateID {
+func (e *AnyExpr) Def() PrivateID {
 	return PrivateID(e.state[2])
 }
 
@@ -3404,12 +3408,16 @@ func (e *Expr) AsMergeOn() *MergeOnExpr {
 // query returns at least one row.
 type ExistsExpr Expr
 
-func MakeExistsExpr(input GroupID) ExistsExpr {
-	return ExistsExpr{op: opt.ExistsOp, state: exprState{uint32(input)}}
+func MakeExistsExpr(input GroupID, def PrivateID) ExistsExpr {
+	return ExistsExpr{op: opt.ExistsOp, state: exprState{uint32(input), uint32(def)}}
 }
 
 func (e *ExistsExpr) Input() GroupID {
 	return GroupID(e.state[0])
+}
+
+func (e *ExistsExpr) Def() PrivateID {
+	return PrivateID(e.state[1])
 }
 
 func (e *ExistsExpr) Fingerprint() Fingerprint {
@@ -5413,11 +5421,11 @@ func (m *Memo) InternRowNumberDef(val *RowNumberDef) PrivateID {
 	return m.privateStorage.internRowNumberDef(val)
 }
 
-// InternOperator adds the given value to the memo and returns an ID that
+// InternSubqueryDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternOperator(val opt.Operator) PrivateID {
-	return m.privateStorage.internOperator(val)
+func (m *Memo) InternSubqueryDef(val *SubqueryDef) PrivateID {
+	return m.privateStorage.internSubqueryDef(val)
 }
 
 // InternColumnID adds the given value to the memo and returns an ID that
@@ -5460,6 +5468,13 @@ func (m *Memo) InternProjectionsOpDef(val *ProjectionsOpDef) PrivateID {
 // this method is a no-op and returns the ID of the previous value.
 func (m *Memo) InternMergeOnDef(val *MergeOnDef) PrivateID {
 	return m.privateStorage.internMergeOnDef(val)
+}
+
+// InternOperator adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (m *Memo) InternOperator(val opt.Operator) PrivateID {
+	return m.privateStorage.internOperator(val)
 }
 
 // InternColType adds the given value to the memo and returns an ID that
@@ -5675,7 +5690,7 @@ func init() {
 
 	// SubqueryOp
 	makeExprLookup[opt.SubqueryOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSubqueryExpr(GroupID(operands[0])))
+		return Expr(MakeSubqueryExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// AnyOp
@@ -5735,7 +5750,7 @@ func init() {
 
 	// ExistsOp
 	makeExprLookup[opt.ExistsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeExistsExpr(GroupID(operands[0])))
+		return Expr(MakeExistsExpr(GroupID(operands[0]), PrivateID(operands[1])))
 	}
 
 	// FiltersOp

@@ -88,11 +88,11 @@ func (_f *Factory) InternRowNumberDef(val *memo.RowNumberDef) memo.PrivateID {
 	return _f.mem.InternRowNumberDef(val)
 }
 
-// InternOperator adds the given value to the memo and returns an ID that
+// InternSubqueryDef adds the given value to the memo and returns an ID that
 // can be used for later lookup. If the same value was added previously,
 // this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternOperator(val opt.Operator) memo.PrivateID {
-	return _f.mem.InternOperator(val)
+func (_f *Factory) InternSubqueryDef(val *memo.SubqueryDef) memo.PrivateID {
+	return _f.mem.InternSubqueryDef(val)
 }
 
 // InternColumnID adds the given value to the memo and returns an ID that
@@ -135,6 +135,13 @@ func (_f *Factory) InternProjectionsOpDef(val *memo.ProjectionsOpDef) memo.Priva
 // this method is a no-op and returns the ID of the previous value.
 func (_f *Factory) InternMergeOnDef(val *memo.MergeOnDef) memo.PrivateID {
 	return _f.mem.InternMergeOnDef(val)
+}
+
+// InternOperator adds the given value to the memo and returns an ID that
+// can be used for later lookup. If the same value was added previously,
+// this method is a no-op and returns the ID of the previous value.
+func (_f *Factory) InternOperator(val opt.Operator) memo.PrivateID {
+	return _f.mem.InternOperator(val)
 }
 
 // InternColType adds the given value to the memo and returns an ID that
@@ -5490,8 +5497,9 @@ func (_f *Factory) ConstructZip(
 // subquery returns zero rows, then that column is bound to NULL.
 func (_f *Factory) ConstructSubquery(
 	input memo.GroupID,
+	def memo.PrivateID,
 ) memo.GroupID {
-	_subqueryExpr := memo.MakeSubqueryExpr(input)
+	_subqueryExpr := memo.MakeSubqueryExpr(input, def)
 	_group := _f.mem.GroupByFingerprint(_subqueryExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -5524,9 +5532,9 @@ func (_f *Factory) ConstructSubquery(
 func (_f *Factory) ConstructAny(
 	input memo.GroupID,
 	scalar memo.GroupID,
-	cmp memo.PrivateID,
+	def memo.PrivateID,
 ) memo.GroupID {
-	_anyExpr := memo.MakeAnyExpr(input, scalar, cmp)
+	_anyExpr := memo.MakeAnyExpr(input, scalar, def)
 	_group := _f.mem.GroupByFingerprint(_anyExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -5720,8 +5728,9 @@ func (_f *Factory) ConstructMergeOn(
 // query returns at least one row.
 func (_f *Factory) ConstructExists(
 	input memo.GroupID,
+	def memo.PrivateID,
 ) memo.GroupID {
-	_existsExpr := memo.MakeExistsExpr(input)
+	_existsExpr := memo.MakeExistsExpr(input, def)
 	_group := _f.mem.GroupByFingerprint(_existsExpr.Fingerprint())
 	if _group != 0 {
 		return _group
@@ -5735,6 +5744,7 @@ func (_f *Factory) ConstructExists(
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsProject) {
 				_group = _f.ConstructExists(
 					input,
+					def,
 				)
 				_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
@@ -5753,6 +5763,7 @@ func (_f *Factory) ConstructExists(
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
 				_group = _f.ConstructExists(
 					input,
+					def,
 				)
 				_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
@@ -5827,16 +5838,17 @@ func (_f *Factory) ConstructFilters(
 			if _anyExpr != nil {
 				input := _anyExpr.Input()
 				scalar := _anyExpr.Scalar()
-				cmp := _anyExpr.Cmp()
+				subqueryDef := _anyExpr.Def()
 				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeAnyFilter) {
 					_group = _f.ConstructFilters(
 						_f.funcs.ReplaceListItem(list, any, _f.ConstructExists(
 							_f.ConstructSelect(
 								input,
 								_f.ConstructFilters(
-									_f.mem.InternList([]memo.GroupID{_f.funcs.ConstructAnyCondition(input, scalar, cmp)}),
+									_f.mem.InternList([]memo.GroupID{_f.funcs.ConstructAnyCondition(input, scalar, subqueryDef)}),
 								),
 							),
+							subqueryDef,
 						)),
 					)
 					_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
@@ -5860,7 +5872,7 @@ func (_f *Factory) ConstructFilters(
 				if _anyExpr != nil {
 					input := _anyExpr.Input()
 					scalar := _anyExpr.Scalar()
-					cmp := _anyExpr.Cmp()
+					subqueryDef := _anyExpr.Def()
 					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeNotAnyFilter) {
 						_group = _f.ConstructFilters(
 							_f.funcs.ReplaceListItem(list, notany, _f.ConstructNot(
@@ -5869,11 +5881,12 @@ func (_f *Factory) ConstructFilters(
 										input,
 										_f.ConstructFilters(
 											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-												_f.funcs.ConstructAnyCondition(input, scalar, cmp),
+												_f.funcs.ConstructAnyCondition(input, scalar, subqueryDef),
 												_f.ConstructFalse(),
 											)}),
 										),
 									),
+									subqueryDef,
 								),
 							)),
 						)
@@ -10376,7 +10389,7 @@ func init() {
 
 	// SubqueryOp
 	dynConstructLookup[opt.SubqueryOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSubquery(memo.GroupID(operands[0]))
+		return f.ConstructSubquery(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// AnyOp
@@ -10436,7 +10449,7 @@ func init() {
 
 	// ExistsOp
 	dynConstructLookup[opt.ExistsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructExists(memo.GroupID(operands[0]))
+		return f.ConstructExists(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
 	}
 
 	// FiltersOp
