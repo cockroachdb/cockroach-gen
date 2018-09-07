@@ -142,6 +142,8 @@ const (
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
 	DetectSelectContradiction
+	EliminateUnionAllLeft
+	EliminateUnionAllRight
 
 	// startExploreRule tracks the number of normalization rules;
 	// all rules greater than this value are exploration rules.

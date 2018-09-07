@@ -5087,6 +5087,42 @@ func (_f *Factory) ConstructUnionAll(
 		return _group
 	}
 
+	// [EliminateUnionAllLeft]
+	{
+		if _f.funcs.HasZeroRows(right) {
+			colmap := colMap
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionAllLeft) {
+				_group = _f.ConstructProject(
+					left,
+					_f.funcs.ProjectColMapLeft(colmap),
+				)
+				_f.mem.AddAltFingerprint(_unionAllExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateUnionAllLeft, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [EliminateUnionAllRight]
+	{
+		if _f.funcs.HasZeroRows(left) {
+			colmap := colMap
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionAllRight) {
+				_group = _f.ConstructProject(
+					right,
+					_f.funcs.ProjectColMapRight(colmap),
+				)
+				_f.mem.AddAltFingerprint(_unionAllExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateUnionAllRight, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_unionAllExpr))
 }
 
