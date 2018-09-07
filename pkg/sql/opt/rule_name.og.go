@@ -55,6 +55,8 @@ const (
 	HoistZipSubquery
 	NormalizeAnyFilter
 	NormalizeNotAnyFilter
+	FoldBinary
+	FoldUnary
 	ConvertGroupByToDistinct
 	EliminateDistinct
 	EliminateGroupByProject
@@ -88,7 +90,6 @@ const (
 	FoldDivOne
 	InvertMinus
 	EliminateUnaryMinus
-	FoldUnaryMinus
 	SimplifyLimitOrdering
 	SimplifyOffsetOrdering
 	SimplifyGroupByOrdering
