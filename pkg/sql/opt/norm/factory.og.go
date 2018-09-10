@@ -10617,6 +10617,570 @@ func (_f *Factory) ConstructAggDistinct(
 	return _f.onConstruct(memo.Expr(_aggDistinctExpr))
 }
 
+func (f *Factory) assignPlaceholders(group memo.GroupID) memo.GroupID {
+	if !f.mem.GroupProperties(group).HasPlaceholder() {
+		return group
+	}
+	expr := f.mem.NormExpr(group)
+	switch expr.Operator() {
+	case opt.ValuesOp:
+		valuesExpr := expr.AsValues()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(valuesExpr.Rows()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		rows := lb.BuildList()
+		cols := valuesExpr.Cols()
+		return f.ConstructValues(rows, cols)
+	case opt.SelectOp:
+		selectExpr := expr.AsSelect()
+		input := f.assignPlaceholders(selectExpr.Input())
+		filter := f.assignPlaceholders(selectExpr.Filter())
+		return f.ConstructSelect(input, filter)
+	case opt.ProjectOp:
+		projectExpr := expr.AsProject()
+		input := f.assignPlaceholders(projectExpr.Input())
+		projections := f.assignPlaceholders(projectExpr.Projections())
+		return f.ConstructProject(input, projections)
+	case opt.InnerJoinOp:
+		innerJoinExpr := expr.AsInnerJoin()
+		left := f.assignPlaceholders(innerJoinExpr.Left())
+		right := f.assignPlaceholders(innerJoinExpr.Right())
+		on := f.assignPlaceholders(innerJoinExpr.On())
+		return f.ConstructInnerJoin(left, right, on)
+	case opt.LeftJoinOp:
+		leftJoinExpr := expr.AsLeftJoin()
+		left := f.assignPlaceholders(leftJoinExpr.Left())
+		right := f.assignPlaceholders(leftJoinExpr.Right())
+		on := f.assignPlaceholders(leftJoinExpr.On())
+		return f.ConstructLeftJoin(left, right, on)
+	case opt.RightJoinOp:
+		rightJoinExpr := expr.AsRightJoin()
+		left := f.assignPlaceholders(rightJoinExpr.Left())
+		right := f.assignPlaceholders(rightJoinExpr.Right())
+		on := f.assignPlaceholders(rightJoinExpr.On())
+		return f.ConstructRightJoin(left, right, on)
+	case opt.FullJoinOp:
+		fullJoinExpr := expr.AsFullJoin()
+		left := f.assignPlaceholders(fullJoinExpr.Left())
+		right := f.assignPlaceholders(fullJoinExpr.Right())
+		on := f.assignPlaceholders(fullJoinExpr.On())
+		return f.ConstructFullJoin(left, right, on)
+	case opt.SemiJoinOp:
+		semiJoinExpr := expr.AsSemiJoin()
+		left := f.assignPlaceholders(semiJoinExpr.Left())
+		right := f.assignPlaceholders(semiJoinExpr.Right())
+		on := f.assignPlaceholders(semiJoinExpr.On())
+		return f.ConstructSemiJoin(left, right, on)
+	case opt.AntiJoinOp:
+		antiJoinExpr := expr.AsAntiJoin()
+		left := f.assignPlaceholders(antiJoinExpr.Left())
+		right := f.assignPlaceholders(antiJoinExpr.Right())
+		on := f.assignPlaceholders(antiJoinExpr.On())
+		return f.ConstructAntiJoin(left, right, on)
+	case opt.IndexJoinOp:
+		indexJoinExpr := expr.AsIndexJoin()
+		input := f.assignPlaceholders(indexJoinExpr.Input())
+		def := indexJoinExpr.Def()
+		return f.ConstructIndexJoin(input, def)
+	case opt.LookupJoinOp:
+		lookupJoinExpr := expr.AsLookupJoin()
+		input := f.assignPlaceholders(lookupJoinExpr.Input())
+		on := f.assignPlaceholders(lookupJoinExpr.On())
+		def := lookupJoinExpr.Def()
+		return f.ConstructLookupJoin(input, on, def)
+	case opt.MergeJoinOp:
+		mergeJoinExpr := expr.AsMergeJoin()
+		left := f.assignPlaceholders(mergeJoinExpr.Left())
+		right := f.assignPlaceholders(mergeJoinExpr.Right())
+		mergeOn := f.assignPlaceholders(mergeJoinExpr.MergeOn())
+		return f.ConstructMergeJoin(left, right, mergeOn)
+	case opt.InnerJoinApplyOp:
+		innerJoinApplyExpr := expr.AsInnerJoinApply()
+		left := f.assignPlaceholders(innerJoinApplyExpr.Left())
+		right := f.assignPlaceholders(innerJoinApplyExpr.Right())
+		on := f.assignPlaceholders(innerJoinApplyExpr.On())
+		return f.ConstructInnerJoinApply(left, right, on)
+	case opt.LeftJoinApplyOp:
+		leftJoinApplyExpr := expr.AsLeftJoinApply()
+		left := f.assignPlaceholders(leftJoinApplyExpr.Left())
+		right := f.assignPlaceholders(leftJoinApplyExpr.Right())
+		on := f.assignPlaceholders(leftJoinApplyExpr.On())
+		return f.ConstructLeftJoinApply(left, right, on)
+	case opt.RightJoinApplyOp:
+		rightJoinApplyExpr := expr.AsRightJoinApply()
+		left := f.assignPlaceholders(rightJoinApplyExpr.Left())
+		right := f.assignPlaceholders(rightJoinApplyExpr.Right())
+		on := f.assignPlaceholders(rightJoinApplyExpr.On())
+		return f.ConstructRightJoinApply(left, right, on)
+	case opt.FullJoinApplyOp:
+		fullJoinApplyExpr := expr.AsFullJoinApply()
+		left := f.assignPlaceholders(fullJoinApplyExpr.Left())
+		right := f.assignPlaceholders(fullJoinApplyExpr.Right())
+		on := f.assignPlaceholders(fullJoinApplyExpr.On())
+		return f.ConstructFullJoinApply(left, right, on)
+	case opt.SemiJoinApplyOp:
+		semiJoinApplyExpr := expr.AsSemiJoinApply()
+		left := f.assignPlaceholders(semiJoinApplyExpr.Left())
+		right := f.assignPlaceholders(semiJoinApplyExpr.Right())
+		on := f.assignPlaceholders(semiJoinApplyExpr.On())
+		return f.ConstructSemiJoinApply(left, right, on)
+	case opt.AntiJoinApplyOp:
+		antiJoinApplyExpr := expr.AsAntiJoinApply()
+		left := f.assignPlaceholders(antiJoinApplyExpr.Left())
+		right := f.assignPlaceholders(antiJoinApplyExpr.Right())
+		on := f.assignPlaceholders(antiJoinApplyExpr.On())
+		return f.ConstructAntiJoinApply(left, right, on)
+	case opt.GroupByOp:
+		groupByExpr := expr.AsGroupBy()
+		input := f.assignPlaceholders(groupByExpr.Input())
+		aggregations := f.assignPlaceholders(groupByExpr.Aggregations())
+		def := groupByExpr.Def()
+		return f.ConstructGroupBy(input, aggregations, def)
+	case opt.ScalarGroupByOp:
+		scalarGroupByExpr := expr.AsScalarGroupBy()
+		input := f.assignPlaceholders(scalarGroupByExpr.Input())
+		aggregations := f.assignPlaceholders(scalarGroupByExpr.Aggregations())
+		def := scalarGroupByExpr.Def()
+		return f.ConstructScalarGroupBy(input, aggregations, def)
+	case opt.DistinctOnOp:
+		distinctOnExpr := expr.AsDistinctOn()
+		input := f.assignPlaceholders(distinctOnExpr.Input())
+		aggregations := f.assignPlaceholders(distinctOnExpr.Aggregations())
+		def := distinctOnExpr.Def()
+		return f.ConstructDistinctOn(input, aggregations, def)
+	case opt.UnionOp:
+		unionExpr := expr.AsUnion()
+		left := f.assignPlaceholders(unionExpr.Left())
+		right := f.assignPlaceholders(unionExpr.Right())
+		colMap := unionExpr.ColMap()
+		return f.ConstructUnion(left, right, colMap)
+	case opt.IntersectOp:
+		intersectExpr := expr.AsIntersect()
+		left := f.assignPlaceholders(intersectExpr.Left())
+		right := f.assignPlaceholders(intersectExpr.Right())
+		colMap := intersectExpr.ColMap()
+		return f.ConstructIntersect(left, right, colMap)
+	case opt.ExceptOp:
+		exceptExpr := expr.AsExcept()
+		left := f.assignPlaceholders(exceptExpr.Left())
+		right := f.assignPlaceholders(exceptExpr.Right())
+		colMap := exceptExpr.ColMap()
+		return f.ConstructExcept(left, right, colMap)
+	case opt.UnionAllOp:
+		unionAllExpr := expr.AsUnionAll()
+		left := f.assignPlaceholders(unionAllExpr.Left())
+		right := f.assignPlaceholders(unionAllExpr.Right())
+		colMap := unionAllExpr.ColMap()
+		return f.ConstructUnionAll(left, right, colMap)
+	case opt.IntersectAllOp:
+		intersectAllExpr := expr.AsIntersectAll()
+		left := f.assignPlaceholders(intersectAllExpr.Left())
+		right := f.assignPlaceholders(intersectAllExpr.Right())
+		colMap := intersectAllExpr.ColMap()
+		return f.ConstructIntersectAll(left, right, colMap)
+	case opt.ExceptAllOp:
+		exceptAllExpr := expr.AsExceptAll()
+		left := f.assignPlaceholders(exceptAllExpr.Left())
+		right := f.assignPlaceholders(exceptAllExpr.Right())
+		colMap := exceptAllExpr.ColMap()
+		return f.ConstructExceptAll(left, right, colMap)
+	case opt.LimitOp:
+		limitExpr := expr.AsLimit()
+		input := f.assignPlaceholders(limitExpr.Input())
+		limit := f.assignPlaceholders(limitExpr.Limit())
+		ordering := limitExpr.Ordering()
+		return f.ConstructLimit(input, limit, ordering)
+	case opt.OffsetOp:
+		offsetExpr := expr.AsOffset()
+		input := f.assignPlaceholders(offsetExpr.Input())
+		offset := f.assignPlaceholders(offsetExpr.Offset())
+		ordering := offsetExpr.Ordering()
+		return f.ConstructOffset(input, offset, ordering)
+	case opt.Max1RowOp:
+		max1RowExpr := expr.AsMax1Row()
+		input := f.assignPlaceholders(max1RowExpr.Input())
+		return f.ConstructMax1Row(input)
+	case opt.ExplainOp:
+		explainExpr := expr.AsExplain()
+		input := f.assignPlaceholders(explainExpr.Input())
+		def := explainExpr.Def()
+		return f.ConstructExplain(input, def)
+	case opt.RowNumberOp:
+		rowNumberExpr := expr.AsRowNumber()
+		input := f.assignPlaceholders(rowNumberExpr.Input())
+		def := rowNumberExpr.Def()
+		return f.ConstructRowNumber(input, def)
+	case opt.ZipOp:
+		zipExpr := expr.AsZip()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(zipExpr.Funcs()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		funcs := lb.BuildList()
+		cols := zipExpr.Cols()
+		return f.ConstructZip(funcs, cols)
+	case opt.SubqueryOp:
+		subqueryExpr := expr.AsSubquery()
+		input := f.assignPlaceholders(subqueryExpr.Input())
+		def := subqueryExpr.Def()
+		return f.ConstructSubquery(input, def)
+	case opt.AnyOp:
+		anyExpr := expr.AsAny()
+		input := f.assignPlaceholders(anyExpr.Input())
+		scalar := f.assignPlaceholders(anyExpr.Scalar())
+		def := anyExpr.Def()
+		return f.ConstructAny(input, scalar, def)
+	case opt.TupleOp:
+		tupleExpr := expr.AsTuple()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(tupleExpr.Elems()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		elems := lb.BuildList()
+		typ := tupleExpr.Typ()
+		return f.ConstructTuple(elems, typ)
+	case opt.ProjectionsOp:
+		projectionsExpr := expr.AsProjections()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(projectionsExpr.Elems()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		elems := lb.BuildList()
+		def := projectionsExpr.Def()
+		return f.ConstructProjections(elems, def)
+	case opt.AggregationsOp:
+		aggregationsExpr := expr.AsAggregations()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(aggregationsExpr.Aggs()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		aggs := lb.BuildList()
+		cols := aggregationsExpr.Cols()
+		return f.ConstructAggregations(aggs, cols)
+	case opt.MergeOnOp:
+		mergeOnExpr := expr.AsMergeOn()
+		on := f.assignPlaceholders(mergeOnExpr.On())
+		def := mergeOnExpr.Def()
+		return f.ConstructMergeOn(on, def)
+	case opt.ExistsOp:
+		existsExpr := expr.AsExists()
+		input := f.assignPlaceholders(existsExpr.Input())
+		def := existsExpr.Def()
+		return f.ConstructExists(input, def)
+	case opt.FiltersOp:
+		filtersExpr := expr.AsFilters()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(filtersExpr.Conditions()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		conditions := lb.BuildList()
+		return f.ConstructFilters(conditions)
+	case opt.AndOp:
+		andExpr := expr.AsAnd()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(andExpr.Conditions()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		conditions := lb.BuildList()
+		return f.ConstructAnd(conditions)
+	case opt.OrOp:
+		orExpr := expr.AsOr()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(orExpr.Conditions()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		conditions := lb.BuildList()
+		return f.ConstructOr(conditions)
+	case opt.NotOp:
+		notExpr := expr.AsNot()
+		input := f.assignPlaceholders(notExpr.Input())
+		return f.ConstructNot(input)
+	case opt.EqOp:
+		eqExpr := expr.AsEq()
+		left := f.assignPlaceholders(eqExpr.Left())
+		right := f.assignPlaceholders(eqExpr.Right())
+		return f.ConstructEq(left, right)
+	case opt.LtOp:
+		ltExpr := expr.AsLt()
+		left := f.assignPlaceholders(ltExpr.Left())
+		right := f.assignPlaceholders(ltExpr.Right())
+		return f.ConstructLt(left, right)
+	case opt.GtOp:
+		gtExpr := expr.AsGt()
+		left := f.assignPlaceholders(gtExpr.Left())
+		right := f.assignPlaceholders(gtExpr.Right())
+		return f.ConstructGt(left, right)
+	case opt.LeOp:
+		leExpr := expr.AsLe()
+		left := f.assignPlaceholders(leExpr.Left())
+		right := f.assignPlaceholders(leExpr.Right())
+		return f.ConstructLe(left, right)
+	case opt.GeOp:
+		geExpr := expr.AsGe()
+		left := f.assignPlaceholders(geExpr.Left())
+		right := f.assignPlaceholders(geExpr.Right())
+		return f.ConstructGe(left, right)
+	case opt.NeOp:
+		neExpr := expr.AsNe()
+		left := f.assignPlaceholders(neExpr.Left())
+		right := f.assignPlaceholders(neExpr.Right())
+		return f.ConstructNe(left, right)
+	case opt.InOp:
+		inExpr := expr.AsIn()
+		left := f.assignPlaceholders(inExpr.Left())
+		right := f.assignPlaceholders(inExpr.Right())
+		return f.ConstructIn(left, right)
+	case opt.NotInOp:
+		notInExpr := expr.AsNotIn()
+		left := f.assignPlaceholders(notInExpr.Left())
+		right := f.assignPlaceholders(notInExpr.Right())
+		return f.ConstructNotIn(left, right)
+	case opt.LikeOp:
+		likeExpr := expr.AsLike()
+		left := f.assignPlaceholders(likeExpr.Left())
+		right := f.assignPlaceholders(likeExpr.Right())
+		return f.ConstructLike(left, right)
+	case opt.NotLikeOp:
+		notLikeExpr := expr.AsNotLike()
+		left := f.assignPlaceholders(notLikeExpr.Left())
+		right := f.assignPlaceholders(notLikeExpr.Right())
+		return f.ConstructNotLike(left, right)
+	case opt.ILikeOp:
+		iLikeExpr := expr.AsILike()
+		left := f.assignPlaceholders(iLikeExpr.Left())
+		right := f.assignPlaceholders(iLikeExpr.Right())
+		return f.ConstructILike(left, right)
+	case opt.NotILikeOp:
+		notILikeExpr := expr.AsNotILike()
+		left := f.assignPlaceholders(notILikeExpr.Left())
+		right := f.assignPlaceholders(notILikeExpr.Right())
+		return f.ConstructNotILike(left, right)
+	case opt.SimilarToOp:
+		similarToExpr := expr.AsSimilarTo()
+		left := f.assignPlaceholders(similarToExpr.Left())
+		right := f.assignPlaceholders(similarToExpr.Right())
+		return f.ConstructSimilarTo(left, right)
+	case opt.NotSimilarToOp:
+		notSimilarToExpr := expr.AsNotSimilarTo()
+		left := f.assignPlaceholders(notSimilarToExpr.Left())
+		right := f.assignPlaceholders(notSimilarToExpr.Right())
+		return f.ConstructNotSimilarTo(left, right)
+	case opt.RegMatchOp:
+		regMatchExpr := expr.AsRegMatch()
+		left := f.assignPlaceholders(regMatchExpr.Left())
+		right := f.assignPlaceholders(regMatchExpr.Right())
+		return f.ConstructRegMatch(left, right)
+	case opt.NotRegMatchOp:
+		notRegMatchExpr := expr.AsNotRegMatch()
+		left := f.assignPlaceholders(notRegMatchExpr.Left())
+		right := f.assignPlaceholders(notRegMatchExpr.Right())
+		return f.ConstructNotRegMatch(left, right)
+	case opt.RegIMatchOp:
+		regIMatchExpr := expr.AsRegIMatch()
+		left := f.assignPlaceholders(regIMatchExpr.Left())
+		right := f.assignPlaceholders(regIMatchExpr.Right())
+		return f.ConstructRegIMatch(left, right)
+	case opt.NotRegIMatchOp:
+		notRegIMatchExpr := expr.AsNotRegIMatch()
+		left := f.assignPlaceholders(notRegIMatchExpr.Left())
+		right := f.assignPlaceholders(notRegIMatchExpr.Right())
+		return f.ConstructNotRegIMatch(left, right)
+	case opt.IsOp:
+		isExpr := expr.AsIs()
+		left := f.assignPlaceholders(isExpr.Left())
+		right := f.assignPlaceholders(isExpr.Right())
+		return f.ConstructIs(left, right)
+	case opt.IsNotOp:
+		isNotExpr := expr.AsIsNot()
+		left := f.assignPlaceholders(isNotExpr.Left())
+		right := f.assignPlaceholders(isNotExpr.Right())
+		return f.ConstructIsNot(left, right)
+	case opt.ContainsOp:
+		containsExpr := expr.AsContains()
+		left := f.assignPlaceholders(containsExpr.Left())
+		right := f.assignPlaceholders(containsExpr.Right())
+		return f.ConstructContains(left, right)
+	case opt.JsonExistsOp:
+		jsonExistsExpr := expr.AsJsonExists()
+		left := f.assignPlaceholders(jsonExistsExpr.Left())
+		right := f.assignPlaceholders(jsonExistsExpr.Right())
+		return f.ConstructJsonExists(left, right)
+	case opt.JsonAllExistsOp:
+		jsonAllExistsExpr := expr.AsJsonAllExists()
+		left := f.assignPlaceholders(jsonAllExistsExpr.Left())
+		right := f.assignPlaceholders(jsonAllExistsExpr.Right())
+		return f.ConstructJsonAllExists(left, right)
+	case opt.JsonSomeExistsOp:
+		jsonSomeExistsExpr := expr.AsJsonSomeExists()
+		left := f.assignPlaceholders(jsonSomeExistsExpr.Left())
+		right := f.assignPlaceholders(jsonSomeExistsExpr.Right())
+		return f.ConstructJsonSomeExists(left, right)
+	case opt.AnyScalarOp:
+		anyScalarExpr := expr.AsAnyScalar()
+		left := f.assignPlaceholders(anyScalarExpr.Left())
+		right := f.assignPlaceholders(anyScalarExpr.Right())
+		cmp := anyScalarExpr.Cmp()
+		return f.ConstructAnyScalar(left, right, cmp)
+	case opt.BitandOp:
+		bitandExpr := expr.AsBitand()
+		left := f.assignPlaceholders(bitandExpr.Left())
+		right := f.assignPlaceholders(bitandExpr.Right())
+		return f.ConstructBitand(left, right)
+	case opt.BitorOp:
+		bitorExpr := expr.AsBitor()
+		left := f.assignPlaceholders(bitorExpr.Left())
+		right := f.assignPlaceholders(bitorExpr.Right())
+		return f.ConstructBitor(left, right)
+	case opt.BitxorOp:
+		bitxorExpr := expr.AsBitxor()
+		left := f.assignPlaceholders(bitxorExpr.Left())
+		right := f.assignPlaceholders(bitxorExpr.Right())
+		return f.ConstructBitxor(left, right)
+	case opt.PlusOp:
+		plusExpr := expr.AsPlus()
+		left := f.assignPlaceholders(plusExpr.Left())
+		right := f.assignPlaceholders(plusExpr.Right())
+		return f.ConstructPlus(left, right)
+	case opt.MinusOp:
+		minusExpr := expr.AsMinus()
+		left := f.assignPlaceholders(minusExpr.Left())
+		right := f.assignPlaceholders(minusExpr.Right())
+		return f.ConstructMinus(left, right)
+	case opt.MultOp:
+		multExpr := expr.AsMult()
+		left := f.assignPlaceholders(multExpr.Left())
+		right := f.assignPlaceholders(multExpr.Right())
+		return f.ConstructMult(left, right)
+	case opt.DivOp:
+		divExpr := expr.AsDiv()
+		left := f.assignPlaceholders(divExpr.Left())
+		right := f.assignPlaceholders(divExpr.Right())
+		return f.ConstructDiv(left, right)
+	case opt.FloorDivOp:
+		floorDivExpr := expr.AsFloorDiv()
+		left := f.assignPlaceholders(floorDivExpr.Left())
+		right := f.assignPlaceholders(floorDivExpr.Right())
+		return f.ConstructFloorDiv(left, right)
+	case opt.ModOp:
+		modExpr := expr.AsMod()
+		left := f.assignPlaceholders(modExpr.Left())
+		right := f.assignPlaceholders(modExpr.Right())
+		return f.ConstructMod(left, right)
+	case opt.PowOp:
+		powExpr := expr.AsPow()
+		left := f.assignPlaceholders(powExpr.Left())
+		right := f.assignPlaceholders(powExpr.Right())
+		return f.ConstructPow(left, right)
+	case opt.ConcatOp:
+		concatExpr := expr.AsConcat()
+		left := f.assignPlaceholders(concatExpr.Left())
+		right := f.assignPlaceholders(concatExpr.Right())
+		return f.ConstructConcat(left, right)
+	case opt.LShiftOp:
+		lShiftExpr := expr.AsLShift()
+		left := f.assignPlaceholders(lShiftExpr.Left())
+		right := f.assignPlaceholders(lShiftExpr.Right())
+		return f.ConstructLShift(left, right)
+	case opt.RShiftOp:
+		rShiftExpr := expr.AsRShift()
+		left := f.assignPlaceholders(rShiftExpr.Left())
+		right := f.assignPlaceholders(rShiftExpr.Right())
+		return f.ConstructRShift(left, right)
+	case opt.FetchValOp:
+		fetchValExpr := expr.AsFetchVal()
+		json := f.assignPlaceholders(fetchValExpr.Json())
+		index := f.assignPlaceholders(fetchValExpr.Index())
+		return f.ConstructFetchVal(json, index)
+	case opt.FetchTextOp:
+		fetchTextExpr := expr.AsFetchText()
+		json := f.assignPlaceholders(fetchTextExpr.Json())
+		index := f.assignPlaceholders(fetchTextExpr.Index())
+		return f.ConstructFetchText(json, index)
+	case opt.FetchValPathOp:
+		fetchValPathExpr := expr.AsFetchValPath()
+		json := f.assignPlaceholders(fetchValPathExpr.Json())
+		path := f.assignPlaceholders(fetchValPathExpr.Path())
+		return f.ConstructFetchValPath(json, path)
+	case opt.FetchTextPathOp:
+		fetchTextPathExpr := expr.AsFetchTextPath()
+		json := f.assignPlaceholders(fetchTextPathExpr.Json())
+		path := f.assignPlaceholders(fetchTextPathExpr.Path())
+		return f.ConstructFetchTextPath(json, path)
+	case opt.UnaryMinusOp:
+		unaryMinusExpr := expr.AsUnaryMinus()
+		input := f.assignPlaceholders(unaryMinusExpr.Input())
+		return f.ConstructUnaryMinus(input)
+	case opt.UnaryComplementOp:
+		unaryComplementExpr := expr.AsUnaryComplement()
+		input := f.assignPlaceholders(unaryComplementExpr.Input())
+		return f.ConstructUnaryComplement(input)
+	case opt.CastOp:
+		castExpr := expr.AsCast()
+		input := f.assignPlaceholders(castExpr.Input())
+		targetTyp := castExpr.TargetTyp()
+		return f.ConstructCast(input, targetTyp)
+	case opt.CaseOp:
+		caseExpr := expr.AsCase()
+		lb := MakeListBuilder(&f.funcs)
+		input := f.assignPlaceholders(caseExpr.Input())
+		for _, item := range f.mem.LookupList(caseExpr.Whens()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		whens := lb.BuildList()
+		return f.ConstructCase(input, whens)
+	case opt.WhenOp:
+		whenExpr := expr.AsWhen()
+		condition := f.assignPlaceholders(whenExpr.Condition())
+		value := f.assignPlaceholders(whenExpr.Value())
+		return f.ConstructWhen(condition, value)
+	case opt.ArrayOp:
+		arrayExpr := expr.AsArray()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(arrayExpr.Elems()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		elems := lb.BuildList()
+		typ := arrayExpr.Typ()
+		return f.ConstructArray(elems, typ)
+	case opt.FunctionOp:
+		functionExpr := expr.AsFunction()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(functionExpr.Args()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		args := lb.BuildList()
+		def := functionExpr.Def()
+		return f.ConstructFunction(args, def)
+	case opt.CoalesceOp:
+		coalesceExpr := expr.AsCoalesce()
+		lb := MakeListBuilder(&f.funcs)
+		for _, item := range f.mem.LookupList(coalesceExpr.Args()) {
+			lb.AddItem(f.assignPlaceholders(item))
+		}
+		args := lb.BuildList()
+		return f.ConstructCoalesce(args)
+	case opt.ColumnAccessOp:
+		columnAccessExpr := expr.AsColumnAccess()
+		input := f.assignPlaceholders(columnAccessExpr.Input())
+		idx := columnAccessExpr.Idx()
+		return f.ConstructColumnAccess(input, idx)
+	case opt.AggDistinctOp:
+		aggDistinctExpr := expr.AsAggDistinct()
+		input := f.assignPlaceholders(aggDistinctExpr.Input())
+		return f.ConstructAggDistinct(input)
+	case opt.PlaceholderOp:
+		value := expr.AsPlaceholder().Value()
+		placeholder := f.mem.LookupPrivate(value).(*tree.Placeholder)
+		d, err := placeholder.Eval(f.evalCtx)
+		if err != nil {
+			panic(err)
+		}
+		return f.ConstructConstVal(d)
+	}
+	panic("unhandled operator")
+}
+
 type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
 
 var dynConstructLookup [opt.NumOperators]dynConstructFunc
