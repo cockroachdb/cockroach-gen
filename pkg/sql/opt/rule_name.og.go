@@ -55,8 +55,10 @@ const (
 	HoistZipSubquery
 	NormalizeAnyFilter
 	NormalizeNotAnyFilter
+	FoldArray
 	FoldBinary
 	FoldUnary
+	FoldComparison
 	ConvertGroupByToDistinct
 	EliminateDistinct
 	EliminateGroupByProject

@@ -6436,6 +6436,25 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.EqOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_eqExpr))
 }
 
@@ -6607,6 +6626,25 @@ func (_f *Factory) ConstructLt(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.LtOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -6786,6 +6824,25 @@ func (_f *Factory) ConstructGt(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.GtOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_gtExpr))
 }
 
@@ -6957,6 +7014,25 @@ func (_f *Factory) ConstructLe(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.LeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -7136,6 +7212,25 @@ func (_f *Factory) ConstructGe(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.GeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_geExpr))
 }
 
@@ -7219,6 +7314,25 @@ func (_f *Factory) ConstructNe(
 						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -7318,6 +7432,25 @@ func (_f *Factory) ConstructIn(
 						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.FoldInNull, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.InOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
 						}
 						return _group
 					}
@@ -7428,6 +7561,25 @@ func (_f *Factory) ConstructNotIn(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotInOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_notInExpr))
 }
 
@@ -7472,6 +7624,25 @@ func (_f *Factory) ConstructLike(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.LikeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_likeExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -7524,6 +7695,25 @@ func (_f *Factory) ConstructNotLike(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotLikeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_notLikeExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_notLikeExpr))
 }
 
@@ -7568,6 +7758,25 @@ func (_f *Factory) ConstructILike(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.ILikeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_iLikeExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -7620,6 +7829,25 @@ func (_f *Factory) ConstructNotILike(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotILikeOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_notILikeExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_notILikeExpr))
 }
 
@@ -7664,6 +7892,25 @@ func (_f *Factory) ConstructSimilarTo(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.SimilarToOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_similarToExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -7716,6 +7963,25 @@ func (_f *Factory) ConstructNotSimilarTo(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotSimilarToOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_notSimilarToExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_notSimilarToExpr))
 }
 
@@ -7760,6 +8026,25 @@ func (_f *Factory) ConstructRegMatch(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.RegMatchOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_regMatchExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -7812,6 +8097,25 @@ func (_f *Factory) ConstructNotRegMatch(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotRegMatchOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_notRegMatchExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_notRegMatchExpr))
 }
 
@@ -7856,6 +8160,25 @@ func (_f *Factory) ConstructRegIMatch(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.RegIMatchOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_regIMatchExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -7908,6 +8231,25 @@ func (_f *Factory) ConstructNotRegIMatch(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotRegIMatchOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_notRegIMatchExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_notRegIMatchExpr))
 }
 
@@ -7942,10 +8284,9 @@ func (_f *Factory) ConstructIs(
 
 	// [FoldNonNullIsNull]
 	{
-		_expr := _f.mem.NormExpr(left)
-		if _expr.IsConstValue() {
-			_nullExpr := _f.mem.NormExpr(left).AsNull()
-			if _nullExpr == nil {
+		_nullExpr := _f.mem.NormExpr(left).AsNull()
+		if _nullExpr == nil {
+			if _f.funcs.IsConstValueOrTuple(left) {
 				_nullExpr2 := _f.mem.NormExpr(right).AsNull()
 				if _nullExpr2 != nil {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullIsNull) {
@@ -8022,6 +8363,25 @@ func (_f *Factory) ConstructIs(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.IsOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_isExpr))
 }
 
@@ -8056,10 +8416,9 @@ func (_f *Factory) ConstructIsNot(
 
 	// [FoldNonNullIsNotNull]
 	{
-		_expr := _f.mem.NormExpr(left)
-		if _expr.IsConstValue() {
-			_nullExpr := _f.mem.NormExpr(left).AsNull()
-			if _nullExpr == nil {
+		_nullExpr := _f.mem.NormExpr(left).AsNull()
+		if _nullExpr == nil {
+			if _f.funcs.IsConstValueOrTuple(left) {
 				_nullExpr2 := _f.mem.NormExpr(right).AsNull()
 				if _nullExpr2 != nil {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullIsNotNull) {
@@ -8131,6 +8490,25 @@ func (_f *Factory) ConstructIsNot(
 						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.IsNotOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -8214,6 +8592,25 @@ func (_f *Factory) ConstructContains(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.ContainsOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_containsExpr))
 }
 
@@ -8258,6 +8655,25 @@ func (_f *Factory) ConstructJsonExists(
 					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.JsonExistsOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_jsonExistsExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
 			}
 		}
 	}
@@ -8310,6 +8726,25 @@ func (_f *Factory) ConstructJsonAllExists(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.JsonAllExistsOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_jsonAllExistsExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_jsonAllExistsExpr))
 }
 
@@ -8358,6 +8793,25 @@ func (_f *Factory) ConstructJsonSomeExists(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.JsonSomeExistsOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_group = result
+						_f.mem.AddAltFingerprint(_jsonSomeExistsExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_jsonSomeExistsExpr))
 }
 
@@ -8387,27 +8841,6 @@ func (_f *Factory) ConstructBitand(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.BitandOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [CommuteVar]
 	{
 		_variableExpr := _f.mem.NormExpr(left).AsVariable()
@@ -8477,6 +8910,25 @@ func (_f *Factory) ConstructBitand(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.BitandOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -8496,27 +8948,6 @@ func (_f *Factory) ConstructBitor(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.BitorOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [CommuteVar]
 	{
 		_variableExpr := _f.mem.NormExpr(left).AsVariable()
@@ -8586,6 +9017,25 @@ func (_f *Factory) ConstructBitor(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.BitorOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -8605,27 +9055,6 @@ func (_f *Factory) ConstructBitxor(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.BitxorOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [CommuteVar]
 	{
 		_variableExpr := _f.mem.NormExpr(left).AsVariable()
@@ -8700,6 +9129,25 @@ func (_f *Factory) ConstructBitxor(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.BitxorOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_bitxorExpr))
 }
 
@@ -8712,27 +9160,6 @@ func (_f *Factory) ConstructPlus(
 	_group := _f.mem.GroupByFingerprint(_plusExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.PlusOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldPlusZero]
@@ -8843,6 +9270,25 @@ func (_f *Factory) ConstructPlus(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.PlusOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_plusExpr))
 }
 
@@ -8855,27 +9301,6 @@ func (_f *Factory) ConstructMinus(
 	_group := _f.mem.GroupByFingerprint(_minusExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.MinusOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldMinusZero]
@@ -8929,6 +9354,25 @@ func (_f *Factory) ConstructMinus(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.MinusOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_minusExpr))
 }
 
@@ -8941,27 +9385,6 @@ func (_f *Factory) ConstructMult(
 	_group := _f.mem.GroupByFingerprint(_multExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.MultOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldMultOne]
@@ -9072,6 +9495,25 @@ func (_f *Factory) ConstructMult(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.MultOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_multExpr))
 }
 
@@ -9084,27 +9526,6 @@ func (_f *Factory) ConstructDiv(
 	_group := _f.mem.GroupByFingerprint(_divExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.DivOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldDivOne]
@@ -9153,6 +9574,25 @@ func (_f *Factory) ConstructDiv(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.DivOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9172,27 +9612,6 @@ func (_f *Factory) ConstructFloorDiv(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.FloorDivOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldDivOne]
 	{
 		_constExpr := _f.mem.NormExpr(right).AsConst()
@@ -9244,6 +9663,25 @@ func (_f *Factory) ConstructFloorDiv(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.FloorDivOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_floorDivExpr))
 }
 
@@ -9256,27 +9694,6 @@ func (_f *Factory) ConstructMod(
 	_group := _f.mem.GroupByFingerprint(_modExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.ModOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_modExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldNullBinaryLeft]
@@ -9308,6 +9725,25 @@ func (_f *Factory) ConstructMod(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.ModOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_modExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9327,27 +9763,6 @@ func (_f *Factory) ConstructPow(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.PowOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_powExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_nullExpr := _f.mem.NormExpr(left).AsNull()
@@ -9377,6 +9792,25 @@ func (_f *Factory) ConstructPow(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.PowOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_powExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9396,27 +9830,6 @@ func (_f *Factory) ConstructConcat(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.ConcatOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_concatExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_nullExpr := _f.mem.NormExpr(left).AsNull()
@@ -9446,6 +9859,25 @@ func (_f *Factory) ConstructConcat(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.ConcatOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_concatExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9465,27 +9897,6 @@ func (_f *Factory) ConstructLShift(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.LShiftOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_lShiftExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_nullExpr := _f.mem.NormExpr(left).AsNull()
@@ -9515,6 +9926,25 @@ func (_f *Factory) ConstructLShift(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.LShiftOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_lShiftExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9534,27 +9964,6 @@ func (_f *Factory) ConstructRShift(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			_constExpr2 := _f.mem.NormExpr(right).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.RShiftOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_rShiftExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_nullExpr := _f.mem.NormExpr(left).AsNull()
@@ -9589,6 +9998,25 @@ func (_f *Factory) ConstructRShift(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.RShiftOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_rShiftExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_rShiftExpr))
 }
 
@@ -9601,29 +10029,6 @@ func (_f *Factory) ConstructFetchVal(
 	_group := _f.mem.GroupByFingerprint(_fetchValExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		left := json
-		_constExpr := _f.mem.NormExpr(json).AsConst()
-		if _constExpr != nil {
-			right := index
-			_constExpr2 := _f.mem.NormExpr(index).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.FetchValOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchValExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldNullBinaryLeft]
@@ -9659,6 +10064,27 @@ func (_f *Factory) ConstructFetchVal(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		left := json
+		if _f.funcs.IsConstValueOrTuple(left) {
+			right := index
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.FetchValOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_fetchValExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9678,29 +10104,6 @@ func (_f *Factory) ConstructFetchText(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		left := json
-		_constExpr := _f.mem.NormExpr(json).AsConst()
-		if _constExpr != nil {
-			right := index
-			_constExpr2 := _f.mem.NormExpr(index).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.FetchTextOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchTextExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		left := json
@@ -9739,6 +10142,27 @@ func (_f *Factory) ConstructFetchText(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		left := json
+		if _f.funcs.IsConstValueOrTuple(left) {
+			right := index
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.FetchTextOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_fetchTextExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_fetchTextExpr))
 }
 
@@ -9751,29 +10175,6 @@ func (_f *Factory) ConstructFetchValPath(
 	_group := _f.mem.GroupByFingerprint(_fetchValPathExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldBinary]
-	{
-		left := json
-		_constExpr := _f.mem.NormExpr(json).AsConst()
-		if _constExpr != nil {
-			right := path
-			_constExpr2 := _f.mem.NormExpr(path).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.FetchValPathOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchValPathExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
 	}
 
 	// [FoldNullBinaryLeft]
@@ -9809,6 +10210,27 @@ func (_f *Factory) ConstructFetchValPath(
 						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		left := json
+		if _f.funcs.IsConstValueOrTuple(left) {
+			right := path
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.FetchValPathOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_fetchValPathExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
 				}
 			}
 		}
@@ -9828,29 +10250,6 @@ func (_f *Factory) ConstructFetchTextPath(
 		return _group
 	}
 
-	// [FoldBinary]
-	{
-		left := json
-		_constExpr := _f.mem.NormExpr(json).AsConst()
-		if _constExpr != nil {
-			right := path
-			_constExpr2 := _f.mem.NormExpr(path).AsConst()
-			if _constExpr2 != nil {
-				result := _f.funcs.FoldBinary(opt.FetchTextPathOp, left, right)
-				if _f.funcs.FoldSucceeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchTextPathExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		left := json
@@ -9889,6 +10288,27 @@ func (_f *Factory) ConstructFetchTextPath(
 		}
 	}
 
+	// [FoldBinary]
+	{
+		left := json
+		if _f.funcs.IsConstValueOrTuple(left) {
+			right := path
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.FetchTextPathOp, left, right)
+				if _f.funcs.FoldSucceeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_group = result
+						_f.mem.AddAltFingerprint(_fetchTextPathExpr.Fingerprint(), _group)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+						}
+						return _group
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_fetchTextPathExpr))
 }
 
@@ -9900,24 +10320,6 @@ func (_f *Factory) ConstructUnaryMinus(
 	_group := _f.mem.GroupByFingerprint(_unaryMinusExpr.Fingerprint())
 	if _group != 0 {
 		return _group
-	}
-
-	// [FoldUnary]
-	{
-		_constExpr := _f.mem.NormExpr(input).AsConst()
-		if _constExpr != nil {
-			result := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
-			if _f.funcs.FoldSucceeded(result) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
-					_group = result
-					_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldUnary, _group, 0, 0)
-					}
-					return _group
-				}
-			}
-		}
 	}
 
 	// [InvertMinus]
@@ -9973,6 +10375,23 @@ func (_f *Factory) ConstructUnaryMinus(
 		}
 	}
 
+	// [FoldUnary]
+	{
+		if _f.funcs.IsConstValueOrTuple(input) {
+			result := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
+			if _f.funcs.FoldSucceeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
+					_group = result
+					_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnary, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_unaryMinusExpr))
 }
 
@@ -9986,24 +10405,6 @@ func (_f *Factory) ConstructUnaryComplement(
 		return _group
 	}
 
-	// [FoldUnary]
-	{
-		_constExpr := _f.mem.NormExpr(input).AsConst()
-		if _constExpr != nil {
-			result := _f.funcs.FoldUnary(opt.UnaryComplementOp, input)
-			if _f.funcs.FoldSucceeded(result) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
-					_group = result
-					_f.mem.AddAltFingerprint(_unaryComplementExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldUnary, _group, 0, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
 	// [FoldNullUnary]
 	{
 		_nullExpr := _f.mem.NormExpr(input).AsNull()
@@ -10015,6 +10416,23 @@ func (_f *Factory) ConstructUnaryComplement(
 					_f.appliedRule(opt.FoldNullUnary, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [FoldUnary]
+	{
+		if _f.funcs.IsConstValueOrTuple(input) {
+			result := _f.funcs.FoldUnary(opt.UnaryComplementOp, input)
+			if _f.funcs.FoldSucceeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
+					_group = result
+					_f.mem.AddAltFingerprint(_unaryComplementExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnary, _group, 0, 0)
+					}
+					return _group
+				}
 			}
 		}
 	}
@@ -10136,6 +10554,20 @@ func (_f *Factory) ConstructArray(
 		return _group
 	}
 
+	// [FoldArray]
+	{
+		if _f.funcs.IsListOfConstants(elems) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldArray) {
+				_group = _f.funcs.FoldArray(elems, typ)
+				_f.mem.AddAltFingerprint(_arrayExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldArray, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_arrayExpr))
 }
 
@@ -10186,8 +10618,8 @@ func (_f *Factory) ConstructCoalesce(
 	{
 		if args.Length > 0 {
 			_item := _f.mem.LookupList(args)[0]
-			_expr := _f.mem.NormExpr(_item)
-			if _expr.IsConstValue() {
+			arg := _item
+			if _f.funcs.IsConstValueOrTuple(arg) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyCoalesce) {
 					_group = _f.funcs.SimplifyCoalesce(args)
 					_f.mem.AddAltFingerprint(_coalesceExpr.Fingerprint(), _group)
