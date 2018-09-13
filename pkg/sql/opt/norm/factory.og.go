@@ -10522,6 +10522,30 @@ func (_f *Factory) ConstructCase(
 		return _group
 	}
 
+	// [SimplifyCaseWhenConstValue]
+	{
+		condition := input
+		_expr := _f.mem.NormExpr(input)
+		if _expr.IsConstValue() {
+			for _, _item := range _f.mem.LookupList(whens) {
+				_whenExpr := _f.mem.NormExpr(_item).AsWhen()
+				if _whenExpr != nil {
+					_expr2 := _f.mem.NormExpr(_whenExpr.Condition())
+					if _expr2.IsConstValue() {
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyCaseWhenConstValue) {
+							_group = _f.funcs.SimplifyWhens(condition, whens)
+							_f.mem.AddAltFingerprint(_caseExpr.Fingerprint(), _group)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyCaseWhenConstValue, _group, 0, 0)
+							}
+							return _group
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _f.onConstruct(memo.Expr(_caseExpr))
 }
 

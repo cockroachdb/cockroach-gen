@@ -132,6 +132,7 @@ const (
 	EliminateExistsGroupBy
 	NormalizeJSONFieldAccess
 	NormalizeJSONContains
+	SimplifyCaseWhenConstValue
 	EliminateSelect
 	EnsureSelectFilters
 	MergeSelects
