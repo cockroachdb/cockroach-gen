@@ -333,26 +333,6 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
-	// [EnsureSelectFilters]
-	{
-		_expr := _f.mem.NormExpr(filter)
-		if !(_expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EnsureSelectFilters) {
-				_group = _f.ConstructSelect(
-					input,
-					_f.ConstructFilters(
-						_f.mem.InternList([]memo.GroupID{filter}),
-					),
-				)
-				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EnsureSelectFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
 	// [MergeSelects]
 	{
 		_selectExpr2 := _f.mem.NormExpr(input).AsSelect()

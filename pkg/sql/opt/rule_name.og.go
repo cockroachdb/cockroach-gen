@@ -134,7 +134,6 @@ const (
 	NormalizeJSONContains
 	SimplifyCaseWhenConstValue
 	EliminateSelect
-	EnsureSelectFilters
 	MergeSelects
 	PushSelectIntoProject
 	MergeSelectInnerJoin
