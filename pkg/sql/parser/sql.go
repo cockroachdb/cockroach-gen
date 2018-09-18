@@ -6,7 +6,6 @@ package parser
 import __yyfmt__ "fmt"
 
 //line sql-gen.y:24
-
 import (
 	"fmt"
 	"strings"
@@ -34,7 +33,6 @@ func unimplementedWithIssue(sqllex sqlLexer, issue int) int {
 }
 
 //line sql-gen.y:55
-
 type sqlSymUnion struct {
 	val interface{}
 }
