@@ -143,7 +143,6 @@ const (
 	PushSelectIntoJoinRight
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
-	DetectSelectContradiction
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
 

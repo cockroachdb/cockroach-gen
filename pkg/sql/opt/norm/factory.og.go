@@ -692,24 +692,6 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
-	// [DetectSelectContradiction]
-	{
-		filters := filter
-		_expr := _f.mem.NormExpr(filter)
-		if _expr.Operator() == opt.FiltersOp || _expr.Operator() == opt.FalseOp {
-			if _f.funcs.IsContradiction(filters) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectSelectContradiction) {
-					_group = _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(input))
-					_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectSelectContradiction, _group, 0, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
 	// [HoistSelectExists]
 	{
 		if _f.funcs.HasHoistableSubquery(filter) {
