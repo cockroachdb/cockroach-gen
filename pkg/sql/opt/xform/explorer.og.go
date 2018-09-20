@@ -174,7 +174,7 @@ func (_e *explorer) exploreInnerJoin(_rootState *exploreState, _root memo.ExprID
 			right := _rootExpr.Right()
 			on := _rootExpr.On()
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
-				_exprs := _e.funcs.ConstructMergeJoins(opt.InnerJoinOp, left, right, on)
+				_exprs := _e.funcs.GenerateMergeJoins(opt.InnerJoinOp, left, right, on)
 				_before := _e.mem.ExprCount(_root.Group)
 				for i := range _exprs {
 					_e.mem.MemoizeDenormExpr(_e.evalCtx, _root.Group, _exprs[i])
@@ -305,7 +305,7 @@ func (_e *explorer) exploreLeftJoin(_rootState *exploreState, _root memo.ExprID)
 			right := _rootExpr.Right()
 			on := _rootExpr.On()
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
-				_exprs := _e.funcs.ConstructMergeJoins(opt.LeftJoinOp, left, right, on)
+				_exprs := _e.funcs.GenerateMergeJoins(opt.LeftJoinOp, left, right, on)
 				_before := _e.mem.ExprCount(_root.Group)
 				for i := range _exprs {
 					_e.mem.MemoizeDenormExpr(_e.evalCtx, _root.Group, _exprs[i])
@@ -436,7 +436,7 @@ func (_e *explorer) exploreRightJoin(_rootState *exploreState, _root memo.ExprID
 			right := _rootExpr.Right()
 			on := _rootExpr.On()
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
-				_exprs := _e.funcs.ConstructMergeJoins(opt.RightJoinOp, left, right, on)
+				_exprs := _e.funcs.GenerateMergeJoins(opt.RightJoinOp, left, right, on)
 				_before := _e.mem.ExprCount(_root.Group)
 				for i := range _exprs {
 					_e.mem.MemoizeDenormExpr(_e.evalCtx, _root.Group, _exprs[i])
@@ -485,7 +485,7 @@ func (_e *explorer) exploreFullJoin(_rootState *exploreState, _root memo.ExprID)
 			right := _rootExpr.Right()
 			on := _rootExpr.On()
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
-				_exprs := _e.funcs.ConstructMergeJoins(opt.FullJoinOp, left, right, on)
+				_exprs := _e.funcs.GenerateMergeJoins(opt.FullJoinOp, left, right, on)
 				_before := _e.mem.ExprCount(_root.Group)
 				for i := range _exprs {
 					_e.mem.MemoizeDenormExpr(_e.evalCtx, _root.Group, _exprs[i])
@@ -512,7 +512,7 @@ func (_e *explorer) exploreSemiJoin(_rootState *exploreState, _root memo.ExprID)
 			right := _rootExpr.Right()
 			on := _rootExpr.On()
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
-				_exprs := _e.funcs.ConstructMergeJoins(opt.SemiJoinOp, left, right, on)
+				_exprs := _e.funcs.GenerateMergeJoins(opt.SemiJoinOp, left, right, on)
 				_before := _e.mem.ExprCount(_root.Group)
 				for i := range _exprs {
 					_e.mem.MemoizeDenormExpr(_e.evalCtx, _root.Group, _exprs[i])
@@ -539,7 +539,7 @@ func (_e *explorer) exploreAntiJoin(_rootState *exploreState, _root memo.ExprID)
 			right := _rootExpr.Right()
 			on := _rootExpr.On()
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
-				_exprs := _e.funcs.ConstructMergeJoins(opt.AntiJoinOp, left, right, on)
+				_exprs := _e.funcs.GenerateMergeJoins(opt.AntiJoinOp, left, right, on)
 				_before := _e.mem.ExprCount(_root.Group)
 				for i := range _exprs {
 					_e.mem.MemoizeDenormExpr(_e.evalCtx, _root.Group, _exprs[i])
