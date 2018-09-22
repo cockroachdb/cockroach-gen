@@ -80,6 +80,7 @@ const (
 	EliminateJoinNoColsLeft
 	EliminateJoinNoColsRight
 	HoistJoinProject
+	SimplifyJoinNotNullEquality
 	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject

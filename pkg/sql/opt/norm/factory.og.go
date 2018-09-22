@@ -1769,6 +1769,54 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructInnerJoin(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2039,6 +2087,54 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructLeftJoin(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2182,6 +2278,54 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructRightJoin(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2277,6 +2421,54 @@ func (_f *Factory) ConstructFullJoin(
 						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructFullJoin(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -2637,6 +2829,54 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructSemiJoin(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2822,6 +3062,54 @@ func (_f *Factory) ConstructAntiJoin(
 					_f.appliedRule(opt.EliminateAntiJoin, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructAntiJoin(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -3413,6 +3701,54 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructInnerJoinApply(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -3784,6 +4120,54 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructLeftJoinApply(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -3941,6 +4325,54 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructRightJoinApply(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -4050,6 +4482,54 @@ func (_f *Factory) ConstructFullJoinApply(
 						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
 					}
 					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructFullJoinApply(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -4366,6 +4846,54 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructSemiJoinApply(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -4565,6 +5093,54 @@ func (_f *Factory) ConstructAntiJoinApply(
 					_f.appliedRule(opt.EliminateAntiJoin, _group, 0, 0)
 				}
 				return _group
+			}
+		}
+	}
+
+	// [SimplifyJoinNotNullEquality]
+	{
+		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+		if _filtersExpr != nil {
+			list := _filtersExpr.Conditions()
+			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+				condition := _item
+				_expr := _f.mem.NormExpr(_item)
+				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
+					eq := _expr.ChildGroup(_f.Memo(), 0)
+					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
+					if _eqExpr != nil {
+						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
+						if _variableExpr != nil {
+							col1 := _variableExpr.Col()
+							if _f.funcs.IsColNotNull2(col1, left, right) {
+								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
+								if _variableExpr2 != nil {
+									col2 := _variableExpr2.Col()
+									if _f.funcs.IsColNotNull2(col2, left, right) {
+										cnst := _expr.ChildGroup(_f.Memo(), 1)
+										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
+										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
+											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+												_group = _f.ConstructAntiJoinApply(
+													left,
+													right,
+													_f.ConstructFilters(
+														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
+													),
+												)
+												_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+												if _f.appliedRule != nil {
+													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
+												}
+												return _group
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
