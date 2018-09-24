@@ -15,6 +15,8 @@ const (
 	SimplifyOr
 	SimplifyFilters
 	FoldNullAndOr
+	FoldNotTrue
+	FoldNotFalse
 	NegateComparison
 	EliminateNot
 	NegateAnd

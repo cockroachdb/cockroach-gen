@@ -6673,6 +6673,36 @@ func (_f *Factory) ConstructNot(
 		return _group
 	}
 
+	// [FoldNotTrue]
+	{
+		_trueExpr := _f.mem.NormExpr(input).AsTrue()
+		if _trueExpr != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNotTrue) {
+				_group = _f.ConstructFalse()
+				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNotTrue, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
+	// [FoldNotFalse]
+	{
+		_falseExpr := _f.mem.NormExpr(input).AsFalse()
+		if _falseExpr != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNotFalse) {
+				_group = _f.ConstructTrue()
+				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNotFalse, _group, 0, 0)
+				}
+				return _group
+			}
+		}
+	}
+
 	// [NegateComparison]
 	{
 		_expr := _f.mem.NormExpr(input)
