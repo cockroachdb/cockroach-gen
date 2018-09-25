@@ -131,6 +131,7 @@ const (
 	FoldNullNotInEmpty
 	NormalizeInConst
 	FoldInNull
+	UnifyComparisonTypes
 	EliminateExistsProject
 	EliminateExistsGroupBy
 	NormalizeJSONFieldAccess
