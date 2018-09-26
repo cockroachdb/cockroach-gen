@@ -83,6 +83,7 @@ const (
 	EliminateJoinNoColsRight
 	HoistJoinProject
 	SimplifyJoinNotNullEquality
+	ExtractJoinEqualities
 	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject

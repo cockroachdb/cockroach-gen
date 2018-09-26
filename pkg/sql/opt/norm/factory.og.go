@@ -1817,6 +1817,35 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [ExtractJoinEqualities]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+						_eqExpr := _f.mem.NormExpr(_item).AsEq()
+						if _eqExpr != nil {
+							a := _eqExpr.Left()
+							b := _eqExpr.Right()
+							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+									_group = _f.funcs.ExtractJoinEqualities(opt.InnerJoinOp, left, right, list)
+									_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2135,6 +2164,35 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [ExtractJoinEqualities]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+						_eqExpr := _f.mem.NormExpr(_item).AsEq()
+						if _eqExpr != nil {
+							a := _eqExpr.Left()
+							b := _eqExpr.Right()
+							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+									_group = _f.funcs.ExtractJoinEqualities(opt.LeftJoinOp, left, right, list)
+									_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2326,6 +2384,35 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
+	// [ExtractJoinEqualities]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+						_eqExpr := _f.mem.NormExpr(_item).AsEq()
+						if _eqExpr != nil {
+							a := _eqExpr.Left()
+							b := _eqExpr.Right()
+							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+									_group = _f.funcs.ExtractJoinEqualities(opt.RightJoinOp, left, right, list)
+									_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -2465,6 +2552,35 @@ func (_f *Factory) ConstructFullJoin(
 											}
 										}
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [ExtractJoinEqualities]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+						_eqExpr := _f.mem.NormExpr(_item).AsEq()
+						if _eqExpr != nil {
+							a := _eqExpr.Left()
+							b := _eqExpr.Right()
+							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+									_group = _f.funcs.ExtractJoinEqualities(opt.FullJoinOp, left, right, list)
+									_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+									}
+									return _group
 								}
 							}
 						}
@@ -2877,6 +2993,35 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [ExtractJoinEqualities]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+						_eqExpr := _f.mem.NormExpr(_item).AsEq()
+						if _eqExpr != nil {
+							a := _eqExpr.Left()
+							b := _eqExpr.Right()
+							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+									_group = _f.funcs.ExtractJoinEqualities(opt.SemiJoinOp, left, right, list)
+									_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+									}
+									return _group
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		if _f.funcs.HasHoistableSubquery(on) {
@@ -3105,6 +3250,35 @@ func (_f *Factory) ConstructAntiJoin(
 											}
 										}
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [ExtractJoinEqualities]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
+				if _filtersExpr != nil {
+					list := _filtersExpr.Conditions()
+					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
+						_eqExpr := _f.mem.NormExpr(_item).AsEq()
+						if _eqExpr != nil {
+							a := _eqExpr.Left()
+							b := _eqExpr.Right()
+							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+									_group = _f.funcs.ExtractJoinEqualities(opt.AntiJoinOp, left, right, list)
+									_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+									}
+									return _group
 								}
 							}
 						}
