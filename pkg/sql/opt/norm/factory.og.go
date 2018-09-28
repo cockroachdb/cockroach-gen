@@ -820,7 +820,8 @@ func (_f *Factory) ConstructSelect(
 			def := _expr.PrivateID()
 			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
 			if _filtersExpr != nil {
-				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.RejectNullCols(input)) {
+				rejectCols := _f.funcs.RejectNullCols(input)
+				if _f.funcs.HasNullRejectingFilter(filter, rejectCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
 						_group = _f.ConstructSelect(
 							_f.DynamicConstruct(
@@ -830,7 +831,7 @@ func (_f *Factory) ConstructSelect(
 										innerInput,
 										_f.ConstructFilters(
 											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-												_f.funcs.NullRejectAggVar(aggregations),
+												_f.funcs.NullRejectAggVar(aggregations, rejectCols),
 												_f.ConstructNull(
 													_f.funcs.AnyType(),
 												),
