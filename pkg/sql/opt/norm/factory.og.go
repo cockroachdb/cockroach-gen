@@ -12392,9 +12392,9 @@ func (_f *Factory) ConstructAggDistinct(
 	return _f.onConstruct(memo.Expr(_aggDistinctExpr))
 }
 
-func (f *Factory) assignPlaceholders(group memo.GroupID) memo.GroupID {
+func (f *Factory) assignPlaceholders(group memo.GroupID) (memo.GroupID, error) {
 	if !f.mem.GroupProperties(group).HasPlaceholder() {
-		return group
+		return group, nil
 	}
 	expr := f.mem.NormExpr(group)
 	switch expr.Operator() {
@@ -12402,556 +12402,1111 @@ func (f *Factory) assignPlaceholders(group memo.GroupID) memo.GroupID {
 		valuesExpr := expr.AsValues()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(valuesExpr.Rows()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		rows := lb.BuildList()
 		cols := valuesExpr.Cols()
-		return f.ConstructValues(rows, cols)
+		return f.ConstructValues(rows, cols), nil
 	case opt.SelectOp:
 		selectExpr := expr.AsSelect()
-		input := f.assignPlaceholders(selectExpr.Input())
-		filter := f.assignPlaceholders(selectExpr.Filter())
-		return f.ConstructSelect(input, filter)
+		input, err := f.assignPlaceholders(selectExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		filter, err := f.assignPlaceholders(selectExpr.Filter())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructSelect(input, filter), nil
 	case opt.ProjectOp:
 		projectExpr := expr.AsProject()
-		input := f.assignPlaceholders(projectExpr.Input())
-		projections := f.assignPlaceholders(projectExpr.Projections())
-		return f.ConstructProject(input, projections)
+		input, err := f.assignPlaceholders(projectExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		projections, err := f.assignPlaceholders(projectExpr.Projections())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructProject(input, projections), nil
 	case opt.InnerJoinOp:
 		innerJoinExpr := expr.AsInnerJoin()
-		left := f.assignPlaceholders(innerJoinExpr.Left())
-		right := f.assignPlaceholders(innerJoinExpr.Right())
-		on := f.assignPlaceholders(innerJoinExpr.On())
-		return f.ConstructInnerJoin(left, right, on)
+		left, err := f.assignPlaceholders(innerJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(innerJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(innerJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructInnerJoin(left, right, on), nil
 	case opt.LeftJoinOp:
 		leftJoinExpr := expr.AsLeftJoin()
-		left := f.assignPlaceholders(leftJoinExpr.Left())
-		right := f.assignPlaceholders(leftJoinExpr.Right())
-		on := f.assignPlaceholders(leftJoinExpr.On())
-		return f.ConstructLeftJoin(left, right, on)
+		left, err := f.assignPlaceholders(leftJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(leftJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(leftJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructLeftJoin(left, right, on), nil
 	case opt.RightJoinOp:
 		rightJoinExpr := expr.AsRightJoin()
-		left := f.assignPlaceholders(rightJoinExpr.Left())
-		right := f.assignPlaceholders(rightJoinExpr.Right())
-		on := f.assignPlaceholders(rightJoinExpr.On())
-		return f.ConstructRightJoin(left, right, on)
+		left, err := f.assignPlaceholders(rightJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(rightJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(rightJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructRightJoin(left, right, on), nil
 	case opt.FullJoinOp:
 		fullJoinExpr := expr.AsFullJoin()
-		left := f.assignPlaceholders(fullJoinExpr.Left())
-		right := f.assignPlaceholders(fullJoinExpr.Right())
-		on := f.assignPlaceholders(fullJoinExpr.On())
-		return f.ConstructFullJoin(left, right, on)
+		left, err := f.assignPlaceholders(fullJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(fullJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(fullJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFullJoin(left, right, on), nil
 	case opt.SemiJoinOp:
 		semiJoinExpr := expr.AsSemiJoin()
-		left := f.assignPlaceholders(semiJoinExpr.Left())
-		right := f.assignPlaceholders(semiJoinExpr.Right())
-		on := f.assignPlaceholders(semiJoinExpr.On())
-		return f.ConstructSemiJoin(left, right, on)
+		left, err := f.assignPlaceholders(semiJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(semiJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(semiJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructSemiJoin(left, right, on), nil
 	case opt.AntiJoinOp:
 		antiJoinExpr := expr.AsAntiJoin()
-		left := f.assignPlaceholders(antiJoinExpr.Left())
-		right := f.assignPlaceholders(antiJoinExpr.Right())
-		on := f.assignPlaceholders(antiJoinExpr.On())
-		return f.ConstructAntiJoin(left, right, on)
+		left, err := f.assignPlaceholders(antiJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(antiJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(antiJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructAntiJoin(left, right, on), nil
 	case opt.IndexJoinOp:
 		indexJoinExpr := expr.AsIndexJoin()
-		input := f.assignPlaceholders(indexJoinExpr.Input())
+		input, err := f.assignPlaceholders(indexJoinExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		def := indexJoinExpr.Def()
-		return f.ConstructIndexJoin(input, def)
+		return f.ConstructIndexJoin(input, def), nil
 	case opt.LookupJoinOp:
 		lookupJoinExpr := expr.AsLookupJoin()
-		input := f.assignPlaceholders(lookupJoinExpr.Input())
-		on := f.assignPlaceholders(lookupJoinExpr.On())
+		input, err := f.assignPlaceholders(lookupJoinExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(lookupJoinExpr.On())
+		if err != nil {
+			return 0, err
+		}
 		def := lookupJoinExpr.Def()
-		return f.ConstructLookupJoin(input, on, def)
+		return f.ConstructLookupJoin(input, on, def), nil
 	case opt.MergeJoinOp:
 		mergeJoinExpr := expr.AsMergeJoin()
-		left := f.assignPlaceholders(mergeJoinExpr.Left())
-		right := f.assignPlaceholders(mergeJoinExpr.Right())
-		mergeOn := f.assignPlaceholders(mergeJoinExpr.MergeOn())
-		return f.ConstructMergeJoin(left, right, mergeOn)
+		left, err := f.assignPlaceholders(mergeJoinExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(mergeJoinExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		mergeOn, err := f.assignPlaceholders(mergeJoinExpr.MergeOn())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructMergeJoin(left, right, mergeOn), nil
 	case opt.InnerJoinApplyOp:
 		innerJoinApplyExpr := expr.AsInnerJoinApply()
-		left := f.assignPlaceholders(innerJoinApplyExpr.Left())
-		right := f.assignPlaceholders(innerJoinApplyExpr.Right())
-		on := f.assignPlaceholders(innerJoinApplyExpr.On())
-		return f.ConstructInnerJoinApply(left, right, on)
+		left, err := f.assignPlaceholders(innerJoinApplyExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(innerJoinApplyExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(innerJoinApplyExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructInnerJoinApply(left, right, on), nil
 	case opt.LeftJoinApplyOp:
 		leftJoinApplyExpr := expr.AsLeftJoinApply()
-		left := f.assignPlaceholders(leftJoinApplyExpr.Left())
-		right := f.assignPlaceholders(leftJoinApplyExpr.Right())
-		on := f.assignPlaceholders(leftJoinApplyExpr.On())
-		return f.ConstructLeftJoinApply(left, right, on)
+		left, err := f.assignPlaceholders(leftJoinApplyExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(leftJoinApplyExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(leftJoinApplyExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructLeftJoinApply(left, right, on), nil
 	case opt.RightJoinApplyOp:
 		rightJoinApplyExpr := expr.AsRightJoinApply()
-		left := f.assignPlaceholders(rightJoinApplyExpr.Left())
-		right := f.assignPlaceholders(rightJoinApplyExpr.Right())
-		on := f.assignPlaceholders(rightJoinApplyExpr.On())
-		return f.ConstructRightJoinApply(left, right, on)
+		left, err := f.assignPlaceholders(rightJoinApplyExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(rightJoinApplyExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(rightJoinApplyExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructRightJoinApply(left, right, on), nil
 	case opt.FullJoinApplyOp:
 		fullJoinApplyExpr := expr.AsFullJoinApply()
-		left := f.assignPlaceholders(fullJoinApplyExpr.Left())
-		right := f.assignPlaceholders(fullJoinApplyExpr.Right())
-		on := f.assignPlaceholders(fullJoinApplyExpr.On())
-		return f.ConstructFullJoinApply(left, right, on)
+		left, err := f.assignPlaceholders(fullJoinApplyExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(fullJoinApplyExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(fullJoinApplyExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFullJoinApply(left, right, on), nil
 	case opt.SemiJoinApplyOp:
 		semiJoinApplyExpr := expr.AsSemiJoinApply()
-		left := f.assignPlaceholders(semiJoinApplyExpr.Left())
-		right := f.assignPlaceholders(semiJoinApplyExpr.Right())
-		on := f.assignPlaceholders(semiJoinApplyExpr.On())
-		return f.ConstructSemiJoinApply(left, right, on)
+		left, err := f.assignPlaceholders(semiJoinApplyExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(semiJoinApplyExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(semiJoinApplyExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructSemiJoinApply(left, right, on), nil
 	case opt.AntiJoinApplyOp:
 		antiJoinApplyExpr := expr.AsAntiJoinApply()
-		left := f.assignPlaceholders(antiJoinApplyExpr.Left())
-		right := f.assignPlaceholders(antiJoinApplyExpr.Right())
-		on := f.assignPlaceholders(antiJoinApplyExpr.On())
-		return f.ConstructAntiJoinApply(left, right, on)
+		left, err := f.assignPlaceholders(antiJoinApplyExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(antiJoinApplyExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		on, err := f.assignPlaceholders(antiJoinApplyExpr.On())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructAntiJoinApply(left, right, on), nil
 	case opt.GroupByOp:
 		groupByExpr := expr.AsGroupBy()
-		input := f.assignPlaceholders(groupByExpr.Input())
-		aggregations := f.assignPlaceholders(groupByExpr.Aggregations())
+		input, err := f.assignPlaceholders(groupByExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		aggregations, err := f.assignPlaceholders(groupByExpr.Aggregations())
+		if err != nil {
+			return 0, err
+		}
 		def := groupByExpr.Def()
-		return f.ConstructGroupBy(input, aggregations, def)
+		return f.ConstructGroupBy(input, aggregations, def), nil
 	case opt.ScalarGroupByOp:
 		scalarGroupByExpr := expr.AsScalarGroupBy()
-		input := f.assignPlaceholders(scalarGroupByExpr.Input())
-		aggregations := f.assignPlaceholders(scalarGroupByExpr.Aggregations())
+		input, err := f.assignPlaceholders(scalarGroupByExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		aggregations, err := f.assignPlaceholders(scalarGroupByExpr.Aggregations())
+		if err != nil {
+			return 0, err
+		}
 		def := scalarGroupByExpr.Def()
-		return f.ConstructScalarGroupBy(input, aggregations, def)
+		return f.ConstructScalarGroupBy(input, aggregations, def), nil
 	case opt.DistinctOnOp:
 		distinctOnExpr := expr.AsDistinctOn()
-		input := f.assignPlaceholders(distinctOnExpr.Input())
-		aggregations := f.assignPlaceholders(distinctOnExpr.Aggregations())
+		input, err := f.assignPlaceholders(distinctOnExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		aggregations, err := f.assignPlaceholders(distinctOnExpr.Aggregations())
+		if err != nil {
+			return 0, err
+		}
 		def := distinctOnExpr.Def()
-		return f.ConstructDistinctOn(input, aggregations, def)
+		return f.ConstructDistinctOn(input, aggregations, def), nil
 	case opt.UnionOp:
 		unionExpr := expr.AsUnion()
-		left := f.assignPlaceholders(unionExpr.Left())
-		right := f.assignPlaceholders(unionExpr.Right())
+		left, err := f.assignPlaceholders(unionExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(unionExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		colMap := unionExpr.ColMap()
-		return f.ConstructUnion(left, right, colMap)
+		return f.ConstructUnion(left, right, colMap), nil
 	case opt.IntersectOp:
 		intersectExpr := expr.AsIntersect()
-		left := f.assignPlaceholders(intersectExpr.Left())
-		right := f.assignPlaceholders(intersectExpr.Right())
+		left, err := f.assignPlaceholders(intersectExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(intersectExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		colMap := intersectExpr.ColMap()
-		return f.ConstructIntersect(left, right, colMap)
+		return f.ConstructIntersect(left, right, colMap), nil
 	case opt.ExceptOp:
 		exceptExpr := expr.AsExcept()
-		left := f.assignPlaceholders(exceptExpr.Left())
-		right := f.assignPlaceholders(exceptExpr.Right())
+		left, err := f.assignPlaceholders(exceptExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(exceptExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		colMap := exceptExpr.ColMap()
-		return f.ConstructExcept(left, right, colMap)
+		return f.ConstructExcept(left, right, colMap), nil
 	case opt.UnionAllOp:
 		unionAllExpr := expr.AsUnionAll()
-		left := f.assignPlaceholders(unionAllExpr.Left())
-		right := f.assignPlaceholders(unionAllExpr.Right())
+		left, err := f.assignPlaceholders(unionAllExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(unionAllExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		colMap := unionAllExpr.ColMap()
-		return f.ConstructUnionAll(left, right, colMap)
+		return f.ConstructUnionAll(left, right, colMap), nil
 	case opt.IntersectAllOp:
 		intersectAllExpr := expr.AsIntersectAll()
-		left := f.assignPlaceholders(intersectAllExpr.Left())
-		right := f.assignPlaceholders(intersectAllExpr.Right())
+		left, err := f.assignPlaceholders(intersectAllExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(intersectAllExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		colMap := intersectAllExpr.ColMap()
-		return f.ConstructIntersectAll(left, right, colMap)
+		return f.ConstructIntersectAll(left, right, colMap), nil
 	case opt.ExceptAllOp:
 		exceptAllExpr := expr.AsExceptAll()
-		left := f.assignPlaceholders(exceptAllExpr.Left())
-		right := f.assignPlaceholders(exceptAllExpr.Right())
+		left, err := f.assignPlaceholders(exceptAllExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(exceptAllExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		colMap := exceptAllExpr.ColMap()
-		return f.ConstructExceptAll(left, right, colMap)
+		return f.ConstructExceptAll(left, right, colMap), nil
 	case opt.LimitOp:
 		limitExpr := expr.AsLimit()
-		input := f.assignPlaceholders(limitExpr.Input())
-		limit := f.assignPlaceholders(limitExpr.Limit())
+		input, err := f.assignPlaceholders(limitExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		limit, err := f.assignPlaceholders(limitExpr.Limit())
+		if err != nil {
+			return 0, err
+		}
 		ordering := limitExpr.Ordering()
-		return f.ConstructLimit(input, limit, ordering)
+		return f.ConstructLimit(input, limit, ordering), nil
 	case opt.OffsetOp:
 		offsetExpr := expr.AsOffset()
-		input := f.assignPlaceholders(offsetExpr.Input())
-		offset := f.assignPlaceholders(offsetExpr.Offset())
+		input, err := f.assignPlaceholders(offsetExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		offset, err := f.assignPlaceholders(offsetExpr.Offset())
+		if err != nil {
+			return 0, err
+		}
 		ordering := offsetExpr.Ordering()
-		return f.ConstructOffset(input, offset, ordering)
+		return f.ConstructOffset(input, offset, ordering), nil
 	case opt.Max1RowOp:
 		max1RowExpr := expr.AsMax1Row()
-		input := f.assignPlaceholders(max1RowExpr.Input())
-		return f.ConstructMax1Row(input)
+		input, err := f.assignPlaceholders(max1RowExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructMax1Row(input), nil
 	case opt.ExplainOp:
 		explainExpr := expr.AsExplain()
-		input := f.assignPlaceholders(explainExpr.Input())
+		input, err := f.assignPlaceholders(explainExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		def := explainExpr.Def()
-		return f.ConstructExplain(input, def)
+		return f.ConstructExplain(input, def), nil
 	case opt.RowNumberOp:
 		rowNumberExpr := expr.AsRowNumber()
-		input := f.assignPlaceholders(rowNumberExpr.Input())
+		input, err := f.assignPlaceholders(rowNumberExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		def := rowNumberExpr.Def()
-		return f.ConstructRowNumber(input, def)
+		return f.ConstructRowNumber(input, def), nil
 	case opt.ZipOp:
 		zipExpr := expr.AsZip()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(zipExpr.Funcs()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		funcs := lb.BuildList()
 		cols := zipExpr.Cols()
-		return f.ConstructZip(funcs, cols)
+		return f.ConstructZip(funcs, cols), nil
 	case opt.SubqueryOp:
 		subqueryExpr := expr.AsSubquery()
-		input := f.assignPlaceholders(subqueryExpr.Input())
+		input, err := f.assignPlaceholders(subqueryExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		def := subqueryExpr.Def()
-		return f.ConstructSubquery(input, def)
+		return f.ConstructSubquery(input, def), nil
 	case opt.AnyOp:
 		anyExpr := expr.AsAny()
-		input := f.assignPlaceholders(anyExpr.Input())
-		scalar := f.assignPlaceholders(anyExpr.Scalar())
+		input, err := f.assignPlaceholders(anyExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		scalar, err := f.assignPlaceholders(anyExpr.Scalar())
+		if err != nil {
+			return 0, err
+		}
 		def := anyExpr.Def()
-		return f.ConstructAny(input, scalar, def)
+		return f.ConstructAny(input, scalar, def), nil
 	case opt.TupleOp:
 		tupleExpr := expr.AsTuple()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(tupleExpr.Elems()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		elems := lb.BuildList()
 		typ := tupleExpr.Typ()
-		return f.ConstructTuple(elems, typ)
+		return f.ConstructTuple(elems, typ), nil
 	case opt.ProjectionsOp:
 		projectionsExpr := expr.AsProjections()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(projectionsExpr.Elems()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		elems := lb.BuildList()
 		def := projectionsExpr.Def()
-		return f.ConstructProjections(elems, def)
+		return f.ConstructProjections(elems, def), nil
 	case opt.AggregationsOp:
 		aggregationsExpr := expr.AsAggregations()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(aggregationsExpr.Aggs()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		aggs := lb.BuildList()
 		cols := aggregationsExpr.Cols()
-		return f.ConstructAggregations(aggs, cols)
+		return f.ConstructAggregations(aggs, cols), nil
 	case opt.MergeOnOp:
 		mergeOnExpr := expr.AsMergeOn()
-		on := f.assignPlaceholders(mergeOnExpr.On())
+		on, err := f.assignPlaceholders(mergeOnExpr.On())
+		if err != nil {
+			return 0, err
+		}
 		def := mergeOnExpr.Def()
-		return f.ConstructMergeOn(on, def)
+		return f.ConstructMergeOn(on, def), nil
 	case opt.ExistsOp:
 		existsExpr := expr.AsExists()
-		input := f.assignPlaceholders(existsExpr.Input())
+		input, err := f.assignPlaceholders(existsExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		def := existsExpr.Def()
-		return f.ConstructExists(input, def)
+		return f.ConstructExists(input, def), nil
 	case opt.FiltersOp:
 		filtersExpr := expr.AsFilters()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(filtersExpr.Conditions()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		conditions := lb.BuildList()
-		return f.ConstructFilters(conditions)
+		return f.ConstructFilters(conditions), nil
 	case opt.AndOp:
 		andExpr := expr.AsAnd()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(andExpr.Conditions()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		conditions := lb.BuildList()
-		return f.ConstructAnd(conditions)
+		return f.ConstructAnd(conditions), nil
 	case opt.OrOp:
 		orExpr := expr.AsOr()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(orExpr.Conditions()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		conditions := lb.BuildList()
-		return f.ConstructOr(conditions)
+		return f.ConstructOr(conditions), nil
 	case opt.NotOp:
 		notExpr := expr.AsNot()
-		input := f.assignPlaceholders(notExpr.Input())
-		return f.ConstructNot(input)
+		input, err := f.assignPlaceholders(notExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNot(input), nil
 	case opt.EqOp:
 		eqExpr := expr.AsEq()
-		left := f.assignPlaceholders(eqExpr.Left())
-		right := f.assignPlaceholders(eqExpr.Right())
-		return f.ConstructEq(left, right)
+		left, err := f.assignPlaceholders(eqExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(eqExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructEq(left, right), nil
 	case opt.LtOp:
 		ltExpr := expr.AsLt()
-		left := f.assignPlaceholders(ltExpr.Left())
-		right := f.assignPlaceholders(ltExpr.Right())
-		return f.ConstructLt(left, right)
+		left, err := f.assignPlaceholders(ltExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(ltExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructLt(left, right), nil
 	case opt.GtOp:
 		gtExpr := expr.AsGt()
-		left := f.assignPlaceholders(gtExpr.Left())
-		right := f.assignPlaceholders(gtExpr.Right())
-		return f.ConstructGt(left, right)
+		left, err := f.assignPlaceholders(gtExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(gtExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructGt(left, right), nil
 	case opt.LeOp:
 		leExpr := expr.AsLe()
-		left := f.assignPlaceholders(leExpr.Left())
-		right := f.assignPlaceholders(leExpr.Right())
-		return f.ConstructLe(left, right)
+		left, err := f.assignPlaceholders(leExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(leExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructLe(left, right), nil
 	case opt.GeOp:
 		geExpr := expr.AsGe()
-		left := f.assignPlaceholders(geExpr.Left())
-		right := f.assignPlaceholders(geExpr.Right())
-		return f.ConstructGe(left, right)
+		left, err := f.assignPlaceholders(geExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(geExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructGe(left, right), nil
 	case opt.NeOp:
 		neExpr := expr.AsNe()
-		left := f.assignPlaceholders(neExpr.Left())
-		right := f.assignPlaceholders(neExpr.Right())
-		return f.ConstructNe(left, right)
+		left, err := f.assignPlaceholders(neExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(neExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNe(left, right), nil
 	case opt.InOp:
 		inExpr := expr.AsIn()
-		left := f.assignPlaceholders(inExpr.Left())
-		right := f.assignPlaceholders(inExpr.Right())
-		return f.ConstructIn(left, right)
+		left, err := f.assignPlaceholders(inExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(inExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructIn(left, right), nil
 	case opt.NotInOp:
 		notInExpr := expr.AsNotIn()
-		left := f.assignPlaceholders(notInExpr.Left())
-		right := f.assignPlaceholders(notInExpr.Right())
-		return f.ConstructNotIn(left, right)
+		left, err := f.assignPlaceholders(notInExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(notInExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNotIn(left, right), nil
 	case opt.LikeOp:
 		likeExpr := expr.AsLike()
-		left := f.assignPlaceholders(likeExpr.Left())
-		right := f.assignPlaceholders(likeExpr.Right())
-		return f.ConstructLike(left, right)
+		left, err := f.assignPlaceholders(likeExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(likeExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructLike(left, right), nil
 	case opt.NotLikeOp:
 		notLikeExpr := expr.AsNotLike()
-		left := f.assignPlaceholders(notLikeExpr.Left())
-		right := f.assignPlaceholders(notLikeExpr.Right())
-		return f.ConstructNotLike(left, right)
+		left, err := f.assignPlaceholders(notLikeExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(notLikeExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNotLike(left, right), nil
 	case opt.ILikeOp:
 		iLikeExpr := expr.AsILike()
-		left := f.assignPlaceholders(iLikeExpr.Left())
-		right := f.assignPlaceholders(iLikeExpr.Right())
-		return f.ConstructILike(left, right)
+		left, err := f.assignPlaceholders(iLikeExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(iLikeExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructILike(left, right), nil
 	case opt.NotILikeOp:
 		notILikeExpr := expr.AsNotILike()
-		left := f.assignPlaceholders(notILikeExpr.Left())
-		right := f.assignPlaceholders(notILikeExpr.Right())
-		return f.ConstructNotILike(left, right)
+		left, err := f.assignPlaceholders(notILikeExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(notILikeExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNotILike(left, right), nil
 	case opt.SimilarToOp:
 		similarToExpr := expr.AsSimilarTo()
-		left := f.assignPlaceholders(similarToExpr.Left())
-		right := f.assignPlaceholders(similarToExpr.Right())
-		return f.ConstructSimilarTo(left, right)
+		left, err := f.assignPlaceholders(similarToExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(similarToExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructSimilarTo(left, right), nil
 	case opt.NotSimilarToOp:
 		notSimilarToExpr := expr.AsNotSimilarTo()
-		left := f.assignPlaceholders(notSimilarToExpr.Left())
-		right := f.assignPlaceholders(notSimilarToExpr.Right())
-		return f.ConstructNotSimilarTo(left, right)
+		left, err := f.assignPlaceholders(notSimilarToExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(notSimilarToExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNotSimilarTo(left, right), nil
 	case opt.RegMatchOp:
 		regMatchExpr := expr.AsRegMatch()
-		left := f.assignPlaceholders(regMatchExpr.Left())
-		right := f.assignPlaceholders(regMatchExpr.Right())
-		return f.ConstructRegMatch(left, right)
+		left, err := f.assignPlaceholders(regMatchExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(regMatchExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructRegMatch(left, right), nil
 	case opt.NotRegMatchOp:
 		notRegMatchExpr := expr.AsNotRegMatch()
-		left := f.assignPlaceholders(notRegMatchExpr.Left())
-		right := f.assignPlaceholders(notRegMatchExpr.Right())
-		return f.ConstructNotRegMatch(left, right)
+		left, err := f.assignPlaceholders(notRegMatchExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(notRegMatchExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNotRegMatch(left, right), nil
 	case opt.RegIMatchOp:
 		regIMatchExpr := expr.AsRegIMatch()
-		left := f.assignPlaceholders(regIMatchExpr.Left())
-		right := f.assignPlaceholders(regIMatchExpr.Right())
-		return f.ConstructRegIMatch(left, right)
+		left, err := f.assignPlaceholders(regIMatchExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(regIMatchExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructRegIMatch(left, right), nil
 	case opt.NotRegIMatchOp:
 		notRegIMatchExpr := expr.AsNotRegIMatch()
-		left := f.assignPlaceholders(notRegIMatchExpr.Left())
-		right := f.assignPlaceholders(notRegIMatchExpr.Right())
-		return f.ConstructNotRegIMatch(left, right)
+		left, err := f.assignPlaceholders(notRegIMatchExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(notRegIMatchExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructNotRegIMatch(left, right), nil
 	case opt.IsOp:
 		isExpr := expr.AsIs()
-		left := f.assignPlaceholders(isExpr.Left())
-		right := f.assignPlaceholders(isExpr.Right())
-		return f.ConstructIs(left, right)
+		left, err := f.assignPlaceholders(isExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(isExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructIs(left, right), nil
 	case opt.IsNotOp:
 		isNotExpr := expr.AsIsNot()
-		left := f.assignPlaceholders(isNotExpr.Left())
-		right := f.assignPlaceholders(isNotExpr.Right())
-		return f.ConstructIsNot(left, right)
+		left, err := f.assignPlaceholders(isNotExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(isNotExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructIsNot(left, right), nil
 	case opt.ContainsOp:
 		containsExpr := expr.AsContains()
-		left := f.assignPlaceholders(containsExpr.Left())
-		right := f.assignPlaceholders(containsExpr.Right())
-		return f.ConstructContains(left, right)
+		left, err := f.assignPlaceholders(containsExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(containsExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructContains(left, right), nil
 	case opt.JsonExistsOp:
 		jsonExistsExpr := expr.AsJsonExists()
-		left := f.assignPlaceholders(jsonExistsExpr.Left())
-		right := f.assignPlaceholders(jsonExistsExpr.Right())
-		return f.ConstructJsonExists(left, right)
+		left, err := f.assignPlaceholders(jsonExistsExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(jsonExistsExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructJsonExists(left, right), nil
 	case opt.JsonAllExistsOp:
 		jsonAllExistsExpr := expr.AsJsonAllExists()
-		left := f.assignPlaceholders(jsonAllExistsExpr.Left())
-		right := f.assignPlaceholders(jsonAllExistsExpr.Right())
-		return f.ConstructJsonAllExists(left, right)
+		left, err := f.assignPlaceholders(jsonAllExistsExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(jsonAllExistsExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructJsonAllExists(left, right), nil
 	case opt.JsonSomeExistsOp:
 		jsonSomeExistsExpr := expr.AsJsonSomeExists()
-		left := f.assignPlaceholders(jsonSomeExistsExpr.Left())
-		right := f.assignPlaceholders(jsonSomeExistsExpr.Right())
-		return f.ConstructJsonSomeExists(left, right)
+		left, err := f.assignPlaceholders(jsonSomeExistsExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(jsonSomeExistsExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructJsonSomeExists(left, right), nil
 	case opt.AnyScalarOp:
 		anyScalarExpr := expr.AsAnyScalar()
-		left := f.assignPlaceholders(anyScalarExpr.Left())
-		right := f.assignPlaceholders(anyScalarExpr.Right())
+		left, err := f.assignPlaceholders(anyScalarExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(anyScalarExpr.Right())
+		if err != nil {
+			return 0, err
+		}
 		cmp := anyScalarExpr.Cmp()
-		return f.ConstructAnyScalar(left, right, cmp)
+		return f.ConstructAnyScalar(left, right, cmp), nil
 	case opt.BitandOp:
 		bitandExpr := expr.AsBitand()
-		left := f.assignPlaceholders(bitandExpr.Left())
-		right := f.assignPlaceholders(bitandExpr.Right())
-		return f.ConstructBitand(left, right)
+		left, err := f.assignPlaceholders(bitandExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(bitandExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructBitand(left, right), nil
 	case opt.BitorOp:
 		bitorExpr := expr.AsBitor()
-		left := f.assignPlaceholders(bitorExpr.Left())
-		right := f.assignPlaceholders(bitorExpr.Right())
-		return f.ConstructBitor(left, right)
+		left, err := f.assignPlaceholders(bitorExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(bitorExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructBitor(left, right), nil
 	case opt.BitxorOp:
 		bitxorExpr := expr.AsBitxor()
-		left := f.assignPlaceholders(bitxorExpr.Left())
-		right := f.assignPlaceholders(bitxorExpr.Right())
-		return f.ConstructBitxor(left, right)
+		left, err := f.assignPlaceholders(bitxorExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(bitxorExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructBitxor(left, right), nil
 	case opt.PlusOp:
 		plusExpr := expr.AsPlus()
-		left := f.assignPlaceholders(plusExpr.Left())
-		right := f.assignPlaceholders(plusExpr.Right())
-		return f.ConstructPlus(left, right)
+		left, err := f.assignPlaceholders(plusExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(plusExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructPlus(left, right), nil
 	case opt.MinusOp:
 		minusExpr := expr.AsMinus()
-		left := f.assignPlaceholders(minusExpr.Left())
-		right := f.assignPlaceholders(minusExpr.Right())
-		return f.ConstructMinus(left, right)
+		left, err := f.assignPlaceholders(minusExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(minusExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructMinus(left, right), nil
 	case opt.MultOp:
 		multExpr := expr.AsMult()
-		left := f.assignPlaceholders(multExpr.Left())
-		right := f.assignPlaceholders(multExpr.Right())
-		return f.ConstructMult(left, right)
+		left, err := f.assignPlaceholders(multExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(multExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructMult(left, right), nil
 	case opt.DivOp:
 		divExpr := expr.AsDiv()
-		left := f.assignPlaceholders(divExpr.Left())
-		right := f.assignPlaceholders(divExpr.Right())
-		return f.ConstructDiv(left, right)
+		left, err := f.assignPlaceholders(divExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(divExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructDiv(left, right), nil
 	case opt.FloorDivOp:
 		floorDivExpr := expr.AsFloorDiv()
-		left := f.assignPlaceholders(floorDivExpr.Left())
-		right := f.assignPlaceholders(floorDivExpr.Right())
-		return f.ConstructFloorDiv(left, right)
+		left, err := f.assignPlaceholders(floorDivExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(floorDivExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFloorDiv(left, right), nil
 	case opt.ModOp:
 		modExpr := expr.AsMod()
-		left := f.assignPlaceholders(modExpr.Left())
-		right := f.assignPlaceholders(modExpr.Right())
-		return f.ConstructMod(left, right)
+		left, err := f.assignPlaceholders(modExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(modExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructMod(left, right), nil
 	case opt.PowOp:
 		powExpr := expr.AsPow()
-		left := f.assignPlaceholders(powExpr.Left())
-		right := f.assignPlaceholders(powExpr.Right())
-		return f.ConstructPow(left, right)
+		left, err := f.assignPlaceholders(powExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(powExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructPow(left, right), nil
 	case opt.ConcatOp:
 		concatExpr := expr.AsConcat()
-		left := f.assignPlaceholders(concatExpr.Left())
-		right := f.assignPlaceholders(concatExpr.Right())
-		return f.ConstructConcat(left, right)
+		left, err := f.assignPlaceholders(concatExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(concatExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructConcat(left, right), nil
 	case opt.LShiftOp:
 		lShiftExpr := expr.AsLShift()
-		left := f.assignPlaceholders(lShiftExpr.Left())
-		right := f.assignPlaceholders(lShiftExpr.Right())
-		return f.ConstructLShift(left, right)
+		left, err := f.assignPlaceholders(lShiftExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(lShiftExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructLShift(left, right), nil
 	case opt.RShiftOp:
 		rShiftExpr := expr.AsRShift()
-		left := f.assignPlaceholders(rShiftExpr.Left())
-		right := f.assignPlaceholders(rShiftExpr.Right())
-		return f.ConstructRShift(left, right)
+		left, err := f.assignPlaceholders(rShiftExpr.Left())
+		if err != nil {
+			return 0, err
+		}
+		right, err := f.assignPlaceholders(rShiftExpr.Right())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructRShift(left, right), nil
 	case opt.FetchValOp:
 		fetchValExpr := expr.AsFetchVal()
-		json := f.assignPlaceholders(fetchValExpr.Json())
-		index := f.assignPlaceholders(fetchValExpr.Index())
-		return f.ConstructFetchVal(json, index)
+		json, err := f.assignPlaceholders(fetchValExpr.Json())
+		if err != nil {
+			return 0, err
+		}
+		index, err := f.assignPlaceholders(fetchValExpr.Index())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFetchVal(json, index), nil
 	case opt.FetchTextOp:
 		fetchTextExpr := expr.AsFetchText()
-		json := f.assignPlaceholders(fetchTextExpr.Json())
-		index := f.assignPlaceholders(fetchTextExpr.Index())
-		return f.ConstructFetchText(json, index)
+		json, err := f.assignPlaceholders(fetchTextExpr.Json())
+		if err != nil {
+			return 0, err
+		}
+		index, err := f.assignPlaceholders(fetchTextExpr.Index())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFetchText(json, index), nil
 	case opt.FetchValPathOp:
 		fetchValPathExpr := expr.AsFetchValPath()
-		json := f.assignPlaceholders(fetchValPathExpr.Json())
-		path := f.assignPlaceholders(fetchValPathExpr.Path())
-		return f.ConstructFetchValPath(json, path)
+		json, err := f.assignPlaceholders(fetchValPathExpr.Json())
+		if err != nil {
+			return 0, err
+		}
+		path, err := f.assignPlaceholders(fetchValPathExpr.Path())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFetchValPath(json, path), nil
 	case opt.FetchTextPathOp:
 		fetchTextPathExpr := expr.AsFetchTextPath()
-		json := f.assignPlaceholders(fetchTextPathExpr.Json())
-		path := f.assignPlaceholders(fetchTextPathExpr.Path())
-		return f.ConstructFetchTextPath(json, path)
+		json, err := f.assignPlaceholders(fetchTextPathExpr.Json())
+		if err != nil {
+			return 0, err
+		}
+		path, err := f.assignPlaceholders(fetchTextPathExpr.Path())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructFetchTextPath(json, path), nil
 	case opt.UnaryMinusOp:
 		unaryMinusExpr := expr.AsUnaryMinus()
-		input := f.assignPlaceholders(unaryMinusExpr.Input())
-		return f.ConstructUnaryMinus(input)
+		input, err := f.assignPlaceholders(unaryMinusExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructUnaryMinus(input), nil
 	case opt.UnaryComplementOp:
 		unaryComplementExpr := expr.AsUnaryComplement()
-		input := f.assignPlaceholders(unaryComplementExpr.Input())
-		return f.ConstructUnaryComplement(input)
+		input, err := f.assignPlaceholders(unaryComplementExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructUnaryComplement(input), nil
 	case opt.CastOp:
 		castExpr := expr.AsCast()
-		input := f.assignPlaceholders(castExpr.Input())
+		input, err := f.assignPlaceholders(castExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		targetTyp := castExpr.TargetTyp()
-		return f.ConstructCast(input, targetTyp)
+		return f.ConstructCast(input, targetTyp), nil
 	case opt.CaseOp:
 		caseExpr := expr.AsCase()
 		lb := MakeListBuilder(&f.funcs)
-		input := f.assignPlaceholders(caseExpr.Input())
+		input, err := f.assignPlaceholders(caseExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		for _, item := range f.mem.LookupList(caseExpr.Whens()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		whens := lb.BuildList()
-		return f.ConstructCase(input, whens)
+		return f.ConstructCase(input, whens), nil
 	case opt.WhenOp:
 		whenExpr := expr.AsWhen()
-		condition := f.assignPlaceholders(whenExpr.Condition())
-		value := f.assignPlaceholders(whenExpr.Value())
-		return f.ConstructWhen(condition, value)
+		condition, err := f.assignPlaceholders(whenExpr.Condition())
+		if err != nil {
+			return 0, err
+		}
+		value, err := f.assignPlaceholders(whenExpr.Value())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructWhen(condition, value), nil
 	case opt.ArrayOp:
 		arrayExpr := expr.AsArray()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(arrayExpr.Elems()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		elems := lb.BuildList()
 		typ := arrayExpr.Typ()
-		return f.ConstructArray(elems, typ)
+		return f.ConstructArray(elems, typ), nil
 	case opt.FunctionOp:
 		functionExpr := expr.AsFunction()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(functionExpr.Args()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		args := lb.BuildList()
 		def := functionExpr.Def()
-		return f.ConstructFunction(args, def)
+		return f.ConstructFunction(args, def), nil
 	case opt.CoalesceOp:
 		coalesceExpr := expr.AsCoalesce()
 		lb := MakeListBuilder(&f.funcs)
 		for _, item := range f.mem.LookupList(coalesceExpr.Args()) {
-			lb.AddItem(f.assignPlaceholders(item))
+			newItem, err := f.assignPlaceholders(item)
+			if err != nil {
+				return 0, err
+			}
+			lb.AddItem(newItem)
 		}
 		args := lb.BuildList()
-		return f.ConstructCoalesce(args)
+		return f.ConstructCoalesce(args), nil
 	case opt.ColumnAccessOp:
 		columnAccessExpr := expr.AsColumnAccess()
-		input := f.assignPlaceholders(columnAccessExpr.Input())
+		input, err := f.assignPlaceholders(columnAccessExpr.Input())
+		if err != nil {
+			return 0, err
+		}
 		idx := columnAccessExpr.Idx()
-		return f.ConstructColumnAccess(input, idx)
+		return f.ConstructColumnAccess(input, idx), nil
 	case opt.AggDistinctOp:
 		aggDistinctExpr := expr.AsAggDistinct()
-		input := f.assignPlaceholders(aggDistinctExpr.Input())
-		return f.ConstructAggDistinct(input)
+		input, err := f.assignPlaceholders(aggDistinctExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructAggDistinct(input), nil
 	case opt.PlaceholderOp:
 		value := expr.AsPlaceholder().Value()
 		placeholder := f.mem.LookupPrivate(value).(*tree.Placeholder)
 		d, err := placeholder.Eval(f.evalCtx)
 		if err != nil {
-			panic(err)
+			return 0, err
 		}
-		return f.ConstructConstVal(d)
+		return f.ConstructConstVal(d), nil
 	}
 	panic("unhandled operator")
 }
