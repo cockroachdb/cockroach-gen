@@ -11914,6 +11914,23 @@ func (_f *Factory) ConstructArray(
 	return _f.onConstruct(memo.Expr(_arrayExpr))
 }
 
+// ConstructIndirection constructs an expression for the Indirection operator.
+// Indirection is a subscripting expression of the form <expr>[<index>].
+// Input must be an Array type and Index must be an int. Multiple indirections
+// and slicing are not supported.
+func (_f *Factory) ConstructIndirection(
+	input memo.GroupID,
+	index memo.GroupID,
+) memo.GroupID {
+	_indirectionExpr := memo.MakeIndirectionExpr(input, index)
+	_group := _f.mem.GroupByFingerprint(_indirectionExpr.Fingerprint())
+	if _group != 0 {
+		return _group
+	}
+
+	return _f.onConstruct(memo.Expr(_indirectionExpr))
+}
+
 // ConstructFunction constructs an expression for the Function operator.
 // Function invokes a builtin SQL function like CONCAT or NOW, passing the given
 // arguments. The private field is a *opt.FuncOpDef struct that provides the
@@ -13459,6 +13476,17 @@ func (f *Factory) assignPlaceholders(group memo.GroupID) (memo.GroupID, error) {
 		elems := lb.BuildList()
 		typ := arrayExpr.Typ()
 		return f.ConstructArray(elems, typ), nil
+	case opt.IndirectionOp:
+		indirectionExpr := expr.AsIndirection()
+		input, err := f.assignPlaceholders(indirectionExpr.Input())
+		if err != nil {
+			return 0, err
+		}
+		index, err := f.assignPlaceholders(indirectionExpr.Index())
+		if err != nil {
+			return 0, err
+		}
+		return f.ConstructIndirection(input, index), nil
 	case opt.FunctionOp:
 		functionExpr := expr.AsFunction()
 		lb := MakeListBuilder(&f.funcs)
@@ -14024,6 +14052,11 @@ func init() {
 	// ArrayOp
 	dynConstructLookup[opt.ArrayOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
 		return f.ConstructArray(operands[0].ListID(), memo.PrivateID(operands[1]))
+	}
+
+	// IndirectionOp
+	dynConstructLookup[opt.IndirectionOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructIndirection(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
 	}
 
 	// FunctionOp

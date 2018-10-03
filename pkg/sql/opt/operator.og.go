@@ -590,6 +590,11 @@ const (
 	// ArrayOp is an ARRAY literal of the form ARRAY[<expr1>, <expr2>, ..., <exprN>].
 	ArrayOp
 
+	// IndirectionOp is a subscripting expression of the form <expr>[<index>].
+	// Input must be an Array type and Index must be an int. Multiple indirections
+	// and slicing are not supported.
+	IndirectionOp
+
 	// FunctionOp invokes a builtin SQL function like CONCAT or NOW, passing the given
 	// arguments. The private field is a *opt.FuncOpDef struct that provides the
 	// name of the function as well as a pointer to the builtin overload definition.
@@ -680,9 +685,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsany-scalarbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggany-not-null-aggfirst-aggagg-distinct"
+const opNames = "unknownsortscanvirtual-scanvaluesselectprojectinner-joinleft-joinright-joinfull-joinsemi-joinanti-joinindex-joinlookup-joinmerge-joininner-join-applyleft-join-applyright-join-applyfull-join-applysemi-join-applyanti-join-applygroup-byscalar-group-bydistinct-onunionintersectexceptunion-allintersect-allexcept-alllimitoffsetmax1-rowexplainshow-trace-for-sessionrow-numberzipsubqueryanyvariableconstnulltruefalseplaceholdertupleprojectionsaggregationsmerge-onexistsfiltersandornoteqltgtlegeneinnot-inlikenot-likei-likenot-i-likesimilar-tonot-similar-toreg-matchnot-reg-matchreg-i-matchnot-reg-i-matchisis-notcontainsjson-existsjson-all-existsjson-some-existsany-scalarbitandbitorbitxorplusminusmultdivfloor-divmodpowconcatl-shiftr-shiftfetch-valfetch-textfetch-val-pathfetch-text-pathunary-minusunary-complementcastcasewhenarrayindirectionfunctioncoalescecolumn-accessunsupported-exprarray-aggavgbool-andbool-orconcat-aggcountcount-rowsmaxminsum-intsumsqr-diffvariancestd-devxor-aggjson-aggjsonb-aggconst-aggconst-not-null-aggany-not-null-aggfirst-aggagg-distinct"
 
-var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 665, 671, 676, 682, 686, 691, 695, 698, 707, 710, 713, 719, 726, 733, 742, 752, 766, 781, 792, 808, 812, 816, 820, 825, 833, 841, 854, 870, 879, 882, 890, 897, 907, 912, 922, 925, 928, 935, 938, 946, 954, 961, 968, 976, 985, 994, 1012, 1028, 1037, 1049}
+var opIndexes = [...]uint32{0, 7, 11, 15, 27, 33, 39, 46, 56, 65, 75, 84, 93, 102, 112, 123, 133, 149, 164, 180, 195, 210, 225, 233, 248, 259, 264, 273, 279, 288, 301, 311, 316, 322, 330, 337, 359, 369, 372, 380, 383, 391, 396, 400, 404, 409, 420, 425, 436, 448, 456, 462, 469, 472, 474, 477, 479, 481, 483, 485, 487, 489, 491, 497, 501, 509, 515, 525, 535, 549, 558, 571, 582, 597, 599, 605, 613, 624, 639, 655, 665, 671, 676, 682, 686, 691, 695, 698, 707, 710, 713, 719, 726, 733, 742, 752, 766, 781, 792, 808, 812, 816, 820, 825, 836, 844, 852, 865, 881, 890, 893, 901, 908, 918, 923, 933, 936, 939, 946, 949, 957, 965, 972, 979, 987, 996, 1005, 1023, 1039, 1048, 1060}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -826,6 +831,7 @@ var ScalarOperators = [...]Operator{
 	CaseOp,
 	WhenOp,
 	ArrayOp,
+	IndirectionOp,
 	FunctionOp,
 	CoalesceOp,
 	ColumnAccessOp,

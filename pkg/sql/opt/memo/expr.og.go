@@ -114,6 +114,7 @@ var opLayoutTable = [...]opLayout{
 	opt.CaseOp:                makeOpLayout(1 /*base*/, 2 /*list*/, 0 /*priv*/),
 	opt.WhenOp:                makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.ArrayOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
+	opt.IndirectionOp:         makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
 	opt.FunctionOp:            makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
 	opt.CoalesceOp:            makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
 	opt.ColumnAccessOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
@@ -247,6 +248,7 @@ var isEnforcerLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -380,6 +382,7 @@ var isRelationalLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -513,6 +516,7 @@ var isJoinLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -646,6 +650,7 @@ var isJoinNonApplyLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -779,6 +784,7 @@ var isJoinApplyLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -912,6 +918,7 @@ var isScalarLookup = [...]bool{
 	opt.CaseOp:                true,
 	opt.WhenOp:                true,
 	opt.ArrayOp:               true,
+	opt.IndirectionOp:         true,
 	opt.FunctionOp:            true,
 	opt.CoalesceOp:            true,
 	opt.ColumnAccessOp:        true,
@@ -1045,6 +1052,7 @@ var isConstValueLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -1178,6 +1186,7 @@ var isBooleanLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -1311,6 +1320,7 @@ var isComparisonLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -1444,6 +1454,7 @@ var isBinaryLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -1577,6 +1588,7 @@ var isUnaryLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -1710,6 +1722,7 @@ var isAggregateLookup = [...]bool{
 	opt.CaseOp:                false,
 	opt.WhenOp:                false,
 	opt.ArrayOp:               false,
+	opt.IndirectionOp:         false,
 	opt.FunctionOp:            false,
 	opt.CoalesceOp:            false,
 	opt.ColumnAccessOp:        false,
@@ -4760,6 +4773,34 @@ func (e *Expr) AsArray() *ArrayExpr {
 	return (*ArrayExpr)(e)
 }
 
+// IndirectionExpr is a subscripting expression of the form <expr>[<index>].
+// Input must be an Array type and Index must be an int. Multiple indirections
+// and slicing are not supported.
+type IndirectionExpr Expr
+
+func MakeIndirectionExpr(input GroupID, index GroupID) IndirectionExpr {
+	return IndirectionExpr{op: opt.IndirectionOp, state: exprState{uint32(input), uint32(index)}}
+}
+
+func (e *IndirectionExpr) Input() GroupID {
+	return GroupID(e.state[0])
+}
+
+func (e *IndirectionExpr) Index() GroupID {
+	return GroupID(e.state[1])
+}
+
+func (e *IndirectionExpr) Fingerprint() Fingerprint {
+	return Fingerprint(*e)
+}
+
+func (e *Expr) AsIndirection() *IndirectionExpr {
+	if e.op != opt.IndirectionOp {
+		return nil
+	}
+	return (*IndirectionExpr)(e)
+}
+
 // FunctionExpr invokes a builtin SQL function like CONCAT or NOW, passing the given
 // arguments. The private field is a *opt.FuncOpDef struct that provides the
 // name of the function as well as a pointer to the builtin overload definition.
@@ -6011,6 +6052,11 @@ func init() {
 	// ArrayOp
 	makeExprLookup[opt.ArrayOp] = func(operands DynamicOperands) Expr {
 		return Expr(MakeArrayExpr(operands[0].ListID(), PrivateID(operands[1])))
+	}
+
+	// IndirectionOp
+	makeExprLookup[opt.IndirectionOp] = func(operands DynamicOperands) Expr {
+		return Expr(MakeIndirectionExpr(GroupID(operands[0]), GroupID(operands[1])))
 	}
 
 	// FunctionOp
