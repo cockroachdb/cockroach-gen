@@ -10135,6 +10135,8 @@ func (_f *Factory) ConstructJsonSomeExists(
 }
 
 // ConstructAnyScalar constructs an expression for the AnyScalar operator.
+// AnyScalar is the form of ANY which refers to an ANY operation on a
+// tuple or array, as opposed to Any which operates on a subquery.
 func (_f *Factory) ConstructAnyScalar(
 	left memo.GroupID,
 	right memo.GroupID,
@@ -10144,6 +10146,51 @@ func (_f *Factory) ConstructAnyScalar(
 	_group := _f.mem.GroupByFingerprint(_anyScalarExpr.Fingerprint())
 	if _group != 0 {
 		return _group
+	}
+
+	// [SimplifyEqualsAnyTuple]
+	{
+		input := left
+		tuple := right
+		_tupleExpr := _f.mem.NormExpr(right).AsTuple()
+		if _tupleExpr != nil {
+			if _f.funcs.IsEquality(cmp) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyEqualsAnyTuple) {
+					_group = _f.ConstructIn(
+						input,
+						tuple,
+					)
+					_f.mem.AddAltFingerprint(_anyScalarExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyEqualsAnyTuple, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
+	}
+
+	// [SimplifyAnyScalarArray]
+	{
+		input := left
+		ary := right
+		_constExpr := _f.mem.NormExpr(right).AsConst()
+		if _constExpr != nil {
+			if _f.funcs.IsArray(ary) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAnyScalarArray) {
+					_group = _f.ConstructAnyScalar(
+						input,
+						_f.funcs.ConvertConstArrayToTuple(ary),
+						cmp,
+					)
+					_f.mem.AddAltFingerprint(_anyScalarExpr.Fingerprint(), _group)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyAnyScalarArray, _group, 0, 0)
+					}
+					return _group
+				}
+			}
+		}
 	}
 
 	return _f.onConstruct(memo.Expr(_anyScalarExpr))

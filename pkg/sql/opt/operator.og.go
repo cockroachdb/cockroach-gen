@@ -512,6 +512,8 @@ const (
 
 	JsonSomeExistsOp
 
+	// AnyScalarOp is the form of ANY which refers to an ANY operation on a
+	// tuple or array, as opposed to Any which operates on a subquery.
 	AnyScalarOp
 
 	BitandOp

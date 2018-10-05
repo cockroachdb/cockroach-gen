@@ -4147,6 +4147,8 @@ func (e *Expr) AsJsonSomeExists() *JsonSomeExistsExpr {
 	return (*JsonSomeExistsExpr)(e)
 }
 
+// AnyScalarExpr is the form of ANY which refers to an ANY operation on a
+// tuple or array, as opposed to Any which operates on a subquery.
 type AnyScalarExpr Expr
 
 func MakeAnyScalarExpr(left GroupID, right GroupID, cmp PrivateID) AnyScalarExpr {

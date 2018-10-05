@@ -138,6 +138,8 @@ const (
 	NormalizeJSONFieldAccess
 	NormalizeJSONContains
 	SimplifyCaseWhenConstValue
+	SimplifyEqualsAnyTuple
+	SimplifyAnyScalarArray
 	EliminateSelect
 	MergeSelects
 	PushSelectIntoProject
