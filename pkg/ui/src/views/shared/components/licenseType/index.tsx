@@ -14,15 +14,19 @@
 
 import React from "react";
 
+import "./licenseType.styl";
+
 /**
  * LicenseType is an indicator showing the current build license.
  */
 export default class LicenseType extends React.Component<{}, {}> {
   render() {
     return (
-      <div>
-        <h3>License type: OSS</h3>
-      </div>
+      <h3>
+        <span className="license-type__label">License type:</span>
+        {" "}
+        <span className="license-type__license">OSS</span>
+      </h3>
     );
   }
 }
