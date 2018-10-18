@@ -9,11 +9,15 @@ const (
 	// Normalize Rule Names
 	// ------------------------------------------------------------
 	EliminateAggDistinct
-	EliminateEmptyFilters
-	EliminateSingletonAndOr
-	SimplifyAnd
-	SimplifyOr
-	SimplifyFilters
+	NormalizeNestedAnds
+	SimplifyTrueAnd
+	SimplifyAndTrue
+	SimplifyFalseAnd
+	SimplifyAndFalse
+	SimplifyTrueOr
+	SimplifyOrTrue
+	SimplifyFalseOr
+	SimplifyOrFalse
 	FoldNullAndOr
 	FoldNotTrue
 	FoldNotFalse
@@ -21,8 +25,7 @@ const (
 	EliminateNot
 	NegateAnd
 	NegateOr
-	ExtractRedundantClause
-	ExtractRedundantSubclause
+	ExtractRedundantConjunct
 	CommuteVarInequality
 	CommuteConstInequality
 	NormalizeCmpPlusConst
@@ -55,8 +58,10 @@ const (
 	HoistJoinSubquery
 	HoistValuesSubquery
 	HoistZipSubquery
-	NormalizeAnyFilter
-	NormalizeNotAnyFilter
+	NormalizeSelectAnyFilter
+	NormalizeJoinAnyFilter
+	NormalizeSelectNotAnyFilter
+	NormalizeJoinNotAnyFilter
 	FoldArray
 	FoldBinary
 	FoldUnary
@@ -68,6 +73,8 @@ const (
 	EliminateAggDistinctForKeys
 	PushSelectIntoInlinableProject
 	InlineProjectInProject
+	SimplifyJoinFilters
+	DetectJoinContradiction
 	PushFilterIntoJoinLeftAndRight
 	MapFilterIntoJoinLeft
 	MapFilterIntoJoinRight
@@ -102,7 +109,7 @@ const (
 	SimplifyRowNumberOrdering
 	SimplifyExplainOrdering
 	EliminateProject
-	EliminateProjectProject
+	MergeProjects
 	PruneProjectCols
 	PruneScanCols
 	PruneSelectCols
@@ -140,6 +147,8 @@ const (
 	SimplifyCaseWhenConstValue
 	SimplifyEqualsAnyTuple
 	SimplifyAnyScalarArray
+	SimplifySelectFilters
+	DetectSelectContradiction
 	EliminateSelect
 	MergeSelects
 	PushSelectIntoProject

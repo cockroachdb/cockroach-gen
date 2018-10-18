@@ -3,1877 +3,224 @@
 package memo
 
 import (
+	"fmt"
+	"unsafe"
+
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
 
-var opLayoutTable = [...]opLayout{
-	opt.UnknownOp:             0xFF, // will cause a crash if used
-	opt.SortOp:                makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ScanOp:                makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.VirtualScanOp:         makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.ValuesOp:              makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.SelectOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ProjectOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.InnerJoinOp:           makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.LeftJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.RightJoinOp:           makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FullJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.SemiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AntiJoinOp:            makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.IndexJoinOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.LookupJoinOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.MergeJoinOp:           makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.InnerJoinApplyOp:      makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.LeftJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.RightJoinApplyOp:      makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FullJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.SemiJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AntiJoinApplyOp:       makeOpLayout(3 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.GroupByOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.ScalarGroupByOp:       makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.DistinctOnOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.UnionOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.IntersectOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.ExceptOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.UnionAllOp:            makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.IntersectAllOp:        makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.ExceptAllOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.LimitOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.OffsetOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.Max1RowOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ExplainOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.ShowTraceForSessionOp: makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.RowNumberOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.ZipOp:                 makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.SubqueryOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.AnyOp:                 makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.VariableOp:            makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.ConstOp:               makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.NullOp:                makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.TrueOp:                makeOpLayout(0 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FalseOp:               makeOpLayout(0 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.PlaceholderOp:         makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.TupleOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.ProjectionsOp:         makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.AggregationsOp:        makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.MergeOnOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.ExistsOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.FiltersOp:             makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
-	opt.AndOp:                 makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
-	opt.OrOp:                  makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
-	opt.NotOp:                 makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.EqOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.LtOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.GtOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.LeOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.GeOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NeOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.InOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NotInOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.LikeOp:                makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NotLikeOp:             makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ILikeOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NotILikeOp:            makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.SimilarToOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NotSimilarToOp:        makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.RegMatchOp:            makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NotRegMatchOp:         makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.RegIMatchOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.NotRegIMatchOp:        makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.IsOp:                  makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.IsNotOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ContainsOp:            makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.JsonExistsOp:          makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.JsonAllExistsOp:       makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.JsonSomeExistsOp:      makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AnyScalarOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 3 /*priv*/),
-	opt.BitandOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.BitorOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.BitxorOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.PlusOp:                makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.MinusOp:               makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.MultOp:                makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.DivOp:                 makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FloorDivOp:            makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ModOp:                 makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.PowOp:                 makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ConcatOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.LShiftOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.RShiftOp:              makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FetchValOp:            makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FetchTextOp:           makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FetchValPathOp:        makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FetchTextPathOp:       makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.UnaryMinusOp:          makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.UnaryComplementOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.CastOp:                makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.CaseOp:                makeOpLayout(1 /*base*/, 2 /*list*/, 0 /*priv*/),
-	opt.WhenOp:                makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ArrayOp:               makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.IndirectionOp:         makeOpLayout(2 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FunctionOp:            makeOpLayout(0 /*base*/, 1 /*list*/, 3 /*priv*/),
-	opt.CoalesceOp:            makeOpLayout(0 /*base*/, 1 /*list*/, 0 /*priv*/),
-	opt.ColumnAccessOp:        makeOpLayout(1 /*base*/, 0 /*list*/, 2 /*priv*/),
-	opt.UnsupportedExprOp:     makeOpLayout(0 /*base*/, 0 /*list*/, 1 /*priv*/),
-	opt.ArrayAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AvgOp:                 makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.BoolAndOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.BoolOrOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ConcatAggOp:           makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.CountOp:               makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.CountRowsOp:           makeOpLayout(0 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.MaxOp:                 makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.MinOp:                 makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.SumIntOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.SumOp:                 makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.SqrDiffOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.VarianceOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.StdDevOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.XorAggOp:              makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.JsonAggOp:             makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.JsonbAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ConstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.ConstNotNullAggOp:     makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AnyNotNullAggOp:       makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.FirstAggOp:            makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
-	opt.AggDistinctOp:         makeOpLayout(1 /*base*/, 0 /*list*/, 0 /*priv*/),
+// SortExpr enforces the ordering of rows returned by its input expression. Rows can
+// be sorted by one or more of the input columns, each of which can be sorted in
+// either ascending or descending order. See the Ordering field in the
+// PhysicalProps struct.
+type SortExpr struct {
+	Input RelExpr
+	phys  *props.Physical
+	cst   Cost
 }
 
-var isEnforcerLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                true,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Op() opt.Operator {
+	return opt.SortOp
 }
 
-var isRelationalLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                true,
-	opt.VirtualScanOp:         true,
-	opt.ValuesOp:              true,
-	opt.SelectOp:              true,
-	opt.ProjectOp:             true,
-	opt.InnerJoinOp:           true,
-	opt.LeftJoinOp:            true,
-	opt.RightJoinOp:           true,
-	opt.FullJoinOp:            true,
-	opt.SemiJoinOp:            true,
-	opt.AntiJoinOp:            true,
-	opt.IndexJoinOp:           true,
-	opt.LookupJoinOp:          true,
-	opt.MergeJoinOp:           true,
-	opt.InnerJoinApplyOp:      true,
-	opt.LeftJoinApplyOp:       true,
-	opt.RightJoinApplyOp:      true,
-	opt.FullJoinApplyOp:       true,
-	opt.SemiJoinApplyOp:       true,
-	opt.AntiJoinApplyOp:       true,
-	opt.GroupByOp:             true,
-	opt.ScalarGroupByOp:       true,
-	opt.DistinctOnOp:          true,
-	opt.UnionOp:               true,
-	opt.IntersectOp:           true,
-	opt.ExceptOp:              true,
-	opt.UnionAllOp:            true,
-	opt.IntersectAllOp:        true,
-	opt.ExceptAllOp:           true,
-	opt.LimitOp:               true,
-	opt.OffsetOp:              true,
-	opt.Max1RowOp:             true,
-	opt.ExplainOp:             true,
-	opt.ShowTraceForSessionOp: true,
-	opt.RowNumberOp:           true,
-	opt.ZipOp:                 true,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) ChildCount() int {
+	return 1
 }
 
-var isJoinLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           true,
-	opt.LeftJoinOp:            true,
-	opt.RightJoinOp:           true,
-	opt.FullJoinOp:            true,
-	opt.SemiJoinOp:            true,
-	opt.AntiJoinOp:            true,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      true,
-	opt.LeftJoinApplyOp:       true,
-	opt.RightJoinApplyOp:      true,
-	opt.FullJoinApplyOp:       true,
-	opt.SemiJoinApplyOp:       true,
-	opt.AntiJoinApplyOp:       true,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Child(nth int) opt.Expr {
+	if nth == 0 {
+		return e.Input
+	}
+	panic("child index out of range")
 }
 
-var isJoinNonApplyLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           true,
-	opt.LeftJoinOp:            true,
-	opt.RightJoinOp:           true,
-	opt.FullJoinOp:            true,
-	opt.SemiJoinOp:            true,
-	opt.AntiJoinOp:            true,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Private() interface{} {
+	return nil
 }
 
-var isJoinApplyLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      true,
-	opt.LeftJoinApplyOp:       true,
-	opt.RightJoinApplyOp:      true,
-	opt.FullJoinApplyOp:       true,
-	opt.SemiJoinApplyOp:       true,
-	opt.AntiJoinApplyOp:       true,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-var isScalarLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            true,
-	opt.AnyOp:                 true,
-	opt.VariableOp:            true,
-	opt.ConstOp:               true,
-	opt.NullOp:                true,
-	opt.TrueOp:                true,
-	opt.FalseOp:               true,
-	opt.PlaceholderOp:         true,
-	opt.TupleOp:               true,
-	opt.ProjectionsOp:         true,
-	opt.AggregationsOp:        true,
-	opt.MergeOnOp:             true,
-	opt.ExistsOp:              true,
-	opt.FiltersOp:             true,
-	opt.AndOp:                 true,
-	opt.OrOp:                  true,
-	opt.NotOp:                 true,
-	opt.EqOp:                  true,
-	opt.LtOp:                  true,
-	opt.GtOp:                  true,
-	opt.LeOp:                  true,
-	opt.GeOp:                  true,
-	opt.NeOp:                  true,
-	opt.InOp:                  true,
-	opt.NotInOp:               true,
-	opt.LikeOp:                true,
-	opt.NotLikeOp:             true,
-	opt.ILikeOp:               true,
-	opt.NotILikeOp:            true,
-	opt.SimilarToOp:           true,
-	opt.NotSimilarToOp:        true,
-	opt.RegMatchOp:            true,
-	opt.NotRegMatchOp:         true,
-	opt.RegIMatchOp:           true,
-	opt.NotRegIMatchOp:        true,
-	opt.IsOp:                  true,
-	opt.IsNotOp:               true,
-	opt.ContainsOp:            true,
-	opt.JsonExistsOp:          true,
-	opt.JsonAllExistsOp:       true,
-	opt.JsonSomeExistsOp:      true,
-	opt.AnyScalarOp:           true,
-	opt.BitandOp:              true,
-	opt.BitorOp:               true,
-	opt.BitxorOp:              true,
-	opt.PlusOp:                true,
-	opt.MinusOp:               true,
-	opt.MultOp:                true,
-	opt.DivOp:                 true,
-	opt.FloorDivOp:            true,
-	opt.ModOp:                 true,
-	opt.PowOp:                 true,
-	opt.ConcatOp:              true,
-	opt.LShiftOp:              true,
-	opt.RShiftOp:              true,
-	opt.FetchValOp:            true,
-	opt.FetchTextOp:           true,
-	opt.FetchValPathOp:        true,
-	opt.FetchTextPathOp:       true,
-	opt.UnaryMinusOp:          true,
-	opt.UnaryComplementOp:     true,
-	opt.CastOp:                true,
-	opt.CaseOp:                true,
-	opt.WhenOp:                true,
-	opt.ArrayOp:               true,
-	opt.IndirectionOp:         true,
-	opt.FunctionOp:            true,
-	opt.CoalesceOp:            true,
-	opt.ColumnAccessOp:        true,
-	opt.UnsupportedExprOp:     true,
-	opt.ArrayAggOp:            true,
-	opt.AvgOp:                 true,
-	opt.BoolAndOp:             true,
-	opt.BoolOrOp:              true,
-	opt.ConcatAggOp:           true,
-	opt.CountOp:               true,
-	opt.CountRowsOp:           true,
-	opt.MaxOp:                 true,
-	opt.MinOp:                 true,
-	opt.SumIntOp:              true,
-	opt.SumOp:                 true,
-	opt.SqrDiffOp:             true,
-	opt.VarianceOp:            true,
-	opt.StdDevOp:              true,
-	opt.XorAggOp:              true,
-	opt.JsonAggOp:             true,
-	opt.JsonbAggOp:            true,
-	opt.ConstAggOp:            true,
-	opt.ConstNotNullAggOp:     true,
-	opt.AnyNotNullAggOp:       true,
-	opt.FirstAggOp:            true,
-	opt.AggDistinctOp:         true,
+func (e *SortExpr) SetChild(nth int, child opt.Expr) {
+	if nth == 0 {
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
 }
 
-var isConstValueLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               true,
-	opt.NullOp:                true,
-	opt.TrueOp:                true,
-	opt.FalseOp:               true,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Memo() *Memo {
+	return e.Input.Memo()
 }
 
-var isBooleanLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                true,
-	opt.FalseOp:               true,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             true,
-	opt.AndOp:                 true,
-	opt.OrOp:                  true,
-	opt.NotOp:                 true,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Relational() *props.Relational {
+	return e.Input.Relational()
 }
 
-var isComparisonLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  true,
-	opt.LtOp:                  true,
-	opt.GtOp:                  true,
-	opt.LeOp:                  true,
-	opt.GeOp:                  true,
-	opt.NeOp:                  true,
-	opt.InOp:                  true,
-	opt.NotInOp:               true,
-	opt.LikeOp:                true,
-	opt.NotLikeOp:             true,
-	opt.ILikeOp:               true,
-	opt.NotILikeOp:            true,
-	opt.SimilarToOp:           true,
-	opt.NotSimilarToOp:        true,
-	opt.RegMatchOp:            true,
-	opt.NotRegMatchOp:         true,
-	opt.RegIMatchOp:           true,
-	opt.NotRegIMatchOp:        true,
-	opt.IsOp:                  true,
-	opt.IsNotOp:               true,
-	opt.ContainsOp:            true,
-	opt.JsonExistsOp:          true,
-	opt.JsonAllExistsOp:       true,
-	opt.JsonSomeExistsOp:      true,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) FirstExpr() RelExpr {
+	return e.Input.FirstExpr()
 }
 
-var isBinaryLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              true,
-	opt.BitorOp:               true,
-	opt.BitxorOp:              true,
-	opt.PlusOp:                true,
-	opt.MinusOp:               true,
-	opt.MultOp:                true,
-	opt.DivOp:                 true,
-	opt.FloorDivOp:            true,
-	opt.ModOp:                 true,
-	opt.PowOp:                 true,
-	opt.ConcatOp:              true,
-	opt.LShiftOp:              true,
-	opt.RShiftOp:              true,
-	opt.FetchValOp:            true,
-	opt.FetchTextOp:           true,
-	opt.FetchValPathOp:        true,
-	opt.FetchTextPathOp:       true,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) NextExpr() RelExpr {
+	return nil
 }
 
-var isUnaryLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          true,
-	opt.UnaryComplementOp:     true,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            false,
-	opt.AvgOp:                 false,
-	opt.BoolAndOp:             false,
-	opt.BoolOrOp:              false,
-	opt.ConcatAggOp:           false,
-	opt.CountOp:               false,
-	opt.CountRowsOp:           false,
-	opt.MaxOp:                 false,
-	opt.MinOp:                 false,
-	opt.SumIntOp:              false,
-	opt.SumOp:                 false,
-	opt.SqrDiffOp:             false,
-	opt.VarianceOp:            false,
-	opt.StdDevOp:              false,
-	opt.XorAggOp:              false,
-	opt.JsonAggOp:             false,
-	opt.JsonbAggOp:            false,
-	opt.ConstAggOp:            false,
-	opt.ConstNotNullAggOp:     false,
-	opt.AnyNotNullAggOp:       false,
-	opt.FirstAggOp:            false,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Physical() *props.Physical {
+	return e.phys
 }
 
-var isAggregateLookup = [...]bool{
-	opt.UnknownOp: false,
-
-	opt.SortOp:                false,
-	opt.ScanOp:                false,
-	opt.VirtualScanOp:         false,
-	opt.ValuesOp:              false,
-	opt.SelectOp:              false,
-	opt.ProjectOp:             false,
-	opt.InnerJoinOp:           false,
-	opt.LeftJoinOp:            false,
-	opt.RightJoinOp:           false,
-	opt.FullJoinOp:            false,
-	opt.SemiJoinOp:            false,
-	opt.AntiJoinOp:            false,
-	opt.IndexJoinOp:           false,
-	opt.LookupJoinOp:          false,
-	opt.MergeJoinOp:           false,
-	opt.InnerJoinApplyOp:      false,
-	opt.LeftJoinApplyOp:       false,
-	opt.RightJoinApplyOp:      false,
-	opt.FullJoinApplyOp:       false,
-	opt.SemiJoinApplyOp:       false,
-	opt.AntiJoinApplyOp:       false,
-	opt.GroupByOp:             false,
-	opt.ScalarGroupByOp:       false,
-	opt.DistinctOnOp:          false,
-	opt.UnionOp:               false,
-	opt.IntersectOp:           false,
-	opt.ExceptOp:              false,
-	opt.UnionAllOp:            false,
-	opt.IntersectAllOp:        false,
-	opt.ExceptAllOp:           false,
-	opt.LimitOp:               false,
-	opt.OffsetOp:              false,
-	opt.Max1RowOp:             false,
-	opt.ExplainOp:             false,
-	opt.ShowTraceForSessionOp: false,
-	opt.RowNumberOp:           false,
-	opt.ZipOp:                 false,
-	opt.SubqueryOp:            false,
-	opt.AnyOp:                 false,
-	opt.VariableOp:            false,
-	opt.ConstOp:               false,
-	opt.NullOp:                false,
-	opt.TrueOp:                false,
-	opt.FalseOp:               false,
-	opt.PlaceholderOp:         false,
-	opt.TupleOp:               false,
-	opt.ProjectionsOp:         false,
-	opt.AggregationsOp:        false,
-	opt.MergeOnOp:             false,
-	opt.ExistsOp:              false,
-	opt.FiltersOp:             false,
-	opt.AndOp:                 false,
-	opt.OrOp:                  false,
-	opt.NotOp:                 false,
-	opt.EqOp:                  false,
-	opt.LtOp:                  false,
-	opt.GtOp:                  false,
-	opt.LeOp:                  false,
-	opt.GeOp:                  false,
-	opt.NeOp:                  false,
-	opt.InOp:                  false,
-	opt.NotInOp:               false,
-	opt.LikeOp:                false,
-	opt.NotLikeOp:             false,
-	opt.ILikeOp:               false,
-	opt.NotILikeOp:            false,
-	opt.SimilarToOp:           false,
-	opt.NotSimilarToOp:        false,
-	opt.RegMatchOp:            false,
-	opt.NotRegMatchOp:         false,
-	opt.RegIMatchOp:           false,
-	opt.NotRegIMatchOp:        false,
-	opt.IsOp:                  false,
-	opt.IsNotOp:               false,
-	opt.ContainsOp:            false,
-	opt.JsonExistsOp:          false,
-	opt.JsonAllExistsOp:       false,
-	opt.JsonSomeExistsOp:      false,
-	opt.AnyScalarOp:           false,
-	opt.BitandOp:              false,
-	opt.BitorOp:               false,
-	opt.BitxorOp:              false,
-	opt.PlusOp:                false,
-	opt.MinusOp:               false,
-	opt.MultOp:                false,
-	opt.DivOp:                 false,
-	opt.FloorDivOp:            false,
-	opt.ModOp:                 false,
-	opt.PowOp:                 false,
-	opt.ConcatOp:              false,
-	opt.LShiftOp:              false,
-	opt.RShiftOp:              false,
-	opt.FetchValOp:            false,
-	opt.FetchTextOp:           false,
-	opt.FetchValPathOp:        false,
-	opt.FetchTextPathOp:       false,
-	opt.UnaryMinusOp:          false,
-	opt.UnaryComplementOp:     false,
-	opt.CastOp:                false,
-	opt.CaseOp:                false,
-	opt.WhenOp:                false,
-	opt.ArrayOp:               false,
-	opt.IndirectionOp:         false,
-	opt.FunctionOp:            false,
-	opt.CoalesceOp:            false,
-	opt.ColumnAccessOp:        false,
-	opt.UnsupportedExprOp:     false,
-	opt.ArrayAggOp:            true,
-	opt.AvgOp:                 true,
-	opt.BoolAndOp:             true,
-	opt.BoolOrOp:              true,
-	opt.ConcatAggOp:           true,
-	opt.CountOp:               true,
-	opt.CountRowsOp:           true,
-	opt.MaxOp:                 true,
-	opt.MinOp:                 true,
-	opt.SumIntOp:              true,
-	opt.SumOp:                 true,
-	opt.SqrDiffOp:             true,
-	opt.VarianceOp:            true,
-	opt.StdDevOp:              true,
-	opt.XorAggOp:              true,
-	opt.JsonAggOp:             true,
-	opt.JsonbAggOp:            true,
-	opt.ConstAggOp:            true,
-	opt.ConstNotNullAggOp:     true,
-	opt.AnyNotNullAggOp:       true,
-	opt.FirstAggOp:            true,
-	opt.AggDistinctOp:         false,
+func (e *SortExpr) Cost() Cost {
+	return e.cst
 }
 
-func (ev ExprView) IsEnforcer() bool {
-	return isEnforcerLookup[ev.op]
+func (e *SortExpr) group() exprGroup {
+	return e.Input.group()
 }
 
-func (ev ExprView) IsRelational() bool {
-	return isRelationalLookup[ev.op]
+func (e *SortExpr) setNext(member RelExpr) {
+	panic("setNext cannot be called on enforcers")
 }
 
-func (ev ExprView) IsJoin() bool {
-	return isJoinLookup[ev.op]
-}
-
-func (ev ExprView) IsJoinNonApply() bool {
-	return isJoinNonApplyLookup[ev.op]
-}
-
-func (ev ExprView) IsJoinApply() bool {
-	return isJoinApplyLookup[ev.op]
-}
-
-func (ev ExprView) IsScalar() bool {
-	return isScalarLookup[ev.op]
-}
-
-func (ev ExprView) IsConstValue() bool {
-	return isConstValueLookup[ev.op]
-}
-
-func (ev ExprView) IsBoolean() bool {
-	return isBooleanLookup[ev.op]
-}
-
-func (ev ExprView) IsComparison() bool {
-	return isComparisonLookup[ev.op]
-}
-
-func (ev ExprView) IsBinary() bool {
-	return isBinaryLookup[ev.op]
-}
-
-func (ev ExprView) IsUnary() bool {
-	return isUnaryLookup[ev.op]
-}
-
-func (ev ExprView) IsAggregate() bool {
-	return isAggregateLookup[ev.op]
-}
-
-func (e *Expr) IsEnforcer() bool {
-	return isEnforcerLookup[e.op]
-}
-
-func (e *Expr) IsRelational() bool {
-	return isRelationalLookup[e.op]
-}
-
-func (e *Expr) IsJoin() bool {
-	return isJoinLookup[e.op]
-}
-
-func (e *Expr) IsJoinNonApply() bool {
-	return isJoinNonApplyLookup[e.op]
-}
-
-func (e *Expr) IsJoinApply() bool {
-	return isJoinApplyLookup[e.op]
-}
-
-func (e *Expr) IsScalar() bool {
-	return isScalarLookup[e.op]
-}
-
-func (e *Expr) IsConstValue() bool {
-	return isConstValueLookup[e.op]
-}
-
-func (e *Expr) IsBoolean() bool {
-	return isBooleanLookup[e.op]
-}
-
-func (e *Expr) IsComparison() bool {
-	return isComparisonLookup[e.op]
-}
-
-func (e *Expr) IsBinary() bool {
-	return isBinaryLookup[e.op]
-}
-
-func (e *Expr) IsUnary() bool {
-	return isUnaryLookup[e.op]
-}
-
-func (e *Expr) IsAggregate() bool {
-	return isAggregateLookup[e.op]
+func (e *SortExpr) setGroup(member exprGroup) {
+	panic("setGroup cannot be called on enforcers")
 }
 
 // ScanExpr returns a result set containing every row in a table by scanning one of
-// the table's indexes according to its ordering. The private Def field is an
-// *opt.ScanOpDef that identifies the table and index to scan, as well as the
-// subset of columns to project from it.
+// the table's indexes according to its ordering. The ScanPrivate field
+// identifies the table and index to scan, as well as the subset of columns to
+// project from it.
 //
 // The scan can be constrained and/or have an internal row limit. A scan can be
 // executed either as a forward or as a reverse scan (except when it has a limit,
 // in which case the direction is fixed).
-type ScanExpr Expr
+type ScanExpr struct {
+	ScanPrivate
 
-func MakeScanExpr(def PrivateID) ScanExpr {
-	return ScanExpr{op: opt.ScanOp, state: exprState{uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ScanExpr) Def() PrivateID {
-	return PrivateID(e.state[0])
+var _ RelExpr = &ScanExpr{}
+
+func (e *ScanExpr) Op() opt.Operator {
+	return opt.ScanOp
 }
 
-func (e *ScanExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *ScanExpr) ChildCount() int {
+	return 0
 }
 
-func (e *Expr) AsScan() *ScanExpr {
-	if e.op != opt.ScanOp {
-		return nil
+func (e *ScanExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *ScanExpr) Private() interface{} {
+	return &e.ScanPrivate
+}
+
+func (e *ScanExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ScanExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *ScanExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ScanExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ScanExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ScanExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ScanExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ScanExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ScanExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ScanExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
 	}
-	return (*ScanExpr)(e)
+	e.next = member
+}
+
+func (e *ScanExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type scanGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ScanExpr
+}
+
+var _ exprGroup = &scanGroup{}
+
+func (g *scanGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *scanGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *scanGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *scanGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *scanGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *scanGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type ScanPrivate struct {
+	Table      opt.TableID
+	Index      int
+	Cols       opt.ColSet
+	Constraint *constraint.Constraint
+	HardLimit  ScanLimit
+	Flags      ScanFlags
 }
 
 // VirtualScanExpr returns a result set containing every row in a virtual table.
@@ -1887,25 +234,122 @@ func (e *Expr) AsScan() *ScanExpr {
 // used to scan virtual tables does not support limits or constraints. Therefore,
 // nearly all the rules that apply to Scan do not apply to VirtualScan, so it
 // makes sense to have a separate operator.
-type VirtualScanExpr Expr
+type VirtualScanExpr struct {
+	VirtualScanPrivate
 
-func MakeVirtualScanExpr(def PrivateID) VirtualScanExpr {
-	return VirtualScanExpr{op: opt.VirtualScanOp, state: exprState{uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *VirtualScanExpr) Def() PrivateID {
-	return PrivateID(e.state[0])
+var _ RelExpr = &VirtualScanExpr{}
+
+func (e *VirtualScanExpr) Op() opt.Operator {
+	return opt.VirtualScanOp
 }
 
-func (e *VirtualScanExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *VirtualScanExpr) ChildCount() int {
+	return 0
 }
 
-func (e *Expr) AsVirtualScan() *VirtualScanExpr {
-	if e.op != opt.VirtualScanOp {
-		return nil
+func (e *VirtualScanExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *VirtualScanExpr) Private() interface{} {
+	return &e.VirtualScanPrivate
+}
+
+func (e *VirtualScanExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *VirtualScanExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *VirtualScanExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *VirtualScanExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *VirtualScanExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *VirtualScanExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *VirtualScanExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *VirtualScanExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *VirtualScanExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *VirtualScanExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
 	}
-	return (*VirtualScanExpr)(e)
+	e.next = member
+}
+
+func (e *VirtualScanExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type virtualScanGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first VirtualScanExpr
+}
+
+var _ exprGroup = &virtualScanGroup{}
+
+func (g *virtualScanGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *virtualScanGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *virtualScanGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *virtualScanGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *virtualScanGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *virtualScanGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type VirtualScanPrivate struct {
+	Table opt.TableID
+	Cols  opt.ColSet
 }
 
 // ValuesExpr returns a manufactured result set containing a constant number of rows.
@@ -1917,29 +361,127 @@ func (e *Expr) AsVirtualScan() *VirtualScanExpr {
 //
 // The Cols field contains the set of column indices returned by each row
 // as an opt.ColList. It is legal for Cols to be empty.
-type ValuesExpr Expr
+type ValuesExpr struct {
+	Rows ScalarListExpr
+	Cols opt.ColList
 
-func MakeValuesExpr(rows ListID, cols PrivateID) ValuesExpr {
-	return ValuesExpr{op: opt.ValuesOp, state: exprState{rows.Offset, rows.Length, uint32(cols)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ValuesExpr) Rows() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+var _ RelExpr = &ValuesExpr{}
+
+func (e *ValuesExpr) Op() opt.Operator {
+	return opt.ValuesOp
 }
 
-func (e *ValuesExpr) Cols() PrivateID {
-	return PrivateID(e.state[2])
+func (e *ValuesExpr) ChildCount() int {
+	return 1
 }
 
-func (e *ValuesExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsValues() *ValuesExpr {
-	if e.op != opt.ValuesOp {
-		return nil
+func (e *ValuesExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Rows
 	}
-	return (*ValuesExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ValuesExpr) Private() interface{} {
+	return &e.Cols
+}
+
+func (e *ValuesExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ValuesExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Rows = *child.(*ScalarListExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ValuesExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ValuesExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ValuesExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ValuesExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ValuesExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ValuesExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ValuesExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ValuesExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ValuesExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type valuesGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ValuesExpr
+}
+
+var _ exprGroup = &valuesGroup{}
+
+func (g *valuesGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *valuesGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *valuesGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *valuesGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *valuesGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *valuesGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // SelectExpr filters rows from its input result set, based on the boolean filter
@@ -1947,60 +489,268 @@ func (e *Expr) AsValues() *ValuesExpr {
 // the Filter operand can be any boolean expression, normalization rules will
 // typically convert it to a Filters operator in order to make conjunction list
 // matching easier.
-type SelectExpr Expr
+type SelectExpr struct {
+	Input   RelExpr
+	Filters FiltersExpr
 
-func MakeSelectExpr(input GroupID, filter GroupID) SelectExpr {
-	return SelectExpr{op: opt.SelectOp, state: exprState{uint32(input), uint32(filter)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *SelectExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &SelectExpr{}
+
+func (e *SelectExpr) Op() opt.Operator {
+	return opt.SelectOp
 }
 
-func (e *SelectExpr) Filter() GroupID {
-	return GroupID(e.state[1])
+func (e *SelectExpr) ChildCount() int {
+	return 2
 }
 
-func (e *SelectExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsSelect() *SelectExpr {
-	if e.op != opt.SelectOp {
-		return nil
+func (e *SelectExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Filters
 	}
-	return (*SelectExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *SelectExpr) Private() interface{} {
+	return nil
+}
+
+func (e *SelectExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SelectExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Filters = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SelectExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *SelectExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *SelectExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *SelectExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *SelectExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *SelectExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *SelectExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *SelectExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *SelectExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type selectGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first SelectExpr
+}
+
+var _ exprGroup = &selectGroup{}
+
+func (g *selectGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *selectGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *selectGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *selectGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *selectGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *selectGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // ProjectExpr modifies the set of columns returned by the input result set. Columns
 // can be removed, reordered, or renamed. In addition, new columns can be
 // synthesized.
-// Projections is a scalar Projections list operator that contains information
-// about the projected columns and any expressions that describe newly
-// synthesized output columns.
-type ProjectExpr Expr
+//
+// Projections describes the synthesized columns constructed by Project, and
+// Passthrough describes the input columns that are passed through as Project
+// output columns.
+type ProjectExpr struct {
+	Input       RelExpr
+	Projections ProjectionsExpr
+	Passthrough opt.ColSet
 
-func MakeProjectExpr(input GroupID, projections GroupID) ProjectExpr {
-	return ProjectExpr{op: opt.ProjectOp, state: exprState{uint32(input), uint32(projections)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ProjectExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &ProjectExpr{}
+
+func (e *ProjectExpr) Op() opt.Operator {
+	return opt.ProjectOp
 }
 
-func (e *ProjectExpr) Projections() GroupID {
-	return GroupID(e.state[1])
+func (e *ProjectExpr) ChildCount() int {
+	return 2
 }
 
-func (e *ProjectExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsProject() *ProjectExpr {
-	if e.op != opt.ProjectOp {
-		return nil
+func (e *ProjectExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Projections
 	}
-	return (*ProjectExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ProjectExpr) Private() interface{} {
+	return &e.Passthrough
+}
+
+func (e *ProjectExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ProjectExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Projections = *child.(*ProjectionsExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ProjectExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ProjectExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ProjectExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ProjectExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ProjectExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ProjectExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ProjectExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ProjectExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ProjectExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type projectGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ProjectExpr
+}
+
+var _ exprGroup = &projectGroup{}
+
+func (g *projectGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *projectGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *projectGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *projectGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *projectGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *projectGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // InnerJoinExpr creates a result set that combines columns from its left and right
@@ -2008,178 +758,808 @@ func (e *Expr) AsProject() *ProjectExpr {
 // predicate are filtered. While expressions in the predicate can refer to
 // columns projected by either the left or right inputs, the inputs are not
 // allowed to refer to the other's projected columns.
-type InnerJoinExpr Expr
+type InnerJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
 
-func MakeInnerJoinExpr(left GroupID, right GroupID, on GroupID) InnerJoinExpr {
-	return InnerJoinExpr{op: opt.InnerJoinOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *InnerJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &InnerJoinExpr{}
+
+func (e *InnerJoinExpr) Op() opt.Operator {
+	return opt.InnerJoinOp
 }
 
-func (e *InnerJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *InnerJoinExpr) ChildCount() int {
+	return 3
 }
 
-func (e *InnerJoinExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *InnerJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsInnerJoin() *InnerJoinExpr {
-	if e.op != opt.InnerJoinOp {
-		return nil
+func (e *InnerJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
 	}
-	return (*InnerJoinExpr)(e)
+	panic("child index out of range")
 }
 
-type LeftJoinExpr Expr
-
-func MakeLeftJoinExpr(left GroupID, right GroupID, on GroupID) LeftJoinExpr {
-	return LeftJoinExpr{op: opt.LeftJoinOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+func (e *InnerJoinExpr) Private() interface{} {
+	return nil
 }
 
-func (e *LeftJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *InnerJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *LeftJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *LeftJoinExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *LeftJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsLeftJoin() *LeftJoinExpr {
-	if e.op != opt.LeftJoinOp {
-		return nil
+func (e *InnerJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
 	}
-	return (*LeftJoinExpr)(e)
+	panic("child index out of range")
 }
 
-type RightJoinExpr Expr
-
-func MakeRightJoinExpr(left GroupID, right GroupID, on GroupID) RightJoinExpr {
-	return RightJoinExpr{op: opt.RightJoinOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+func (e *InnerJoinExpr) Memo() *Memo {
+	return e.grp.memo()
 }
 
-func (e *RightJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *InnerJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
 }
 
-func (e *RightJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *InnerJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
 }
 
-func (e *RightJoinExpr) On() GroupID {
-	return GroupID(e.state[2])
+func (e *InnerJoinExpr) NextExpr() RelExpr {
+	return e.next
 }
 
-func (e *RightJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *InnerJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
 }
 
-func (e *Expr) AsRightJoin() *RightJoinExpr {
-	if e.op != opt.RightJoinOp {
-		return nil
+func (e *InnerJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *InnerJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *InnerJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
 	}
-	return (*RightJoinExpr)(e)
+	e.next = member
 }
 
-type FullJoinExpr Expr
-
-func MakeFullJoinExpr(left GroupID, right GroupID, on GroupID) FullJoinExpr {
-	return FullJoinExpr{op: opt.FullJoinOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
-}
-
-func (e *FullJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *FullJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *FullJoinExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *FullJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFullJoin() *FullJoinExpr {
-	if e.op != opt.FullJoinOp {
-		return nil
+func (e *InnerJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
 	}
-	return (*FullJoinExpr)(e)
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
 }
 
-type SemiJoinExpr Expr
-
-func MakeSemiJoinExpr(left GroupID, right GroupID, on GroupID) SemiJoinExpr {
-	return SemiJoinExpr{op: opt.SemiJoinOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+type innerJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first InnerJoinExpr
 }
 
-func (e *SemiJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ exprGroup = &innerJoinGroup{}
+
+func (g *innerJoinGroup) memo() *Memo {
+	return g.mem
 }
 
-func (e *SemiJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (g *innerJoinGroup) relational() *props.Relational {
+	return &g.rel
 }
 
-func (e *SemiJoinExpr) On() GroupID {
-	return GroupID(e.state[2])
+func (g *innerJoinGroup) physical() *props.Physical {
+	return g.phys
 }
 
-func (e *SemiJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (g *innerJoinGroup) firstExpr() RelExpr {
+	return &g.first
 }
 
-func (e *Expr) AsSemiJoin() *SemiJoinExpr {
-	if e.op != opt.SemiJoinOp {
-		return nil
+func (g *innerJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *innerJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type LeftJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &LeftJoinExpr{}
+
+func (e *LeftJoinExpr) Op() opt.Operator {
+	return opt.LeftJoinOp
+}
+
+func (e *LeftJoinExpr) ChildCount() int {
+	return 3
+}
+
+func (e *LeftJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
 	}
-	return (*SemiJoinExpr)(e)
+	panic("child index out of range")
 }
 
-type AntiJoinExpr Expr
-
-func MakeAntiJoinExpr(left GroupID, right GroupID, on GroupID) AntiJoinExpr {
-	return AntiJoinExpr{op: opt.AntiJoinOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+func (e *LeftJoinExpr) Private() interface{} {
+	return nil
 }
 
-func (e *AntiJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *LeftJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *AntiJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *AntiJoinExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *AntiJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsAntiJoin() *AntiJoinExpr {
-	if e.op != opt.AntiJoinOp {
-		return nil
+func (e *LeftJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
 	}
-	return (*AntiJoinExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *LeftJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *LeftJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *LeftJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *LeftJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *LeftJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *LeftJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *LeftJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *LeftJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *LeftJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type leftJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first LeftJoinExpr
+}
+
+var _ exprGroup = &leftJoinGroup{}
+
+func (g *leftJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *leftJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *leftJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *leftJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *leftJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *leftJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type RightJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &RightJoinExpr{}
+
+func (e *RightJoinExpr) Op() opt.Operator {
+	return opt.RightJoinOp
+}
+
+func (e *RightJoinExpr) ChildCount() int {
+	return 3
+}
+
+func (e *RightJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *RightJoinExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RightJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RightJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *RightJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *RightJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *RightJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *RightJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *RightJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *RightJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *RightJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *RightJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *RightJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type rightJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first RightJoinExpr
+}
+
+var _ exprGroup = &rightJoinGroup{}
+
+func (g *rightJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *rightJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *rightJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *rightJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *rightJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *rightJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type FullJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &FullJoinExpr{}
+
+func (e *FullJoinExpr) Op() opt.Operator {
+	return opt.FullJoinOp
+}
+
+func (e *FullJoinExpr) ChildCount() int {
+	return 3
+}
+
+func (e *FullJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *FullJoinExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FullJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FullJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FullJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *FullJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *FullJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *FullJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *FullJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *FullJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *FullJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *FullJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *FullJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type fullJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first FullJoinExpr
+}
+
+var _ exprGroup = &fullJoinGroup{}
+
+func (g *fullJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *fullJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *fullJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *fullJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *fullJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *fullJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type SemiJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &SemiJoinExpr{}
+
+func (e *SemiJoinExpr) Op() opt.Operator {
+	return opt.SemiJoinOp
+}
+
+func (e *SemiJoinExpr) ChildCount() int {
+	return 3
+}
+
+func (e *SemiJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *SemiJoinExpr) Private() interface{} {
+	return nil
+}
+
+func (e *SemiJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SemiJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SemiJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *SemiJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *SemiJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *SemiJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *SemiJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *SemiJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *SemiJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *SemiJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *SemiJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type semiJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first SemiJoinExpr
+}
+
+var _ exprGroup = &semiJoinGroup{}
+
+func (g *semiJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *semiJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *semiJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *semiJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *semiJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *semiJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type AntiJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AntiJoinExpr{}
+
+func (e *AntiJoinExpr) Op() opt.Operator {
+	return opt.AntiJoinOp
+}
+
+func (e *AntiJoinExpr) ChildCount() int {
+	return 3
+}
+
+func (e *AntiJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *AntiJoinExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AntiJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AntiJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *AntiJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AntiJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AntiJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AntiJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AntiJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *AntiJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *AntiJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AntiJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AntiJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type antiJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first AntiJoinExpr
+}
+
+var _ exprGroup = &antiJoinGroup{}
+
+func (g *antiJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *antiJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *antiJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *antiJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *antiJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *antiJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // IndexJoinExpr represents an inner join between an input expression and a primary
@@ -2189,270 +1569,1226 @@ func (e *Expr) AsAntiJoin() *AntiJoinExpr {
 //
 // IndexJoin operators are created from Scan operators (unlike lookup joins which
 // are created from Join operators).
-type IndexJoinExpr Expr
+type IndexJoinExpr struct {
+	Input RelExpr
+	IndexJoinPrivate
 
-func MakeIndexJoinExpr(input GroupID, def PrivateID) IndexJoinExpr {
-	return IndexJoinExpr{op: opt.IndexJoinOp, state: exprState{uint32(input), uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *IndexJoinExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &IndexJoinExpr{}
+
+func (e *IndexJoinExpr) Op() opt.Operator {
+	return opt.IndexJoinOp
 }
 
-func (e *IndexJoinExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
+func (e *IndexJoinExpr) ChildCount() int {
+	return 1
 }
 
-func (e *IndexJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsIndexJoin() *IndexJoinExpr {
-	if e.op != opt.IndexJoinOp {
-		return nil
+func (e *IndexJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*IndexJoinExpr)(e)
+	panic("child index out of range")
 }
 
-// LookupJoinExpr represents a join between an input expression and an index.
-// The type of join is in the Def private.
-type LookupJoinExpr Expr
-
-func MakeLookupJoinExpr(input GroupID, on GroupID, def PrivateID) LookupJoinExpr {
-	return LookupJoinExpr{op: opt.LookupJoinOp, state: exprState{uint32(input), uint32(on), uint32(def)}}
+func (e *IndexJoinExpr) Private() interface{} {
+	return &e.IndexJoinPrivate
 }
 
-func (e *LookupJoinExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *IndexJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *LookupJoinExpr) On() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *LookupJoinExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *LookupJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsLookupJoin() *LookupJoinExpr {
-	if e.op != opt.LookupJoinOp {
-		return nil
+func (e *IndexJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
 	}
-	return (*LookupJoinExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *IndexJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *IndexJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *IndexJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *IndexJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *IndexJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *IndexJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *IndexJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *IndexJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *IndexJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type indexJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first IndexJoinExpr
+}
+
+var _ exprGroup = &indexJoinGroup{}
+
+func (g *indexJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *indexJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *indexJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *indexJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *indexJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *indexJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type IndexJoinPrivate struct {
+	Table opt.TableID
+	Cols  opt.ColSet
+}
+
+// LookupJoinExpr represents a join between an input expression and an index. The
+// type of join is in the LookupJoinPrivate field.
+type LookupJoinExpr struct {
+	Input RelExpr
+	On    FiltersExpr
+	LookupJoinPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &LookupJoinExpr{}
+
+func (e *LookupJoinExpr) Op() opt.Operator {
+	return opt.LookupJoinOp
+}
+
+func (e *LookupJoinExpr) ChildCount() int {
+	return 2
+}
+
+func (e *LookupJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *LookupJoinExpr) Private() interface{} {
+	return &e.LookupJoinPrivate
+}
+
+func (e *LookupJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LookupJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *LookupJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *LookupJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *LookupJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *LookupJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *LookupJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *LookupJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *LookupJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *LookupJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *LookupJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type lookupJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first LookupJoinExpr
+}
+
+var _ exprGroup = &lookupJoinGroup{}
+
+func (g *lookupJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *lookupJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *lookupJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *lookupJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *lookupJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *lookupJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type LookupJoinPrivate struct {
+	JoinType    opt.Operator
+	Table       opt.TableID
+	Index       int
+	KeyCols     opt.ColList
+	Cols        opt.ColSet
+	lookupProps props.Relational
 }
 
 // MergeJoinExpr represents a join that is executed using merge-join.
 // MergeOn is a scalar which contains the ON condition and merge-join ordering
 // information; see the MergeOn scalar operator.
-// It can be any type of join (identified in the private of MergeOn).
-type MergeJoinExpr Expr
+// It can be any type of join (identified in the MergeJoinPrivate field).
+type MergeJoinExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+	MergeJoinPrivate
 
-func MakeMergeJoinExpr(left GroupID, right GroupID, mergeOn GroupID) MergeJoinExpr {
-	return MergeJoinExpr{op: opt.MergeJoinOp, state: exprState{uint32(left), uint32(right), uint32(mergeOn)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *MergeJoinExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &MergeJoinExpr{}
+
+func (e *MergeJoinExpr) Op() opt.Operator {
+	return opt.MergeJoinOp
 }
 
-func (e *MergeJoinExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *MergeJoinExpr) ChildCount() int {
+	return 3
 }
 
-func (e *MergeJoinExpr) MergeOn() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *MergeJoinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsMergeJoin() *MergeJoinExpr {
-	if e.op != opt.MergeJoinOp {
-		return nil
+func (e *MergeJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
 	}
-	return (*MergeJoinExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *MergeJoinExpr) Private() interface{} {
+	return &e.MergeJoinPrivate
+}
+
+func (e *MergeJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *MergeJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *MergeJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *MergeJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *MergeJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *MergeJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *MergeJoinExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *MergeJoinExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *MergeJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *MergeJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *MergeJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type mergeJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first MergeJoinExpr
+}
+
+var _ exprGroup = &mergeJoinGroup{}
+
+func (g *mergeJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *mergeJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *mergeJoinGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *mergeJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *mergeJoinGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *mergeJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type MergeJoinPrivate struct {
+	JoinType      opt.Operator
+	LeftEq        opt.Ordering
+	RightEq       opt.Ordering
+	LeftOrdering  props.OrderingChoice
+	RightOrdering props.OrderingChoice
 }
 
 // InnerJoinApplyExpr has the same join semantics as InnerJoin. However, unlike
 // InnerJoin, it allows the right input to refer to columns projected by the
 // left input.
-type InnerJoinApplyExpr Expr
+type InnerJoinApplyExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
 
-func MakeInnerJoinApplyExpr(left GroupID, right GroupID, on GroupID) InnerJoinApplyExpr {
-	return InnerJoinApplyExpr{op: opt.InnerJoinApplyOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *InnerJoinApplyExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &InnerJoinApplyExpr{}
+
+func (e *InnerJoinApplyExpr) Op() opt.Operator {
+	return opt.InnerJoinApplyOp
 }
 
-func (e *InnerJoinApplyExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *InnerJoinApplyExpr) ChildCount() int {
+	return 3
 }
 
-func (e *InnerJoinApplyExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *InnerJoinApplyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsInnerJoinApply() *InnerJoinApplyExpr {
-	if e.op != opt.InnerJoinApplyOp {
-		return nil
+func (e *InnerJoinApplyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
 	}
-	return (*InnerJoinApplyExpr)(e)
+	panic("child index out of range")
 }
 
-type LeftJoinApplyExpr Expr
-
-func MakeLeftJoinApplyExpr(left GroupID, right GroupID, on GroupID) LeftJoinApplyExpr {
-	return LeftJoinApplyExpr{op: opt.LeftJoinApplyOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+func (e *InnerJoinApplyExpr) Private() interface{} {
+	return nil
 }
 
-func (e *LeftJoinApplyExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *InnerJoinApplyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *LeftJoinApplyExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *LeftJoinApplyExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *LeftJoinApplyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsLeftJoinApply() *LeftJoinApplyExpr {
-	if e.op != opt.LeftJoinApplyOp {
-		return nil
+func (e *InnerJoinApplyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
 	}
-	return (*LeftJoinApplyExpr)(e)
+	panic("child index out of range")
 }
 
-type RightJoinApplyExpr Expr
-
-func MakeRightJoinApplyExpr(left GroupID, right GroupID, on GroupID) RightJoinApplyExpr {
-	return RightJoinApplyExpr{op: opt.RightJoinApplyOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+func (e *InnerJoinApplyExpr) Memo() *Memo {
+	return e.grp.memo()
 }
 
-func (e *RightJoinApplyExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *InnerJoinApplyExpr) Relational() *props.Relational {
+	return e.grp.relational()
 }
 
-func (e *RightJoinApplyExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *InnerJoinApplyExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
 }
 
-func (e *RightJoinApplyExpr) On() GroupID {
-	return GroupID(e.state[2])
+func (e *InnerJoinApplyExpr) NextExpr() RelExpr {
+	return e.next
 }
 
-func (e *RightJoinApplyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *InnerJoinApplyExpr) Physical() *props.Physical {
+	return e.grp.physical()
 }
 
-func (e *Expr) AsRightJoinApply() *RightJoinApplyExpr {
-	if e.op != opt.RightJoinApplyOp {
-		return nil
+func (e *InnerJoinApplyExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *InnerJoinApplyExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *InnerJoinApplyExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
 	}
-	return (*RightJoinApplyExpr)(e)
+	e.next = member
 }
 
-type FullJoinApplyExpr Expr
-
-func MakeFullJoinApplyExpr(left GroupID, right GroupID, on GroupID) FullJoinApplyExpr {
-	return FullJoinApplyExpr{op: opt.FullJoinApplyOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
-}
-
-func (e *FullJoinApplyExpr) Left() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *FullJoinApplyExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *FullJoinApplyExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *FullJoinApplyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFullJoinApply() *FullJoinApplyExpr {
-	if e.op != opt.FullJoinApplyOp {
-		return nil
+func (e *InnerJoinApplyExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
 	}
-	return (*FullJoinApplyExpr)(e)
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
 }
 
-type SemiJoinApplyExpr Expr
-
-func MakeSemiJoinApplyExpr(left GroupID, right GroupID, on GroupID) SemiJoinApplyExpr {
-	return SemiJoinApplyExpr{op: opt.SemiJoinApplyOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+type innerJoinApplyGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first InnerJoinApplyExpr
 }
 
-func (e *SemiJoinApplyExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ exprGroup = &innerJoinApplyGroup{}
+
+func (g *innerJoinApplyGroup) memo() *Memo {
+	return g.mem
 }
 
-func (e *SemiJoinApplyExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (g *innerJoinApplyGroup) relational() *props.Relational {
+	return &g.rel
 }
 
-func (e *SemiJoinApplyExpr) On() GroupID {
-	return GroupID(e.state[2])
+func (g *innerJoinApplyGroup) physical() *props.Physical {
+	return g.phys
 }
 
-func (e *SemiJoinApplyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (g *innerJoinApplyGroup) firstExpr() RelExpr {
+	return &g.first
 }
 
-func (e *Expr) AsSemiJoinApply() *SemiJoinApplyExpr {
-	if e.op != opt.SemiJoinApplyOp {
-		return nil
+func (g *innerJoinApplyGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *innerJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type LeftJoinApplyExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &LeftJoinApplyExpr{}
+
+func (e *LeftJoinApplyExpr) Op() opt.Operator {
+	return opt.LeftJoinApplyOp
+}
+
+func (e *LeftJoinApplyExpr) ChildCount() int {
+	return 3
+}
+
+func (e *LeftJoinApplyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
 	}
-	return (*SemiJoinApplyExpr)(e)
+	panic("child index out of range")
 }
 
-type AntiJoinApplyExpr Expr
-
-func MakeAntiJoinApplyExpr(left GroupID, right GroupID, on GroupID) AntiJoinApplyExpr {
-	return AntiJoinApplyExpr{op: opt.AntiJoinApplyOp, state: exprState{uint32(left), uint32(right), uint32(on)}}
+func (e *LeftJoinApplyExpr) Private() interface{} {
+	return nil
 }
 
-func (e *AntiJoinApplyExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *LeftJoinApplyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *AntiJoinApplyExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *AntiJoinApplyExpr) On() GroupID {
-	return GroupID(e.state[2])
-}
-
-func (e *AntiJoinApplyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsAntiJoinApply() *AntiJoinApplyExpr {
-	if e.op != opt.AntiJoinApplyOp {
-		return nil
+func (e *LeftJoinApplyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
 	}
-	return (*AntiJoinApplyExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *LeftJoinApplyExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *LeftJoinApplyExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *LeftJoinApplyExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *LeftJoinApplyExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *LeftJoinApplyExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *LeftJoinApplyExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *LeftJoinApplyExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *LeftJoinApplyExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *LeftJoinApplyExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type leftJoinApplyGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first LeftJoinApplyExpr
+}
+
+var _ exprGroup = &leftJoinApplyGroup{}
+
+func (g *leftJoinApplyGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *leftJoinApplyGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *leftJoinApplyGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *leftJoinApplyGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *leftJoinApplyGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *leftJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type RightJoinApplyExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &RightJoinApplyExpr{}
+
+func (e *RightJoinApplyExpr) Op() opt.Operator {
+	return opt.RightJoinApplyOp
+}
+
+func (e *RightJoinApplyExpr) ChildCount() int {
+	return 3
+}
+
+func (e *RightJoinApplyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *RightJoinApplyExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RightJoinApplyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RightJoinApplyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *RightJoinApplyExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *RightJoinApplyExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *RightJoinApplyExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *RightJoinApplyExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *RightJoinApplyExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *RightJoinApplyExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *RightJoinApplyExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *RightJoinApplyExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *RightJoinApplyExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type rightJoinApplyGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first RightJoinApplyExpr
+}
+
+var _ exprGroup = &rightJoinApplyGroup{}
+
+func (g *rightJoinApplyGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *rightJoinApplyGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *rightJoinApplyGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *rightJoinApplyGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *rightJoinApplyGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *rightJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type FullJoinApplyExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &FullJoinApplyExpr{}
+
+func (e *FullJoinApplyExpr) Op() opt.Operator {
+	return opt.FullJoinApplyOp
+}
+
+func (e *FullJoinApplyExpr) ChildCount() int {
+	return 3
+}
+
+func (e *FullJoinApplyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *FullJoinApplyExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FullJoinApplyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FullJoinApplyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FullJoinApplyExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *FullJoinApplyExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *FullJoinApplyExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *FullJoinApplyExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *FullJoinApplyExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *FullJoinApplyExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *FullJoinApplyExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *FullJoinApplyExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *FullJoinApplyExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type fullJoinApplyGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first FullJoinApplyExpr
+}
+
+var _ exprGroup = &fullJoinApplyGroup{}
+
+func (g *fullJoinApplyGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *fullJoinApplyGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *fullJoinApplyGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *fullJoinApplyGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *fullJoinApplyGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *fullJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type SemiJoinApplyExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &SemiJoinApplyExpr{}
+
+func (e *SemiJoinApplyExpr) Op() opt.Operator {
+	return opt.SemiJoinApplyOp
+}
+
+func (e *SemiJoinApplyExpr) ChildCount() int {
+	return 3
+}
+
+func (e *SemiJoinApplyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *SemiJoinApplyExpr) Private() interface{} {
+	return nil
+}
+
+func (e *SemiJoinApplyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SemiJoinApplyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SemiJoinApplyExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *SemiJoinApplyExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *SemiJoinApplyExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *SemiJoinApplyExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *SemiJoinApplyExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *SemiJoinApplyExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *SemiJoinApplyExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *SemiJoinApplyExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *SemiJoinApplyExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type semiJoinApplyGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first SemiJoinApplyExpr
+}
+
+var _ exprGroup = &semiJoinApplyGroup{}
+
+func (g *semiJoinApplyGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *semiJoinApplyGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *semiJoinApplyGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *semiJoinApplyGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *semiJoinApplyGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *semiJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type AntiJoinApplyExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	On    FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AntiJoinApplyExpr{}
+
+func (e *AntiJoinApplyExpr) Op() opt.Operator {
+	return opt.AntiJoinApplyOp
+}
+
+func (e *AntiJoinApplyExpr) ChildCount() int {
+	return 3
+}
+
+func (e *AntiJoinApplyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	case 2:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *AntiJoinApplyExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AntiJoinApplyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AntiJoinApplyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	case 2:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *AntiJoinApplyExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AntiJoinApplyExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AntiJoinApplyExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AntiJoinApplyExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AntiJoinApplyExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *AntiJoinApplyExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *AntiJoinApplyExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AntiJoinApplyExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AntiJoinApplyExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type antiJoinApplyGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first AntiJoinApplyExpr
+}
+
+var _ exprGroup = &antiJoinApplyGroup{}
+
+func (g *antiJoinApplyGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *antiJoinApplyGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *antiJoinApplyGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *antiJoinApplyGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *antiJoinApplyGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *antiJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // GroupByExpr computes aggregate functions over groups of input rows. Input rows
@@ -2468,38 +2804,146 @@ func (e *Expr) AsAntiJoinApply() *AntiJoinApplyExpr {
 // form a single group. GroupBy is used for queries with aggregate functions,
 // HAVING clauses and/or GROUP BY expressions.
 //
-// The Def private contains an ordering; this ordering is used to determine
-// intra-group ordering and is only useful if there is an order-dependent
-// aggregation (like ARRAY_AGG). Grouping columns are inconsequential in this
-// ordering; we currently set all grouping columns as optional in this ordering
-// (but note that this is not required by the operator).
-type GroupByExpr Expr
+// The GroupingPrivate field contains an ordering; this ordering is used to
+// determine intra-group ordering and is only useful if there is an order-
+// dependent aggregation (like ARRAY_AGG). Grouping columns are inconsequential
+// in this ordering; we currently set all grouping columns as optional in this
+// ordering (but note that this is not required by the operator).
+type GroupByExpr struct {
+	Input        RelExpr
+	Aggregations AggregationsExpr
+	GroupingPrivate
 
-func MakeGroupByExpr(input GroupID, aggregations GroupID, def PrivateID) GroupByExpr {
-	return GroupByExpr{op: opt.GroupByOp, state: exprState{uint32(input), uint32(aggregations), uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *GroupByExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &GroupByExpr{}
+
+func (e *GroupByExpr) Op() opt.Operator {
+	return opt.GroupByOp
 }
 
-func (e *GroupByExpr) Aggregations() GroupID {
-	return GroupID(e.state[1])
+func (e *GroupByExpr) ChildCount() int {
+	return 2
 }
 
-func (e *GroupByExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *GroupByExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsGroupBy() *GroupByExpr {
-	if e.op != opt.GroupByOp {
-		return nil
+func (e *GroupByExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Aggregations
 	}
-	return (*GroupByExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *GroupByExpr) Private() interface{} {
+	return &e.GroupingPrivate
+}
+
+func (e *GroupByExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *GroupByExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Aggregations = *child.(*AggregationsExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *GroupByExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *GroupByExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *GroupByExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *GroupByExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *GroupByExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *GroupByExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *GroupByExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *GroupByExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *GroupByExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type groupByGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first GroupByExpr
+}
+
+var _ exprGroup = &groupByGroup{}
+
+func (g *groupByGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *groupByGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *groupByGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *groupByGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *groupByGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *groupByGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+// GroupingPrivate is shared between the grouping-related operators: GroupBy
+// ScalarGroupBy, and DistinctOn. This allows the operators to be treated
+// polymorphically.
+type GroupingPrivate struct {
+	GroupingCols opt.ColSet
+	Ordering     props.OrderingChoice
 }
 
 // ScalarGroupByExpr computes aggregate functions over the complete set of input
@@ -2510,36 +2954,137 @@ func (e *Expr) AsGroupBy() *GroupByExpr {
 // null or zero, depending on the function). ScalarGroupBy always returns exactly
 // one row - either the single-group aggregates or the default aggregate values.
 //
-// ScalarGroupBy uses the same GroupByDef private so that it's polymorphic with
+// ScalarGroupBy uses the GroupingPrivate struct so that it's polymorphic with
 // GroupBy and can be used in the same rules (when appropriate). In the
-// ScalarGroupBy case, the grouping column field in GroupByDef is always empty.
-type ScalarGroupByExpr Expr
+// ScalarGroupBy case, the grouping column field in GroupingPrivate is always
+// empty.
+type ScalarGroupByExpr struct {
+	Input        RelExpr
+	Aggregations AggregationsExpr
+	GroupingPrivate
 
-func MakeScalarGroupByExpr(input GroupID, aggregations GroupID, def PrivateID) ScalarGroupByExpr {
-	return ScalarGroupByExpr{op: opt.ScalarGroupByOp, state: exprState{uint32(input), uint32(aggregations), uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ScalarGroupByExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &ScalarGroupByExpr{}
+
+func (e *ScalarGroupByExpr) Op() opt.Operator {
+	return opt.ScalarGroupByOp
 }
 
-func (e *ScalarGroupByExpr) Aggregations() GroupID {
-	return GroupID(e.state[1])
+func (e *ScalarGroupByExpr) ChildCount() int {
+	return 2
 }
 
-func (e *ScalarGroupByExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *ScalarGroupByExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsScalarGroupBy() *ScalarGroupByExpr {
-	if e.op != opt.ScalarGroupByOp {
-		return nil
+func (e *ScalarGroupByExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Aggregations
 	}
-	return (*ScalarGroupByExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ScalarGroupByExpr) Private() interface{} {
+	return &e.GroupingPrivate
+}
+
+func (e *ScalarGroupByExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ScalarGroupByExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Aggregations = *child.(*AggregationsExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ScalarGroupByExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ScalarGroupByExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ScalarGroupByExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ScalarGroupByExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ScalarGroupByExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ScalarGroupByExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ScalarGroupByExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ScalarGroupByExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ScalarGroupByExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type scalarGroupByGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ScalarGroupByExpr
+}
+
+var _ exprGroup = &scalarGroupByGroup{}
+
+func (g *scalarGroupByGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *scalarGroupByGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *scalarGroupByGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *scalarGroupByGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *scalarGroupByGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *scalarGroupByGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // DistinctOnExpr filters out rows that are identical on the set of grouping columns;
@@ -2559,11 +3104,11 @@ func (e *Expr) AsScalarGroupBy() *ScalarGroupByExpr {
 // and is either passed through or discarded. In particular, note that this
 // preserves the input ordering.
 //
-// The ordering in the private will be required of the input; it determines which
-// row can get "chosen" for each group of values on the grouping columns.
-// There is no restriction on the ordering; but note that grouping columns are
-// inconsequential - they can appear anywhere in the ordering and they won't
-// change the results (other than the result ordering).
+// The ordering in the GroupingPrivate field will be required of the input; it
+// determines which row can get "chosen" for each group of values on the grouping
+// columns. There is no restriction on the ordering; but note that grouping
+// columns are inconsequential - they can appear anywhere in the ordering and
+// they won't change the results (other than the result ordering).
 //
 // Currently when we build DistinctOn, we set all grouping columns as optional
 // cols in Ordering (but this is not required by the operator).
@@ -2572,146 +3117,572 @@ func (e *Expr) AsScalarGroupBy() *ScalarGroupByExpr {
 // specific interesting orderings because execution is more efficient when we can
 // rely on an ordering on the grouping columns (or a subset of them).
 //
-// DistinctOn uses an Aggregations child and the GroupByDef private so that it's
-// polymorphic with GroupBy and can be used in the same rules (when appropriate).
-// In the DistinctOn case, the aggregations can be only FirstAgg or ConstAgg.
-type DistinctOnExpr Expr
+// DistinctOn uses an Aggregations child and the GroupingPrivate struct so that
+// it's polymorphic with GroupBy and can be used in the same rules (when
+// appropriate). In the DistinctOn case, the aggregations can be only FirstAgg or
+// ConstAgg.
+type DistinctOnExpr struct {
+	Input        RelExpr
+	Aggregations AggregationsExpr
+	GroupingPrivate
 
-func MakeDistinctOnExpr(input GroupID, aggregations GroupID, def PrivateID) DistinctOnExpr {
-	return DistinctOnExpr{op: opt.DistinctOnOp, state: exprState{uint32(input), uint32(aggregations), uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *DistinctOnExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &DistinctOnExpr{}
+
+func (e *DistinctOnExpr) Op() opt.Operator {
+	return opt.DistinctOnOp
 }
 
-func (e *DistinctOnExpr) Aggregations() GroupID {
-	return GroupID(e.state[1])
+func (e *DistinctOnExpr) ChildCount() int {
+	return 2
 }
 
-func (e *DistinctOnExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *DistinctOnExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsDistinctOn() *DistinctOnExpr {
-	if e.op != opt.DistinctOnOp {
-		return nil
+func (e *DistinctOnExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Aggregations
 	}
-	return (*DistinctOnExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *DistinctOnExpr) Private() interface{} {
+	return &e.GroupingPrivate
+}
+
+func (e *DistinctOnExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *DistinctOnExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Aggregations = *child.(*AggregationsExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *DistinctOnExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *DistinctOnExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *DistinctOnExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *DistinctOnExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *DistinctOnExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *DistinctOnExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *DistinctOnExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *DistinctOnExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *DistinctOnExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type distinctOnGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first DistinctOnExpr
+}
+
+var _ exprGroup = &distinctOnGroup{}
+
+func (g *distinctOnGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *distinctOnGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *distinctOnGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *distinctOnGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *distinctOnGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *distinctOnGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // UnionExpr is an operator used to combine the Left and Right input relations into
 // a single set containing rows from both inputs. Duplicate rows are discarded.
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the Union with the output columns. See the comment above opt.SetOpColMap
-// for more details.
-type UnionExpr Expr
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// Union with the output columns. See the comment above SetPrivate for more
+// details.
+type UnionExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	SetPrivate
 
-func MakeUnionExpr(left GroupID, right GroupID, colMap PrivateID) UnionExpr {
-	return UnionExpr{op: opt.UnionOp, state: exprState{uint32(left), uint32(right), uint32(colMap)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *UnionExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &UnionExpr{}
+
+func (e *UnionExpr) Op() opt.Operator {
+	return opt.UnionOp
 }
 
-func (e *UnionExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *UnionExpr) ChildCount() int {
+	return 2
 }
 
-func (e *UnionExpr) ColMap() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *UnionExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsUnion() *UnionExpr {
-	if e.op != opt.UnionOp {
-		return nil
+func (e *UnionExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*UnionExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *UnionExpr) Private() interface{} {
+	return &e.SetPrivate
+}
+
+func (e *UnionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnionExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *UnionExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UnionExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UnionExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UnionExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UnionExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *UnionExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *UnionExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UnionExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UnionExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type unionGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first UnionExpr
+}
+
+var _ exprGroup = &unionGroup{}
+
+func (g *unionGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *unionGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *unionGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *unionGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *unionGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *unionGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+// SetPrivate contains fields used by the relational set operators: Union,
+// Intersect, Except, UnionAll, IntersectAll and ExceptAll. It matches columns
+// from the left and right inputs of the operator with the output columns, since
+// OutputCols are not ordered and may not correspond to each other.
+//
+// For example, consider the following query:
+//   SELECT y, x FROM xy UNION SELECT b, a FROM ab
+//
+// Given:
+//   col  index
+//   x    1
+//   y    2
+//   a    3
+//   b    4
+//
+// SetPrivate will contain the following values:
+//   Left:  [2, 1]
+//   Right: [4, 3]
+//   Out:   [5, 6]  <-- synthesized output columns
+type SetPrivate struct {
+	LeftCols  opt.ColList
+	RightCols opt.ColList
+	OutCols   opt.ColList
 }
 
 // IntersectExpr is an operator used to perform an intersection between the Left
 // and Right input relations. The result consists only of rows in the Left
 // relation that are also present in the Right relation. Duplicate rows are
 // discarded.
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the Intersect with the output columns. See the comment above
-// opt.SetOpColMap for more details.
-type IntersectExpr Expr
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// Intersect with the output columns. See the comment above SetPrivate for more
+// details.
+type IntersectExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	SetPrivate
 
-func MakeIntersectExpr(left GroupID, right GroupID, colMap PrivateID) IntersectExpr {
-	return IntersectExpr{op: opt.IntersectOp, state: exprState{uint32(left), uint32(right), uint32(colMap)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *IntersectExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &IntersectExpr{}
+
+func (e *IntersectExpr) Op() opt.Operator {
+	return opt.IntersectOp
 }
 
-func (e *IntersectExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *IntersectExpr) ChildCount() int {
+	return 2
 }
 
-func (e *IntersectExpr) ColMap() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *IntersectExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsIntersect() *IntersectExpr {
-	if e.op != opt.IntersectOp {
-		return nil
+func (e *IntersectExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*IntersectExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *IntersectExpr) Private() interface{} {
+	return &e.SetPrivate
+}
+
+func (e *IntersectExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IntersectExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *IntersectExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *IntersectExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *IntersectExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *IntersectExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *IntersectExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *IntersectExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *IntersectExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *IntersectExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *IntersectExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type intersectGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first IntersectExpr
+}
+
+var _ exprGroup = &intersectGroup{}
+
+func (g *intersectGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *intersectGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *intersectGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *intersectGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *intersectGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *intersectGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // ExceptExpr is an operator used to perform a set difference between the Left and
 // Right input relations. The result consists only of rows in the Left relation
 // that are not present in the Right relation. Duplicate rows are discarded.
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the Except with the output columns. See the comment above opt.SetOpColMap
-// for more details.
-type ExceptExpr Expr
+// The SetPrivate field matches columns from the Left and Right inputs of the Except
+// with the output columns. See the comment above SetPrivate for more details.
+type ExceptExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	SetPrivate
 
-func MakeExceptExpr(left GroupID, right GroupID, colMap PrivateID) ExceptExpr {
-	return ExceptExpr{op: opt.ExceptOp, state: exprState{uint32(left), uint32(right), uint32(colMap)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ExceptExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &ExceptExpr{}
+
+func (e *ExceptExpr) Op() opt.Operator {
+	return opt.ExceptOp
 }
 
-func (e *ExceptExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *ExceptExpr) ChildCount() int {
+	return 2
 }
 
-func (e *ExceptExpr) ColMap() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *ExceptExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsExcept() *ExceptExpr {
-	if e.op != opt.ExceptOp {
-		return nil
+func (e *ExceptExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*ExceptExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ExceptExpr) Private() interface{} {
+	return &e.SetPrivate
+}
+
+func (e *ExceptExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ExceptExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ExceptExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ExceptExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ExceptExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ExceptExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ExceptExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ExceptExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ExceptExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ExceptExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ExceptExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type exceptGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ExceptExpr
+}
+
+var _ exprGroup = &exceptGroup{}
+
+func (g *exceptGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *exceptGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *exceptGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *exceptGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *exceptGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *exceptGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // UnionAllExpr is an operator used to combine the Left and Right input relations
 // into a single set containing rows from both inputs. Duplicate rows are
 // not discarded. For example:
+//
 //   SELECT x FROM xx UNION ALL SELECT y FROM yy
 //     x       y         out
 //   -----   -----      -----
@@ -2722,36 +3693,136 @@ func (e *Expr) AsExcept() *ExceptExpr {
 //                        2
 //                        3
 //
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the UnionAll with the output columns. See the comment above
-// opt.SetOpColMap for more details.
-type UnionAllExpr Expr
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// UnionAll with the output columns. See the comment above SetPrivate for more
+// details.
+type UnionAllExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	SetPrivate
 
-func MakeUnionAllExpr(left GroupID, right GroupID, colMap PrivateID) UnionAllExpr {
-	return UnionAllExpr{op: opt.UnionAllOp, state: exprState{uint32(left), uint32(right), uint32(colMap)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *UnionAllExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &UnionAllExpr{}
+
+func (e *UnionAllExpr) Op() opt.Operator {
+	return opt.UnionAllOp
 }
 
-func (e *UnionAllExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *UnionAllExpr) ChildCount() int {
+	return 2
 }
 
-func (e *UnionAllExpr) ColMap() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *UnionAllExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsUnionAll() *UnionAllExpr {
-	if e.op != opt.UnionAllOp {
-		return nil
+func (e *UnionAllExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*UnionAllExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *UnionAllExpr) Private() interface{} {
+	return &e.SetPrivate
+}
+
+func (e *UnionAllExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnionAllExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *UnionAllExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UnionAllExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UnionAllExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UnionAllExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UnionAllExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *UnionAllExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *UnionAllExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UnionAllExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UnionAllExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type unionAllGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first UnionAllExpr
+}
+
+var _ exprGroup = &unionAllGroup{}
+
+func (g *unionAllGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *unionAllGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *unionAllGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *unionAllGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *unionAllGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *unionAllGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // IntersectAllExpr is an operator used to perform an intersection between the Left
@@ -2759,6 +3830,7 @@ func (e *Expr) AsUnionAll() *UnionAllExpr {
 // relation that have a corresponding row in the Right relation. Duplicate rows
 // are not discarded. This effectively creates a one-to-one mapping between the
 // Left and Right rows. For example:
+//
 //   SELECT x FROM xx INTERSECT ALL SELECT y FROM yy
 //     x       y         out
 //   -----   -----      -----
@@ -2769,36 +3841,136 @@ func (e *Expr) AsUnionAll() *UnionAllExpr {
 //     2       3
 //     4
 //
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the IntersectAll with the output columns. See the comment above
-// opt.SetOpColMap for more details.
-type IntersectAllExpr Expr
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// IntersectAll with the output columns. See the comment above SetPrivate for more
+// details.
+type IntersectAllExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	SetPrivate
 
-func MakeIntersectAllExpr(left GroupID, right GroupID, colMap PrivateID) IntersectAllExpr {
-	return IntersectAllExpr{op: opt.IntersectAllOp, state: exprState{uint32(left), uint32(right), uint32(colMap)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *IntersectAllExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &IntersectAllExpr{}
+
+func (e *IntersectAllExpr) Op() opt.Operator {
+	return opt.IntersectAllOp
 }
 
-func (e *IntersectAllExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *IntersectAllExpr) ChildCount() int {
+	return 2
 }
 
-func (e *IntersectAllExpr) ColMap() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *IntersectAllExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsIntersectAll() *IntersectAllExpr {
-	if e.op != opt.IntersectAllOp {
-		return nil
+func (e *IntersectAllExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*IntersectAllExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *IntersectAllExpr) Private() interface{} {
+	return &e.SetPrivate
+}
+
+func (e *IntersectAllExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IntersectAllExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *IntersectAllExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *IntersectAllExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *IntersectAllExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *IntersectAllExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *IntersectAllExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *IntersectAllExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *IntersectAllExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *IntersectAllExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *IntersectAllExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type intersectAllGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first IntersectAllExpr
+}
+
+var _ exprGroup = &intersectAllGroup{}
+
+func (g *intersectAllGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *intersectAllGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *intersectAllGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *intersectAllGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *intersectAllGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *intersectAllGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // ExceptAllExpr is an operator used to perform a set difference between the Left
@@ -2816,201 +3988,907 @@ func (e *Expr) AsIntersectAll() *IntersectAllExpr {
 //     2       3
 //     4
 //
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the ExceptAll with the output columns. See the comment above
-// opt.SetOpColMap for more details.
-type ExceptAllExpr Expr
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// ExceptAll with the output columns. See the comment above SetPrivate for more
+// details.
+type ExceptAllExpr struct {
+	Left  RelExpr
+	Right RelExpr
+	SetPrivate
 
-func MakeExceptAllExpr(left GroupID, right GroupID, colMap PrivateID) ExceptAllExpr {
-	return ExceptAllExpr{op: opt.ExceptAllOp, state: exprState{uint32(left), uint32(right), uint32(colMap)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ExceptAllExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &ExceptAllExpr{}
+
+func (e *ExceptAllExpr) Op() opt.Operator {
+	return opt.ExceptAllOp
 }
 
-func (e *ExceptAllExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *ExceptAllExpr) ChildCount() int {
+	return 2
 }
 
-func (e *ExceptAllExpr) ColMap() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *ExceptAllExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsExceptAll() *ExceptAllExpr {
-	if e.op != opt.ExceptAllOp {
-		return nil
+func (e *ExceptAllExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*ExceptAllExpr)(e)
+	panic("child index out of range")
 }
 
-// LimitExpr returns a limited subset of the results in the input relation.
-// The limit expression is a scalar value; the operator returns at most this many
-// rows. The private field is a props.OrderingChoice which indicates the row
-// ordering required from the input (the first rows with respect to this ordering
-// are returned).
-type LimitExpr Expr
-
-func MakeLimitExpr(input GroupID, limit GroupID, ordering PrivateID) LimitExpr {
-	return LimitExpr{op: opt.LimitOp, state: exprState{uint32(input), uint32(limit), uint32(ordering)}}
+func (e *ExceptAllExpr) Private() interface{} {
+	return &e.SetPrivate
 }
 
-func (e *LimitExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *ExceptAllExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *LimitExpr) Limit() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *LimitExpr) Ordering() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *LimitExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsLimit() *LimitExpr {
-	if e.op != opt.LimitOp {
-		return nil
+func (e *ExceptAllExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(RelExpr)
+		return
+	case 1:
+		e.Right = child.(RelExpr)
+		return
 	}
-	return (*LimitExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ExceptAllExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ExceptAllExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ExceptAllExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ExceptAllExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ExceptAllExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ExceptAllExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ExceptAllExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ExceptAllExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ExceptAllExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type exceptAllGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ExceptAllExpr
+}
+
+var _ exprGroup = &exceptAllGroup{}
+
+func (g *exceptAllGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *exceptAllGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *exceptAllGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *exceptAllGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *exceptAllGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *exceptAllGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+// LimitExpr returns a limited subset of the results in the input relation. The limit
+// expression is a scalar value; the operator returns at most this many rows. The
+// Orering field is a props.OrderingChoice which indicates the row ordering
+// required from the input (the first rows with respect to this ordering are
+// returned).
+type LimitExpr struct {
+	Input    RelExpr
+	Limit    opt.ScalarExpr
+	Ordering props.OrderingChoice
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &LimitExpr{}
+
+func (e *LimitExpr) Op() opt.Operator {
+	return opt.LimitOp
+}
+
+func (e *LimitExpr) ChildCount() int {
+	return 2
+}
+
+func (e *LimitExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Limit
+	}
+	panic("child index out of range")
+}
+
+func (e *LimitExpr) Private() interface{} {
+	return &e.Ordering
+}
+
+func (e *LimitExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LimitExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Limit = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *LimitExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *LimitExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *LimitExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *LimitExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *LimitExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *LimitExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *LimitExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *LimitExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *LimitExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type limitGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first LimitExpr
+}
+
+var _ exprGroup = &limitGroup{}
+
+func (g *limitGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *limitGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *limitGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *limitGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *limitGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *limitGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // OffsetExpr filters out the first Offset rows of the input relation; used in
 // conjunction with Limit.
-type OffsetExpr Expr
+type OffsetExpr struct {
+	Input    RelExpr
+	Offset   opt.ScalarExpr
+	Ordering props.OrderingChoice
 
-func MakeOffsetExpr(input GroupID, offset GroupID, ordering PrivateID) OffsetExpr {
-	return OffsetExpr{op: opt.OffsetOp, state: exprState{uint32(input), uint32(offset), uint32(ordering)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *OffsetExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &OffsetExpr{}
+
+func (e *OffsetExpr) Op() opt.Operator {
+	return opt.OffsetOp
 }
 
-func (e *OffsetExpr) Offset() GroupID {
-	return GroupID(e.state[1])
+func (e *OffsetExpr) ChildCount() int {
+	return 2
 }
 
-func (e *OffsetExpr) Ordering() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *OffsetExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsOffset() *OffsetExpr {
-	if e.op != opt.OffsetOp {
-		return nil
+func (e *OffsetExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Offset
 	}
-	return (*OffsetExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *OffsetExpr) Private() interface{} {
+	return &e.Ordering
+}
+
+func (e *OffsetExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *OffsetExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Offset = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *OffsetExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *OffsetExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *OffsetExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *OffsetExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *OffsetExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *OffsetExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *OffsetExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *OffsetExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *OffsetExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type offsetGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first OffsetExpr
+}
+
+var _ exprGroup = &offsetGroup{}
+
+func (g *offsetGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *offsetGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *offsetGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *offsetGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *offsetGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *offsetGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // Max1RowExpr enforces that its input must return at most one row. It is used as
 // input to the Subquery operator. See the comment above Subquery for more
 // details.
-type Max1RowExpr Expr
+type Max1RowExpr struct {
+	Input RelExpr
 
-func MakeMax1RowExpr(input GroupID) Max1RowExpr {
-	return Max1RowExpr{op: opt.Max1RowOp, state: exprState{uint32(input)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *Max1RowExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &Max1RowExpr{}
+
+func (e *Max1RowExpr) Op() opt.Operator {
+	return opt.Max1RowOp
 }
 
-func (e *Max1RowExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *Max1RowExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsMax1Row() *Max1RowExpr {
-	if e.op != opt.Max1RowOp {
-		return nil
+func (e *Max1RowExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*Max1RowExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *Max1RowExpr) Private() interface{} {
+	return nil
+}
+
+func (e *Max1RowExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *Max1RowExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *Max1RowExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *Max1RowExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *Max1RowExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *Max1RowExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *Max1RowExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *Max1RowExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *Max1RowExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *Max1RowExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *Max1RowExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type max1RowGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first Max1RowExpr
+}
+
+var _ exprGroup = &max1RowGroup{}
+
+func (g *max1RowGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *max1RowGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *max1RowGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *max1RowGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *max1RowGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *max1RowGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // ExplainExpr returns information about the execution plan of the "input"
 // expression.
-type ExplainExpr Expr
+type ExplainExpr struct {
+	Input RelExpr
+	ExplainPrivate
 
-func MakeExplainExpr(input GroupID, def PrivateID) ExplainExpr {
-	return ExplainExpr{op: opt.ExplainOp, state: exprState{uint32(input), uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ExplainExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &ExplainExpr{}
+
+func (e *ExplainExpr) Op() opt.Operator {
+	return opt.ExplainOp
 }
 
-func (e *ExplainExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
+func (e *ExplainExpr) ChildCount() int {
+	return 1
 }
 
-func (e *ExplainExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsExplain() *ExplainExpr {
-	if e.op != opt.ExplainOp {
-		return nil
+func (e *ExplainExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*ExplainExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ExplainExpr) Private() interface{} {
+	return &e.ExplainPrivate
+}
+
+func (e *ExplainExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ExplainExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ExplainExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ExplainExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ExplainExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ExplainExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ExplainExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ExplainExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ExplainExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ExplainExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ExplainExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type explainGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ExplainExpr
+}
+
+var _ exprGroup = &explainGroup{}
+
+func (g *explainGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *explainGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *explainGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *explainGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *explainGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *explainGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type ExplainPrivate struct {
+	Options tree.ExplainOptions
+	ColList opt.ColList
+	Props   *props.Physical
 }
 
 // ShowTraceForSessionExpr returns the current session traces.
-type ShowTraceForSessionExpr Expr
+type ShowTraceForSessionExpr struct {
+	ShowTracePrivate
 
-func MakeShowTraceForSessionExpr(def PrivateID) ShowTraceForSessionExpr {
-	return ShowTraceForSessionExpr{op: opt.ShowTraceForSessionOp, state: exprState{uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ShowTraceForSessionExpr) Def() PrivateID {
-	return PrivateID(e.state[0])
+var _ RelExpr = &ShowTraceForSessionExpr{}
+
+func (e *ShowTraceForSessionExpr) Op() opt.Operator {
+	return opt.ShowTraceForSessionOp
 }
 
-func (e *ShowTraceForSessionExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *ShowTraceForSessionExpr) ChildCount() int {
+	return 0
 }
 
-func (e *Expr) AsShowTraceForSession() *ShowTraceForSessionExpr {
-	if e.op != opt.ShowTraceForSessionOp {
-		return nil
+func (e *ShowTraceForSessionExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *ShowTraceForSessionExpr) Private() interface{} {
+	return &e.ShowTracePrivate
+}
+
+func (e *ShowTraceForSessionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ShowTraceForSessionExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *ShowTraceForSessionExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ShowTraceForSessionExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ShowTraceForSessionExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ShowTraceForSessionExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ShowTraceForSessionExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ShowTraceForSessionExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ShowTraceForSessionExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ShowTraceForSessionExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
 	}
-	return (*ShowTraceForSessionExpr)(e)
+	e.next = member
+}
+
+func (e *ShowTraceForSessionExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type showTraceForSessionGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ShowTraceForSessionExpr
+}
+
+var _ exprGroup = &showTraceForSessionGroup{}
+
+func (g *showTraceForSessionGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *showTraceForSessionGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *showTraceForSessionGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *showTraceForSessionGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *showTraceForSessionGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *showTraceForSessionGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type ShowTracePrivate struct {
+	TraceType tree.ShowTraceType
+	Compact   bool
+	ColList   opt.ColList
 }
 
 // RowNumberExpr adds a column to each row in its input containing a unique,
 // increasing number.
-type RowNumberExpr Expr
+type RowNumberExpr struct {
+	Input RelExpr
+	RowNumberPrivate
 
-func MakeRowNumberExpr(input GroupID, def PrivateID) RowNumberExpr {
-	return RowNumberExpr{op: opt.RowNumberOp, state: exprState{uint32(input), uint32(def)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *RowNumberExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ RelExpr = &RowNumberExpr{}
+
+func (e *RowNumberExpr) Op() opt.Operator {
+	return opt.RowNumberOp
 }
 
-func (e *RowNumberExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
+func (e *RowNumberExpr) ChildCount() int {
+	return 1
 }
 
-func (e *RowNumberExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsRowNumber() *RowNumberExpr {
-	if e.op != opt.RowNumberOp {
-		return nil
+func (e *RowNumberExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*RowNumberExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *RowNumberExpr) Private() interface{} {
+	return &e.RowNumberPrivate
+}
+
+func (e *RowNumberExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *RowNumberExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *RowNumberExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *RowNumberExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *RowNumberExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *RowNumberExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *RowNumberExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *RowNumberExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *RowNumberExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *RowNumberExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type rowNumberGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first RowNumberExpr
+}
+
+var _ exprGroup = &rowNumberGroup{}
+
+func (g *rowNumberGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *rowNumberGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *rowNumberGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *rowNumberGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *rowNumberGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *rowNumberGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
+}
+
+type RowNumberPrivate struct {
+	Ordering props.OrderingChoice
+	ColID    opt.ColumnID
 }
 
 // ZipExpr represents a functional zip over generators a,b,c, which returns tuples of
@@ -3033,29 +4911,127 @@ func (e *Expr) AsRowNumber() *RowNumberExpr {
 // represents the columns output by the functions. Funcs and Cols might not be
 // the same length since a single function may output multiple columns
 // (e.g., pg_get_keywords() outputs three columns).
-type ZipExpr Expr
+type ZipExpr struct {
+	Funcs ScalarListExpr
+	Cols  opt.ColList
 
-func MakeZipExpr(funcs ListID, cols PrivateID) ZipExpr {
-	return ZipExpr{op: opt.ZipOp, state: exprState{funcs.Offset, funcs.Length, uint32(cols)}}
+	grp  exprGroup
+	next RelExpr
 }
 
-func (e *ZipExpr) Funcs() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+var _ RelExpr = &ZipExpr{}
+
+func (e *ZipExpr) Op() opt.Operator {
+	return opt.ZipOp
 }
 
-func (e *ZipExpr) Cols() PrivateID {
-	return PrivateID(e.state[2])
+func (e *ZipExpr) ChildCount() int {
+	return 1
 }
 
-func (e *ZipExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsZip() *ZipExpr {
-	if e.op != opt.ZipOp {
-		return nil
+func (e *ZipExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Funcs
 	}
-	return (*ZipExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ZipExpr) Private() interface{} {
+	return &e.Cols
+}
+
+func (e *ZipExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ZipExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Funcs = *child.(*ScalarListExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ZipExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ZipExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ZipExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ZipExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ZipExpr) Physical() *props.Physical {
+	return e.grp.physical()
+}
+
+func (e *ZipExpr) Cost() Cost {
+	return e.grp.cost()
+}
+
+func (e *ZipExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ZipExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ZipExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type zipGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	phys  *props.Physical
+	cst   Cost
+	first ZipExpr
+}
+
+var _ exprGroup = &zipGroup{}
+
+func (g *zipGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *zipGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *zipGroup) physical() *props.Physical {
+	return g.phys
+}
+
+func (g *zipGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *zipGroup) cost() Cost {
+	return g.cst
+}
+
+func (g *zipGroup) setBestProps(physical *props.Physical, cost Cost) {
+	g.phys = physical
+	g.cst = cost
 }
 
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
@@ -3075,29 +5051,60 @@ func (e *Expr) AsZip() *ZipExpr {
 // subquery must project exactly one output column. If the subquery returns one
 // row, then that column is bound to the single column value in that row. If the
 // subquery returns zero rows, then that column is bound to NULL.
-type SubqueryExpr Expr
+type SubqueryExpr struct {
+	Input RelExpr
+	SubqueryPrivate
 
-func MakeSubqueryExpr(input GroupID, def PrivateID) SubqueryExpr {
-	return SubqueryExpr{op: opt.SubqueryOp, state: exprState{uint32(input), uint32(def)}}
+	Typ types.T
 }
 
-func (e *SubqueryExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &SubqueryExpr{}
+
+func (e *SubqueryExpr) Op() opt.Operator {
+	return opt.SubqueryOp
 }
 
-func (e *SubqueryExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
+func (e *SubqueryExpr) ChildCount() int {
+	return 1
 }
 
-func (e *SubqueryExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsSubquery() *SubqueryExpr {
-	if e.op != opt.SubqueryOp {
-		return nil
+func (e *SubqueryExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*SubqueryExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *SubqueryExpr) Private() interface{} {
+	return &e.SubqueryPrivate
+}
+
+func (e *SubqueryExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SubqueryExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SubqueryExpr) DataType() types.T {
+	return e.Typ
+}
+
+// SubqueryPrivate contains information related to a subquery (Subquery, Any,
+// Exists). It is shared between the operators so that the same rules can be used
+// across all the subquery operators.
+type SubqueryPrivate struct {
+	OriginalExpr *tree.Subquery
+	Cmp          opt.Operator
 }
 
 // AnyExpr is a SQL operator that applies a comparison to every row of an input
@@ -3111,88 +5118,193 @@ func (e *Expr) AsSubquery() *SubqueryExpr {
 //   <scalar> NOT IN (<subquery>)
 //   ==> (Not (Any <subquery> <scalar> EqOp))
 //
-//   <scalar> <comp> {SOME|ANY}(<subquery>)
-//   ==> (Any <subquery> <scalar> <comp>)
+//   <scalar> <cmp> {SOME|ANY}(<subquery>)
+//   ==> (Any <subquery> <scalar> <cmp>)
 //
-//   <scalar> <comp> ALL(<subquery>)
-//   ==> (Not (Any <subquery> <scalar> <negated-comp>))
+//   <scalar> <cmp> ALL(<subquery>)
+//   ==> (Not (Any <subquery> <scalar> <negated-cmp>))
 //
 // Any expects the input subquery to return a single column of any data type. The
 // scalar value is compared with that column using the specified comparison
 // operator.
-type AnyExpr Expr
-
-func MakeAnyExpr(input GroupID, scalar GroupID, def PrivateID) AnyExpr {
-	return AnyExpr{op: opt.AnyOp, state: exprState{uint32(input), uint32(scalar), uint32(def)}}
+type AnyExpr struct {
+	Input  RelExpr
+	Scalar opt.ScalarExpr
+	SubqueryPrivate
 }
 
-func (e *AnyExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &AnyExpr{}
+
+func (e *AnyExpr) Op() opt.Operator {
+	return opt.AnyOp
 }
 
-func (e *AnyExpr) Scalar() GroupID {
-	return GroupID(e.state[1])
+func (e *AnyExpr) ChildCount() int {
+	return 2
 }
 
-func (e *AnyExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *AnyExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsAny() *AnyExpr {
-	if e.op != opt.AnyOp {
-		return nil
+func (e *AnyExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Scalar
 	}
-	return (*AnyExpr)(e)
+	panic("child index out of range")
 }
 
-// VariableExpr is the typed scalar value of a column in the query. The private
-// field is a Metadata.ColumnID that references the column by index.
-type VariableExpr Expr
-
-func MakeVariableExpr(col PrivateID) VariableExpr {
-	return VariableExpr{op: opt.VariableOp, state: exprState{uint32(col)}}
+func (e *AnyExpr) Private() interface{} {
+	return &e.SubqueryPrivate
 }
 
-func (e *VariableExpr) Col() PrivateID {
-	return PrivateID(e.state[0])
+func (e *AnyExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *VariableExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsVariable() *VariableExpr {
-	if e.op != opt.VariableOp {
-		return nil
+func (e *AnyExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Scalar = child.(opt.ScalarExpr)
+		return
 	}
-	return (*VariableExpr)(e)
+	panic("child index out of range")
 }
 
-// ConstExpr is a typed scalar constant value. The private field is a tree.Datum
-// value having any datum type that's legal in the expression's context.
-type ConstExpr Expr
-
-func MakeConstExpr(value PrivateID) ConstExpr {
-	return ConstExpr{op: opt.ConstOp, state: exprState{uint32(value)}}
+func (e *AnyExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *ConstExpr) Value() PrivateID {
-	return PrivateID(e.state[0])
+// ExistsExpr takes a relational query as its input, and evaluates to true if the
+// query returns at least one row.
+type ExistsExpr struct {
+	Input RelExpr
+	SubqueryPrivate
 }
 
-func (e *ConstExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &ExistsExpr{}
+
+func (e *ExistsExpr) Op() opt.Operator {
+	return opt.ExistsOp
 }
 
-func (e *Expr) AsConst() *ConstExpr {
-	if e.op != opt.ConstOp {
-		return nil
+func (e *ExistsExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ExistsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*ConstExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ExistsExpr) Private() interface{} {
+	return &e.SubqueryPrivate
+}
+
+func (e *ExistsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ExistsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ExistsExpr) DataType() types.T {
+	return types.Bool
+}
+
+// VariableExpr is the typed scalar value of a column in the query. The Col field is
+// a metadata ColumnID value that references the column by index.
+type VariableExpr struct {
+	Col opt.ColumnID
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &VariableExpr{}
+
+func (e *VariableExpr) Op() opt.Operator {
+	return opt.VariableOp
+}
+
+func (e *VariableExpr) ChildCount() int {
+	return 0
+}
+
+func (e *VariableExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *VariableExpr) Private() interface{} {
+	return &e.Col
+}
+
+func (e *VariableExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *VariableExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *VariableExpr) DataType() types.T {
+	return e.Typ
+}
+
+// ConstExpr is a typed scalar constant value. The Value field is a tree.Datum value
+// having any datum type that's legal in the expression's context.
+type ConstExpr struct {
+	Value tree.Datum
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &ConstExpr{}
+
+func (e *ConstExpr) Op() opt.Operator {
+	return opt.ConstOp
+}
+
+func (e *ConstExpr) ChildCount() int {
+	return 0
+}
+
+func (e *ConstExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *ConstExpr) Private() interface{} {
+	return e.Value
+}
+
+func (e *ConstExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ConstExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *ConstExpr) DataType() types.T {
+	return e.Typ
 }
 
 // NullExpr is the constant SQL null value that has "unknown value" semantics. If
@@ -3211,1438 +5323,2953 @@ func (e *Expr) AsConst() *ConstExpr {
 // Null is its own operator rather than a Const datum in order to make matching
 // and replacement easier and more efficient, as patterns can contain (Null)
 // expressions.
-type NullExpr Expr
-
-func MakeNullExpr(typ PrivateID) NullExpr {
-	return NullExpr{op: opt.NullOp, state: exprState{uint32(typ)}}
+type NullExpr struct {
+	Typ types.T
 }
 
-func (e *NullExpr) Typ() PrivateID {
-	return PrivateID(e.state[0])
+var _ opt.ScalarExpr = &NullExpr{}
+
+func (e *NullExpr) Op() opt.Operator {
+	return opt.NullOp
 }
 
-func (e *NullExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *NullExpr) ChildCount() int {
+	return 0
 }
 
-func (e *Expr) AsNull() *NullExpr {
-	if e.op != opt.NullOp {
-		return nil
-	}
-	return (*NullExpr)(e)
+func (e *NullExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *NullExpr) Private() interface{} {
+	return e.Typ
+}
+
+func (e *NullExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NullExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *NullExpr) DataType() types.T {
+	return e.Typ
 }
 
 // TrueExpr is the boolean true value that is equivalent to the tree.DBoolTrue datum
 // value. It is a separate operator to make matching and replacement simpler and
 // more efficient, as patterns can contain (True) expressions.
-type TrueExpr Expr
-
-func MakeTrueExpr() TrueExpr {
-	return TrueExpr{op: opt.TrueOp, state: exprState{}}
+type TrueExpr struct {
 }
 
-func (e *TrueExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &TrueExpr{}
+
+func (e *TrueExpr) Op() opt.Operator {
+	return opt.TrueOp
 }
 
-func (e *Expr) AsTrue() *TrueExpr {
-	if e.op != opt.TrueOp {
-		return nil
-	}
-	return (*TrueExpr)(e)
+func (e *TrueExpr) ChildCount() int {
+	return 0
+}
+
+func (e *TrueExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *TrueExpr) Private() interface{} {
+	return nil
+}
+
+func (e *TrueExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *TrueExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *TrueExpr) DataType() types.T {
+	return types.Bool
 }
 
 // FalseExpr is the boolean false value that is equivalent to the tree.DBoolFalse
 // datum value. It is a separate operator to make matching and replacement
 // simpler and more efficient, as patterns can contain (False) expressions.
-type FalseExpr Expr
-
-func MakeFalseExpr() FalseExpr {
-	return FalseExpr{op: opt.FalseOp, state: exprState{}}
+type FalseExpr struct {
 }
 
-func (e *FalseExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &FalseExpr{}
+
+func (e *FalseExpr) Op() opt.Operator {
+	return opt.FalseOp
 }
 
-func (e *Expr) AsFalse() *FalseExpr {
-	if e.op != opt.FalseOp {
-		return nil
+func (e *FalseExpr) ChildCount() int {
+	return 0
+}
+
+func (e *FalseExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *FalseExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FalseExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FalseExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *FalseExpr) DataType() types.T {
+	return types.Bool
+}
+
+type PlaceholderExpr struct {
+	Value tree.TypedExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &PlaceholderExpr{}
+
+func (e *PlaceholderExpr) Op() opt.Operator {
+	return opt.PlaceholderOp
+}
+
+func (e *PlaceholderExpr) ChildCount() int {
+	return 0
+}
+
+func (e *PlaceholderExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *PlaceholderExpr) Private() interface{} {
+	return e.Value
+}
+
+func (e *PlaceholderExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *PlaceholderExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *PlaceholderExpr) DataType() types.T {
+	return e.Typ
+}
+
+type TupleExpr struct {
+	Elems ScalarListExpr
+	Typ   types.T
+}
+
+var _ opt.ScalarExpr = &TupleExpr{}
+
+func (e *TupleExpr) Op() opt.Operator {
+	return opt.TupleOp
+}
+
+func (e *TupleExpr) ChildCount() int {
+	return 1
+}
+
+func (e *TupleExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Elems
 	}
-	return (*FalseExpr)(e)
+	panic("child index out of range")
 }
 
-type PlaceholderExpr Expr
-
-func MakePlaceholderExpr(value PrivateID) PlaceholderExpr {
-	return PlaceholderExpr{op: opt.PlaceholderOp, state: exprState{uint32(value)}}
+func (e *TupleExpr) Private() interface{} {
+	return e.Typ
 }
 
-func (e *PlaceholderExpr) Value() PrivateID {
-	return PrivateID(e.state[0])
+func (e *TupleExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *PlaceholderExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsPlaceholder() *PlaceholderExpr {
-	if e.op != opt.PlaceholderOp {
-		return nil
+func (e *TupleExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Elems = *child.(*ScalarListExpr)
+		return
 	}
-	return (*PlaceholderExpr)(e)
+	panic("child index out of range")
 }
 
-type TupleExpr Expr
-
-func MakeTupleExpr(elems ListID, typ PrivateID) TupleExpr {
-	return TupleExpr{op: opt.TupleOp, state: exprState{elems.Offset, elems.Length, uint32(typ)}}
+func (e *TupleExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *TupleExpr) Elems() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+// ProjectionsExpr is a set of ProjectionsItem expressions that specify the ColumnIDs
+// and scalar expressions for the synthesized output columns projected by a
+// containing Project operator. It is legal for the set to be empty. See the
+// Project and ProjectionsItem headers for more details.
+type ProjectionsExpr []ProjectionsItem
+
+var EmptyProjectionsExpr = ProjectionsExpr{}
+
+var _ opt.ScalarExpr = &ProjectionsExpr{}
+
+func (e *ProjectionsExpr) Op() opt.Operator {
+	return opt.ProjectionsOp
 }
 
-func (e *TupleExpr) Typ() PrivateID {
-	return PrivateID(e.state[2])
+func (e *ProjectionsExpr) ChildCount() int {
+	return len(*e)
 }
 
-func (e *TupleExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *ProjectionsExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
 }
 
-func (e *Expr) AsTuple() *TupleExpr {
-	if e.op != opt.TupleOp {
-		return nil
-	}
-	return (*TupleExpr)(e)
+func (e *ProjectionsExpr) Private() interface{} {
+	return nil
 }
 
-// ProjectionsExpr is a set of typed scalar expressions that will become output
-// columns for a containing Project operator.
+func (e *ProjectionsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ProjectionsExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*ProjectionsItem)
+}
+
+func (e *ProjectionsExpr) DataType() types.T {
+	return types.Any
+}
+
+// ProjectionsItem encapsulates the information needed to synthesize an output
+// column, including its ColumnID and the scalar expression that produces its
+// value. In addition, the ProjectionsItem caches a set of scalar properties that
+// are lazily calculated by traversing the Element scalar expression. This allows
+// the properties for the entire expression subtree to be calculated once and
+// then repeatedly reused.
 //
-// The private Defs field contains the list of column indexes returned by each
-// expression, and a list of pass-through columns.
-//
-// Elems cannot contain a simple VariableOp with the same ColumnID as the
-// synthesized column (in Def.SynthesizedCols); that is a pass-through column.
-// Elems can contain a VariableOp when a new ColumnID is being assigned, such as
-// in the case of an outer column reference.
-type ProjectionsExpr Expr
+// The Element scalar expression cannot contain a simple VariableOp with the same
+// ColumnID as the one stored in the ColPrivate field, since that would make it a
+// pass-through column. Pass-through columns are always stored on the containing
+// Project operator instead. However, the Element field can contain a VariableOp
+// when a new ColumnID is being assigned, such as in the case of an outer column
+// reference.
+type ProjectionsItem struct {
+	Element opt.ScalarExpr
+	ColPrivate
 
-func MakeProjectionsExpr(elems ListID, def PrivateID) ProjectionsExpr {
-	return ProjectionsExpr{op: opt.ProjectionsOp, state: exprState{elems.Offset, elems.Length, uint32(def)}}
+	Typ types.T
 }
 
-func (e *ProjectionsExpr) Elems() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+var _ opt.ScalarExpr = &ProjectionsItem{}
+
+func (e *ProjectionsItem) Op() opt.Operator {
+	return opt.ProjectionsItemOp
 }
 
-func (e *ProjectionsExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
+func (e *ProjectionsItem) ChildCount() int {
+	return 1
 }
 
-func (e *ProjectionsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsProjections() *ProjectionsExpr {
-	if e.op != opt.ProjectionsOp {
-		return nil
+func (e *ProjectionsItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Element
 	}
-	return (*ProjectionsExpr)(e)
+	panic("child index out of range")
 }
 
-// AggregationsExpr is a set of aggregate expressions that will become output columns
-// for a containing GroupBy operator. The expressions can only consist of
-// aggregate functions, variable references, and modifiers like AggDistinct.
-// Examples of valid expressions:
+func (e *ProjectionsItem) Private() interface{} {
+	return &e.ColPrivate
+}
+
+func (e *ProjectionsItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ProjectionsItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Element = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ProjectionsItem) DataType() types.T {
+	return e.Typ
+}
+
+func (e *ProjectionsItem) ScalarProps(mem *Memo) *props.Scalar {
+	if !e.scalar.Populated {
+		mem.logPropsBuilder.buildProjectionsItemProps(e, &e.scalar)
+	}
+	return &e.scalar
+}
+
+// ColPrivate contains the ColumnID of a synthesized projection or aggregation
+// column, as well as a set of lazily-populated scalar properties that apply to
+// the column. ColPrivate is shared by ProjectionsItem and AggregationsItem so
+// that they can be treated polymorphically.
+type ColPrivate struct {
+	Col    opt.ColumnID
+	scalar props.Scalar
+}
+
+// AggregationsExpr is a set of AggregationsItem expressions that specify the
+// ColumnIDs and aggregation expression for output columns projected by a
+// containing grouping operator (GroupBy, ScalarGroupBy, or DistinctOn). It is
+// legal for the set to be empty. See the AggregationsItem header for more
+// details.
+type AggregationsExpr []AggregationsItem
+
+var EmptyAggregationsExpr = AggregationsExpr{}
+
+var _ opt.ScalarExpr = &AggregationsExpr{}
+
+func (e *AggregationsExpr) Op() opt.Operator {
+	return opt.AggregationsOp
+}
+
+func (e *AggregationsExpr) ChildCount() int {
+	return len(*e)
+}
+
+func (e *AggregationsExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
+}
+
+func (e *AggregationsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AggregationsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AggregationsExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*AggregationsItem)
+}
+
+func (e *AggregationsExpr) DataType() types.T {
+	return types.Any
+}
+
+// AggregationsItem encapsulates the information for constructing an aggregate
+// output column, including its ColumnID and the aggregate expression that
+// produces its value. In addition, the AggregationsItem caches a set of scalar
+// properties that are lazily calculated by traversing the Agg scalar expression.
+// This allows the properties for the aggregate expression to be calculated once
+// and then repeatedly reused.
+//
+// The aggregate expression can only consist of aggregate functions, variable
+// references, and modifiers like AggDistinct. Examples of valid expressions:
+//
 //   (Min (Variable 1))
 //   (Count (AggDistinct (Variable 1)))
 //
 // More complex arguments must be formulated using a Project operator as input to
-// the GroupBy operator.
-//
-// The private Cols field contains the list of column indexes returned by the
-// expression, as an opt.ColList. It is legal for Cols to be empty.
-type AggregationsExpr Expr
+// the grouping operator.
+type AggregationsItem struct {
+	Agg opt.ScalarExpr
+	ColPrivate
 
-func MakeAggregationsExpr(aggs ListID, cols PrivateID) AggregationsExpr {
-	return AggregationsExpr{op: opt.AggregationsOp, state: exprState{aggs.Offset, aggs.Length, uint32(cols)}}
+	Typ types.T
 }
 
-func (e *AggregationsExpr) Aggs() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+var _ opt.ScalarExpr = &AggregationsItem{}
+
+func (e *AggregationsItem) Op() opt.Operator {
+	return opt.AggregationsItemOp
 }
 
-func (e *AggregationsExpr) Cols() PrivateID {
-	return PrivateID(e.state[2])
+func (e *AggregationsItem) ChildCount() int {
+	return 1
 }
 
-func (e *AggregationsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsAggregations() *AggregationsExpr {
-	if e.op != opt.AggregationsOp {
-		return nil
+func (e *AggregationsItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Agg
 	}
-	return (*AggregationsExpr)(e)
+	panic("child index out of range")
 }
 
-// MergeOnExpr contains the ON condition and the metadata for a merge join; it is
-// always a child of MergeJoin.
-type MergeOnExpr Expr
-
-func MakeMergeOnExpr(on GroupID, def PrivateID) MergeOnExpr {
-	return MergeOnExpr{op: opt.MergeOnOp, state: exprState{uint32(on), uint32(def)}}
+func (e *AggregationsItem) Private() interface{} {
+	return &e.ColPrivate
 }
 
-func (e *MergeOnExpr) On() GroupID {
-	return GroupID(e.state[0])
+func (e *AggregationsItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *MergeOnExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
-}
-
-func (e *MergeOnExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsMergeOn() *MergeOnExpr {
-	if e.op != opt.MergeOnOp {
-		return nil
+func (e *AggregationsItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Agg = child.(opt.ScalarExpr)
+		return
 	}
-	return (*MergeOnExpr)(e)
+	panic("child index out of range")
 }
 
-// ExistsExpr takes a relational query as its input, and evaluates to true if the
-// query returns at least one row.
-type ExistsExpr Expr
-
-func MakeExistsExpr(input GroupID, def PrivateID) ExistsExpr {
-	return ExistsExpr{op: opt.ExistsOp, state: exprState{uint32(input), uint32(def)}}
+func (e *AggregationsItem) DataType() types.T {
+	return e.Typ
 }
 
-func (e *ExistsExpr) Input() GroupID {
-	return GroupID(e.state[0])
-}
-
-func (e *ExistsExpr) Def() PrivateID {
-	return PrivateID(e.state[1])
-}
-
-func (e *ExistsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsExists() *ExistsExpr {
-	if e.op != opt.ExistsOp {
-		return nil
+func (e *AggregationsItem) ScalarProps(mem *Memo) *props.Scalar {
+	if !e.scalar.Populated {
+		mem.logPropsBuilder.buildAggregationsItemProps(e, &e.scalar)
 	}
-	return (*ExistsExpr)(e)
+	return &e.scalar
 }
 
-// FiltersExpr is a boolean And operator that only appears as the Filters child of
-// a Select operator, or the On child of a Join operator. For example:
-//   (Select
-//     (Scan a)
-//     (Filters (Gt (Variable a) 1) (Lt (Variable a) 5))
-//   )
-//
-// Normalization rules ensure that a Filters expression is always created if
-// there is at least one condition, so that other rules can rely on its presence
-// when matching, even in the case where there is only one condition. The
-// semantics of the Filters operator are identical to those of the And operator.
-type FiltersExpr Expr
+// FiltersExpr is a set of FiltersItem expressions that specify a set of conjuncts
+// that filter rows selected by a containing Select or Join operator. A row is
+// filtered only if all conditions evaluate to true. If the set is empty, then
+// it never filters rows. See the Select and FiltersItem headers for more
+// details.
+type FiltersExpr []FiltersItem
 
-func MakeFiltersExpr(conditions ListID) FiltersExpr {
-	return FiltersExpr{op: opt.FiltersOp, state: exprState{conditions.Offset, conditions.Length}}
+var EmptyFiltersExpr = FiltersExpr{}
+
+var _ opt.ScalarExpr = &FiltersExpr{}
+
+func (e *FiltersExpr) Op() opt.Operator {
+	return opt.FiltersOp
 }
 
-func (e *FiltersExpr) Conditions() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+func (e *FiltersExpr) ChildCount() int {
+	return len(*e)
 }
 
-func (e *FiltersExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *FiltersExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
 }
 
-func (e *Expr) AsFilters() *FiltersExpr {
-	if e.op != opt.FiltersOp {
-		return nil
+func (e *FiltersExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FiltersExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FiltersExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*FiltersItem)
+}
+
+func (e *FiltersExpr) DataType() types.T {
+	return types.Any
+}
+
+// FiltersItem contains a filter condition that's evaluated to determine whether
+// Select or Join rows should be filtered. In addition, the FiltersItem caches a
+// set of scalar properties that are lazily calculated by traversing the
+// Condition scalar expression. This allows the properties for the entire
+// expression subtree to be calculated once and then repeatedly reused.
+type FiltersItem struct {
+	Condition opt.ScalarExpr
+	scalar    props.Scalar
+}
+
+var _ opt.ScalarExpr = &FiltersItem{}
+
+func (e *FiltersItem) Op() opt.Operator {
+	return opt.FiltersItemOp
+}
+
+func (e *FiltersItem) ChildCount() int {
+	return 1
+}
+
+func (e *FiltersItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Condition
 	}
-	return (*FiltersExpr)(e)
+	panic("child index out of range")
 }
 
-// AndExpr is the boolean conjunction operator that evalutes to true if all of its
-// conditions evaluate to true. If the conditions list is empty, it evalutes to
-// true.
-type AndExpr Expr
-
-func MakeAndExpr(conditions ListID) AndExpr {
-	return AndExpr{op: opt.AndOp, state: exprState{conditions.Offset, conditions.Length}}
+func (e *FiltersItem) Private() interface{} {
+	return &e.scalar
 }
 
-func (e *AndExpr) Conditions() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+func (e *FiltersItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *AndExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsAnd() *AndExpr {
-	if e.op != opt.AndOp {
-		return nil
+func (e *FiltersItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Condition = child.(opt.ScalarExpr)
+		return
 	}
-	return (*AndExpr)(e)
+	panic("child index out of range")
 }
 
-// OrExpr is the boolean disjunction operator that evalutes to true if any of its
-// conditions evaluate to true. If the conditions list is empty, it evaluates to
-// false.
-type OrExpr Expr
-
-func MakeOrExpr(conditions ListID) OrExpr {
-	return OrExpr{op: opt.OrOp, state: exprState{conditions.Offset, conditions.Length}}
+func (e *FiltersItem) DataType() types.T {
+	return types.Bool
 }
 
-func (e *OrExpr) Conditions() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
-}
-
-func (e *OrExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsOr() *OrExpr {
-	if e.op != opt.OrOp {
-		return nil
+func (e *FiltersItem) ScalarProps(mem *Memo) *props.Scalar {
+	if !e.scalar.Populated {
+		mem.logPropsBuilder.buildFiltersItemProps(e, &e.scalar)
 	}
-	return (*OrExpr)(e)
+	return &e.scalar
+}
+
+// AndExpr is the boolean conjunction operator that evalutes to true only if both of
+// its conditions evaluate to true.
+type AndExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &AndExpr{}
+
+func (e *AndExpr) Op() opt.Operator {
+	return opt.AndOp
+}
+
+func (e *AndExpr) ChildCount() int {
+	return 2
+}
+
+func (e *AndExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *AndExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AndExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AndExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *AndExpr) DataType() types.T {
+	return types.Bool
+}
+
+// OrExpr is the boolean disjunction operator that evaluates to true if either one of
+// its conditions evaluates to true.
+type OrExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &OrExpr{}
+
+func (e *OrExpr) Op() opt.Operator {
+	return opt.OrOp
+}
+
+func (e *OrExpr) ChildCount() int {
+	return 2
+}
+
+func (e *OrExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *OrExpr) Private() interface{} {
+	return nil
+}
+
+func (e *OrExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *OrExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *OrExpr) DataType() types.T {
+	return types.Bool
 }
 
 // NotExpr is the boolean negation operator that evaluates to true if its input
-// evalutes to false.
-type NotExpr Expr
-
-func MakeNotExpr(input GroupID) NotExpr {
-	return NotExpr{op: opt.NotOp, state: exprState{uint32(input)}}
+// evaluates to false.
+type NotExpr struct {
+	Input opt.ScalarExpr
 }
 
-func (e *NotExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &NotExpr{}
+
+func (e *NotExpr) Op() opt.Operator {
+	return opt.NotOp
 }
 
-func (e *NotExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *NotExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsNot() *NotExpr {
-	if e.op != opt.NotOp {
-		return nil
+func (e *NotExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*NotExpr)(e)
+	panic("child index out of range")
 }
 
-type EqExpr Expr
-
-func MakeEqExpr(left GroupID, right GroupID) EqExpr {
-	return EqExpr{op: opt.EqOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NotExpr) Private() interface{} {
+	return nil
 }
 
-func (e *EqExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *NotExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *EqExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *EqExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsEq() *EqExpr {
-	if e.op != opt.EqOp {
-		return nil
+func (e *NotExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*EqExpr)(e)
+	panic("child index out of range")
 }
 
-type LtExpr Expr
-
-func MakeLtExpr(left GroupID, right GroupID) LtExpr {
-	return LtExpr{op: opt.LtOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NotExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *LtExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type EqExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *LtExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &EqExpr{}
+
+func (e *EqExpr) Op() opt.Operator {
+	return opt.EqOp
 }
 
-func (e *LtExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *EqExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsLt() *LtExpr {
-	if e.op != opt.LtOp {
-		return nil
+func (e *EqExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*LtExpr)(e)
+	panic("child index out of range")
 }
 
-type GtExpr Expr
-
-func MakeGtExpr(left GroupID, right GroupID) GtExpr {
-	return GtExpr{op: opt.GtOp, state: exprState{uint32(left), uint32(right)}}
+func (e *EqExpr) Private() interface{} {
+	return nil
 }
 
-func (e *GtExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *EqExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *GtExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *GtExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsGt() *GtExpr {
-	if e.op != opt.GtOp {
-		return nil
+func (e *EqExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*GtExpr)(e)
+	panic("child index out of range")
 }
 
-type LeExpr Expr
-
-func MakeLeExpr(left GroupID, right GroupID) LeExpr {
-	return LeExpr{op: opt.LeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *EqExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *LeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type LtExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *LeExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &LtExpr{}
+
+func (e *LtExpr) Op() opt.Operator {
+	return opt.LtOp
 }
 
-func (e *LeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *LtExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsLe() *LeExpr {
-	if e.op != opt.LeOp {
-		return nil
+func (e *LtExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*LeExpr)(e)
+	panic("child index out of range")
 }
 
-type GeExpr Expr
-
-func MakeGeExpr(left GroupID, right GroupID) GeExpr {
-	return GeExpr{op: opt.GeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *LtExpr) Private() interface{} {
+	return nil
 }
 
-func (e *GeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *LtExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *GeExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *GeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsGe() *GeExpr {
-	if e.op != opt.GeOp {
-		return nil
+func (e *LtExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*GeExpr)(e)
+	panic("child index out of range")
 }
 
-type NeExpr Expr
-
-func MakeNeExpr(left GroupID, right GroupID) NeExpr {
-	return NeExpr{op: opt.NeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *LtExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type GtExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NeExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &GtExpr{}
+
+func (e *GtExpr) Op() opt.Operator {
+	return opt.GtOp
 }
 
-func (e *NeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *GtExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNe() *NeExpr {
-	if e.op != opt.NeOp {
-		return nil
+func (e *GtExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NeExpr)(e)
+	panic("child index out of range")
 }
 
-type InExpr Expr
-
-func MakeInExpr(left GroupID, right GroupID) InExpr {
-	return InExpr{op: opt.InOp, state: exprState{uint32(left), uint32(right)}}
+func (e *GtExpr) Private() interface{} {
+	return nil
 }
 
-func (e *InExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *GtExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *InExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *InExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsIn() *InExpr {
-	if e.op != opt.InOp {
-		return nil
+func (e *GtExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*InExpr)(e)
+	panic("child index out of range")
 }
 
-type NotInExpr Expr
-
-func MakeNotInExpr(left GroupID, right GroupID) NotInExpr {
-	return NotInExpr{op: opt.NotInOp, state: exprState{uint32(left), uint32(right)}}
+func (e *GtExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NotInExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type LeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NotInExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &LeExpr{}
+
+func (e *LeExpr) Op() opt.Operator {
+	return opt.LeOp
 }
 
-func (e *NotInExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *LeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNotIn() *NotInExpr {
-	if e.op != opt.NotInOp {
-		return nil
+func (e *LeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NotInExpr)(e)
+	panic("child index out of range")
 }
 
-type LikeExpr Expr
-
-func MakeLikeExpr(left GroupID, right GroupID) LikeExpr {
-	return LikeExpr{op: opt.LikeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *LeExpr) Private() interface{} {
+	return nil
 }
 
-func (e *LikeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *LeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *LikeExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *LikeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsLike() *LikeExpr {
-	if e.op != opt.LikeOp {
-		return nil
+func (e *LeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*LikeExpr)(e)
+	panic("child index out of range")
 }
 
-type NotLikeExpr Expr
-
-func MakeNotLikeExpr(left GroupID, right GroupID) NotLikeExpr {
-	return NotLikeExpr{op: opt.NotLikeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *LeExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NotLikeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type GeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NotLikeExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &GeExpr{}
+
+func (e *GeExpr) Op() opt.Operator {
+	return opt.GeOp
 }
 
-func (e *NotLikeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *GeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNotLike() *NotLikeExpr {
-	if e.op != opt.NotLikeOp {
-		return nil
+func (e *GeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NotLikeExpr)(e)
+	panic("child index out of range")
 }
 
-type ILikeExpr Expr
-
-func MakeILikeExpr(left GroupID, right GroupID) ILikeExpr {
-	return ILikeExpr{op: opt.ILikeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *GeExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ILikeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *GeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *ILikeExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *ILikeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsILike() *ILikeExpr {
-	if e.op != opt.ILikeOp {
-		return nil
+func (e *GeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*ILikeExpr)(e)
+	panic("child index out of range")
 }
 
-type NotILikeExpr Expr
-
-func MakeNotILikeExpr(left GroupID, right GroupID) NotILikeExpr {
-	return NotILikeExpr{op: opt.NotILikeOp, state: exprState{uint32(left), uint32(right)}}
+func (e *GeExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NotILikeExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type NeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NotILikeExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &NeExpr{}
+
+func (e *NeExpr) Op() opt.Operator {
+	return opt.NeOp
 }
 
-func (e *NotILikeExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *NeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNotILike() *NotILikeExpr {
-	if e.op != opt.NotILikeOp {
-		return nil
+func (e *NeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NotILikeExpr)(e)
+	panic("child index out of range")
 }
 
-type SimilarToExpr Expr
-
-func MakeSimilarToExpr(left GroupID, right GroupID) SimilarToExpr {
-	return SimilarToExpr{op: opt.SimilarToOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NeExpr) Private() interface{} {
+	return nil
 }
 
-func (e *SimilarToExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *NeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *SimilarToExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *SimilarToExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsSimilarTo() *SimilarToExpr {
-	if e.op != opt.SimilarToOp {
-		return nil
+func (e *NeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*SimilarToExpr)(e)
+	panic("child index out of range")
 }
 
-type NotSimilarToExpr Expr
-
-func MakeNotSimilarToExpr(left GroupID, right GroupID) NotSimilarToExpr {
-	return NotSimilarToExpr{op: opt.NotSimilarToOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NeExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NotSimilarToExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type InExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NotSimilarToExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &InExpr{}
+
+func (e *InExpr) Op() opt.Operator {
+	return opt.InOp
 }
 
-func (e *NotSimilarToExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *InExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNotSimilarTo() *NotSimilarToExpr {
-	if e.op != opt.NotSimilarToOp {
-		return nil
+func (e *InExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NotSimilarToExpr)(e)
+	panic("child index out of range")
 }
 
-type RegMatchExpr Expr
-
-func MakeRegMatchExpr(left GroupID, right GroupID) RegMatchExpr {
-	return RegMatchExpr{op: opt.RegMatchOp, state: exprState{uint32(left), uint32(right)}}
+func (e *InExpr) Private() interface{} {
+	return nil
 }
 
-func (e *RegMatchExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *InExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *RegMatchExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *RegMatchExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsRegMatch() *RegMatchExpr {
-	if e.op != opt.RegMatchOp {
-		return nil
+func (e *InExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*RegMatchExpr)(e)
+	panic("child index out of range")
 }
 
-type NotRegMatchExpr Expr
-
-func MakeNotRegMatchExpr(left GroupID, right GroupID) NotRegMatchExpr {
-	return NotRegMatchExpr{op: opt.NotRegMatchOp, state: exprState{uint32(left), uint32(right)}}
+func (e *InExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NotRegMatchExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type NotInExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NotRegMatchExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &NotInExpr{}
+
+func (e *NotInExpr) Op() opt.Operator {
+	return opt.NotInOp
 }
 
-func (e *NotRegMatchExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *NotInExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNotRegMatch() *NotRegMatchExpr {
-	if e.op != opt.NotRegMatchOp {
-		return nil
+func (e *NotInExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NotRegMatchExpr)(e)
+	panic("child index out of range")
 }
 
-type RegIMatchExpr Expr
-
-func MakeRegIMatchExpr(left GroupID, right GroupID) RegIMatchExpr {
-	return RegIMatchExpr{op: opt.RegIMatchOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NotInExpr) Private() interface{} {
+	return nil
 }
 
-func (e *RegIMatchExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *NotInExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *RegIMatchExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *RegIMatchExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsRegIMatch() *RegIMatchExpr {
-	if e.op != opt.RegIMatchOp {
-		return nil
+func (e *NotInExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*RegIMatchExpr)(e)
+	panic("child index out of range")
 }
 
-type NotRegIMatchExpr Expr
-
-func MakeNotRegIMatchExpr(left GroupID, right GroupID) NotRegIMatchExpr {
-	return NotRegIMatchExpr{op: opt.NotRegIMatchOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NotInExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *NotRegIMatchExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type LikeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *NotRegIMatchExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &LikeExpr{}
+
+func (e *LikeExpr) Op() opt.Operator {
+	return opt.LikeOp
 }
 
-func (e *NotRegIMatchExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *LikeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsNotRegIMatch() *NotRegIMatchExpr {
-	if e.op != opt.NotRegIMatchOp {
-		return nil
+func (e *LikeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*NotRegIMatchExpr)(e)
+	panic("child index out of range")
 }
 
-type IsExpr Expr
-
-func MakeIsExpr(left GroupID, right GroupID) IsExpr {
-	return IsExpr{op: opt.IsOp, state: exprState{uint32(left), uint32(right)}}
+func (e *LikeExpr) Private() interface{} {
+	return nil
 }
 
-func (e *IsExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *LikeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *IsExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *IsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsIs() *IsExpr {
-	if e.op != opt.IsOp {
-		return nil
+func (e *LikeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*IsExpr)(e)
+	panic("child index out of range")
 }
 
-type IsNotExpr Expr
-
-func MakeIsNotExpr(left GroupID, right GroupID) IsNotExpr {
-	return IsNotExpr{op: opt.IsNotOp, state: exprState{uint32(left), uint32(right)}}
+func (e *LikeExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *IsNotExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type NotLikeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *IsNotExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &NotLikeExpr{}
+
+func (e *NotLikeExpr) Op() opt.Operator {
+	return opt.NotLikeOp
 }
 
-func (e *IsNotExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *NotLikeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsIsNot() *IsNotExpr {
-	if e.op != opt.IsNotOp {
-		return nil
+func (e *NotLikeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*IsNotExpr)(e)
+	panic("child index out of range")
 }
 
-type ContainsExpr Expr
-
-func MakeContainsExpr(left GroupID, right GroupID) ContainsExpr {
-	return ContainsExpr{op: opt.ContainsOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NotLikeExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ContainsExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *NotLikeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *ContainsExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *ContainsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsContains() *ContainsExpr {
-	if e.op != opt.ContainsOp {
-		return nil
+func (e *NotLikeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*ContainsExpr)(e)
+	panic("child index out of range")
 }
 
-type JsonExistsExpr Expr
-
-func MakeJsonExistsExpr(left GroupID, right GroupID) JsonExistsExpr {
-	return JsonExistsExpr{op: opt.JsonExistsOp, state: exprState{uint32(left), uint32(right)}}
+func (e *NotLikeExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *JsonExistsExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type ILikeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *JsonExistsExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &ILikeExpr{}
+
+func (e *ILikeExpr) Op() opt.Operator {
+	return opt.ILikeOp
 }
 
-func (e *JsonExistsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *ILikeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsJsonExists() *JsonExistsExpr {
-	if e.op != opt.JsonExistsOp {
-		return nil
+func (e *ILikeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*JsonExistsExpr)(e)
+	panic("child index out of range")
 }
 
-type JsonAllExistsExpr Expr
-
-func MakeJsonAllExistsExpr(left GroupID, right GroupID) JsonAllExistsExpr {
-	return JsonAllExistsExpr{op: opt.JsonAllExistsOp, state: exprState{uint32(left), uint32(right)}}
+func (e *ILikeExpr) Private() interface{} {
+	return nil
 }
 
-func (e *JsonAllExistsExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *ILikeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *JsonAllExistsExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *JsonAllExistsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsJsonAllExists() *JsonAllExistsExpr {
-	if e.op != opt.JsonAllExistsOp {
-		return nil
+func (e *ILikeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*JsonAllExistsExpr)(e)
+	panic("child index out of range")
 }
 
-type JsonSomeExistsExpr Expr
-
-func MakeJsonSomeExistsExpr(left GroupID, right GroupID) JsonSomeExistsExpr {
-	return JsonSomeExistsExpr{op: opt.JsonSomeExistsOp, state: exprState{uint32(left), uint32(right)}}
+func (e *ILikeExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *JsonSomeExistsExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type NotILikeExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
 }
 
-func (e *JsonSomeExistsExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &NotILikeExpr{}
+
+func (e *NotILikeExpr) Op() opt.Operator {
+	return opt.NotILikeOp
 }
 
-func (e *JsonSomeExistsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *NotILikeExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsJsonSomeExists() *JsonSomeExistsExpr {
-	if e.op != opt.JsonSomeExistsOp {
-		return nil
+func (e *NotILikeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*JsonSomeExistsExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *NotILikeExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NotILikeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NotILikeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *NotILikeExpr) DataType() types.T {
+	return types.Bool
+}
+
+type SimilarToExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &SimilarToExpr{}
+
+func (e *SimilarToExpr) Op() opt.Operator {
+	return opt.SimilarToOp
+}
+
+func (e *SimilarToExpr) ChildCount() int {
+	return 2
+}
+
+func (e *SimilarToExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *SimilarToExpr) Private() interface{} {
+	return nil
+}
+
+func (e *SimilarToExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SimilarToExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SimilarToExpr) DataType() types.T {
+	return types.Bool
+}
+
+type NotSimilarToExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &NotSimilarToExpr{}
+
+func (e *NotSimilarToExpr) Op() opt.Operator {
+	return opt.NotSimilarToOp
+}
+
+func (e *NotSimilarToExpr) ChildCount() int {
+	return 2
+}
+
+func (e *NotSimilarToExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *NotSimilarToExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NotSimilarToExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NotSimilarToExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *NotSimilarToExpr) DataType() types.T {
+	return types.Bool
+}
+
+type RegMatchExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &RegMatchExpr{}
+
+func (e *RegMatchExpr) Op() opt.Operator {
+	return opt.RegMatchOp
+}
+
+func (e *RegMatchExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RegMatchExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *RegMatchExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RegMatchExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegMatchExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *RegMatchExpr) DataType() types.T {
+	return types.Bool
+}
+
+type NotRegMatchExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &NotRegMatchExpr{}
+
+func (e *NotRegMatchExpr) Op() opt.Operator {
+	return opt.NotRegMatchOp
+}
+
+func (e *NotRegMatchExpr) ChildCount() int {
+	return 2
+}
+
+func (e *NotRegMatchExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *NotRegMatchExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NotRegMatchExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NotRegMatchExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *NotRegMatchExpr) DataType() types.T {
+	return types.Bool
+}
+
+type RegIMatchExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &RegIMatchExpr{}
+
+func (e *RegIMatchExpr) Op() opt.Operator {
+	return opt.RegIMatchOp
+}
+
+func (e *RegIMatchExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RegIMatchExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *RegIMatchExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RegIMatchExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegIMatchExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *RegIMatchExpr) DataType() types.T {
+	return types.Bool
+}
+
+type NotRegIMatchExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &NotRegIMatchExpr{}
+
+func (e *NotRegIMatchExpr) Op() opt.Operator {
+	return opt.NotRegIMatchOp
+}
+
+func (e *NotRegIMatchExpr) ChildCount() int {
+	return 2
+}
+
+func (e *NotRegIMatchExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *NotRegIMatchExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NotRegIMatchExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NotRegIMatchExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *NotRegIMatchExpr) DataType() types.T {
+	return types.Bool
+}
+
+type IsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &IsExpr{}
+
+func (e *IsExpr) Op() opt.Operator {
+	return opt.IsOp
+}
+
+func (e *IsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *IsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *IsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *IsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *IsExpr) DataType() types.T {
+	return types.Bool
+}
+
+type IsNotExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &IsNotExpr{}
+
+func (e *IsNotExpr) Op() opt.Operator {
+	return opt.IsNotOp
+}
+
+func (e *IsNotExpr) ChildCount() int {
+	return 2
+}
+
+func (e *IsNotExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *IsNotExpr) Private() interface{} {
+	return nil
+}
+
+func (e *IsNotExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IsNotExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *IsNotExpr) DataType() types.T {
+	return types.Bool
+}
+
+type ContainsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &ContainsExpr{}
+
+func (e *ContainsExpr) Op() opt.Operator {
+	return opt.ContainsOp
+}
+
+func (e *ContainsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *ContainsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *ContainsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ContainsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ContainsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ContainsExpr) DataType() types.T {
+	return types.Bool
+}
+
+type JsonExistsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &JsonExistsExpr{}
+
+func (e *JsonExistsExpr) Op() opt.Operator {
+	return opt.JsonExistsOp
+}
+
+func (e *JsonExistsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *JsonExistsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonExistsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonExistsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonExistsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonExistsExpr) DataType() types.T {
+	return types.Bool
+}
+
+type JsonAllExistsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &JsonAllExistsExpr{}
+
+func (e *JsonAllExistsExpr) Op() opt.Operator {
+	return opt.JsonAllExistsOp
+}
+
+func (e *JsonAllExistsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *JsonAllExistsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonAllExistsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonAllExistsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonAllExistsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonAllExistsExpr) DataType() types.T {
+	return types.Bool
+}
+
+type JsonSomeExistsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+}
+
+var _ opt.ScalarExpr = &JsonSomeExistsExpr{}
+
+func (e *JsonSomeExistsExpr) Op() opt.Operator {
+	return opt.JsonSomeExistsOp
+}
+
+func (e *JsonSomeExistsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *JsonSomeExistsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonSomeExistsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonSomeExistsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonSomeExistsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonSomeExistsExpr) DataType() types.T {
+	return types.Bool
 }
 
 // AnyScalarExpr is the form of ANY which refers to an ANY operation on a
 // tuple or array, as opposed to Any which operates on a subquery.
-type AnyScalarExpr Expr
-
-func MakeAnyScalarExpr(left GroupID, right GroupID, cmp PrivateID) AnyScalarExpr {
-	return AnyScalarExpr{op: opt.AnyScalarOp, state: exprState{uint32(left), uint32(right), uint32(cmp)}}
+type AnyScalarExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+	Cmp   opt.Operator
 }
 
-func (e *AnyScalarExpr) Left() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &AnyScalarExpr{}
+
+func (e *AnyScalarExpr) Op() opt.Operator {
+	return opt.AnyScalarOp
 }
 
-func (e *AnyScalarExpr) Right() GroupID {
-	return GroupID(e.state[1])
+func (e *AnyScalarExpr) ChildCount() int {
+	return 2
 }
 
-func (e *AnyScalarExpr) Cmp() PrivateID {
-	return PrivateID(e.state[2])
-}
-
-func (e *AnyScalarExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsAnyScalar() *AnyScalarExpr {
-	if e.op != opt.AnyScalarOp {
-		return nil
+func (e *AnyScalarExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*AnyScalarExpr)(e)
+	panic("child index out of range")
 }
 
-type BitandExpr Expr
-
-func MakeBitandExpr(left GroupID, right GroupID) BitandExpr {
-	return BitandExpr{op: opt.BitandOp, state: exprState{uint32(left), uint32(right)}}
+func (e *AnyScalarExpr) Private() interface{} {
+	return &e.Cmp
 }
 
-func (e *BitandExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *AnyScalarExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *BitandExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *BitandExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsBitand() *BitandExpr {
-	if e.op != opt.BitandOp {
-		return nil
+func (e *AnyScalarExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*BitandExpr)(e)
+	panic("child index out of range")
 }
 
-type BitorExpr Expr
-
-func MakeBitorExpr(left GroupID, right GroupID) BitorExpr {
-	return BitorExpr{op: opt.BitorOp, state: exprState{uint32(left), uint32(right)}}
+func (e *AnyScalarExpr) DataType() types.T {
+	return types.Bool
 }
 
-func (e *BitorExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type BitandExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *BitorExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &BitandExpr{}
+
+func (e *BitandExpr) Op() opt.Operator {
+	return opt.BitandOp
 }
 
-func (e *BitorExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *BitandExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsBitor() *BitorExpr {
-	if e.op != opt.BitorOp {
-		return nil
+func (e *BitandExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*BitorExpr)(e)
+	panic("child index out of range")
 }
 
-type BitxorExpr Expr
-
-func MakeBitxorExpr(left GroupID, right GroupID) BitxorExpr {
-	return BitxorExpr{op: opt.BitxorOp, state: exprState{uint32(left), uint32(right)}}
+func (e *BitandExpr) Private() interface{} {
+	return nil
 }
 
-func (e *BitxorExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *BitandExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *BitxorExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *BitxorExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsBitxor() *BitxorExpr {
-	if e.op != opt.BitxorOp {
-		return nil
+func (e *BitandExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*BitxorExpr)(e)
+	panic("child index out of range")
 }
 
-type PlusExpr Expr
-
-func MakePlusExpr(left GroupID, right GroupID) PlusExpr {
-	return PlusExpr{op: opt.PlusOp, state: exprState{uint32(left), uint32(right)}}
+func (e *BitandExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *PlusExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type BitorExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *PlusExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &BitorExpr{}
+
+func (e *BitorExpr) Op() opt.Operator {
+	return opt.BitorOp
 }
 
-func (e *PlusExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *BitorExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsPlus() *PlusExpr {
-	if e.op != opt.PlusOp {
-		return nil
+func (e *BitorExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*PlusExpr)(e)
+	panic("child index out of range")
 }
 
-type MinusExpr Expr
-
-func MakeMinusExpr(left GroupID, right GroupID) MinusExpr {
-	return MinusExpr{op: opt.MinusOp, state: exprState{uint32(left), uint32(right)}}
+func (e *BitorExpr) Private() interface{} {
+	return nil
 }
 
-func (e *MinusExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *BitorExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *MinusExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *MinusExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsMinus() *MinusExpr {
-	if e.op != opt.MinusOp {
-		return nil
+func (e *BitorExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*MinusExpr)(e)
+	panic("child index out of range")
 }
 
-type MultExpr Expr
-
-func MakeMultExpr(left GroupID, right GroupID) MultExpr {
-	return MultExpr{op: opt.MultOp, state: exprState{uint32(left), uint32(right)}}
+func (e *BitorExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *MultExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type BitxorExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *MultExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &BitxorExpr{}
+
+func (e *BitxorExpr) Op() opt.Operator {
+	return opt.BitxorOp
 }
 
-func (e *MultExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *BitxorExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsMult() *MultExpr {
-	if e.op != opt.MultOp {
-		return nil
+func (e *BitxorExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*MultExpr)(e)
+	panic("child index out of range")
 }
 
-type DivExpr Expr
-
-func MakeDivExpr(left GroupID, right GroupID) DivExpr {
-	return DivExpr{op: opt.DivOp, state: exprState{uint32(left), uint32(right)}}
+func (e *BitxorExpr) Private() interface{} {
+	return nil
 }
 
-func (e *DivExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *BitxorExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *DivExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *DivExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsDiv() *DivExpr {
-	if e.op != opt.DivOp {
-		return nil
+func (e *BitxorExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*DivExpr)(e)
+	panic("child index out of range")
 }
 
-type FloorDivExpr Expr
-
-func MakeFloorDivExpr(left GroupID, right GroupID) FloorDivExpr {
-	return FloorDivExpr{op: opt.FloorDivOp, state: exprState{uint32(left), uint32(right)}}
+func (e *BitxorExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *FloorDivExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type PlusExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *FloorDivExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &PlusExpr{}
+
+func (e *PlusExpr) Op() opt.Operator {
+	return opt.PlusOp
 }
 
-func (e *FloorDivExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *PlusExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsFloorDiv() *FloorDivExpr {
-	if e.op != opt.FloorDivOp {
-		return nil
+func (e *PlusExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*FloorDivExpr)(e)
+	panic("child index out of range")
 }
 
-type ModExpr Expr
-
-func MakeModExpr(left GroupID, right GroupID) ModExpr {
-	return ModExpr{op: opt.ModOp, state: exprState{uint32(left), uint32(right)}}
+func (e *PlusExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ModExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *PlusExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *ModExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *ModExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsMod() *ModExpr {
-	if e.op != opt.ModOp {
-		return nil
+func (e *PlusExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*ModExpr)(e)
+	panic("child index out of range")
 }
 
-type PowExpr Expr
-
-func MakePowExpr(left GroupID, right GroupID) PowExpr {
-	return PowExpr{op: opt.PowOp, state: exprState{uint32(left), uint32(right)}}
+func (e *PlusExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *PowExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type MinusExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *PowExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &MinusExpr{}
+
+func (e *MinusExpr) Op() opt.Operator {
+	return opt.MinusOp
 }
 
-func (e *PowExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *MinusExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsPow() *PowExpr {
-	if e.op != opt.PowOp {
-		return nil
+func (e *MinusExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*PowExpr)(e)
+	panic("child index out of range")
 }
 
-type ConcatExpr Expr
-
-func MakeConcatExpr(left GroupID, right GroupID) ConcatExpr {
-	return ConcatExpr{op: opt.ConcatOp, state: exprState{uint32(left), uint32(right)}}
+func (e *MinusExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ConcatExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *MinusExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *ConcatExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *ConcatExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsConcat() *ConcatExpr {
-	if e.op != opt.ConcatOp {
-		return nil
+func (e *MinusExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*ConcatExpr)(e)
+	panic("child index out of range")
 }
 
-type LShiftExpr Expr
-
-func MakeLShiftExpr(left GroupID, right GroupID) LShiftExpr {
-	return LShiftExpr{op: opt.LShiftOp, state: exprState{uint32(left), uint32(right)}}
+func (e *MinusExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *LShiftExpr) Left() GroupID {
-	return GroupID(e.state[0])
+type MultExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *LShiftExpr) Right() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &MultExpr{}
+
+func (e *MultExpr) Op() opt.Operator {
+	return opt.MultOp
 }
 
-func (e *LShiftExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *MultExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsLShift() *LShiftExpr {
-	if e.op != opt.LShiftOp {
-		return nil
+func (e *MultExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*LShiftExpr)(e)
+	panic("child index out of range")
 }
 
-type RShiftExpr Expr
-
-func MakeRShiftExpr(left GroupID, right GroupID) RShiftExpr {
-	return RShiftExpr{op: opt.RShiftOp, state: exprState{uint32(left), uint32(right)}}
+func (e *MultExpr) Private() interface{} {
+	return nil
 }
 
-func (e *RShiftExpr) Left() GroupID {
-	return GroupID(e.state[0])
+func (e *MultExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *RShiftExpr) Right() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *RShiftExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsRShift() *RShiftExpr {
-	if e.op != opt.RShiftOp {
-		return nil
+func (e *MultExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*RShiftExpr)(e)
+	panic("child index out of range")
 }
 
-type FetchValExpr Expr
-
-func MakeFetchValExpr(json GroupID, index GroupID) FetchValExpr {
-	return FetchValExpr{op: opt.FetchValOp, state: exprState{uint32(json), uint32(index)}}
+func (e *MultExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *FetchValExpr) Json() GroupID {
-	return GroupID(e.state[0])
+type DivExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *FetchValExpr) Index() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &DivExpr{}
+
+func (e *DivExpr) Op() opt.Operator {
+	return opt.DivOp
 }
 
-func (e *FetchValExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *DivExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsFetchVal() *FetchValExpr {
-	if e.op != opt.FetchValOp {
-		return nil
+func (e *DivExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*FetchValExpr)(e)
+	panic("child index out of range")
 }
 
-type FetchTextExpr Expr
-
-func MakeFetchTextExpr(json GroupID, index GroupID) FetchTextExpr {
-	return FetchTextExpr{op: opt.FetchTextOp, state: exprState{uint32(json), uint32(index)}}
+func (e *DivExpr) Private() interface{} {
+	return nil
 }
 
-func (e *FetchTextExpr) Json() GroupID {
-	return GroupID(e.state[0])
+func (e *DivExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *FetchTextExpr) Index() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *FetchTextExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFetchText() *FetchTextExpr {
-	if e.op != opt.FetchTextOp {
-		return nil
+func (e *DivExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*FetchTextExpr)(e)
+	panic("child index out of range")
 }
 
-type FetchValPathExpr Expr
-
-func MakeFetchValPathExpr(json GroupID, path GroupID) FetchValPathExpr {
-	return FetchValPathExpr{op: opt.FetchValPathOp, state: exprState{uint32(json), uint32(path)}}
+func (e *DivExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *FetchValPathExpr) Json() GroupID {
-	return GroupID(e.state[0])
+type FloorDivExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *FetchValPathExpr) Path() GroupID {
-	return GroupID(e.state[1])
+var _ opt.ScalarExpr = &FloorDivExpr{}
+
+func (e *FloorDivExpr) Op() opt.Operator {
+	return opt.FloorDivOp
 }
 
-func (e *FetchValPathExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *FloorDivExpr) ChildCount() int {
+	return 2
 }
 
-func (e *Expr) AsFetchValPath() *FetchValPathExpr {
-	if e.op != opt.FetchValPathOp {
-		return nil
+func (e *FloorDivExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*FetchValPathExpr)(e)
+	panic("child index out of range")
 }
 
-type FetchTextPathExpr Expr
-
-func MakeFetchTextPathExpr(json GroupID, path GroupID) FetchTextPathExpr {
-	return FetchTextPathExpr{op: opt.FetchTextPathOp, state: exprState{uint32(json), uint32(path)}}
+func (e *FloorDivExpr) Private() interface{} {
+	return nil
 }
 
-func (e *FetchTextPathExpr) Json() GroupID {
-	return GroupID(e.state[0])
+func (e *FloorDivExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *FetchTextPathExpr) Path() GroupID {
-	return GroupID(e.state[1])
-}
-
-func (e *FetchTextPathExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFetchTextPath() *FetchTextPathExpr {
-	if e.op != opt.FetchTextPathOp {
-		return nil
+func (e *FloorDivExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*FetchTextPathExpr)(e)
+	panic("child index out of range")
 }
 
-type UnaryMinusExpr Expr
-
-func MakeUnaryMinusExpr(input GroupID) UnaryMinusExpr {
-	return UnaryMinusExpr{op: opt.UnaryMinusOp, state: exprState{uint32(input)}}
+func (e *FloorDivExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *UnaryMinusExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type ModExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *UnaryMinusExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &ModExpr{}
+
+func (e *ModExpr) Op() opt.Operator {
+	return opt.ModOp
 }
 
-func (e *Expr) AsUnaryMinus() *UnaryMinusExpr {
-	if e.op != opt.UnaryMinusOp {
-		return nil
+func (e *ModExpr) ChildCount() int {
+	return 2
+}
+
+func (e *ModExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
 	}
-	return (*UnaryMinusExpr)(e)
+	panic("child index out of range")
 }
 
-type UnaryComplementExpr Expr
-
-func MakeUnaryComplementExpr(input GroupID) UnaryComplementExpr {
-	return UnaryComplementExpr{op: opt.UnaryComplementOp, state: exprState{uint32(input)}}
+func (e *ModExpr) Private() interface{} {
+	return nil
 }
 
-func (e *UnaryComplementExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *ModExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *UnaryComplementExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsUnaryComplement() *UnaryComplementExpr {
-	if e.op != opt.UnaryComplementOp {
-		return nil
+func (e *ModExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
 	}
-	return (*UnaryComplementExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ModExpr) DataType() types.T {
+	return e.Typ
+}
+
+type PowExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &PowExpr{}
+
+func (e *PowExpr) Op() opt.Operator {
+	return opt.PowOp
+}
+
+func (e *PowExpr) ChildCount() int {
+	return 2
+}
+
+func (e *PowExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *PowExpr) Private() interface{} {
+	return nil
+}
+
+func (e *PowExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *PowExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *PowExpr) DataType() types.T {
+	return e.Typ
+}
+
+type ConcatExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &ConcatExpr{}
+
+func (e *ConcatExpr) Op() opt.Operator {
+	return opt.ConcatOp
+}
+
+func (e *ConcatExpr) ChildCount() int {
+	return 2
+}
+
+func (e *ConcatExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *ConcatExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ConcatExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ConcatExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ConcatExpr) DataType() types.T {
+	return e.Typ
+}
+
+type LShiftExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &LShiftExpr{}
+
+func (e *LShiftExpr) Op() opt.Operator {
+	return opt.LShiftOp
+}
+
+func (e *LShiftExpr) ChildCount() int {
+	return 2
+}
+
+func (e *LShiftExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *LShiftExpr) Private() interface{} {
+	return nil
+}
+
+func (e *LShiftExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LShiftExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *LShiftExpr) DataType() types.T {
+	return e.Typ
+}
+
+type RShiftExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &RShiftExpr{}
+
+func (e *RShiftExpr) Op() opt.Operator {
+	return opt.RShiftOp
+}
+
+func (e *RShiftExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RShiftExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic("child index out of range")
+}
+
+func (e *RShiftExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RShiftExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RShiftExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *RShiftExpr) DataType() types.T {
+	return e.Typ
+}
+
+type FetchValExpr struct {
+	Json  opt.ScalarExpr
+	Index opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &FetchValExpr{}
+
+func (e *FetchValExpr) Op() opt.Operator {
+	return opt.FetchValOp
+}
+
+func (e *FetchValExpr) ChildCount() int {
+	return 2
+}
+
+func (e *FetchValExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Json
+	case 1:
+		return e.Index
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchValExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FetchValExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FetchValExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Json = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Index = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchValExpr) DataType() types.T {
+	return e.Typ
+}
+
+type FetchTextExpr struct {
+	Json  opt.ScalarExpr
+	Index opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &FetchTextExpr{}
+
+func (e *FetchTextExpr) Op() opt.Operator {
+	return opt.FetchTextOp
+}
+
+func (e *FetchTextExpr) ChildCount() int {
+	return 2
+}
+
+func (e *FetchTextExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Json
+	case 1:
+		return e.Index
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchTextExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FetchTextExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FetchTextExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Json = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Index = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchTextExpr) DataType() types.T {
+	return e.Typ
+}
+
+type FetchValPathExpr struct {
+	Json opt.ScalarExpr
+	Path opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &FetchValPathExpr{}
+
+func (e *FetchValPathExpr) Op() opt.Operator {
+	return opt.FetchValPathOp
+}
+
+func (e *FetchValPathExpr) ChildCount() int {
+	return 2
+}
+
+func (e *FetchValPathExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Json
+	case 1:
+		return e.Path
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchValPathExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FetchValPathExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FetchValPathExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Json = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Path = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchValPathExpr) DataType() types.T {
+	return e.Typ
+}
+
+type FetchTextPathExpr struct {
+	Json opt.ScalarExpr
+	Path opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &FetchTextPathExpr{}
+
+func (e *FetchTextPathExpr) Op() opt.Operator {
+	return opt.FetchTextPathOp
+}
+
+func (e *FetchTextPathExpr) ChildCount() int {
+	return 2
+}
+
+func (e *FetchTextPathExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Json
+	case 1:
+		return e.Path
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchTextPathExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FetchTextPathExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FetchTextPathExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Json = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Path = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FetchTextPathExpr) DataType() types.T {
+	return e.Typ
+}
+
+type UnaryMinusExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &UnaryMinusExpr{}
+
+func (e *UnaryMinusExpr) Op() opt.Operator {
+	return opt.UnaryMinusOp
+}
+
+func (e *UnaryMinusExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UnaryMinusExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *UnaryMinusExpr) Private() interface{} {
+	return nil
+}
+
+func (e *UnaryMinusExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnaryMinusExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *UnaryMinusExpr) DataType() types.T {
+	return e.Typ
+}
+
+type UnaryComplementExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &UnaryComplementExpr{}
+
+func (e *UnaryComplementExpr) Op() opt.Operator {
+	return opt.UnaryComplementOp
+}
+
+func (e *UnaryComplementExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UnaryComplementExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *UnaryComplementExpr) Private() interface{} {
+	return nil
+}
+
+func (e *UnaryComplementExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnaryComplementExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *UnaryComplementExpr) DataType() types.T {
+	return e.Typ
 }
 
 // CastExpr converts the input expression into an expression of the target type.
@@ -4655,32 +8282,56 @@ func (e *Expr) AsUnaryComplement() *UnaryComplementExpr {
 // That expression has the effect of truncating the string to just 'he', since
 // the target data type allows a maximum of two characters. This is one example
 // of a "lossy" cast.
-type CastExpr Expr
+type CastExpr struct {
+	Input     opt.ScalarExpr
+	TargetTyp coltypes.T
 
-func MakeCastExpr(input GroupID, targetTyp PrivateID) CastExpr {
-	return CastExpr{op: opt.CastOp, state: exprState{uint32(input), uint32(targetTyp)}}
+	Typ types.T
 }
 
-func (e *CastExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &CastExpr{}
+
+func (e *CastExpr) Op() opt.Operator {
+	return opt.CastOp
 }
 
-func (e *CastExpr) TargetTyp() PrivateID {
-	return PrivateID(e.state[1])
+func (e *CastExpr) ChildCount() int {
+	return 1
 }
 
-func (e *CastExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsCast() *CastExpr {
-	if e.op != opt.CastOp {
-		return nil
+func (e *CastExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*CastExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *CastExpr) Private() interface{} {
+	return e.TargetTyp
+}
+
+func (e *CastExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CastExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *CastExpr) DataType() types.T {
+	return e.Typ
 }
 
 // CaseExpr is a CASE statement of the form:
+//
 //   CASE [ <Input> ]
 //       WHEN <condval1> THEN <expr1>
 //     [ WHEN <condval2> THEN <expr2> ] ...
@@ -4688,572 +8339,1213 @@ func (e *Expr) AsCast() *CastExpr {
 //   END
 //
 // The Case operator evaluates <Input> (if not provided, Input is set to True),
-// then picks the WHEN branch where <condval> is equal to
-// <Input>, then evaluates and returns the corresponding THEN expression. If no
-// WHEN branch matches, the ELSE expression is evaluated and returned, if any.
-// Otherwise, NULL is returned.
+// then picks the WHEN branch where <condval> is equal to <Input>, then evaluates
+// and returns the corresponding THEN expression. If no WHEN branch matches, the
+// ELSE expression is evaluated and returned, if any. Otherwise, NULL is
+// returned.
 //
 // Note that the Whens list inside Case is used to represent all the WHEN
 // branches as well as the ELSE statement if it exists. It is of the form:
-// [(When <condval1> <expr1>),(When <condval2> <expr2>),...,<expr>]
-type CaseExpr Expr
+//
+//   [(When <condval1> <expr1>),(When <condval2> <expr2>),...,<expr>]
+//
+type CaseExpr struct {
+	Input  opt.ScalarExpr
+	Whens  ScalarListExpr
+	OrElse opt.ScalarExpr
 
-func MakeCaseExpr(input GroupID, whens ListID) CaseExpr {
-	return CaseExpr{op: opt.CaseOp, state: exprState{uint32(input), whens.Offset, whens.Length}}
+	Typ types.T
 }
 
-func (e *CaseExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &CaseExpr{}
+
+func (e *CaseExpr) Op() opt.Operator {
+	return opt.CaseOp
 }
 
-func (e *CaseExpr) Whens() ListID {
-	return ListID{Offset: e.state[1], Length: e.state[2]}
+func (e *CaseExpr) ChildCount() int {
+	return 3
 }
 
-func (e *CaseExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsCase() *CaseExpr {
-	if e.op != opt.CaseOp {
-		return nil
+func (e *CaseExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Whens
+	case 2:
+		return e.OrElse
 	}
-	return (*CaseExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *CaseExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CaseExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CaseExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Whens = *child.(*ScalarListExpr)
+		return
+	case 2:
+		e.OrElse = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *CaseExpr) DataType() types.T {
+	return e.Typ
 }
 
 // WhenExpr represents a single WHEN ... THEN ... condition inside a CASE statement.
 // It is the type of each list item in Whens (except for the last item which is
 // a raw expression for the ELSE statement).
-type WhenExpr Expr
+type WhenExpr struct {
+	Condition opt.ScalarExpr
+	Value     opt.ScalarExpr
 
-func MakeWhenExpr(condition GroupID, value GroupID) WhenExpr {
-	return WhenExpr{op: opt.WhenOp, state: exprState{uint32(condition), uint32(value)}}
+	Typ types.T
 }
 
-func (e *WhenExpr) Condition() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &WhenExpr{}
+
+func (e *WhenExpr) Op() opt.Operator {
+	return opt.WhenOp
 }
 
-func (e *WhenExpr) Value() GroupID {
-	return GroupID(e.state[1])
+func (e *WhenExpr) ChildCount() int {
+	return 2
 }
 
-func (e *WhenExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsWhen() *WhenExpr {
-	if e.op != opt.WhenOp {
-		return nil
+func (e *WhenExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Condition
+	case 1:
+		return e.Value
 	}
-	return (*WhenExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *WhenExpr) Private() interface{} {
+	return nil
+}
+
+func (e *WhenExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WhenExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Condition = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *WhenExpr) DataType() types.T {
+	return e.Typ
 }
 
 // ArrayExpr is an ARRAY literal of the form ARRAY[<expr1>, <expr2>, ..., <exprN>].
-type ArrayExpr Expr
-
-func MakeArrayExpr(elems ListID, typ PrivateID) ArrayExpr {
-	return ArrayExpr{op: opt.ArrayOp, state: exprState{elems.Offset, elems.Length, uint32(typ)}}
+type ArrayExpr struct {
+	Elems ScalarListExpr
+	Typ   types.T
 }
 
-func (e *ArrayExpr) Elems() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+var _ opt.ScalarExpr = &ArrayExpr{}
+
+func (e *ArrayExpr) Op() opt.Operator {
+	return opt.ArrayOp
 }
 
-func (e *ArrayExpr) Typ() PrivateID {
-	return PrivateID(e.state[2])
+func (e *ArrayExpr) ChildCount() int {
+	return 1
 }
 
-func (e *ArrayExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsArray() *ArrayExpr {
-	if e.op != opt.ArrayOp {
-		return nil
+func (e *ArrayExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Elems
 	}
-	return (*ArrayExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ArrayExpr) Private() interface{} {
+	return e.Typ
+}
+
+func (e *ArrayExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ArrayExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Elems = *child.(*ScalarListExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ArrayExpr) DataType() types.T {
+	return e.Typ
 }
 
 // IndirectionExpr is a subscripting expression of the form <expr>[<index>].
 // Input must be an Array type and Index must be an int. Multiple indirections
 // and slicing are not supported.
-type IndirectionExpr Expr
+type IndirectionExpr struct {
+	Input opt.ScalarExpr
+	Index opt.ScalarExpr
 
-func MakeIndirectionExpr(input GroupID, index GroupID) IndirectionExpr {
-	return IndirectionExpr{op: opt.IndirectionOp, state: exprState{uint32(input), uint32(index)}}
+	Typ types.T
 }
 
-func (e *IndirectionExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &IndirectionExpr{}
+
+func (e *IndirectionExpr) Op() opt.Operator {
+	return opt.IndirectionOp
 }
 
-func (e *IndirectionExpr) Index() GroupID {
-	return GroupID(e.state[1])
+func (e *IndirectionExpr) ChildCount() int {
+	return 2
 }
 
-func (e *IndirectionExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsIndirection() *IndirectionExpr {
-	if e.op != opt.IndirectionOp {
-		return nil
+func (e *IndirectionExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Index
 	}
-	return (*IndirectionExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *IndirectionExpr) Private() interface{} {
+	return nil
+}
+
+func (e *IndirectionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IndirectionExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Index = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *IndirectionExpr) DataType() types.T {
+	return e.Typ
 }
 
 // FunctionExpr invokes a builtin SQL function like CONCAT or NOW, passing the given
-// arguments. The private field is a *opt.FuncOpDef struct that provides the
-// name of the function as well as a pointer to the builtin overload definition.
-type FunctionExpr Expr
-
-func MakeFunctionExpr(args ListID, def PrivateID) FunctionExpr {
-	return FunctionExpr{op: opt.FunctionOp, state: exprState{args.Offset, args.Length, uint32(def)}}
+// arguments. The FunctionPrivate field contains the name of the function as well
+// as pointers to its type and properties.
+type FunctionExpr struct {
+	Args ScalarListExpr
+	FunctionPrivate
 }
 
-func (e *FunctionExpr) Args() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+var _ opt.ScalarExpr = &FunctionExpr{}
+
+func (e *FunctionExpr) Op() opt.Operator {
+	return opt.FunctionOp
 }
 
-func (e *FunctionExpr) Def() PrivateID {
-	return PrivateID(e.state[2])
+func (e *FunctionExpr) ChildCount() int {
+	return 1
 }
 
-func (e *FunctionExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsFunction() *FunctionExpr {
-	if e.op != opt.FunctionOp {
-		return nil
+func (e *FunctionExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Args
 	}
-	return (*FunctionExpr)(e)
+	panic("child index out of range")
 }
 
-type CoalesceExpr Expr
-
-func MakeCoalesceExpr(args ListID) CoalesceExpr {
-	return CoalesceExpr{op: opt.CoalesceOp, state: exprState{args.Offset, args.Length}}
+func (e *FunctionExpr) Private() interface{} {
+	return &e.FunctionPrivate
 }
 
-func (e *CoalesceExpr) Args() ListID {
-	return ListID{Offset: e.state[0], Length: e.state[1]}
+func (e *FunctionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *CoalesceExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsCoalesce() *CoalesceExpr {
-	if e.op != opt.CoalesceOp {
-		return nil
+func (e *FunctionExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Args = *child.(*ScalarListExpr)
+		return
 	}
-	return (*CoalesceExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *FunctionExpr) DataType() types.T {
+	return e.Typ
+}
+
+type FunctionPrivate struct {
+	Name       string
+	Typ        types.T
+	Properties *tree.FunctionProperties
+	Overload   *tree.Overload
+}
+
+type CoalesceExpr struct {
+	Args ScalarListExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &CoalesceExpr{}
+
+func (e *CoalesceExpr) Op() opt.Operator {
+	return opt.CoalesceOp
+}
+
+func (e *CoalesceExpr) ChildCount() int {
+	return 1
+}
+
+func (e *CoalesceExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Args
+	}
+	panic("child index out of range")
+}
+
+func (e *CoalesceExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CoalesceExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CoalesceExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Args = *child.(*ScalarListExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *CoalesceExpr) DataType() types.T {
+	return e.Typ
 }
 
 // ColumnAccessExpr is a scalar expression that returns a column from the given
 // input expression (which is assumed to be of type Tuple). Idx is the ordinal
 // index of the column in Input.
-type ColumnAccessExpr Expr
+type ColumnAccessExpr struct {
+	Input opt.ScalarExpr
+	Idx   TupleOrdinal
 
-func MakeColumnAccessExpr(input GroupID, idx PrivateID) ColumnAccessExpr {
-	return ColumnAccessExpr{op: opt.ColumnAccessOp, state: exprState{uint32(input), uint32(idx)}}
+	Typ types.T
 }
 
-func (e *ColumnAccessExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &ColumnAccessExpr{}
+
+func (e *ColumnAccessExpr) Op() opt.Operator {
+	return opt.ColumnAccessOp
 }
 
-func (e *ColumnAccessExpr) Idx() PrivateID {
-	return PrivateID(e.state[1])
+func (e *ColumnAccessExpr) ChildCount() int {
+	return 1
 }
 
-func (e *ColumnAccessExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsColumnAccess() *ColumnAccessExpr {
-	if e.op != opt.ColumnAccessOp {
-		return nil
+func (e *ColumnAccessExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*ColumnAccessExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ColumnAccessExpr) Private() interface{} {
+	return &e.Idx
+}
+
+func (e *ColumnAccessExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ColumnAccessExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ColumnAccessExpr) DataType() types.T {
+	return e.Typ
 }
 
 // UnsupportedExprExpr is used for interfacing with the old planner code. It can
 // encapsulate a TypedExpr that is otherwise not supported by the optimizer.
-type UnsupportedExprExpr Expr
+type UnsupportedExprExpr struct {
+	Value tree.TypedExpr
 
-func MakeUnsupportedExprExpr(value PrivateID) UnsupportedExprExpr {
-	return UnsupportedExprExpr{op: opt.UnsupportedExprOp, state: exprState{uint32(value)}}
+	Typ types.T
 }
 
-func (e *UnsupportedExprExpr) Value() PrivateID {
-	return PrivateID(e.state[0])
+var _ opt.ScalarExpr = &UnsupportedExprExpr{}
+
+func (e *UnsupportedExprExpr) Op() opt.Operator {
+	return opt.UnsupportedExprOp
 }
 
-func (e *UnsupportedExprExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *UnsupportedExprExpr) ChildCount() int {
+	return 0
 }
 
-func (e *Expr) AsUnsupportedExpr() *UnsupportedExprExpr {
-	if e.op != opt.UnsupportedExprOp {
-		return nil
+func (e *UnsupportedExprExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *UnsupportedExprExpr) Private() interface{} {
+	return e.Value
+}
+
+func (e *UnsupportedExprExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnsupportedExprExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *UnsupportedExprExpr) DataType() types.T {
+	return e.Typ
+}
+
+type ArrayAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &ArrayAggExpr{}
+
+func (e *ArrayAggExpr) Op() opt.Operator {
+	return opt.ArrayAggOp
+}
+
+func (e *ArrayAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ArrayAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*UnsupportedExprExpr)(e)
+	panic("child index out of range")
 }
 
-type ArrayAggExpr Expr
-
-func MakeArrayAggExpr(input GroupID) ArrayAggExpr {
-	return ArrayAggExpr{op: opt.ArrayAggOp, state: exprState{uint32(input)}}
+func (e *ArrayAggExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ArrayAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *ArrayAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *ArrayAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsArrayAgg() *ArrayAggExpr {
-	if e.op != opt.ArrayAggOp {
-		return nil
+func (e *ArrayAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*ArrayAggExpr)(e)
+	panic("child index out of range")
 }
 
-type AvgExpr Expr
-
-func MakeAvgExpr(input GroupID) AvgExpr {
-	return AvgExpr{op: opt.AvgOp, state: exprState{uint32(input)}}
+func (e *ArrayAggExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *AvgExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type AvgExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *AvgExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &AvgExpr{}
+
+func (e *AvgExpr) Op() opt.Operator {
+	return opt.AvgOp
 }
 
-func (e *Expr) AsAvg() *AvgExpr {
-	if e.op != opt.AvgOp {
-		return nil
+func (e *AvgExpr) ChildCount() int {
+	return 1
+}
+
+func (e *AvgExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*AvgExpr)(e)
+	panic("child index out of range")
 }
 
-type BoolAndExpr Expr
-
-func MakeBoolAndExpr(input GroupID) BoolAndExpr {
-	return BoolAndExpr{op: opt.BoolAndOp, state: exprState{uint32(input)}}
+func (e *AvgExpr) Private() interface{} {
+	return nil
 }
 
-func (e *BoolAndExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *AvgExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *BoolAndExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsBoolAnd() *BoolAndExpr {
-	if e.op != opt.BoolAndOp {
-		return nil
+func (e *AvgExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*BoolAndExpr)(e)
+	panic("child index out of range")
 }
 
-type BoolOrExpr Expr
-
-func MakeBoolOrExpr(input GroupID) BoolOrExpr {
-	return BoolOrExpr{op: opt.BoolOrOp, state: exprState{uint32(input)}}
+func (e *AvgExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *BoolOrExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type BoolAndExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *BoolOrExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &BoolAndExpr{}
+
+func (e *BoolAndExpr) Op() opt.Operator {
+	return opt.BoolAndOp
 }
 
-func (e *Expr) AsBoolOr() *BoolOrExpr {
-	if e.op != opt.BoolOrOp {
-		return nil
+func (e *BoolAndExpr) ChildCount() int {
+	return 1
+}
+
+func (e *BoolAndExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*BoolOrExpr)(e)
+	panic("child index out of range")
 }
 
-type ConcatAggExpr Expr
-
-func MakeConcatAggExpr(input GroupID) ConcatAggExpr {
-	return ConcatAggExpr{op: opt.ConcatAggOp, state: exprState{uint32(input)}}
+func (e *BoolAndExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ConcatAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *BoolAndExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *ConcatAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsConcatAgg() *ConcatAggExpr {
-	if e.op != opt.ConcatAggOp {
-		return nil
+func (e *BoolAndExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*ConcatAggExpr)(e)
+	panic("child index out of range")
 }
 
-type CountExpr Expr
-
-func MakeCountExpr(input GroupID) CountExpr {
-	return CountExpr{op: opt.CountOp, state: exprState{uint32(input)}}
+func (e *BoolAndExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *CountExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type BoolOrExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *CountExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &BoolOrExpr{}
+
+func (e *BoolOrExpr) Op() opt.Operator {
+	return opt.BoolOrOp
 }
 
-func (e *Expr) AsCount() *CountExpr {
-	if e.op != opt.CountOp {
-		return nil
+func (e *BoolOrExpr) ChildCount() int {
+	return 1
+}
+
+func (e *BoolOrExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*CountExpr)(e)
+	panic("child index out of range")
 }
 
-type CountRowsExpr Expr
-
-func MakeCountRowsExpr() CountRowsExpr {
-	return CountRowsExpr{op: opt.CountRowsOp, state: exprState{}}
+func (e *BoolOrExpr) Private() interface{} {
+	return nil
 }
 
-func (e *CountRowsExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *BoolOrExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *Expr) AsCountRows() *CountRowsExpr {
-	if e.op != opt.CountRowsOp {
-		return nil
+func (e *BoolOrExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*CountRowsExpr)(e)
+	panic("child index out of range")
 }
 
-type MaxExpr Expr
-
-func MakeMaxExpr(input GroupID) MaxExpr {
-	return MaxExpr{op: opt.MaxOp, state: exprState{uint32(input)}}
+func (e *BoolOrExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *MaxExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type ConcatAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *MaxExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &ConcatAggExpr{}
+
+func (e *ConcatAggExpr) Op() opt.Operator {
+	return opt.ConcatAggOp
 }
 
-func (e *Expr) AsMax() *MaxExpr {
-	if e.op != opt.MaxOp {
-		return nil
+func (e *ConcatAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ConcatAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*MaxExpr)(e)
+	panic("child index out of range")
 }
 
-type MinExpr Expr
-
-func MakeMinExpr(input GroupID) MinExpr {
-	return MinExpr{op: opt.MinOp, state: exprState{uint32(input)}}
+func (e *ConcatAggExpr) Private() interface{} {
+	return nil
 }
 
-func (e *MinExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *ConcatAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *MinExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsMin() *MinExpr {
-	if e.op != opt.MinOp {
-		return nil
+func (e *ConcatAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*MinExpr)(e)
+	panic("child index out of range")
 }
 
-type SumIntExpr Expr
-
-func MakeSumIntExpr(input GroupID) SumIntExpr {
-	return SumIntExpr{op: opt.SumIntOp, state: exprState{uint32(input)}}
+func (e *ConcatAggExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *SumIntExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type CountExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *SumIntExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &CountExpr{}
+
+func (e *CountExpr) Op() opt.Operator {
+	return opt.CountOp
 }
 
-func (e *Expr) AsSumInt() *SumIntExpr {
-	if e.op != opt.SumIntOp {
-		return nil
+func (e *CountExpr) ChildCount() int {
+	return 1
+}
+
+func (e *CountExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*SumIntExpr)(e)
+	panic("child index out of range")
 }
 
-type SumExpr Expr
-
-func MakeSumExpr(input GroupID) SumExpr {
-	return SumExpr{op: opt.SumOp, state: exprState{uint32(input)}}
+func (e *CountExpr) Private() interface{} {
+	return nil
 }
 
-func (e *SumExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *CountExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *SumExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsSum() *SumExpr {
-	if e.op != opt.SumOp {
-		return nil
+func (e *CountExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*SumExpr)(e)
+	panic("child index out of range")
 }
 
-type SqrDiffExpr Expr
-
-func MakeSqrDiffExpr(input GroupID) SqrDiffExpr {
-	return SqrDiffExpr{op: opt.SqrDiffOp, state: exprState{uint32(input)}}
+func (e *CountExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *SqrDiffExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type CountRowsExpr struct {
 }
 
-func (e *SqrDiffExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &CountRowsExpr{}
+
+func (e *CountRowsExpr) Op() opt.Operator {
+	return opt.CountRowsOp
 }
 
-func (e *Expr) AsSqrDiff() *SqrDiffExpr {
-	if e.op != opt.SqrDiffOp {
-		return nil
+func (e *CountRowsExpr) ChildCount() int {
+	return 0
+}
+
+func (e *CountRowsExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *CountRowsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CountRowsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CountRowsExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *CountRowsExpr) DataType() types.T {
+	return types.Int
+}
+
+type MaxExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &MaxExpr{}
+
+func (e *MaxExpr) Op() opt.Operator {
+	return opt.MaxOp
+}
+
+func (e *MaxExpr) ChildCount() int {
+	return 1
+}
+
+func (e *MaxExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*SqrDiffExpr)(e)
+	panic("child index out of range")
 }
 
-type VarianceExpr Expr
-
-func MakeVarianceExpr(input GroupID) VarianceExpr {
-	return VarianceExpr{op: opt.VarianceOp, state: exprState{uint32(input)}}
+func (e *MaxExpr) Private() interface{} {
+	return nil
 }
 
-func (e *VarianceExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *MaxExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *VarianceExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsVariance() *VarianceExpr {
-	if e.op != opt.VarianceOp {
-		return nil
+func (e *MaxExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*VarianceExpr)(e)
+	panic("child index out of range")
 }
 
-type StdDevExpr Expr
-
-func MakeStdDevExpr(input GroupID) StdDevExpr {
-	return StdDevExpr{op: opt.StdDevOp, state: exprState{uint32(input)}}
+func (e *MaxExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *StdDevExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type MinExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *StdDevExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &MinExpr{}
+
+func (e *MinExpr) Op() opt.Operator {
+	return opt.MinOp
 }
 
-func (e *Expr) AsStdDev() *StdDevExpr {
-	if e.op != opt.StdDevOp {
-		return nil
+func (e *MinExpr) ChildCount() int {
+	return 1
+}
+
+func (e *MinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*StdDevExpr)(e)
+	panic("child index out of range")
 }
 
-type XorAggExpr Expr
-
-func MakeXorAggExpr(input GroupID) XorAggExpr {
-	return XorAggExpr{op: opt.XorAggOp, state: exprState{uint32(input)}}
+func (e *MinExpr) Private() interface{} {
+	return nil
 }
 
-func (e *XorAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *MinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *XorAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsXorAgg() *XorAggExpr {
-	if e.op != opt.XorAggOp {
-		return nil
+func (e *MinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*XorAggExpr)(e)
+	panic("child index out of range")
 }
 
-type JsonAggExpr Expr
-
-func MakeJsonAggExpr(input GroupID) JsonAggExpr {
-	return JsonAggExpr{op: opt.JsonAggOp, state: exprState{uint32(input)}}
+func (e *MinExpr) DataType() types.T {
+	return e.Typ
 }
 
-func (e *JsonAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+type SumIntExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
 }
 
-func (e *JsonAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+var _ opt.ScalarExpr = &SumIntExpr{}
+
+func (e *SumIntExpr) Op() opt.Operator {
+	return opt.SumIntOp
 }
 
-func (e *Expr) AsJsonAgg() *JsonAggExpr {
-	if e.op != opt.JsonAggOp {
-		return nil
+func (e *SumIntExpr) ChildCount() int {
+	return 1
+}
+
+func (e *SumIntExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*JsonAggExpr)(e)
+	panic("child index out of range")
 }
 
-type JsonbAggExpr Expr
-
-func MakeJsonbAggExpr(input GroupID) JsonbAggExpr {
-	return JsonbAggExpr{op: opt.JsonbAggOp, state: exprState{uint32(input)}}
+func (e *SumIntExpr) Private() interface{} {
+	return nil
 }
 
-func (e *JsonbAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+func (e *SumIntExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-func (e *JsonbAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
-}
-
-func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
-	if e.op != opt.JsonbAggOp {
-		return nil
+func (e *SumIntExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
 	}
-	return (*JsonbAggExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *SumIntExpr) DataType() types.T {
+	return e.Typ
+}
+
+type SumExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &SumExpr{}
+
+func (e *SumExpr) Op() opt.Operator {
+	return opt.SumOp
+}
+
+func (e *SumExpr) ChildCount() int {
+	return 1
+}
+
+func (e *SumExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *SumExpr) Private() interface{} {
+	return nil
+}
+
+func (e *SumExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SumExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SumExpr) DataType() types.T {
+	return e.Typ
+}
+
+type SqrDiffExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &SqrDiffExpr{}
+
+func (e *SqrDiffExpr) Op() opt.Operator {
+	return opt.SqrDiffOp
+}
+
+func (e *SqrDiffExpr) ChildCount() int {
+	return 1
+}
+
+func (e *SqrDiffExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *SqrDiffExpr) Private() interface{} {
+	return nil
+}
+
+func (e *SqrDiffExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SqrDiffExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *SqrDiffExpr) DataType() types.T {
+	return e.Typ
+}
+
+type VarianceExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &VarianceExpr{}
+
+func (e *VarianceExpr) Op() opt.Operator {
+	return opt.VarianceOp
+}
+
+func (e *VarianceExpr) ChildCount() int {
+	return 1
+}
+
+func (e *VarianceExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *VarianceExpr) Private() interface{} {
+	return nil
+}
+
+func (e *VarianceExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *VarianceExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *VarianceExpr) DataType() types.T {
+	return e.Typ
+}
+
+type StdDevExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &StdDevExpr{}
+
+func (e *StdDevExpr) Op() opt.Operator {
+	return opt.StdDevOp
+}
+
+func (e *StdDevExpr) ChildCount() int {
+	return 1
+}
+
+func (e *StdDevExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *StdDevExpr) Private() interface{} {
+	return nil
+}
+
+func (e *StdDevExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *StdDevExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *StdDevExpr) DataType() types.T {
+	return e.Typ
+}
+
+type XorAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &XorAggExpr{}
+
+func (e *XorAggExpr) Op() opt.Operator {
+	return opt.XorAggOp
+}
+
+func (e *XorAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *XorAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *XorAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *XorAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *XorAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *XorAggExpr) DataType() types.T {
+	return e.Typ
+}
+
+type JsonAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &JsonAggExpr{}
+
+func (e *JsonAggExpr) Op() opt.Operator {
+	return opt.JsonAggOp
+}
+
+func (e *JsonAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *JsonAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonAggExpr) DataType() types.T {
+	return e.Typ
+}
+
+type JsonbAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &JsonbAggExpr{}
+
+func (e *JsonbAggExpr) Op() opt.Operator {
+	return opt.JsonbAggOp
+}
+
+func (e *JsonbAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *JsonbAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonbAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonbAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonbAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *JsonbAggExpr) DataType() types.T {
+	return e.Typ
 }
 
 // ConstAggExpr is used in the special case when the value of a column is known to be
@@ -5262,25 +9554,51 @@ func (e *Expr) AsJsonbAgg() *JsonbAggExpr {
 //
 // ConstAgg is not part of SQL, but it's used internally to rewrite correlated
 // subqueries into an efficient and convenient form.
-type ConstAggExpr Expr
+type ConstAggExpr struct {
+	Input opt.ScalarExpr
 
-func MakeConstAggExpr(input GroupID) ConstAggExpr {
-	return ConstAggExpr{op: opt.ConstAggOp, state: exprState{uint32(input)}}
+	Typ types.T
 }
 
-func (e *ConstAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &ConstAggExpr{}
+
+func (e *ConstAggExpr) Op() opt.Operator {
+	return opt.ConstAggOp
 }
 
-func (e *ConstAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *ConstAggExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsConstAgg() *ConstAggExpr {
-	if e.op != opt.ConstAggOp {
-		return nil
+func (e *ConstAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*ConstAggExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ConstAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ConstAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ConstAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ConstAggExpr) DataType() types.T {
+	return e.Typ
 }
 
 // ConstNotNullAggExpr is used in the special case when the value of a column is
@@ -5291,25 +9609,51 @@ func (e *Expr) AsConstAgg() *ConstAggExpr {
 //
 // ConstNotNullAgg is not part of SQL, but it's used internally to rewrite
 // correlated subqueries into an efficient and convenient form.
-type ConstNotNullAggExpr Expr
+type ConstNotNullAggExpr struct {
+	Input opt.ScalarExpr
 
-func MakeConstNotNullAggExpr(input GroupID) ConstNotNullAggExpr {
-	return ConstNotNullAggExpr{op: opt.ConstNotNullAggOp, state: exprState{uint32(input)}}
+	Typ types.T
 }
 
-func (e *ConstNotNullAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &ConstNotNullAggExpr{}
+
+func (e *ConstNotNullAggExpr) Op() opt.Operator {
+	return opt.ConstNotNullAggOp
 }
 
-func (e *ConstNotNullAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *ConstNotNullAggExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsConstNotNullAgg() *ConstNotNullAggExpr {
-	if e.op != opt.ConstNotNullAggOp {
-		return nil
+func (e *ConstNotNullAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*ConstNotNullAggExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *ConstNotNullAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ConstNotNullAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ConstNotNullAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ConstNotNullAggExpr) DataType() types.T {
+	return e.Typ
 }
 
 // AnyNotNullAggExpr returns any non-NULL value it receives, with no other guarantees.
@@ -5317,882 +9661,5898 @@ func (e *Expr) AsConstNotNullAgg() *ConstNotNullAggExpr {
 //
 // AnyNotNullAgg is not part of SQL, but it's used internally to rewrite
 // correlated subqueries into an efficient and convenient form.
-type AnyNotNullAggExpr Expr
+type AnyNotNullAggExpr struct {
+	Input opt.ScalarExpr
 
-func MakeAnyNotNullAggExpr(input GroupID) AnyNotNullAggExpr {
-	return AnyNotNullAggExpr{op: opt.AnyNotNullAggOp, state: exprState{uint32(input)}}
+	Typ types.T
 }
 
-func (e *AnyNotNullAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &AnyNotNullAggExpr{}
+
+func (e *AnyNotNullAggExpr) Op() opt.Operator {
+	return opt.AnyNotNullAggOp
 }
 
-func (e *AnyNotNullAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *AnyNotNullAggExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsAnyNotNullAgg() *AnyNotNullAggExpr {
-	if e.op != opt.AnyNotNullAggOp {
-		return nil
+func (e *AnyNotNullAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*AnyNotNullAggExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *AnyNotNullAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AnyNotNullAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AnyNotNullAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *AnyNotNullAggExpr) DataType() types.T {
+	return e.Typ
 }
 
 // FirstAggExpr is used only by DistinctOn; it returns the value on the first row
 // according to an ordering; if the ordering is unspecified (or partially
 // specified), it is an arbitrary ordering but it must be the same across all
 // FirstAggs in a DistinctOn.
-type FirstAggExpr Expr
+type FirstAggExpr struct {
+	Input opt.ScalarExpr
 
-func MakeFirstAggExpr(input GroupID) FirstAggExpr {
-	return FirstAggExpr{op: opt.FirstAggOp, state: exprState{uint32(input)}}
+	Typ types.T
 }
 
-func (e *FirstAggExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &FirstAggExpr{}
+
+func (e *FirstAggExpr) Op() opt.Operator {
+	return opt.FirstAggOp
 }
 
-func (e *FirstAggExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *FirstAggExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsFirstAgg() *FirstAggExpr {
-	if e.op != opt.FirstAggOp {
-		return nil
+func (e *FirstAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*FirstAggExpr)(e)
+	panic("child index out of range")
+}
+
+func (e *FirstAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FirstAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FirstAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *FirstAggExpr) DataType() types.T {
+	return e.Typ
 }
 
 // AggDistinctExpr is used as a modifier that wraps the input of an aggregate
 // function. It causes the respective aggregation to only process each distinct
 // value once.
-type AggDistinctExpr Expr
+type AggDistinctExpr struct {
+	Input opt.ScalarExpr
 
-func MakeAggDistinctExpr(input GroupID) AggDistinctExpr {
-	return AggDistinctExpr{op: opt.AggDistinctOp, state: exprState{uint32(input)}}
+	Typ types.T
 }
 
-func (e *AggDistinctExpr) Input() GroupID {
-	return GroupID(e.state[0])
+var _ opt.ScalarExpr = &AggDistinctExpr{}
+
+func (e *AggDistinctExpr) Op() opt.Operator {
+	return opt.AggDistinctOp
 }
 
-func (e *AggDistinctExpr) Fingerprint() Fingerprint {
-	return Fingerprint(*e)
+func (e *AggDistinctExpr) ChildCount() int {
+	return 1
 }
 
-func (e *Expr) AsAggDistinct() *AggDistinctExpr {
-	if e.op != opt.AggDistinctOp {
-		return nil
+func (e *AggDistinctExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
 	}
-	return (*AggDistinctExpr)(e)
+	panic("child index out of range")
 }
 
-// InternScanOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternScanOpDef(val *ScanOpDef) PrivateID {
-	return m.privateStorage.internScanOpDef(val)
+func (e *AggDistinctExpr) Private() interface{} {
+	return nil
 }
 
-// InternVirtualScanOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternVirtualScanOpDef(val *VirtualScanOpDef) PrivateID {
-	return m.privateStorage.internVirtualScanOpDef(val)
+func (e *AggDistinctExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-// InternColList adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternColList(val opt.ColList) PrivateID {
-	return m.privateStorage.internColList(val)
+func (e *AggDistinctExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
 }
 
-// InternIndexJoinDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternIndexJoinDef(val *IndexJoinDef) PrivateID {
-	return m.privateStorage.internIndexJoinDef(val)
+func (e *AggDistinctExpr) DataType() types.T {
+	return e.Typ
 }
 
-// InternLookupJoinDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternLookupJoinDef(val *LookupJoinDef) PrivateID {
-	return m.privateStorage.internLookupJoinDef(val)
+// ScalarListExpr is a list expression that has scalar expression items of type
+// opt.ScalarExpr. opt.ScalarExpr is an external type that is defined outside of
+// Optgen. It is hard-coded in the code generator to be the item type for
+// ScalarList.
+//
+// TODO(andyk): Consider adding Optgen syntax like:
+//                define ScalarList []ScalarExpr
+type ScalarListExpr []opt.ScalarExpr
+
+var EmptyScalarListExpr = ScalarListExpr{}
+
+var _ opt.ScalarExpr = &ScalarListExpr{}
+
+func (e *ScalarListExpr) Op() opt.Operator {
+	return opt.ScalarListOp
 }
 
-// InternGroupByDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternGroupByDef(val *GroupByDef) PrivateID {
-	return m.privateStorage.internGroupByDef(val)
+func (e *ScalarListExpr) ChildCount() int {
+	return len(*e)
 }
 
-// InternSetOpColMap adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternSetOpColMap(val *SetOpColMap) PrivateID {
-	return m.privateStorage.internSetOpColMap(val)
+func (e *ScalarListExpr) Child(nth int) opt.Expr {
+	return (*e)[nth]
 }
 
-// InternOrderingChoice adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternOrderingChoice(val *props.OrderingChoice) PrivateID {
-	return m.privateStorage.internOrderingChoice(val)
+func (e *ScalarListExpr) Private() interface{} {
+	return nil
 }
 
-// InternExplainOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternExplainOpDef(val *ExplainOpDef) PrivateID {
-	return m.privateStorage.internExplainOpDef(val)
+func (e *ScalarListExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
 }
 
-// InternShowTraceOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternShowTraceOpDef(val *ShowTraceOpDef) PrivateID {
-	return m.privateStorage.internShowTraceOpDef(val)
+func (e *ScalarListExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = child.(opt.ScalarExpr)
 }
 
-// InternRowNumberDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternRowNumberDef(val *RowNumberDef) PrivateID {
-	return m.privateStorage.internRowNumberDef(val)
+func (e *ScalarListExpr) DataType() types.T {
+	return types.Any
 }
 
-// InternSubqueryDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternSubqueryDef(val *SubqueryDef) PrivateID {
-	return m.privateStorage.internSubqueryDef(val)
+func (m *Memo) MemoizeScan(
+	scanPrivate *ScanPrivate,
+) *ScanExpr {
+	const size = int64(unsafe.Sizeof(scanGroup{}))
+	grp := &scanGroup{mem: m, first: ScanExpr{
+		ScanPrivate: *scanPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternScan(e)
+	if interned == e {
+		m.logPropsBuilder.buildScanProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternColumnID adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternColumnID(val opt.ColumnID) PrivateID {
-	return m.privateStorage.internColumnID(val)
+func (m *Memo) MemoizeVirtualScan(
+	virtualScanPrivate *VirtualScanPrivate,
+) *VirtualScanExpr {
+	const size = int64(unsafe.Sizeof(virtualScanGroup{}))
+	grp := &virtualScanGroup{mem: m, first: VirtualScanExpr{
+		VirtualScanPrivate: *virtualScanPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternVirtualScan(e)
+	if interned == e {
+		m.logPropsBuilder.buildVirtualScanProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternDatum adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternDatum(val tree.Datum) PrivateID {
-	return m.privateStorage.internDatum(val)
+func (m *Memo) MemoizeValues(
+	rows ScalarListExpr,
+	cols opt.ColList,
+) *ValuesExpr {
+	const size = int64(unsafe.Sizeof(valuesGroup{}))
+	grp := &valuesGroup{mem: m, first: ValuesExpr{
+		Rows: rows,
+		Cols: cols,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternValues(e)
+	if interned == e {
+		m.logPropsBuilder.buildValuesProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternType adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternType(val types.T) PrivateID {
-	return m.privateStorage.internType(val)
+func (m *Memo) MemoizeSelect(
+	input RelExpr,
+	filters FiltersExpr,
+) *SelectExpr {
+	const size = int64(unsafe.Sizeof(selectGroup{}))
+	grp := &selectGroup{mem: m, first: SelectExpr{
+		Input:   input,
+		Filters: filters,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternSelect(e)
+	if interned == e {
+		m.logPropsBuilder.buildSelectProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternTypedExpr adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternTypedExpr(val tree.TypedExpr) PrivateID {
-	return m.privateStorage.internTypedExpr(val)
+func (m *Memo) MemoizeProject(
+	input RelExpr,
+	projections ProjectionsExpr,
+	passthrough opt.ColSet,
+) *ProjectExpr {
+	const size = int64(unsafe.Sizeof(projectGroup{}))
+	grp := &projectGroup{mem: m, first: ProjectExpr{
+		Input:       input,
+		Projections: projections,
+		Passthrough: passthrough,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternProject(e)
+	if interned == e {
+		m.logPropsBuilder.buildProjectProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternProjectionsOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternProjectionsOpDef(val *ProjectionsOpDef) PrivateID {
-	return m.privateStorage.internProjectionsOpDef(val)
+func (m *Memo) MemoizeInnerJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *InnerJoinExpr {
+	const size = int64(unsafe.Sizeof(innerJoinGroup{}))
+	grp := &innerJoinGroup{mem: m, first: InnerJoinExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternInnerJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildInnerJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternMergeOnDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternMergeOnDef(val *MergeOnDef) PrivateID {
-	return m.privateStorage.internMergeOnDef(val)
+func (m *Memo) MemoizeLeftJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *LeftJoinExpr {
+	const size = int64(unsafe.Sizeof(leftJoinGroup{}))
+	grp := &leftJoinGroup{mem: m, first: LeftJoinExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternLeftJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildLeftJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternOperator adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternOperator(val opt.Operator) PrivateID {
-	return m.privateStorage.internOperator(val)
+func (m *Memo) MemoizeRightJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *RightJoinExpr {
+	const size = int64(unsafe.Sizeof(rightJoinGroup{}))
+	grp := &rightJoinGroup{mem: m, first: RightJoinExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternRightJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildRightJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternColType adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternColType(val coltypes.T) PrivateID {
-	return m.privateStorage.internColType(val)
+func (m *Memo) MemoizeFullJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *FullJoinExpr {
+	const size = int64(unsafe.Sizeof(fullJoinGroup{}))
+	grp := &fullJoinGroup{mem: m, first: FullJoinExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternFullJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildFullJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternFuncOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternFuncOpDef(val *FuncOpDef) PrivateID {
-	return m.privateStorage.internFuncOpDef(val)
+func (m *Memo) MemoizeSemiJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *SemiJoinExpr {
+	const size = int64(unsafe.Sizeof(semiJoinGroup{}))
+	grp := &semiJoinGroup{mem: m, first: SemiJoinExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternSemiJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildSemiJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-// InternTupleOrdinal adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (m *Memo) InternTupleOrdinal(val TupleOrdinal) PrivateID {
-	return m.privateStorage.internTupleOrdinal(val)
+func (m *Memo) MemoizeAntiJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *AntiJoinExpr {
+	const size = int64(unsafe.Sizeof(antiJoinGroup{}))
+	grp := &antiJoinGroup{mem: m, first: AntiJoinExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAntiJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildAntiJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-type makeExprFunc func(operands DynamicOperands) Expr
-
-var makeExprLookup [opt.NumOperators]makeExprFunc
-
-func init() {
-	// UnknownOp
-	makeExprLookup[opt.UnknownOp] = func(operands DynamicOperands) Expr {
-		panic("op type not initialized")
-	}
-
-	// ScanOp
-	makeExprLookup[opt.ScanOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeScanExpr(PrivateID(operands[0])))
-	}
-
-	// VirtualScanOp
-	makeExprLookup[opt.VirtualScanOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeVirtualScanExpr(PrivateID(operands[0])))
-	}
-
-	// ValuesOp
-	makeExprLookup[opt.ValuesOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeValuesExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// SelectOp
-	makeExprLookup[opt.SelectOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSelectExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// ProjectOp
-	makeExprLookup[opt.ProjectOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeProjectExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// InnerJoinOp
-	makeExprLookup[opt.InnerJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeInnerJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// LeftJoinOp
-	makeExprLookup[opt.LeftJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLeftJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// RightJoinOp
-	makeExprLookup[opt.RightJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeRightJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// FullJoinOp
-	makeExprLookup[opt.FullJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFullJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// SemiJoinOp
-	makeExprLookup[opt.SemiJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSemiJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// AntiJoinOp
-	makeExprLookup[opt.AntiJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAntiJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// IndexJoinOp
-	makeExprLookup[opt.IndexJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeIndexJoinExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// LookupJoinOp
-	makeExprLookup[opt.LookupJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLookupJoinExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// MergeJoinOp
-	makeExprLookup[opt.MergeJoinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMergeJoinExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// InnerJoinApplyOp
-	makeExprLookup[opt.InnerJoinApplyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeInnerJoinApplyExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// LeftJoinApplyOp
-	makeExprLookup[opt.LeftJoinApplyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLeftJoinApplyExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// RightJoinApplyOp
-	makeExprLookup[opt.RightJoinApplyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeRightJoinApplyExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// FullJoinApplyOp
-	makeExprLookup[opt.FullJoinApplyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFullJoinApplyExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// SemiJoinApplyOp
-	makeExprLookup[opt.SemiJoinApplyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSemiJoinApplyExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// AntiJoinApplyOp
-	makeExprLookup[opt.AntiJoinApplyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAntiJoinApplyExpr(GroupID(operands[0]), GroupID(operands[1]), GroupID(operands[2])))
-	}
-
-	// GroupByOp
-	makeExprLookup[opt.GroupByOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeGroupByExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// ScalarGroupByOp
-	makeExprLookup[opt.ScalarGroupByOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeScalarGroupByExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// DistinctOnOp
-	makeExprLookup[opt.DistinctOnOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeDistinctOnExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// UnionOp
-	makeExprLookup[opt.UnionOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeUnionExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// IntersectOp
-	makeExprLookup[opt.IntersectOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeIntersectExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// ExceptOp
-	makeExprLookup[opt.ExceptOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeExceptExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// UnionAllOp
-	makeExprLookup[opt.UnionAllOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeUnionAllExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// IntersectAllOp
-	makeExprLookup[opt.IntersectAllOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeIntersectAllExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// ExceptAllOp
-	makeExprLookup[opt.ExceptAllOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeExceptAllExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// LimitOp
-	makeExprLookup[opt.LimitOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLimitExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// OffsetOp
-	makeExprLookup[opt.OffsetOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeOffsetExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// Max1RowOp
-	makeExprLookup[opt.Max1RowOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMax1RowExpr(GroupID(operands[0])))
-	}
-
-	// ExplainOp
-	makeExprLookup[opt.ExplainOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeExplainExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// ShowTraceForSessionOp
-	makeExprLookup[opt.ShowTraceForSessionOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeShowTraceForSessionExpr(PrivateID(operands[0])))
-	}
-
-	// RowNumberOp
-	makeExprLookup[opt.RowNumberOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeRowNumberExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// ZipOp
-	makeExprLookup[opt.ZipOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeZipExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// SubqueryOp
-	makeExprLookup[opt.SubqueryOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSubqueryExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// AnyOp
-	makeExprLookup[opt.AnyOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAnyExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// VariableOp
-	makeExprLookup[opt.VariableOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeVariableExpr(PrivateID(operands[0])))
-	}
-
-	// ConstOp
-	makeExprLookup[opt.ConstOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeConstExpr(PrivateID(operands[0])))
-	}
-
-	// NullOp
-	makeExprLookup[opt.NullOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNullExpr(PrivateID(operands[0])))
-	}
-
-	// TrueOp
-	makeExprLookup[opt.TrueOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeTrueExpr())
-	}
-
-	// FalseOp
-	makeExprLookup[opt.FalseOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFalseExpr())
-	}
-
-	// PlaceholderOp
-	makeExprLookup[opt.PlaceholderOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakePlaceholderExpr(PrivateID(operands[0])))
-	}
-
-	// TupleOp
-	makeExprLookup[opt.TupleOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeTupleExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// ProjectionsOp
-	makeExprLookup[opt.ProjectionsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeProjectionsExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// AggregationsOp
-	makeExprLookup[opt.AggregationsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAggregationsExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// MergeOnOp
-	makeExprLookup[opt.MergeOnOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMergeOnExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// ExistsOp
-	makeExprLookup[opt.ExistsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeExistsExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// FiltersOp
-	makeExprLookup[opt.FiltersOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFiltersExpr(operands[0].ListID()))
-	}
-
-	// AndOp
-	makeExprLookup[opt.AndOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAndExpr(operands[0].ListID()))
-	}
-
-	// OrOp
-	makeExprLookup[opt.OrOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeOrExpr(operands[0].ListID()))
-	}
-
-	// NotOp
-	makeExprLookup[opt.NotOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotExpr(GroupID(operands[0])))
-	}
-
-	// EqOp
-	makeExprLookup[opt.EqOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeEqExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// LtOp
-	makeExprLookup[opt.LtOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLtExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// GtOp
-	makeExprLookup[opt.GtOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeGtExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// LeOp
-	makeExprLookup[opt.LeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// GeOp
-	makeExprLookup[opt.GeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeGeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NeOp
-	makeExprLookup[opt.NeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// InOp
-	makeExprLookup[opt.InOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeInExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NotInOp
-	makeExprLookup[opt.NotInOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotInExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// LikeOp
-	makeExprLookup[opt.LikeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLikeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NotLikeOp
-	makeExprLookup[opt.NotLikeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotLikeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// ILikeOp
-	makeExprLookup[opt.ILikeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeILikeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NotILikeOp
-	makeExprLookup[opt.NotILikeOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotILikeExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// SimilarToOp
-	makeExprLookup[opt.SimilarToOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSimilarToExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NotSimilarToOp
-	makeExprLookup[opt.NotSimilarToOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotSimilarToExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// RegMatchOp
-	makeExprLookup[opt.RegMatchOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeRegMatchExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NotRegMatchOp
-	makeExprLookup[opt.NotRegMatchOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotRegMatchExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// RegIMatchOp
-	makeExprLookup[opt.RegIMatchOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeRegIMatchExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// NotRegIMatchOp
-	makeExprLookup[opt.NotRegIMatchOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeNotRegIMatchExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// IsOp
-	makeExprLookup[opt.IsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeIsExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// IsNotOp
-	makeExprLookup[opt.IsNotOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeIsNotExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// ContainsOp
-	makeExprLookup[opt.ContainsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeContainsExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// JsonExistsOp
-	makeExprLookup[opt.JsonExistsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeJsonExistsExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// JsonAllExistsOp
-	makeExprLookup[opt.JsonAllExistsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeJsonAllExistsExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// JsonSomeExistsOp
-	makeExprLookup[opt.JsonSomeExistsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeJsonSomeExistsExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// AnyScalarOp
-	makeExprLookup[opt.AnyScalarOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAnyScalarExpr(GroupID(operands[0]), GroupID(operands[1]), PrivateID(operands[2])))
-	}
-
-	// BitandOp
-	makeExprLookup[opt.BitandOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeBitandExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// BitorOp
-	makeExprLookup[opt.BitorOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeBitorExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// BitxorOp
-	makeExprLookup[opt.BitxorOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeBitxorExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// PlusOp
-	makeExprLookup[opt.PlusOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakePlusExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// MinusOp
-	makeExprLookup[opt.MinusOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMinusExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// MultOp
-	makeExprLookup[opt.MultOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMultExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// DivOp
-	makeExprLookup[opt.DivOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeDivExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// FloorDivOp
-	makeExprLookup[opt.FloorDivOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFloorDivExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// ModOp
-	makeExprLookup[opt.ModOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeModExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// PowOp
-	makeExprLookup[opt.PowOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakePowExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// ConcatOp
-	makeExprLookup[opt.ConcatOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeConcatExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// LShiftOp
-	makeExprLookup[opt.LShiftOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeLShiftExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// RShiftOp
-	makeExprLookup[opt.RShiftOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeRShiftExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// FetchValOp
-	makeExprLookup[opt.FetchValOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFetchValExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// FetchTextOp
-	makeExprLookup[opt.FetchTextOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFetchTextExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// FetchValPathOp
-	makeExprLookup[opt.FetchValPathOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFetchValPathExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// FetchTextPathOp
-	makeExprLookup[opt.FetchTextPathOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFetchTextPathExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// UnaryMinusOp
-	makeExprLookup[opt.UnaryMinusOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeUnaryMinusExpr(GroupID(operands[0])))
-	}
-
-	// UnaryComplementOp
-	makeExprLookup[opt.UnaryComplementOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeUnaryComplementExpr(GroupID(operands[0])))
-	}
-
-	// CastOp
-	makeExprLookup[opt.CastOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeCastExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// CaseOp
-	makeExprLookup[opt.CaseOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeCaseExpr(GroupID(operands[0]), operands[1].ListID()))
-	}
-
-	// WhenOp
-	makeExprLookup[opt.WhenOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeWhenExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// ArrayOp
-	makeExprLookup[opt.ArrayOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeArrayExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// IndirectionOp
-	makeExprLookup[opt.IndirectionOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeIndirectionExpr(GroupID(operands[0]), GroupID(operands[1])))
-	}
-
-	// FunctionOp
-	makeExprLookup[opt.FunctionOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFunctionExpr(operands[0].ListID(), PrivateID(operands[1])))
-	}
-
-	// CoalesceOp
-	makeExprLookup[opt.CoalesceOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeCoalesceExpr(operands[0].ListID()))
-	}
-
-	// ColumnAccessOp
-	makeExprLookup[opt.ColumnAccessOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeColumnAccessExpr(GroupID(operands[0]), PrivateID(operands[1])))
-	}
-
-	// UnsupportedExprOp
-	makeExprLookup[opt.UnsupportedExprOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeUnsupportedExprExpr(PrivateID(operands[0])))
-	}
-
-	// ArrayAggOp
-	makeExprLookup[opt.ArrayAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeArrayAggExpr(GroupID(operands[0])))
-	}
-
-	// AvgOp
-	makeExprLookup[opt.AvgOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAvgExpr(GroupID(operands[0])))
-	}
-
-	// BoolAndOp
-	makeExprLookup[opt.BoolAndOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeBoolAndExpr(GroupID(operands[0])))
-	}
-
-	// BoolOrOp
-	makeExprLookup[opt.BoolOrOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeBoolOrExpr(GroupID(operands[0])))
-	}
-
-	// ConcatAggOp
-	makeExprLookup[opt.ConcatAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeConcatAggExpr(GroupID(operands[0])))
-	}
-
-	// CountOp
-	makeExprLookup[opt.CountOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeCountExpr(GroupID(operands[0])))
-	}
-
-	// CountRowsOp
-	makeExprLookup[opt.CountRowsOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeCountRowsExpr())
-	}
-
-	// MaxOp
-	makeExprLookup[opt.MaxOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMaxExpr(GroupID(operands[0])))
-	}
-
-	// MinOp
-	makeExprLookup[opt.MinOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeMinExpr(GroupID(operands[0])))
-	}
-
-	// SumIntOp
-	makeExprLookup[opt.SumIntOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSumIntExpr(GroupID(operands[0])))
-	}
-
-	// SumOp
-	makeExprLookup[opt.SumOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSumExpr(GroupID(operands[0])))
-	}
-
-	// SqrDiffOp
-	makeExprLookup[opt.SqrDiffOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeSqrDiffExpr(GroupID(operands[0])))
-	}
-
-	// VarianceOp
-	makeExprLookup[opt.VarianceOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeVarianceExpr(GroupID(operands[0])))
-	}
-
-	// StdDevOp
-	makeExprLookup[opt.StdDevOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeStdDevExpr(GroupID(operands[0])))
-	}
-
-	// XorAggOp
-	makeExprLookup[opt.XorAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeXorAggExpr(GroupID(operands[0])))
-	}
-
-	// JsonAggOp
-	makeExprLookup[opt.JsonAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeJsonAggExpr(GroupID(operands[0])))
-	}
-
-	// JsonbAggOp
-	makeExprLookup[opt.JsonbAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeJsonbAggExpr(GroupID(operands[0])))
-	}
-
-	// ConstAggOp
-	makeExprLookup[opt.ConstAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeConstAggExpr(GroupID(operands[0])))
-	}
-
-	// ConstNotNullAggOp
-	makeExprLookup[opt.ConstNotNullAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeConstNotNullAggExpr(GroupID(operands[0])))
-	}
-
-	// AnyNotNullAggOp
-	makeExprLookup[opt.AnyNotNullAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAnyNotNullAggExpr(GroupID(operands[0])))
-	}
-
-	// FirstAggOp
-	makeExprLookup[opt.FirstAggOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeFirstAggExpr(GroupID(operands[0])))
-	}
-
-	// AggDistinctOp
-	makeExprLookup[opt.AggDistinctOp] = func(operands DynamicOperands) Expr {
-		return Expr(MakeAggDistinctExpr(GroupID(operands[0])))
-	}
-
+func (m *Memo) MemoizeIndexJoin(
+	input RelExpr,
+	indexJoinPrivate *IndexJoinPrivate,
+) *IndexJoinExpr {
+	const size = int64(unsafe.Sizeof(indexJoinGroup{}))
+	grp := &indexJoinGroup{mem: m, first: IndexJoinExpr{
+		Input:            input,
+		IndexJoinPrivate: *indexJoinPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternIndexJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildIndexJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
 }
 
-func MakeExpr(op opt.Operator, operands DynamicOperands) Expr {
-	return makeExprLookup[op](operands)
+func (m *Memo) MemoizeLookupJoin(
+	input RelExpr,
+	on FiltersExpr,
+	lookupJoinPrivate *LookupJoinPrivate,
+) *LookupJoinExpr {
+	const size = int64(unsafe.Sizeof(lookupJoinGroup{}))
+	grp := &lookupJoinGroup{mem: m, first: LookupJoinExpr{
+		Input:             input,
+		On:                on,
+		LookupJoinPrivate: *lookupJoinPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternLookupJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildLookupJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeMergeJoin(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+	mergeJoinPrivate *MergeJoinPrivate,
+) *MergeJoinExpr {
+	const size = int64(unsafe.Sizeof(mergeJoinGroup{}))
+	grp := &mergeJoinGroup{mem: m, first: MergeJoinExpr{
+		Left:             left,
+		Right:            right,
+		On:               on,
+		MergeJoinPrivate: *mergeJoinPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternMergeJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildMergeJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeInnerJoinApply(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *InnerJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(innerJoinApplyGroup{}))
+	grp := &innerJoinApplyGroup{mem: m, first: InnerJoinApplyExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternInnerJoinApply(e)
+	if interned == e {
+		m.logPropsBuilder.buildInnerJoinApplyProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLeftJoinApply(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *LeftJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(leftJoinApplyGroup{}))
+	grp := &leftJoinApplyGroup{mem: m, first: LeftJoinApplyExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternLeftJoinApply(e)
+	if interned == e {
+		m.logPropsBuilder.buildLeftJoinApplyProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRightJoinApply(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *RightJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(rightJoinApplyGroup{}))
+	grp := &rightJoinApplyGroup{mem: m, first: RightJoinApplyExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternRightJoinApply(e)
+	if interned == e {
+		m.logPropsBuilder.buildRightJoinApplyProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFullJoinApply(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *FullJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(fullJoinApplyGroup{}))
+	grp := &fullJoinApplyGroup{mem: m, first: FullJoinApplyExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternFullJoinApply(e)
+	if interned == e {
+		m.logPropsBuilder.buildFullJoinApplyProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeSemiJoinApply(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *SemiJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(semiJoinApplyGroup{}))
+	grp := &semiJoinApplyGroup{mem: m, first: SemiJoinApplyExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternSemiJoinApply(e)
+	if interned == e {
+		m.logPropsBuilder.buildSemiJoinApplyProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAntiJoinApply(
+	left RelExpr,
+	right RelExpr,
+	on FiltersExpr,
+) *AntiJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(antiJoinApplyGroup{}))
+	grp := &antiJoinApplyGroup{mem: m, first: AntiJoinApplyExpr{
+		Left:  left,
+		Right: right,
+		On:    on,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAntiJoinApply(e)
+	if interned == e {
+		m.logPropsBuilder.buildAntiJoinApplyProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeGroupBy(
+	input RelExpr,
+	aggregations AggregationsExpr,
+	groupingPrivate *GroupingPrivate,
+) *GroupByExpr {
+	const size = int64(unsafe.Sizeof(groupByGroup{}))
+	grp := &groupByGroup{mem: m, first: GroupByExpr{
+		Input:           input,
+		Aggregations:    aggregations,
+		GroupingPrivate: *groupingPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternGroupBy(e)
+	if interned == e {
+		m.logPropsBuilder.buildGroupByProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeScalarGroupBy(
+	input RelExpr,
+	aggregations AggregationsExpr,
+	groupingPrivate *GroupingPrivate,
+) *ScalarGroupByExpr {
+	const size = int64(unsafe.Sizeof(scalarGroupByGroup{}))
+	grp := &scalarGroupByGroup{mem: m, first: ScalarGroupByExpr{
+		Input:           input,
+		Aggregations:    aggregations,
+		GroupingPrivate: *groupingPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternScalarGroupBy(e)
+	if interned == e {
+		m.logPropsBuilder.buildScalarGroupByProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeDistinctOn(
+	input RelExpr,
+	aggregations AggregationsExpr,
+	groupingPrivate *GroupingPrivate,
+) *DistinctOnExpr {
+	const size = int64(unsafe.Sizeof(distinctOnGroup{}))
+	grp := &distinctOnGroup{mem: m, first: DistinctOnExpr{
+		Input:           input,
+		Aggregations:    aggregations,
+		GroupingPrivate: *groupingPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternDistinctOn(e)
+	if interned == e {
+		m.logPropsBuilder.buildDistinctOnProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeUnion(
+	left RelExpr,
+	right RelExpr,
+	setPrivate *SetPrivate,
+) *UnionExpr {
+	const size = int64(unsafe.Sizeof(unionGroup{}))
+	grp := &unionGroup{mem: m, first: UnionExpr{
+		Left:       left,
+		Right:      right,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUnion(e)
+	if interned == e {
+		m.logPropsBuilder.buildUnionProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIntersect(
+	left RelExpr,
+	right RelExpr,
+	setPrivate *SetPrivate,
+) *IntersectExpr {
+	const size = int64(unsafe.Sizeof(intersectGroup{}))
+	grp := &intersectGroup{mem: m, first: IntersectExpr{
+		Left:       left,
+		Right:      right,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternIntersect(e)
+	if interned == e {
+		m.logPropsBuilder.buildIntersectProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeExcept(
+	left RelExpr,
+	right RelExpr,
+	setPrivate *SetPrivate,
+) *ExceptExpr {
+	const size = int64(unsafe.Sizeof(exceptGroup{}))
+	grp := &exceptGroup{mem: m, first: ExceptExpr{
+		Left:       left,
+		Right:      right,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternExcept(e)
+	if interned == e {
+		m.logPropsBuilder.buildExceptProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeUnionAll(
+	left RelExpr,
+	right RelExpr,
+	setPrivate *SetPrivate,
+) *UnionAllExpr {
+	const size = int64(unsafe.Sizeof(unionAllGroup{}))
+	grp := &unionAllGroup{mem: m, first: UnionAllExpr{
+		Left:       left,
+		Right:      right,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUnionAll(e)
+	if interned == e {
+		m.logPropsBuilder.buildUnionAllProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIntersectAll(
+	left RelExpr,
+	right RelExpr,
+	setPrivate *SetPrivate,
+) *IntersectAllExpr {
+	const size = int64(unsafe.Sizeof(intersectAllGroup{}))
+	grp := &intersectAllGroup{mem: m, first: IntersectAllExpr{
+		Left:       left,
+		Right:      right,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternIntersectAll(e)
+	if interned == e {
+		m.logPropsBuilder.buildIntersectAllProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeExceptAll(
+	left RelExpr,
+	right RelExpr,
+	setPrivate *SetPrivate,
+) *ExceptAllExpr {
+	const size = int64(unsafe.Sizeof(exceptAllGroup{}))
+	grp := &exceptAllGroup{mem: m, first: ExceptAllExpr{
+		Left:       left,
+		Right:      right,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternExceptAll(e)
+	if interned == e {
+		m.logPropsBuilder.buildExceptAllProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLimit(
+	input RelExpr,
+	limit opt.ScalarExpr,
+	ordering props.OrderingChoice,
+) *LimitExpr {
+	const size = int64(unsafe.Sizeof(limitGroup{}))
+	grp := &limitGroup{mem: m, first: LimitExpr{
+		Input:    input,
+		Limit:    limit,
+		Ordering: ordering,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternLimit(e)
+	if interned == e {
+		m.logPropsBuilder.buildLimitProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeOffset(
+	input RelExpr,
+	offset opt.ScalarExpr,
+	ordering props.OrderingChoice,
+) *OffsetExpr {
+	const size = int64(unsafe.Sizeof(offsetGroup{}))
+	grp := &offsetGroup{mem: m, first: OffsetExpr{
+		Input:    input,
+		Offset:   offset,
+		Ordering: ordering,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternOffset(e)
+	if interned == e {
+		m.logPropsBuilder.buildOffsetProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeMax1Row(
+	input RelExpr,
+) *Max1RowExpr {
+	const size = int64(unsafe.Sizeof(max1RowGroup{}))
+	grp := &max1RowGroup{mem: m, first: Max1RowExpr{
+		Input: input,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternMax1Row(e)
+	if interned == e {
+		m.logPropsBuilder.buildMax1RowProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeExplain(
+	input RelExpr,
+	explainPrivate *ExplainPrivate,
+) *ExplainExpr {
+	const size = int64(unsafe.Sizeof(explainGroup{}))
+	grp := &explainGroup{mem: m, first: ExplainExpr{
+		Input:          input,
+		ExplainPrivate: *explainPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternExplain(e)
+	if interned == e {
+		m.logPropsBuilder.buildExplainProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeShowTraceForSession(
+	showTracePrivate *ShowTracePrivate,
+) *ShowTraceForSessionExpr {
+	const size = int64(unsafe.Sizeof(showTraceForSessionGroup{}))
+	grp := &showTraceForSessionGroup{mem: m, first: ShowTraceForSessionExpr{
+		ShowTracePrivate: *showTracePrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternShowTraceForSession(e)
+	if interned == e {
+		m.logPropsBuilder.buildShowTraceForSessionProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRowNumber(
+	input RelExpr,
+	rowNumberPrivate *RowNumberPrivate,
+) *RowNumberExpr {
+	const size = int64(unsafe.Sizeof(rowNumberGroup{}))
+	grp := &rowNumberGroup{mem: m, first: RowNumberExpr{
+		Input:            input,
+		RowNumberPrivate: *rowNumberPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternRowNumber(e)
+	if interned == e {
+		m.logPropsBuilder.buildRowNumberProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeZip(
+	funcs ScalarListExpr,
+	cols opt.ColList,
+) *ZipExpr {
+	const size = int64(unsafe.Sizeof(zipGroup{}))
+	grp := &zipGroup{mem: m, first: ZipExpr{
+		Funcs: funcs,
+		Cols:  cols,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternZip(e)
+	if interned == e {
+		m.logPropsBuilder.buildZipProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeSubquery(
+	input RelExpr,
+	subqueryPrivate *SubqueryPrivate,
+) *SubqueryExpr {
+	const size = int64(unsafe.Sizeof(SubqueryExpr{}))
+	e := &SubqueryExpr{
+		Input:           input,
+		SubqueryPrivate: *subqueryPrivate,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSubquery(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAny(
+	input RelExpr,
+	scalar opt.ScalarExpr,
+	subqueryPrivate *SubqueryPrivate,
+) *AnyExpr {
+	const size = int64(unsafe.Sizeof(AnyExpr{}))
+	e := &AnyExpr{
+		Input:           input,
+		Scalar:          scalar,
+		SubqueryPrivate: *subqueryPrivate,
+	}
+	interned := m.interner.InternAny(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeExists(
+	input RelExpr,
+	subqueryPrivate *SubqueryPrivate,
+) *ExistsExpr {
+	const size = int64(unsafe.Sizeof(ExistsExpr{}))
+	e := &ExistsExpr{
+		Input:           input,
+		SubqueryPrivate: *subqueryPrivate,
+	}
+	interned := m.interner.InternExists(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeVariable(
+	col opt.ColumnID,
+) *VariableExpr {
+	const size = int64(unsafe.Sizeof(VariableExpr{}))
+	e := &VariableExpr{
+		Col: col,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternVariable(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeConst(
+	value tree.Datum,
+) *ConstExpr {
+	const size = int64(unsafe.Sizeof(ConstExpr{}))
+	e := &ConstExpr{
+		Value: value,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternConst(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNull(
+	typ types.T,
+) *NullExpr {
+	const size = int64(unsafe.Sizeof(NullExpr{}))
+	e := &NullExpr{
+		Typ: typ,
+	}
+	interned := m.interner.InternNull(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeTrue() *TrueExpr {
+	return TrueSingleton
+}
+
+func (m *Memo) MemoizeFalse() *FalseExpr {
+	return FalseSingleton
+}
+
+func (m *Memo) MemoizePlaceholder(
+	value tree.TypedExpr,
+) *PlaceholderExpr {
+	const size = int64(unsafe.Sizeof(PlaceholderExpr{}))
+	e := &PlaceholderExpr{
+		Value: value,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternPlaceholder(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeTuple(
+	elems ScalarListExpr,
+	typ types.T,
+) *TupleExpr {
+	const size = int64(unsafe.Sizeof(TupleExpr{}))
+	e := &TupleExpr{
+		Elems: elems,
+		Typ:   typ,
+	}
+	interned := m.interner.InternTuple(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAnd(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *AndExpr {
+	const size = int64(unsafe.Sizeof(AndExpr{}))
+	e := &AndExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternAnd(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeOr(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *OrExpr {
+	const size = int64(unsafe.Sizeof(OrExpr{}))
+	e := &OrExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternOr(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNot(
+	input opt.ScalarExpr,
+) *NotExpr {
+	const size = int64(unsafe.Sizeof(NotExpr{}))
+	e := &NotExpr{
+		Input: input,
+	}
+	interned := m.interner.InternNot(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeEq(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *EqExpr {
+	const size = int64(unsafe.Sizeof(EqExpr{}))
+	e := &EqExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternEq(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLt(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *LtExpr {
+	const size = int64(unsafe.Sizeof(LtExpr{}))
+	e := &LtExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternLt(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeGt(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *GtExpr {
+	const size = int64(unsafe.Sizeof(GtExpr{}))
+	e := &GtExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternGt(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLe(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *LeExpr {
+	const size = int64(unsafe.Sizeof(LeExpr{}))
+	e := &LeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternLe(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeGe(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *GeExpr {
+	const size = int64(unsafe.Sizeof(GeExpr{}))
+	e := &GeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternGe(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNe(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NeExpr {
+	const size = int64(unsafe.Sizeof(NeExpr{}))
+	e := &NeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNe(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIn(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *InExpr {
+	const size = int64(unsafe.Sizeof(InExpr{}))
+	e := &InExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternIn(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNotIn(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NotInExpr {
+	const size = int64(unsafe.Sizeof(NotInExpr{}))
+	e := &NotInExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNotIn(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLike(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *LikeExpr {
+	const size = int64(unsafe.Sizeof(LikeExpr{}))
+	e := &LikeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternLike(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNotLike(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NotLikeExpr {
+	const size = int64(unsafe.Sizeof(NotLikeExpr{}))
+	e := &NotLikeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNotLike(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeILike(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *ILikeExpr {
+	const size = int64(unsafe.Sizeof(ILikeExpr{}))
+	e := &ILikeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternILike(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNotILike(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NotILikeExpr {
+	const size = int64(unsafe.Sizeof(NotILikeExpr{}))
+	e := &NotILikeExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNotILike(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeSimilarTo(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *SimilarToExpr {
+	const size = int64(unsafe.Sizeof(SimilarToExpr{}))
+	e := &SimilarToExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternSimilarTo(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNotSimilarTo(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NotSimilarToExpr {
+	const size = int64(unsafe.Sizeof(NotSimilarToExpr{}))
+	e := &NotSimilarToExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNotSimilarTo(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRegMatch(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *RegMatchExpr {
+	const size = int64(unsafe.Sizeof(RegMatchExpr{}))
+	e := &RegMatchExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternRegMatch(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNotRegMatch(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NotRegMatchExpr {
+	const size = int64(unsafe.Sizeof(NotRegMatchExpr{}))
+	e := &NotRegMatchExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNotRegMatch(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRegIMatch(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *RegIMatchExpr {
+	const size = int64(unsafe.Sizeof(RegIMatchExpr{}))
+	e := &RegIMatchExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternRegIMatch(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNotRegIMatch(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *NotRegIMatchExpr {
+	const size = int64(unsafe.Sizeof(NotRegIMatchExpr{}))
+	e := &NotRegIMatchExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternNotRegIMatch(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIs(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *IsExpr {
+	const size = int64(unsafe.Sizeof(IsExpr{}))
+	e := &IsExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternIs(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIsNot(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *IsNotExpr {
+	const size = int64(unsafe.Sizeof(IsNotExpr{}))
+	e := &IsNotExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternIsNot(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeContains(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *ContainsExpr {
+	const size = int64(unsafe.Sizeof(ContainsExpr{}))
+	e := &ContainsExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternContains(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeJsonExists(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *JsonExistsExpr {
+	const size = int64(unsafe.Sizeof(JsonExistsExpr{}))
+	e := &JsonExistsExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternJsonExists(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeJsonAllExists(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *JsonAllExistsExpr {
+	const size = int64(unsafe.Sizeof(JsonAllExistsExpr{}))
+	e := &JsonAllExistsExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternJsonAllExists(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeJsonSomeExists(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *JsonSomeExistsExpr {
+	const size = int64(unsafe.Sizeof(JsonSomeExistsExpr{}))
+	e := &JsonSomeExistsExpr{
+		Left:  left,
+		Right: right,
+	}
+	interned := m.interner.InternJsonSomeExists(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAnyScalar(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+	cmp opt.Operator,
+) *AnyScalarExpr {
+	const size = int64(unsafe.Sizeof(AnyScalarExpr{}))
+	e := &AnyScalarExpr{
+		Left:  left,
+		Right: right,
+		Cmp:   cmp,
+	}
+	interned := m.interner.InternAnyScalar(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBitand(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *BitandExpr {
+	const size = int64(unsafe.Sizeof(BitandExpr{}))
+	e := &BitandExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBitand(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBitor(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *BitorExpr {
+	const size = int64(unsafe.Sizeof(BitorExpr{}))
+	e := &BitorExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBitor(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBitxor(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *BitxorExpr {
+	const size = int64(unsafe.Sizeof(BitxorExpr{}))
+	e := &BitxorExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBitxor(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizePlus(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *PlusExpr {
+	const size = int64(unsafe.Sizeof(PlusExpr{}))
+	e := &PlusExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternPlus(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeMinus(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *MinusExpr {
+	const size = int64(unsafe.Sizeof(MinusExpr{}))
+	e := &MinusExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternMinus(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeMult(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *MultExpr {
+	const size = int64(unsafe.Sizeof(MultExpr{}))
+	e := &MultExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternMult(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeDiv(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *DivExpr {
+	const size = int64(unsafe.Sizeof(DivExpr{}))
+	e := &DivExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternDiv(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFloorDiv(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *FloorDivExpr {
+	const size = int64(unsafe.Sizeof(FloorDivExpr{}))
+	e := &FloorDivExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFloorDiv(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeMod(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *ModExpr {
+	const size = int64(unsafe.Sizeof(ModExpr{}))
+	e := &ModExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternMod(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizePow(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *PowExpr {
+	const size = int64(unsafe.Sizeof(PowExpr{}))
+	e := &PowExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternPow(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeConcat(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *ConcatExpr {
+	const size = int64(unsafe.Sizeof(ConcatExpr{}))
+	e := &ConcatExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternConcat(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLShift(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *LShiftExpr {
+	const size = int64(unsafe.Sizeof(LShiftExpr{}))
+	e := &LShiftExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternLShift(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRShift(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *RShiftExpr {
+	const size = int64(unsafe.Sizeof(RShiftExpr{}))
+	e := &RShiftExpr{
+		Left:  left,
+		Right: right,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternRShift(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFetchVal(
+	json opt.ScalarExpr,
+	index opt.ScalarExpr,
+) *FetchValExpr {
+	const size = int64(unsafe.Sizeof(FetchValExpr{}))
+	e := &FetchValExpr{
+		Json:  json,
+		Index: index,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFetchVal(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFetchText(
+	json opt.ScalarExpr,
+	index opt.ScalarExpr,
+) *FetchTextExpr {
+	const size = int64(unsafe.Sizeof(FetchTextExpr{}))
+	e := &FetchTextExpr{
+		Json:  json,
+		Index: index,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFetchText(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFetchValPath(
+	json opt.ScalarExpr,
+	path opt.ScalarExpr,
+) *FetchValPathExpr {
+	const size = int64(unsafe.Sizeof(FetchValPathExpr{}))
+	e := &FetchValPathExpr{
+		Json: json,
+		Path: path,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFetchValPath(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFetchTextPath(
+	json opt.ScalarExpr,
+	path opt.ScalarExpr,
+) *FetchTextPathExpr {
+	const size = int64(unsafe.Sizeof(FetchTextPathExpr{}))
+	e := &FetchTextPathExpr{
+		Json: json,
+		Path: path,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFetchTextPath(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeUnaryMinus(
+	input opt.ScalarExpr,
+) *UnaryMinusExpr {
+	const size = int64(unsafe.Sizeof(UnaryMinusExpr{}))
+	e := &UnaryMinusExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternUnaryMinus(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeUnaryComplement(
+	input opt.ScalarExpr,
+) *UnaryComplementExpr {
+	const size = int64(unsafe.Sizeof(UnaryComplementExpr{}))
+	e := &UnaryComplementExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternUnaryComplement(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeCast(
+	input opt.ScalarExpr,
+	targetTyp coltypes.T,
+) *CastExpr {
+	const size = int64(unsafe.Sizeof(CastExpr{}))
+	e := &CastExpr{
+		Input:     input,
+		TargetTyp: targetTyp,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCast(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeCase(
+	input opt.ScalarExpr,
+	whens ScalarListExpr,
+	orElse opt.ScalarExpr,
+) *CaseExpr {
+	const size = int64(unsafe.Sizeof(CaseExpr{}))
+	e := &CaseExpr{
+		Input:  input,
+		Whens:  whens,
+		OrElse: orElse,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCase(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeWhen(
+	condition opt.ScalarExpr,
+	value opt.ScalarExpr,
+) *WhenExpr {
+	const size = int64(unsafe.Sizeof(WhenExpr{}))
+	e := &WhenExpr{
+		Condition: condition,
+		Value:     value,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternWhen(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeArray(
+	elems ScalarListExpr,
+	typ types.T,
+) *ArrayExpr {
+	const size = int64(unsafe.Sizeof(ArrayExpr{}))
+	e := &ArrayExpr{
+		Elems: elems,
+		Typ:   typ,
+	}
+	interned := m.interner.InternArray(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIndirection(
+	input opt.ScalarExpr,
+	index opt.ScalarExpr,
+) *IndirectionExpr {
+	const size = int64(unsafe.Sizeof(IndirectionExpr{}))
+	e := &IndirectionExpr{
+		Input: input,
+		Index: index,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternIndirection(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFunction(
+	args ScalarListExpr,
+	functionPrivate *FunctionPrivate,
+) *FunctionExpr {
+	const size = int64(unsafe.Sizeof(FunctionExpr{}))
+	e := &FunctionExpr{
+		Args:            args,
+		FunctionPrivate: *functionPrivate,
+	}
+	interned := m.interner.InternFunction(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeCoalesce(
+	args ScalarListExpr,
+) *CoalesceExpr {
+	const size = int64(unsafe.Sizeof(CoalesceExpr{}))
+	e := &CoalesceExpr{
+		Args: args,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCoalesce(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeColumnAccess(
+	input opt.ScalarExpr,
+	idx TupleOrdinal,
+) *ColumnAccessExpr {
+	const size = int64(unsafe.Sizeof(ColumnAccessExpr{}))
+	e := &ColumnAccessExpr{
+		Input: input,
+		Idx:   idx,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternColumnAccess(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeUnsupportedExpr(
+	value tree.TypedExpr,
+) *UnsupportedExprExpr {
+	const size = int64(unsafe.Sizeof(UnsupportedExprExpr{}))
+	e := &UnsupportedExprExpr{
+		Value: value,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternUnsupportedExpr(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeArrayAgg(
+	input opt.ScalarExpr,
+) *ArrayAggExpr {
+	const size = int64(unsafe.Sizeof(ArrayAggExpr{}))
+	e := &ArrayAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternArrayAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAvg(
+	input opt.ScalarExpr,
+) *AvgExpr {
+	const size = int64(unsafe.Sizeof(AvgExpr{}))
+	e := &AvgExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternAvg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBoolAnd(
+	input opt.ScalarExpr,
+) *BoolAndExpr {
+	const size = int64(unsafe.Sizeof(BoolAndExpr{}))
+	e := &BoolAndExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBoolAnd(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBoolOr(
+	input opt.ScalarExpr,
+) *BoolOrExpr {
+	const size = int64(unsafe.Sizeof(BoolOrExpr{}))
+	e := &BoolOrExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBoolOr(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeConcatAgg(
+	input opt.ScalarExpr,
+) *ConcatAggExpr {
+	const size = int64(unsafe.Sizeof(ConcatAggExpr{}))
+	e := &ConcatAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternConcatAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeCount(
+	input opt.ScalarExpr,
+) *CountExpr {
+	const size = int64(unsafe.Sizeof(CountExpr{}))
+	e := &CountExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCount(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeCountRows() *CountRowsExpr {
+	return CountRowsSingleton
+}
+
+func (m *Memo) MemoizeMax(
+	input opt.ScalarExpr,
+) *MaxExpr {
+	const size = int64(unsafe.Sizeof(MaxExpr{}))
+	e := &MaxExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternMax(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeMin(
+	input opt.ScalarExpr,
+) *MinExpr {
+	const size = int64(unsafe.Sizeof(MinExpr{}))
+	e := &MinExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternMin(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeSumInt(
+	input opt.ScalarExpr,
+) *SumIntExpr {
+	const size = int64(unsafe.Sizeof(SumIntExpr{}))
+	e := &SumIntExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSumInt(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeSum(
+	input opt.ScalarExpr,
+) *SumExpr {
+	const size = int64(unsafe.Sizeof(SumExpr{}))
+	e := &SumExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSum(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeSqrDiff(
+	input opt.ScalarExpr,
+) *SqrDiffExpr {
+	const size = int64(unsafe.Sizeof(SqrDiffExpr{}))
+	e := &SqrDiffExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSqrDiff(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeVariance(
+	input opt.ScalarExpr,
+) *VarianceExpr {
+	const size = int64(unsafe.Sizeof(VarianceExpr{}))
+	e := &VarianceExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternVariance(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeStdDev(
+	input opt.ScalarExpr,
+) *StdDevExpr {
+	const size = int64(unsafe.Sizeof(StdDevExpr{}))
+	e := &StdDevExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternStdDev(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeXorAgg(
+	input opt.ScalarExpr,
+) *XorAggExpr {
+	const size = int64(unsafe.Sizeof(XorAggExpr{}))
+	e := &XorAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternXorAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeJsonAgg(
+	input opt.ScalarExpr,
+) *JsonAggExpr {
+	const size = int64(unsafe.Sizeof(JsonAggExpr{}))
+	e := &JsonAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternJsonAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeJsonbAgg(
+	input opt.ScalarExpr,
+) *JsonbAggExpr {
+	const size = int64(unsafe.Sizeof(JsonbAggExpr{}))
+	e := &JsonbAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternJsonbAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeConstAgg(
+	input opt.ScalarExpr,
+) *ConstAggExpr {
+	const size = int64(unsafe.Sizeof(ConstAggExpr{}))
+	e := &ConstAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternConstAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeConstNotNullAgg(
+	input opt.ScalarExpr,
+) *ConstNotNullAggExpr {
+	const size = int64(unsafe.Sizeof(ConstNotNullAggExpr{}))
+	e := &ConstNotNullAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternConstNotNullAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAnyNotNullAgg(
+	input opt.ScalarExpr,
+) *AnyNotNullAggExpr {
+	const size = int64(unsafe.Sizeof(AnyNotNullAggExpr{}))
+	e := &AnyNotNullAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternAnyNotNullAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFirstAgg(
+	input opt.ScalarExpr,
+) *FirstAggExpr {
+	const size = int64(unsafe.Sizeof(FirstAggExpr{}))
+	e := &FirstAggExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFirstAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeAggDistinct(
+	input opt.ScalarExpr,
+) *AggDistinctExpr {
+	const size = int64(unsafe.Sizeof(AggDistinctExpr{}))
+	e := &AggDistinctExpr{
+		Input: input,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternAggDistinct(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
+	const size = int64(unsafe.Sizeof(ScanExpr{}))
+	interned := m.interner.InternScan(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddVirtualScanToGroup(e *VirtualScanExpr, grp RelExpr) *VirtualScanExpr {
+	const size = int64(unsafe.Sizeof(VirtualScanExpr{}))
+	interned := m.interner.InternVirtualScan(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddValuesToGroup(e *ValuesExpr, grp RelExpr) *ValuesExpr {
+	const size = int64(unsafe.Sizeof(ValuesExpr{}))
+	interned := m.interner.InternValues(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddSelectToGroup(e *SelectExpr, grp RelExpr) *SelectExpr {
+	const size = int64(unsafe.Sizeof(SelectExpr{}))
+	interned := m.interner.InternSelect(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddProjectToGroup(e *ProjectExpr, grp RelExpr) *ProjectExpr {
+	const size = int64(unsafe.Sizeof(ProjectExpr{}))
+	interned := m.interner.InternProject(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddInnerJoinToGroup(e *InnerJoinExpr, grp RelExpr) *InnerJoinExpr {
+	const size = int64(unsafe.Sizeof(InnerJoinExpr{}))
+	interned := m.interner.InternInnerJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddLeftJoinToGroup(e *LeftJoinExpr, grp RelExpr) *LeftJoinExpr {
+	const size = int64(unsafe.Sizeof(LeftJoinExpr{}))
+	interned := m.interner.InternLeftJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddRightJoinToGroup(e *RightJoinExpr, grp RelExpr) *RightJoinExpr {
+	const size = int64(unsafe.Sizeof(RightJoinExpr{}))
+	interned := m.interner.InternRightJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddFullJoinToGroup(e *FullJoinExpr, grp RelExpr) *FullJoinExpr {
+	const size = int64(unsafe.Sizeof(FullJoinExpr{}))
+	interned := m.interner.InternFullJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddSemiJoinToGroup(e *SemiJoinExpr, grp RelExpr) *SemiJoinExpr {
+	const size = int64(unsafe.Sizeof(SemiJoinExpr{}))
+	interned := m.interner.InternSemiJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddAntiJoinToGroup(e *AntiJoinExpr, grp RelExpr) *AntiJoinExpr {
+	const size = int64(unsafe.Sizeof(AntiJoinExpr{}))
+	interned := m.interner.InternAntiJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddIndexJoinToGroup(e *IndexJoinExpr, grp RelExpr) *IndexJoinExpr {
+	const size = int64(unsafe.Sizeof(IndexJoinExpr{}))
+	interned := m.interner.InternIndexJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddLookupJoinToGroup(e *LookupJoinExpr, grp RelExpr) *LookupJoinExpr {
+	const size = int64(unsafe.Sizeof(LookupJoinExpr{}))
+	interned := m.interner.InternLookupJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddMergeJoinToGroup(e *MergeJoinExpr, grp RelExpr) *MergeJoinExpr {
+	const size = int64(unsafe.Sizeof(MergeJoinExpr{}))
+	interned := m.interner.InternMergeJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddInnerJoinApplyToGroup(e *InnerJoinApplyExpr, grp RelExpr) *InnerJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(InnerJoinApplyExpr{}))
+	interned := m.interner.InternInnerJoinApply(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddLeftJoinApplyToGroup(e *LeftJoinApplyExpr, grp RelExpr) *LeftJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(LeftJoinApplyExpr{}))
+	interned := m.interner.InternLeftJoinApply(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddRightJoinApplyToGroup(e *RightJoinApplyExpr, grp RelExpr) *RightJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(RightJoinApplyExpr{}))
+	interned := m.interner.InternRightJoinApply(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddFullJoinApplyToGroup(e *FullJoinApplyExpr, grp RelExpr) *FullJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(FullJoinApplyExpr{}))
+	interned := m.interner.InternFullJoinApply(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddSemiJoinApplyToGroup(e *SemiJoinApplyExpr, grp RelExpr) *SemiJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(SemiJoinApplyExpr{}))
+	interned := m.interner.InternSemiJoinApply(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddAntiJoinApplyToGroup(e *AntiJoinApplyExpr, grp RelExpr) *AntiJoinApplyExpr {
+	const size = int64(unsafe.Sizeof(AntiJoinApplyExpr{}))
+	interned := m.interner.InternAntiJoinApply(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddGroupByToGroup(e *GroupByExpr, grp RelExpr) *GroupByExpr {
+	const size = int64(unsafe.Sizeof(GroupByExpr{}))
+	interned := m.interner.InternGroupBy(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddScalarGroupByToGroup(e *ScalarGroupByExpr, grp RelExpr) *ScalarGroupByExpr {
+	const size = int64(unsafe.Sizeof(ScalarGroupByExpr{}))
+	interned := m.interner.InternScalarGroupBy(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddDistinctOnToGroup(e *DistinctOnExpr, grp RelExpr) *DistinctOnExpr {
+	const size = int64(unsafe.Sizeof(DistinctOnExpr{}))
+	interned := m.interner.InternDistinctOn(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddUnionToGroup(e *UnionExpr, grp RelExpr) *UnionExpr {
+	const size = int64(unsafe.Sizeof(UnionExpr{}))
+	interned := m.interner.InternUnion(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddIntersectToGroup(e *IntersectExpr, grp RelExpr) *IntersectExpr {
+	const size = int64(unsafe.Sizeof(IntersectExpr{}))
+	interned := m.interner.InternIntersect(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddExceptToGroup(e *ExceptExpr, grp RelExpr) *ExceptExpr {
+	const size = int64(unsafe.Sizeof(ExceptExpr{}))
+	interned := m.interner.InternExcept(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddUnionAllToGroup(e *UnionAllExpr, grp RelExpr) *UnionAllExpr {
+	const size = int64(unsafe.Sizeof(UnionAllExpr{}))
+	interned := m.interner.InternUnionAll(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddIntersectAllToGroup(e *IntersectAllExpr, grp RelExpr) *IntersectAllExpr {
+	const size = int64(unsafe.Sizeof(IntersectAllExpr{}))
+	interned := m.interner.InternIntersectAll(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddExceptAllToGroup(e *ExceptAllExpr, grp RelExpr) *ExceptAllExpr {
+	const size = int64(unsafe.Sizeof(ExceptAllExpr{}))
+	interned := m.interner.InternExceptAll(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddLimitToGroup(e *LimitExpr, grp RelExpr) *LimitExpr {
+	const size = int64(unsafe.Sizeof(LimitExpr{}))
+	interned := m.interner.InternLimit(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddOffsetToGroup(e *OffsetExpr, grp RelExpr) *OffsetExpr {
+	const size = int64(unsafe.Sizeof(OffsetExpr{}))
+	interned := m.interner.InternOffset(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddMax1RowToGroup(e *Max1RowExpr, grp RelExpr) *Max1RowExpr {
+	const size = int64(unsafe.Sizeof(Max1RowExpr{}))
+	interned := m.interner.InternMax1Row(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
+	const size = int64(unsafe.Sizeof(ExplainExpr{}))
+	interned := m.interner.InternExplain(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp RelExpr) *ShowTraceForSessionExpr {
+	const size = int64(unsafe.Sizeof(ShowTraceForSessionExpr{}))
+	interned := m.interner.InternShowTraceForSession(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddRowNumberToGroup(e *RowNumberExpr, grp RelExpr) *RowNumberExpr {
+	const size = int64(unsafe.Sizeof(RowNumberExpr{}))
+	interned := m.interner.InternRowNumber(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (m *Memo) AddZipToGroup(e *ZipExpr, grp RelExpr) *ZipExpr {
+	const size = int64(unsafe.Sizeof(ZipExpr{}))
+	interned := m.interner.InternZip(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+	}
+	return interned
+}
+
+func (in *interner) InternExpr(e opt.Expr) opt.Expr {
+	switch t := e.(type) {
+	case *ScanExpr:
+		return in.InternScan(t)
+	case *VirtualScanExpr:
+		return in.InternVirtualScan(t)
+	case *ValuesExpr:
+		return in.InternValues(t)
+	case *SelectExpr:
+		return in.InternSelect(t)
+	case *ProjectExpr:
+		return in.InternProject(t)
+	case *InnerJoinExpr:
+		return in.InternInnerJoin(t)
+	case *LeftJoinExpr:
+		return in.InternLeftJoin(t)
+	case *RightJoinExpr:
+		return in.InternRightJoin(t)
+	case *FullJoinExpr:
+		return in.InternFullJoin(t)
+	case *SemiJoinExpr:
+		return in.InternSemiJoin(t)
+	case *AntiJoinExpr:
+		return in.InternAntiJoin(t)
+	case *IndexJoinExpr:
+		return in.InternIndexJoin(t)
+	case *LookupJoinExpr:
+		return in.InternLookupJoin(t)
+	case *MergeJoinExpr:
+		return in.InternMergeJoin(t)
+	case *InnerJoinApplyExpr:
+		return in.InternInnerJoinApply(t)
+	case *LeftJoinApplyExpr:
+		return in.InternLeftJoinApply(t)
+	case *RightJoinApplyExpr:
+		return in.InternRightJoinApply(t)
+	case *FullJoinApplyExpr:
+		return in.InternFullJoinApply(t)
+	case *SemiJoinApplyExpr:
+		return in.InternSemiJoinApply(t)
+	case *AntiJoinApplyExpr:
+		return in.InternAntiJoinApply(t)
+	case *GroupByExpr:
+		return in.InternGroupBy(t)
+	case *ScalarGroupByExpr:
+		return in.InternScalarGroupBy(t)
+	case *DistinctOnExpr:
+		return in.InternDistinctOn(t)
+	case *UnionExpr:
+		return in.InternUnion(t)
+	case *IntersectExpr:
+		return in.InternIntersect(t)
+	case *ExceptExpr:
+		return in.InternExcept(t)
+	case *UnionAllExpr:
+		return in.InternUnionAll(t)
+	case *IntersectAllExpr:
+		return in.InternIntersectAll(t)
+	case *ExceptAllExpr:
+		return in.InternExceptAll(t)
+	case *LimitExpr:
+		return in.InternLimit(t)
+	case *OffsetExpr:
+		return in.InternOffset(t)
+	case *Max1RowExpr:
+		return in.InternMax1Row(t)
+	case *ExplainExpr:
+		return in.InternExplain(t)
+	case *ShowTraceForSessionExpr:
+		return in.InternShowTraceForSession(t)
+	case *RowNumberExpr:
+		return in.InternRowNumber(t)
+	case *ZipExpr:
+		return in.InternZip(t)
+	case *SubqueryExpr:
+		return in.InternSubquery(t)
+	case *AnyExpr:
+		return in.InternAny(t)
+	case *ExistsExpr:
+		return in.InternExists(t)
+	case *VariableExpr:
+		return in.InternVariable(t)
+	case *ConstExpr:
+		return in.InternConst(t)
+	case *NullExpr:
+		return in.InternNull(t)
+	case *TrueExpr:
+		return in.InternTrue(t)
+	case *FalseExpr:
+		return in.InternFalse(t)
+	case *PlaceholderExpr:
+		return in.InternPlaceholder(t)
+	case *TupleExpr:
+		return in.InternTuple(t)
+	case *ProjectionsExpr:
+		return in.InternProjections(t)
+	case *ProjectionsItem:
+		return in.InternProjectionsItem(t)
+	case *AggregationsExpr:
+		return in.InternAggregations(t)
+	case *AggregationsItem:
+		return in.InternAggregationsItem(t)
+	case *FiltersExpr:
+		return in.InternFilters(t)
+	case *FiltersItem:
+		return in.InternFiltersItem(t)
+	case *AndExpr:
+		return in.InternAnd(t)
+	case *OrExpr:
+		return in.InternOr(t)
+	case *NotExpr:
+		return in.InternNot(t)
+	case *EqExpr:
+		return in.InternEq(t)
+	case *LtExpr:
+		return in.InternLt(t)
+	case *GtExpr:
+		return in.InternGt(t)
+	case *LeExpr:
+		return in.InternLe(t)
+	case *GeExpr:
+		return in.InternGe(t)
+	case *NeExpr:
+		return in.InternNe(t)
+	case *InExpr:
+		return in.InternIn(t)
+	case *NotInExpr:
+		return in.InternNotIn(t)
+	case *LikeExpr:
+		return in.InternLike(t)
+	case *NotLikeExpr:
+		return in.InternNotLike(t)
+	case *ILikeExpr:
+		return in.InternILike(t)
+	case *NotILikeExpr:
+		return in.InternNotILike(t)
+	case *SimilarToExpr:
+		return in.InternSimilarTo(t)
+	case *NotSimilarToExpr:
+		return in.InternNotSimilarTo(t)
+	case *RegMatchExpr:
+		return in.InternRegMatch(t)
+	case *NotRegMatchExpr:
+		return in.InternNotRegMatch(t)
+	case *RegIMatchExpr:
+		return in.InternRegIMatch(t)
+	case *NotRegIMatchExpr:
+		return in.InternNotRegIMatch(t)
+	case *IsExpr:
+		return in.InternIs(t)
+	case *IsNotExpr:
+		return in.InternIsNot(t)
+	case *ContainsExpr:
+		return in.InternContains(t)
+	case *JsonExistsExpr:
+		return in.InternJsonExists(t)
+	case *JsonAllExistsExpr:
+		return in.InternJsonAllExists(t)
+	case *JsonSomeExistsExpr:
+		return in.InternJsonSomeExists(t)
+	case *AnyScalarExpr:
+		return in.InternAnyScalar(t)
+	case *BitandExpr:
+		return in.InternBitand(t)
+	case *BitorExpr:
+		return in.InternBitor(t)
+	case *BitxorExpr:
+		return in.InternBitxor(t)
+	case *PlusExpr:
+		return in.InternPlus(t)
+	case *MinusExpr:
+		return in.InternMinus(t)
+	case *MultExpr:
+		return in.InternMult(t)
+	case *DivExpr:
+		return in.InternDiv(t)
+	case *FloorDivExpr:
+		return in.InternFloorDiv(t)
+	case *ModExpr:
+		return in.InternMod(t)
+	case *PowExpr:
+		return in.InternPow(t)
+	case *ConcatExpr:
+		return in.InternConcat(t)
+	case *LShiftExpr:
+		return in.InternLShift(t)
+	case *RShiftExpr:
+		return in.InternRShift(t)
+	case *FetchValExpr:
+		return in.InternFetchVal(t)
+	case *FetchTextExpr:
+		return in.InternFetchText(t)
+	case *FetchValPathExpr:
+		return in.InternFetchValPath(t)
+	case *FetchTextPathExpr:
+		return in.InternFetchTextPath(t)
+	case *UnaryMinusExpr:
+		return in.InternUnaryMinus(t)
+	case *UnaryComplementExpr:
+		return in.InternUnaryComplement(t)
+	case *CastExpr:
+		return in.InternCast(t)
+	case *CaseExpr:
+		return in.InternCase(t)
+	case *WhenExpr:
+		return in.InternWhen(t)
+	case *ArrayExpr:
+		return in.InternArray(t)
+	case *IndirectionExpr:
+		return in.InternIndirection(t)
+	case *FunctionExpr:
+		return in.InternFunction(t)
+	case *CoalesceExpr:
+		return in.InternCoalesce(t)
+	case *ColumnAccessExpr:
+		return in.InternColumnAccess(t)
+	case *UnsupportedExprExpr:
+		return in.InternUnsupportedExpr(t)
+	case *ArrayAggExpr:
+		return in.InternArrayAgg(t)
+	case *AvgExpr:
+		return in.InternAvg(t)
+	case *BoolAndExpr:
+		return in.InternBoolAnd(t)
+	case *BoolOrExpr:
+		return in.InternBoolOr(t)
+	case *ConcatAggExpr:
+		return in.InternConcatAgg(t)
+	case *CountExpr:
+		return in.InternCount(t)
+	case *CountRowsExpr:
+		return in.InternCountRows(t)
+	case *MaxExpr:
+		return in.InternMax(t)
+	case *MinExpr:
+		return in.InternMin(t)
+	case *SumIntExpr:
+		return in.InternSumInt(t)
+	case *SumExpr:
+		return in.InternSum(t)
+	case *SqrDiffExpr:
+		return in.InternSqrDiff(t)
+	case *VarianceExpr:
+		return in.InternVariance(t)
+	case *StdDevExpr:
+		return in.InternStdDev(t)
+	case *XorAggExpr:
+		return in.InternXorAgg(t)
+	case *JsonAggExpr:
+		return in.InternJsonAgg(t)
+	case *JsonbAggExpr:
+		return in.InternJsonbAgg(t)
+	case *ConstAggExpr:
+		return in.InternConstAgg(t)
+	case *ConstNotNullAggExpr:
+		return in.InternConstNotNullAgg(t)
+	case *AnyNotNullAggExpr:
+		return in.InternAnyNotNullAgg(t)
+	case *FirstAggExpr:
+		return in.InternFirstAgg(t)
+	case *AggDistinctExpr:
+		return in.InternAggDistinct(t)
+	case *ScalarListExpr:
+		return in.InternScalarList(t)
+	default:
+		panic(fmt.Sprintf("unhandled op: %s", e.Op()))
+	}
+}
+
+func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ScanOp)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.Index)
+	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashConstraint(val.Constraint)
+	in.hasher.HashScanLimit(val.HardLimit)
+	in.hasher.HashScanFlags(val.Flags)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ScanExpr); ok {
+			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsConstraintEqual(val.Constraint, existing.Constraint) &&
+				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
+				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternVirtualScan(val *VirtualScanExpr) *VirtualScanExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.VirtualScanOp)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColSet(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*VirtualScanExpr); ok {
+			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternValues(val *ValuesExpr) *ValuesExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ValuesOp)
+	in.hasher.HashScalarListExpr(val.Rows)
+	in.hasher.HashColList(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ValuesExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Rows, existing.Rows) &&
+				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSelect(val *SelectExpr) *SelectExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SelectOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFiltersExpr(val.Filters)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SelectExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFiltersExprEqual(val.Filters, existing.Filters) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternProject(val *ProjectExpr) *ProjectExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ProjectOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashProjectionsExpr(val.Projections)
+	in.hasher.HashColSet(val.Passthrough)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ProjectExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsProjectionsExprEqual(val.Projections, existing.Projections) &&
+				in.hasher.IsColSetEqual(val.Passthrough, existing.Passthrough) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternInnerJoin(val *InnerJoinExpr) *InnerJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.InnerJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*InnerJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLeftJoin(val *LeftJoinExpr) *LeftJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LeftJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LeftJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRightJoin(val *RightJoinExpr) *RightJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RightJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RightJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFullJoin(val *FullJoinExpr) *FullJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FullJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FullJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSemiJoin(val *SemiJoinExpr) *SemiJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SemiJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SemiJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAntiJoin(val *AntiJoinExpr) *AntiJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AntiJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AntiJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIndexJoin(val *IndexJoinExpr) *IndexJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IndexJoinOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColSet(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IndexJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LookupJoinOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashOperator(val.JoinType)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.Index)
+	in.hasher.HashColList(val.KeyCols)
+	in.hasher.HashColSet(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LookupJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsOperatorEqual(val.JoinType, existing.JoinType) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMergeJoin(val *MergeJoinExpr) *MergeJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.MergeJoinOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashOperator(val.JoinType)
+	in.hasher.HashOrdering(val.LeftEq)
+	in.hasher.HashOrdering(val.RightEq)
+	in.hasher.HashOrderingChoice(val.LeftOrdering)
+	in.hasher.HashOrderingChoice(val.RightOrdering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*MergeJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsOperatorEqual(val.JoinType, existing.JoinType) &&
+				in.hasher.IsOrderingEqual(val.LeftEq, existing.LeftEq) &&
+				in.hasher.IsOrderingEqual(val.RightEq, existing.RightEq) &&
+				in.hasher.IsOrderingChoiceEqual(val.LeftOrdering, existing.LeftOrdering) &&
+				in.hasher.IsOrderingChoiceEqual(val.RightOrdering, existing.RightOrdering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternInnerJoinApply(val *InnerJoinApplyExpr) *InnerJoinApplyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.InnerJoinApplyOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*InnerJoinApplyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLeftJoinApply(val *LeftJoinApplyExpr) *LeftJoinApplyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LeftJoinApplyOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LeftJoinApplyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRightJoinApply(val *RightJoinApplyExpr) *RightJoinApplyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RightJoinApplyOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RightJoinApplyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFullJoinApply(val *FullJoinApplyExpr) *FullJoinApplyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FullJoinApplyOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FullJoinApplyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSemiJoinApply(val *SemiJoinApplyExpr) *SemiJoinApplyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SemiJoinApplyOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SemiJoinApplyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAntiJoinApply(val *AntiJoinApplyExpr) *AntiJoinApplyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AntiJoinApplyOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashFiltersExpr(val.On)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AntiJoinApplyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternGroupBy(val *GroupByExpr) *GroupByExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.GroupByOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashAggregationsExpr(val.Aggregations)
+	in.hasher.HashColSet(val.GroupingCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*GroupByExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
+				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternScalarGroupBy(val *ScalarGroupByExpr) *ScalarGroupByExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ScalarGroupByOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashAggregationsExpr(val.Aggregations)
+	in.hasher.HashColSet(val.GroupingCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ScalarGroupByExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
+				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternDistinctOn(val *DistinctOnExpr) *DistinctOnExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.DistinctOnOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashAggregationsExpr(val.Aggregations)
+	in.hasher.HashColSet(val.GroupingCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*DistinctOnExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
+				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnion(val *UnionExpr) *UnionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnionOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnionExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIntersect(val *IntersectExpr) *IntersectExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IntersectOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IntersectExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternExcept(val *ExceptExpr) *ExceptExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ExceptOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ExceptExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnionAll(val *UnionAllExpr) *UnionAllExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnionAllOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnionAllExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIntersectAll(val *IntersectAllExpr) *IntersectAllExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IntersectAllOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IntersectAllExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternExceptAll(val *ExceptAllExpr) *ExceptAllExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ExceptAllOp)
+	in.hasher.HashRelExpr(val.Left)
+	in.hasher.HashRelExpr(val.Right)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ExceptAllExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLimit(val *LimitExpr) *LimitExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LimitOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Limit)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LimitExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Limit, existing.Limit) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternOffset(val *OffsetExpr) *OffsetExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.OffsetOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Offset)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*OffsetExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Offset, existing.Offset) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMax1Row(val *Max1RowExpr) *Max1RowExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.Max1RowOp)
+	in.hasher.HashRelExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*Max1RowExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ExplainOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashExplainOptions(val.Options)
+	in.hasher.HashColList(val.ColList)
+	in.hasher.HashPhysProps(val.Props)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ExplainExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsExplainOptionsEqual(val.Options, existing.Options) &&
+				in.hasher.IsColListEqual(val.ColList, existing.ColList) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternShowTraceForSession(val *ShowTraceForSessionExpr) *ShowTraceForSessionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ShowTraceForSessionOp)
+	in.hasher.HashShowTraceType(val.TraceType)
+	in.hasher.HashBool(val.Compact)
+	in.hasher.HashColList(val.ColList)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ShowTraceForSessionExpr); ok {
+			if in.hasher.IsShowTraceTypeEqual(val.TraceType, existing.TraceType) &&
+				in.hasher.IsBoolEqual(val.Compact, existing.Compact) &&
+				in.hasher.IsColListEqual(val.ColList, existing.ColList) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRowNumber(val *RowNumberExpr) *RowNumberExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RowNumberOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashColumnID(val.ColID)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RowNumberExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternZip(val *ZipExpr) *ZipExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ZipOp)
+	in.hasher.HashScalarListExpr(val.Funcs)
+	in.hasher.HashColList(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ZipExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Funcs, existing.Funcs) &&
+				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SubqueryOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOperator(val.Cmp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SubqueryExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AnyOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Scalar)
+	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOperator(val.Cmp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AnyExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Scalar, existing.Scalar) &&
+				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ExistsOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOperator(val.Cmp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ExistsExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternVariable(val *VariableExpr) *VariableExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.VariableOp)
+	in.hasher.HashColumnID(val.Col)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*VariableExpr); ok {
+			if in.hasher.IsColumnIDEqual(val.Col, existing.Col) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternConst(val *ConstExpr) *ConstExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ConstOp)
+	in.hasher.HashDatum(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ConstExpr); ok {
+			if in.hasher.IsDatumEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNull(val *NullExpr) *NullExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NullOp)
+	in.hasher.HashDatumType(val.Typ)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NullExpr); ok {
+			if in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternTrue(val *TrueExpr) *TrueExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.TrueOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*TrueExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFalse(val *FalseExpr) *FalseExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FalseOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FalseExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPlaceholder(val *PlaceholderExpr) *PlaceholderExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PlaceholderOp)
+	in.hasher.HashTypedExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PlaceholderExpr); ok {
+			if in.hasher.IsTypedExprEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternTuple(val *TupleExpr) *TupleExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.TupleOp)
+	in.hasher.HashScalarListExpr(val.Elems)
+	in.hasher.HashDatumType(val.Typ)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*TupleExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Elems, existing.Elems) &&
+				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternProjections(val *ProjectionsExpr) *ProjectionsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ProjectionsOp)
+	in.hasher.HashProjectionsExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ProjectionsExpr); ok {
+			if in.hasher.IsProjectionsExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternProjectionsItem(val *ProjectionsItem) *ProjectionsItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ProjectionsItemOp)
+	in.hasher.HashScalarExpr(val.Element)
+	in.hasher.HashColumnID(val.Col)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ProjectionsItem); ok {
+			if in.hasher.IsScalarExprEqual(val.Element, existing.Element) &&
+				in.hasher.IsColumnIDEqual(val.Col, existing.Col) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAggregations(val *AggregationsExpr) *AggregationsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AggregationsOp)
+	in.hasher.HashAggregationsExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AggregationsExpr); ok {
+			if in.hasher.IsAggregationsExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAggregationsItem(val *AggregationsItem) *AggregationsItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AggregationsItemOp)
+	in.hasher.HashScalarExpr(val.Agg)
+	in.hasher.HashColumnID(val.Col)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AggregationsItem); ok {
+			if in.hasher.IsScalarExprEqual(val.Agg, existing.Agg) &&
+				in.hasher.IsColumnIDEqual(val.Col, existing.Col) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFilters(val *FiltersExpr) *FiltersExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FiltersOp)
+	in.hasher.HashFiltersExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FiltersExpr); ok {
+			if in.hasher.IsFiltersExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFiltersItem(val *FiltersItem) *FiltersItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FiltersItemOp)
+	in.hasher.HashScalarExpr(val.Condition)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FiltersItem); ok {
+			if in.hasher.IsScalarExprEqual(val.Condition, existing.Condition) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAnd(val *AndExpr) *AndExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AndOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AndExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternOr(val *OrExpr) *OrExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.OrOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*OrExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNot(val *NotExpr) *NotExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternEq(val *EqExpr) *EqExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.EqOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*EqExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLt(val *LtExpr) *LtExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LtOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LtExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternGt(val *GtExpr) *GtExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.GtOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*GtExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLe(val *LeExpr) *LeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternGe(val *GeExpr) *GeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.GeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*GeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNe(val *NeExpr) *NeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIn(val *InExpr) *InExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.InOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*InExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNotIn(val *NotInExpr) *NotInExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotInOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotInExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLike(val *LikeExpr) *LikeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LikeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LikeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNotLike(val *NotLikeExpr) *NotLikeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotLikeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotLikeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternILike(val *ILikeExpr) *ILikeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ILikeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ILikeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNotILike(val *NotILikeExpr) *NotILikeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotILikeOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotILikeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSimilarTo(val *SimilarToExpr) *SimilarToExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SimilarToOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SimilarToExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNotSimilarTo(val *NotSimilarToExpr) *NotSimilarToExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotSimilarToOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotSimilarToExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegMatch(val *RegMatchExpr) *RegMatchExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegMatchOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegMatchExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNotRegMatch(val *NotRegMatchExpr) *NotRegMatchExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotRegMatchOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotRegMatchExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegIMatch(val *RegIMatchExpr) *RegIMatchExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegIMatchOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegIMatchExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNotRegIMatch(val *NotRegIMatchExpr) *NotRegIMatchExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NotRegIMatchOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NotRegIMatchExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIs(val *IsExpr) *IsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIsNot(val *IsNotExpr) *IsNotExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IsNotOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IsNotExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternContains(val *ContainsExpr) *ContainsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ContainsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ContainsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonExists(val *JsonExistsExpr) *JsonExistsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonExistsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonExistsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonAllExists(val *JsonAllExistsExpr) *JsonAllExistsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonAllExistsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonAllExistsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonSomeExists(val *JsonSomeExistsExpr) *JsonSomeExistsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonSomeExistsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonSomeExistsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAnyScalar(val *AnyScalarExpr) *AnyScalarExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AnyScalarOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+	in.hasher.HashOperator(val.Cmp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AnyScalarExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBitand(val *BitandExpr) *BitandExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BitandOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BitandExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBitor(val *BitorExpr) *BitorExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BitorOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BitorExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBitxor(val *BitxorExpr) *BitxorExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BitxorOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BitxorExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPlus(val *PlusExpr) *PlusExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PlusOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PlusExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMinus(val *MinusExpr) *MinusExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.MinusOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*MinusExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMult(val *MultExpr) *MultExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.MultOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*MultExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternDiv(val *DivExpr) *DivExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.DivOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*DivExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFloorDiv(val *FloorDivExpr) *FloorDivExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FloorDivOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FloorDivExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMod(val *ModExpr) *ModExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ModOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ModExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPow(val *PowExpr) *PowExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PowOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PowExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternConcat(val *ConcatExpr) *ConcatExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ConcatOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ConcatExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLShift(val *LShiftExpr) *LShiftExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LShiftOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LShiftExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRShift(val *RShiftExpr) *RShiftExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RShiftOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RShiftExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFetchVal(val *FetchValExpr) *FetchValExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FetchValOp)
+	in.hasher.HashScalarExpr(val.Json)
+	in.hasher.HashScalarExpr(val.Index)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FetchValExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Json, existing.Json) &&
+				in.hasher.IsScalarExprEqual(val.Index, existing.Index) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFetchText(val *FetchTextExpr) *FetchTextExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FetchTextOp)
+	in.hasher.HashScalarExpr(val.Json)
+	in.hasher.HashScalarExpr(val.Index)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FetchTextExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Json, existing.Json) &&
+				in.hasher.IsScalarExprEqual(val.Index, existing.Index) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFetchValPath(val *FetchValPathExpr) *FetchValPathExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FetchValPathOp)
+	in.hasher.HashScalarExpr(val.Json)
+	in.hasher.HashScalarExpr(val.Path)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FetchValPathExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Json, existing.Json) &&
+				in.hasher.IsScalarExprEqual(val.Path, existing.Path) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFetchTextPath(val *FetchTextPathExpr) *FetchTextPathExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FetchTextPathOp)
+	in.hasher.HashScalarExpr(val.Json)
+	in.hasher.HashScalarExpr(val.Path)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FetchTextPathExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Json, existing.Json) &&
+				in.hasher.IsScalarExprEqual(val.Path, existing.Path) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnaryMinus(val *UnaryMinusExpr) *UnaryMinusExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnaryMinusOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnaryMinusExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnaryComplement(val *UnaryComplementExpr) *UnaryComplementExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnaryComplementOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnaryComplementExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCast(val *CastExpr) *CastExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CastOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashColType(val.TargetTyp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CastExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsColTypeEqual(val.TargetTyp, existing.TargetTyp) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCase(val *CaseExpr) *CaseExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CaseOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarListExpr(val.Whens)
+	in.hasher.HashScalarExpr(val.OrElse)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CaseExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarListExprEqual(val.Whens, existing.Whens) &&
+				in.hasher.IsScalarExprEqual(val.OrElse, existing.OrElse) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWhen(val *WhenExpr) *WhenExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WhenOp)
+	in.hasher.HashScalarExpr(val.Condition)
+	in.hasher.HashScalarExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WhenExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Condition, existing.Condition) &&
+				in.hasher.IsScalarExprEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternArray(val *ArrayExpr) *ArrayExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ArrayOp)
+	in.hasher.HashScalarListExpr(val.Elems)
+	in.hasher.HashDatumType(val.Typ)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ArrayExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Elems, existing.Elems) &&
+				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIndirection(val *IndirectionExpr) *IndirectionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IndirectionOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Index)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IndirectionExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Index, existing.Index) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFunction(val *FunctionExpr) *FunctionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FunctionOp)
+	in.hasher.HashScalarListExpr(val.Args)
+	in.hasher.HashString(val.Name)
+	in.hasher.HashDatumType(val.Typ)
+	in.hasher.HashFuncProps(val.Properties)
+	in.hasher.HashFuncOverload(val.Overload)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FunctionExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Args, existing.Args) &&
+				in.hasher.IsStringEqual(val.Name, existing.Name) &&
+				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) &&
+				in.hasher.IsFuncPropsEqual(val.Properties, existing.Properties) &&
+				in.hasher.IsFuncOverloadEqual(val.Overload, existing.Overload) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCoalesce(val *CoalesceExpr) *CoalesceExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CoalesceOp)
+	in.hasher.HashScalarListExpr(val.Args)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CoalesceExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Args, existing.Args) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternColumnAccess(val *ColumnAccessExpr) *ColumnAccessExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ColumnAccessOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashTupleOrdinal(val.Idx)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ColumnAccessExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTupleOrdinalEqual(val.Idx, existing.Idx) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnsupportedExpr(val *UnsupportedExprExpr) *UnsupportedExprExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnsupportedExprOp)
+	in.hasher.HashTypedExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnsupportedExprExpr); ok {
+			if in.hasher.IsTypedExprEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternArrayAgg(val *ArrayAggExpr) *ArrayAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ArrayAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ArrayAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAvg(val *AvgExpr) *AvgExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AvgOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AvgExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBoolAnd(val *BoolAndExpr) *BoolAndExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BoolAndOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BoolAndExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBoolOr(val *BoolOrExpr) *BoolOrExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BoolOrOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BoolOrExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternConcatAgg(val *ConcatAggExpr) *ConcatAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ConcatAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ConcatAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCount(val *CountExpr) *CountExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CountOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CountExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCountRows(val *CountRowsExpr) *CountRowsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CountRowsOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CountRowsExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMax(val *MaxExpr) *MaxExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.MaxOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*MaxExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMin(val *MinExpr) *MinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.MinOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*MinExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSumInt(val *SumIntExpr) *SumIntExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SumIntOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SumIntExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSum(val *SumExpr) *SumExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SumOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SumExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSqrDiff(val *SqrDiffExpr) *SqrDiffExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SqrDiffOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SqrDiffExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternVariance(val *VarianceExpr) *VarianceExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.VarianceOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*VarianceExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternStdDev(val *StdDevExpr) *StdDevExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.StdDevOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*StdDevExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternXorAgg(val *XorAggExpr) *XorAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.XorAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*XorAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonAgg(val *JsonAggExpr) *JsonAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonbAgg(val *JsonbAggExpr) *JsonbAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonbAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonbAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternConstAgg(val *ConstAggExpr) *ConstAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ConstAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ConstAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternConstNotNullAgg(val *ConstNotNullAggExpr) *ConstNotNullAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ConstNotNullAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ConstNotNullAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAnyNotNullAgg(val *AnyNotNullAggExpr) *AnyNotNullAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AnyNotNullAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AnyNotNullAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFirstAgg(val *FirstAggExpr) *FirstAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FirstAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FirstAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAggDistinct(val *AggDistinctExpr) *AggDistinctExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AggDistinctOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AggDistinctExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternScalarList(val *ScalarListExpr) *ScalarListExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ScalarListOp)
+	in.hasher.HashScalarListExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ScalarListExpr); ok {
+			if in.hasher.IsScalarListExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
+	switch t := e.(type) {
+	case *ScanExpr:
+		b.buildScanProps(t, rel)
+	case *VirtualScanExpr:
+		b.buildVirtualScanProps(t, rel)
+	case *ValuesExpr:
+		b.buildValuesProps(t, rel)
+	case *SelectExpr:
+		b.buildSelectProps(t, rel)
+	case *ProjectExpr:
+		b.buildProjectProps(t, rel)
+	case *InnerJoinExpr:
+		b.buildInnerJoinProps(t, rel)
+	case *LeftJoinExpr:
+		b.buildLeftJoinProps(t, rel)
+	case *RightJoinExpr:
+		b.buildRightJoinProps(t, rel)
+	case *FullJoinExpr:
+		b.buildFullJoinProps(t, rel)
+	case *SemiJoinExpr:
+		b.buildSemiJoinProps(t, rel)
+	case *AntiJoinExpr:
+		b.buildAntiJoinProps(t, rel)
+	case *IndexJoinExpr:
+		b.buildIndexJoinProps(t, rel)
+	case *LookupJoinExpr:
+		b.buildLookupJoinProps(t, rel)
+	case *MergeJoinExpr:
+		b.buildMergeJoinProps(t, rel)
+	case *InnerJoinApplyExpr:
+		b.buildInnerJoinApplyProps(t, rel)
+	case *LeftJoinApplyExpr:
+		b.buildLeftJoinApplyProps(t, rel)
+	case *RightJoinApplyExpr:
+		b.buildRightJoinApplyProps(t, rel)
+	case *FullJoinApplyExpr:
+		b.buildFullJoinApplyProps(t, rel)
+	case *SemiJoinApplyExpr:
+		b.buildSemiJoinApplyProps(t, rel)
+	case *AntiJoinApplyExpr:
+		b.buildAntiJoinApplyProps(t, rel)
+	case *GroupByExpr:
+		b.buildGroupByProps(t, rel)
+	case *ScalarGroupByExpr:
+		b.buildScalarGroupByProps(t, rel)
+	case *DistinctOnExpr:
+		b.buildDistinctOnProps(t, rel)
+	case *UnionExpr:
+		b.buildUnionProps(t, rel)
+	case *IntersectExpr:
+		b.buildIntersectProps(t, rel)
+	case *ExceptExpr:
+		b.buildExceptProps(t, rel)
+	case *UnionAllExpr:
+		b.buildUnionAllProps(t, rel)
+	case *IntersectAllExpr:
+		b.buildIntersectAllProps(t, rel)
+	case *ExceptAllExpr:
+		b.buildExceptAllProps(t, rel)
+	case *LimitExpr:
+		b.buildLimitProps(t, rel)
+	case *OffsetExpr:
+		b.buildOffsetProps(t, rel)
+	case *Max1RowExpr:
+		b.buildMax1RowProps(t, rel)
+	case *ExplainExpr:
+		b.buildExplainProps(t, rel)
+	case *ShowTraceForSessionExpr:
+		b.buildShowTraceForSessionProps(t, rel)
+	case *RowNumberExpr:
+		b.buildRowNumberProps(t, rel)
+	case *ZipExpr:
+		b.buildZipProps(t, rel)
+	default:
+		panic(fmt.Sprintf("unhandled type: %s", t.Op()))
+	}
 }

@@ -3,6 +3,8 @@
 package norm
 
 import (
+	"fmt"
+
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
@@ -11,179 +13,20 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
 
-// InternScanOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternScanOpDef(val *memo.ScanOpDef) memo.PrivateID {
-	return _f.mem.InternScanOpDef(val)
-}
-
-// InternVirtualScanOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternVirtualScanOpDef(val *memo.VirtualScanOpDef) memo.PrivateID {
-	return _f.mem.InternVirtualScanOpDef(val)
-}
-
-// InternColList adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternColList(val opt.ColList) memo.PrivateID {
-	return _f.mem.InternColList(val)
-}
-
-// InternIndexJoinDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternIndexJoinDef(val *memo.IndexJoinDef) memo.PrivateID {
-	return _f.mem.InternIndexJoinDef(val)
-}
-
-// InternLookupJoinDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternLookupJoinDef(val *memo.LookupJoinDef) memo.PrivateID {
-	return _f.mem.InternLookupJoinDef(val)
-}
-
-// InternGroupByDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternGroupByDef(val *memo.GroupByDef) memo.PrivateID {
-	return _f.mem.InternGroupByDef(val)
-}
-
-// InternSetOpColMap adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternSetOpColMap(val *memo.SetOpColMap) memo.PrivateID {
-	return _f.mem.InternSetOpColMap(val)
-}
-
-// InternOrderingChoice adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternOrderingChoice(val *props.OrderingChoice) memo.PrivateID {
-	return _f.mem.InternOrderingChoice(val)
-}
-
-// InternExplainOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternExplainOpDef(val *memo.ExplainOpDef) memo.PrivateID {
-	return _f.mem.InternExplainOpDef(val)
-}
-
-// InternShowTraceOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternShowTraceOpDef(val *memo.ShowTraceOpDef) memo.PrivateID {
-	return _f.mem.InternShowTraceOpDef(val)
-}
-
-// InternRowNumberDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternRowNumberDef(val *memo.RowNumberDef) memo.PrivateID {
-	return _f.mem.InternRowNumberDef(val)
-}
-
-// InternSubqueryDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternSubqueryDef(val *memo.SubqueryDef) memo.PrivateID {
-	return _f.mem.InternSubqueryDef(val)
-}
-
-// InternColumnID adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternColumnID(val opt.ColumnID) memo.PrivateID {
-	return _f.mem.InternColumnID(val)
-}
-
-// InternDatum adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternDatum(val tree.Datum) memo.PrivateID {
-	return _f.mem.InternDatum(val)
-}
-
-// InternType adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternType(val types.T) memo.PrivateID {
-	return _f.mem.InternType(val)
-}
-
-// InternTypedExpr adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternTypedExpr(val tree.TypedExpr) memo.PrivateID {
-	return _f.mem.InternTypedExpr(val)
-}
-
-// InternProjectionsOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternProjectionsOpDef(val *memo.ProjectionsOpDef) memo.PrivateID {
-	return _f.mem.InternProjectionsOpDef(val)
-}
-
-// InternMergeOnDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternMergeOnDef(val *memo.MergeOnDef) memo.PrivateID {
-	return _f.mem.InternMergeOnDef(val)
-}
-
-// InternOperator adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternOperator(val opt.Operator) memo.PrivateID {
-	return _f.mem.InternOperator(val)
-}
-
-// InternColType adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternColType(val coltypes.T) memo.PrivateID {
-	return _f.mem.InternColType(val)
-}
-
-// InternFuncOpDef adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternFuncOpDef(val *memo.FuncOpDef) memo.PrivateID {
-	return _f.mem.InternFuncOpDef(val)
-}
-
-// InternTupleOrdinal adds the given value to the memo and returns an ID that
-// can be used for later lookup. If the same value was added previously,
-// this method is a no-op and returns the ID of the previous value.
-func (_f *Factory) InternTupleOrdinal(val memo.TupleOrdinal) memo.PrivateID {
-	return _f.mem.InternTupleOrdinal(val)
-}
-
 // ConstructScan constructs an expression for the Scan operator.
 // Scan returns a result set containing every row in a table by scanning one of
-// the table's indexes according to its ordering. The private Def field is an
-// *opt.ScanOpDef that identifies the table and index to scan, as well as the
-// subset of columns to project from it.
+// the table's indexes according to its ordering. The ScanPrivate field
+// identifies the table and index to scan, as well as the subset of columns to
+// project from it.
 //
 // The scan can be constrained and/or have an internal row limit. A scan can be
 // executed either as a forward or as a reverse scan (except when it has a limit,
 // in which case the direction is fixed).
 func (_f *Factory) ConstructScan(
-	def memo.PrivateID,
-) memo.GroupID {
-	_scanExpr := memo.MakeScanExpr(def)
-	_group := _f.mem.GroupByFingerprint(_scanExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_scanExpr))
+	scanPrivate *memo.ScanPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeScan(scanPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructVirtualScan constructs an expression for the VirtualScan operator.
@@ -199,15 +42,10 @@ func (_f *Factory) ConstructScan(
 // nearly all the rules that apply to Scan do not apply to VirtualScan, so it
 // makes sense to have a separate operator.
 func (_f *Factory) ConstructVirtualScan(
-	def memo.PrivateID,
-) memo.GroupID {
-	_virtualScanExpr := memo.MakeVirtualScanExpr(def)
-	_group := _f.mem.GroupByFingerprint(_virtualScanExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_virtualScanExpr))
+	virtualScanPrivate *memo.VirtualScanPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeVirtualScan(virtualScanPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructValues constructs an expression for the Values operator.
@@ -221,33 +59,28 @@ func (_f *Factory) ConstructVirtualScan(
 // The Cols field contains the set of column indices returned by each row
 // as an opt.ColList. It is legal for Cols to be empty.
 func (_f *Factory) ConstructValues(
-	rows memo.ListID,
-	cols memo.PrivateID,
-) memo.GroupID {
-	_valuesExpr := memo.MakeValuesExpr(rows, cols)
-	_group := _f.mem.GroupByFingerprint(_valuesExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	rows memo.ScalarListExpr,
+	cols opt.ColList,
+) memo.RelExpr {
 	// [HoistValuesSubquery]
 	{
-		for _, _item := range _f.mem.LookupList(rows) {
+		for i := range rows {
+			_item := rows[i]
 			item := _item
 			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistValuesSubquery) {
-					_group = _f.funcs.HoistValuesSubquery(rows, cols)
-					_f.mem.AddAltFingerprint(_valuesExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistValuesSubquery(rows, cols).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistValuesSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistValuesSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_valuesExpr))
+	e := _f.mem.MemoizeValues(rows, cols)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructSelect constructs an expression for the Select operator.
@@ -257,36 +90,25 @@ func (_f *Factory) ConstructValues(
 // typically convert it to a Filters operator in order to make conjunction list
 // matching easier.
 func (_f *Factory) ConstructSelect(
-	input memo.GroupID,
-	filter memo.GroupID,
-) memo.GroupID {
-	_selectExpr := memo.MakeSelectExpr(input, filter)
-	_group := _f.mem.GroupByFingerprint(_selectExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	filters memo.FiltersExpr,
+) memo.RelExpr {
 	// [RejectNullsLeftJoin]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.OutputCols(right)) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsLeftJoin) {
-						_group = _f.ConstructSelect(
-							_f.funcs.ConstructNonLeftJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
-							filter,
-						)
-						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.RejectNullsLeftJoin, _group, 0, 0)
-						}
-						return _group
+		if input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.FullJoinOp || input.Op() == opt.FullJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			if _f.funcs.HasNullRejectingFilter(filters, _f.funcs.OutputCols(right)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsLeftJoin) {
+					_expr := _f.ConstructSelect(
+						_f.funcs.ConstructNonLeftJoin(input.Op(), left, right, on),
+						filters,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.RejectNullsLeftJoin, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -294,25 +116,134 @@ func (_f *Factory) ConstructSelect(
 
 	// [RejectNullsRightJoin]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp || _expr.Operator() == opt.FullJoinOp || _expr.Operator() == opt.FullJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				if _f.funcs.HasNullRejectingFilter(filter, _f.funcs.OutputCols(left)) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsRightJoin) {
-						_group = _f.ConstructSelect(
-							_f.funcs.ConstructNonRightJoin(_f.mem.NormExpr(input).Operator(), left, right, on),
-							filter,
-						)
-						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.RejectNullsRightJoin, _group, 0, 0)
-						}
-						return _group
+		if input.Op() == opt.RightJoinOp || input.Op() == opt.RightJoinApplyOp || input.Op() == opt.FullJoinOp || input.Op() == opt.FullJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			if _f.funcs.HasNullRejectingFilter(filters, _f.funcs.OutputCols(left)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsRightJoin) {
+					_expr := _f.ConstructSelect(
+						_f.funcs.ConstructNonRightJoin(input.Op(), left, right, on),
+						filters,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.RejectNullsRightJoin, nil, _expr)
 					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [SimplifySelectFilters]
+	{
+		for i := range filters {
+			_item := &filters[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(filters) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectFilters) {
+						_expr := _f.ConstructSelect(
+							input,
+							_f.funcs.SimplifyFilters(filters),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySelectFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeSelectAnyFilter]
+	{
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeSelectAnyFilter) {
+					_expr := _f.ConstructSelect(
+						input,
+						_f.funcs.ReplaceFiltersItem(filters, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeSelectAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeSelectNotAnyFilter]
+	{
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeSelectNotAnyFilter) {
+						_expr := _f.ConstructSelect(
+							input,
+							_f.funcs.ReplaceFiltersItem(filters, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeSelectNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectSelectContradiction]
+	{
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectSelectContradiction) {
+					_expr := _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(input)).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectSelectContradiction, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -320,73 +251,64 @@ func (_f *Factory) ConstructSelect(
 
 	// [EliminateSelect]
 	{
-		_trueExpr := _f.mem.NormExpr(filter).AsTrue()
-		if _trueExpr != nil {
+		if len(filters) == 0 {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSelect) {
-				_group = input
-				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+				_expr := input
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateSelect, _group, 0, 0)
+					_f.appliedRule(opt.EliminateSelect, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [MergeSelects]
 	{
-		_selectExpr2 := _f.mem.NormExpr(input).AsSelect()
-		if _selectExpr2 != nil {
-			input := _selectExpr2.Input()
-			innerFilter := _selectExpr2.Filter()
+		_select, _ := input.(*memo.SelectExpr)
+		if _select != nil {
+			input := _select.Input
+			innerFilters := _select.Filters
 			if _f.matchedRule == nil || _f.matchedRule(opt.MergeSelects) {
-				_group = _f.ConstructSelect(
+				_expr := _f.ConstructSelect(
 					input,
-					_f.funcs.ConcatFilters(innerFilter, filter),
+					_f.funcs.ConcatFilters(innerFilters, filters),
 				)
-				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.MergeSelects, _group, 0, 0)
+					_f.appliedRule(opt.MergeSelects, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [PushSelectIntoProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			projections := _projectExpr.Projections()
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					condition := _item
-					inputCols := _f.funcs.OutputCols(input)
-					if _f.funcs.IsBoundBy(condition, inputCols) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoProject) {
-							_group = _f.ConstructSelect(
-								_f.ConstructProject(
-									_f.ConstructSelect(
-										input,
-										_f.ConstructFilters(
-											_f.funcs.ExtractBoundConditions(list, inputCols),
-										),
-									),
-									projections,
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			passthrough := _project.Passthrough
+			for i := range filters {
+				_item := &filters[i]
+				item := _item
+				inputCols := _f.funcs.OutputCols(input)
+				if _f.funcs.IsBoundBy(item, inputCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoProject) {
+						_expr := _f.ConstructSelect(
+							_f.ConstructProject(
+								_f.ConstructSelect(
+									input,
+									_f.funcs.ExtractBoundConditions(filters, inputCols),
 								),
-								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, inputCols),
-								),
-							)
-							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushSelectIntoProject, _group, 0, 0)
-							}
-							return _group
+								projections,
+								passthrough,
+							),
+							_f.funcs.ExtractUnboundConditions(filters, inputCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoProject, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
@@ -395,73 +317,67 @@ func (_f *Factory) ConstructSelect(
 
 	// [MergeSelectInnerJoin]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
 			if _f.matchedRule == nil || _f.matchedRule(opt.MergeSelectInnerJoin) {
-				_group = _f.DynamicConstruct(
-					_f.mem.NormOp(input),
-					memo.DynamicOperands{
-						memo.DynamicID(left),
-						memo.DynamicID(right),
-						memo.DynamicID(_f.funcs.ConcatFilters(on, filter)),
-					},
-				)
-				_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+				_arg := _f.funcs.ConcatFilters(on, filters)
+				_expr := _f.DynamicConstruct(
+					input.Op(),
+					left,
+					right,
+					&_arg,
+				).(memo.RelExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.MergeSelectInnerJoin, _group, 0, 0)
+					_f.appliedRule(opt.MergeSelectInnerJoin, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [PushSelectCondLeftIntoJoinLeftAndRight]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.SemiJoinOp || _expr.Operator() == opt.SemiJoinApplyOp || _expr.Operator() == opt.AntiJoinOp || _expr.Operator() == opt.AntiJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					condition := _item
-					if _f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(on, condition, right) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight) {
-								_group = _f.ConstructSelect(
-									_f.DynamicConstruct(
-										_f.mem.NormOp(input),
-										memo.DynamicOperands{
-											memo.DynamicID(_f.ConstructSelect(
-												left,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{condition}),
-												),
-											)),
-											memo.DynamicID(_f.ConstructSelect(
-												right,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(on, condition, right)}),
-												),
-											)),
-											memo.DynamicID(on),
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.SemiJoinOp || input.Op() == opt.SemiJoinApplyOp || input.Op() == opt.AntiJoinOp || input.Op() == opt.AntiJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			for i := range filters {
+				_item := &filters[i]
+				item := _item
+				condition := item.Condition
+				if _f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+					if _f.funcs.CanMap(on, item, right) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight) {
+							on := on
+							_expr := _f.ConstructSelect(
+								_f.DynamicConstruct(
+									input.Op(),
+									_f.ConstructSelect(
+										left,
+										memo.FiltersExpr{
+											{
+												Condition: condition,
+											},
 										},
 									),
-									_f.ConstructFilters(
-										_f.funcs.RemoveListItem(list, condition),
+									_f.ConstructSelect(
+										right,
+										memo.FiltersExpr{
+											{
+												Condition: _f.funcs.Map(on, item, right),
+											},
+										},
 									),
-								)
-								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight, _group, 0, 0)
-								}
-								return _group
+									&on,
+								).(memo.RelExpr),
+								_f.funcs.RemoveFiltersItem(filters, item),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight, nil, _expr)
 							}
+							return _expr
 						}
 					}
 				}
@@ -471,48 +387,45 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectCondRightIntoJoinLeftAndRight]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					condition := _item
-					if _f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(on, condition, left) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
-								_group = _f.ConstructSelect(
-									_f.DynamicConstruct(
-										_f.mem.NormOp(input),
-										memo.DynamicOperands{
-											memo.DynamicID(_f.ConstructSelect(
-												left,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(on, condition, left)}),
-												),
-											)),
-											memo.DynamicID(_f.ConstructSelect(
-												right,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{condition}),
-												),
-											)),
-											memo.DynamicID(on),
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.RightJoinOp || input.Op() == opt.RightJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			for i := range filters {
+				_item := &filters[i]
+				item := _item
+				condition := item.Condition
+				if _f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+					if _f.funcs.CanMap(on, item, left) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
+							on := on
+							_expr := _f.ConstructSelect(
+								_f.DynamicConstruct(
+									input.Op(),
+									_f.ConstructSelect(
+										left,
+										memo.FiltersExpr{
+											{
+												Condition: _f.funcs.Map(on, item, left),
+											},
 										},
 									),
-									_f.ConstructFilters(
-										_f.funcs.RemoveListItem(list, condition),
+									_f.ConstructSelect(
+										right,
+										memo.FiltersExpr{
+											{
+												Condition: condition,
+											},
+										},
 									),
-								)
-								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.PushSelectCondRightIntoJoinLeftAndRight, _group, 0, 0)
-								}
-								return _group
+									&on,
+								).(memo.RelExpr),
+								_f.funcs.RemoveFiltersItem(filters, item),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushSelectCondRightIntoJoinLeftAndRight, nil, _expr)
 							}
+							return _expr
 						}
 					}
 				}
@@ -522,43 +435,33 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectIntoJoinLeft]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.LeftJoinOp || _expr.Operator() == opt.LeftJoinApplyOp || _expr.Operator() == opt.SemiJoinOp || _expr.Operator() == opt.SemiJoinApplyOp || _expr.Operator() == opt.AntiJoinOp || _expr.Operator() == opt.AntiJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					condition := _item
-					leftCols := _f.funcs.OutputCols(left)
-					if _f.funcs.IsBoundBy(condition, leftCols) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinLeft) {
-							_group = _f.ConstructSelect(
-								_f.DynamicConstruct(
-									_f.mem.NormOp(input),
-									memo.DynamicOperands{
-										memo.DynamicID(_f.ConstructSelect(
-											left,
-											_f.ConstructFilters(
-												_f.funcs.ExtractBoundConditions(list, leftCols),
-											),
-										)),
-										memo.DynamicID(right),
-										memo.DynamicID(on),
-									},
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.SemiJoinOp || input.Op() == opt.SemiJoinApplyOp || input.Op() == opt.AntiJoinOp || input.Op() == opt.AntiJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			for i := range filters {
+				_item := &filters[i]
+				item := _item
+				leftCols := _f.funcs.OutputCols(left)
+				if _f.funcs.IsBoundBy(item, leftCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinLeft) {
+						on := on
+						_expr := _f.ConstructSelect(
+							_f.DynamicConstruct(
+								input.Op(),
+								_f.ConstructSelect(
+									left,
+									_f.funcs.ExtractBoundConditions(filters, leftCols),
 								),
-								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, leftCols),
-								),
-							)
-							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushSelectIntoJoinLeft, _group, 0, 0)
-							}
-							return _group
+								right,
+								&on,
+							).(memo.RelExpr),
+							_f.funcs.ExtractUnboundConditions(filters, leftCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoJoinLeft, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
@@ -567,43 +470,33 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectIntoJoinRight]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp || _expr.Operator() == opt.RightJoinOp || _expr.Operator() == opt.RightJoinApplyOp {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					condition := _item
-					rightCols := _f.funcs.OutputCols(right)
-					if _f.funcs.IsBoundBy(condition, rightCols) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinRight) {
-							_group = _f.ConstructSelect(
-								_f.DynamicConstruct(
-									_f.mem.NormOp(input),
-									memo.DynamicOperands{
-										memo.DynamicID(left),
-										memo.DynamicID(_f.ConstructSelect(
-											right,
-											_f.ConstructFilters(
-												_f.funcs.ExtractBoundConditions(list, rightCols),
-											),
-										)),
-										memo.DynamicID(on),
-									},
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.RightJoinOp || input.Op() == opt.RightJoinApplyOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			for i := range filters {
+				_item := &filters[i]
+				item := _item
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.IsBoundBy(item, rightCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinRight) {
+						on := on
+						_expr := _f.ConstructSelect(
+							_f.DynamicConstruct(
+								input.Op(),
+								left,
+								_f.ConstructSelect(
+									right,
+									_f.funcs.ExtractBoundConditions(filters, rightCols),
 								),
-								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, rightCols),
-								),
-							)
-							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushSelectIntoJoinRight, _group, 0, 0)
-							}
-							return _group
+								&on,
+							).(memo.RelExpr),
+							_f.funcs.ExtractUnboundConditions(filters, rightCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoJoinRight, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
@@ -612,44 +505,33 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectIntoGroupBy]
 	{
-		groupOp := input
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			input := _expr.ChildGroup(_f.Memo(), 0)
-			aggregations := _expr.ChildGroup(_f.Memo(), 1)
-			def := _expr.PrivateID()
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					condition := _item
-					passthroughCols := _f.funcs.GroupingAndConstCols(def, aggregations)
-					if _f.funcs.IsBoundBy(condition, passthroughCols) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
-							_group = _f.ConstructSelect(
-								_f.DynamicConstruct(
-									_f.mem.NormOp(groupOp),
-									memo.DynamicOperands{
-										memo.DynamicID(_f.ConstructSelect(
-											input,
-											_f.ConstructFilters(
-												_f.funcs.ExtractBoundConditions(list, passthroughCols),
-											),
-										)),
-										memo.DynamicID(aggregations),
-										memo.DynamicID(def),
-									},
+		if input.Op() == opt.GroupByOp || input.Op() == opt.DistinctOnOp {
+			groupingInput := input.Child(0).(memo.RelExpr)
+			aggregations := *input.Child(1).(*memo.AggregationsExpr)
+			groupingPrivate := input.Private().(*memo.GroupingPrivate)
+			for i := range filters {
+				_item := &filters[i]
+				item := _item
+				passthrough := _f.funcs.GroupingAndConstCols(groupingPrivate, aggregations)
+				if _f.funcs.IsBoundBy(item, passthrough) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoGroupBy) {
+						aggregations := aggregations
+						_expr := _f.ConstructSelect(
+							_f.DynamicConstruct(
+								input.Op(),
+								_f.ConstructSelect(
+									groupingInput,
+									_f.funcs.ExtractBoundConditions(filters, passthrough),
 								),
-								_f.ConstructFilters(
-									_f.funcs.ExtractUnboundConditions(list, passthroughCols),
-								),
-							)
-							_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushSelectIntoGroupBy, _group, 0, 0)
-							}
-							return _group
+								&aggregations,
+								groupingPrivate,
+							).(memo.RelExpr),
+							_f.funcs.ExtractUnboundConditions(filters, passthrough),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoGroupBy, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
@@ -658,32 +540,26 @@ func (_f *Factory) ConstructSelect(
 
 	// [RemoveNotNullCondition]
 	{
-		_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_isNotExpr := _f.mem.NormExpr(_item).AsIsNot()
-				if _isNotExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_isNotExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						col := _variableExpr.Col()
-						if _f.funcs.IsColNotNull(col, input) {
-							_nullExpr := _f.mem.NormExpr(_isNotExpr.Right()).AsNull()
-							if _nullExpr != nil {
-								if _f.matchedRule == nil || _f.matchedRule(opt.RemoveNotNullCondition) {
-									_group = _f.ConstructSelect(
-										input,
-										_f.ConstructFilters(
-											_f.funcs.RemoveListItem(list, condition),
-										),
-									)
-									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.RemoveNotNullCondition, _group, 0, 0)
-									}
-									return _group
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			_isNot, _ := item.Condition.(*memo.IsNotExpr)
+			if _isNot != nil {
+				_variable, _ := _isNot.Left.(*memo.VariableExpr)
+				if _variable != nil {
+					col := _variable.Col
+					if _f.funcs.IsColNotNull(col, input) {
+						_null, _ := _isNot.Right.(*memo.NullExpr)
+						if _null != nil {
+							if _f.matchedRule == nil || _f.matchedRule(opt.RemoveNotNullCondition) {
+								_expr := _f.ConstructSelect(
+									input,
+									_f.funcs.RemoveFiltersItem(filters, item),
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.RemoveNotNullCondition, nil, _expr)
 								}
+								return _expr
 							}
 						}
 					}
@@ -694,34 +570,26 @@ func (_f *Factory) ConstructSelect(
 
 	// [HoistSelectExists]
 	{
-		if _f.funcs.HasHoistableSubquery(filter) {
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					exists := _item
-					_existsExpr := _f.mem.NormExpr(_item).AsExists()
-					if _existsExpr != nil {
-						subquery := _existsExpr.Input()
-						if _f.funcs.HasOuterCols(subquery) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
-								_group = _f.ConstructSelect(
-									_f.ConstructSemiJoinApply(
-										input,
-										subquery,
-										_f.ConstructTrue(),
-									),
-									_f.ConstructFilters(
-										_f.funcs.RemoveListItem(list, exists),
-									),
-								)
-								_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.HoistSelectExists, _group, 0, 0)
-								}
-								return _group
-							}
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
+				_exists, _ := item.Condition.(*memo.ExistsExpr)
+				if _exists != nil {
+					subquery := _exists.Input
+					if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectExists) {
+						_expr := _f.ConstructSelect(
+							_f.ConstructSemiJoinApply(
+								input,
+								subquery,
+								memo.EmptyFiltersExpr,
+							),
+							_f.funcs.RemoveFiltersItem(filters, item),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.HoistSelectExists, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
@@ -730,36 +598,28 @@ func (_f *Factory) ConstructSelect(
 
 	// [HoistSelectNotExists]
 	{
-		if _f.funcs.HasHoistableSubquery(filter) {
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				list := _filtersExpr.Conditions()
-				for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-					exists := _item
-					_notExpr := _f.mem.NormExpr(_item).AsNot()
-					if _notExpr != nil {
-						_existsExpr := _f.mem.NormExpr(_notExpr.Input()).AsExists()
-						if _existsExpr != nil {
-							subquery := _existsExpr.Input()
-							if _f.funcs.HasOuterCols(subquery) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
-									_group = _f.ConstructSelect(
-										_f.ConstructAntiJoinApply(
-											input,
-											subquery,
-											_f.ConstructTrue(),
-										),
-										_f.ConstructFilters(
-											_f.funcs.RemoveListItem(list, exists),
-										),
-									)
-									_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.HoistSelectNotExists, _group, 0, 0)
-									}
-									return _group
-								}
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
+				_not, _ := item.Condition.(*memo.NotExpr)
+				if _not != nil {
+					_exists, _ := _not.Input.(*memo.ExistsExpr)
+					if _exists != nil {
+						subquery := _exists.Input
+						if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectNotExists) {
+							_expr := _f.ConstructSelect(
+								_f.ConstructAntiJoinApply(
+									input,
+									subquery,
+									memo.EmptyFiltersExpr,
+								),
+								_f.funcs.RemoveFiltersItem(filters, item),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.HoistSelectNotExists, nil, _expr)
 							}
+							return _expr
 						}
 					}
 				}
@@ -769,16 +629,16 @@ func (_f *Factory) ConstructSelect(
 
 	// [HoistSelectSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(filter) {
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
+		for i := range filters {
+			_item := &filters[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistSelectSubquery) {
-					_group = _f.funcs.HoistSelectSubquery(input, filter)
-					_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistSelectSubquery(input, filters).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistSelectSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistSelectSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -786,25 +646,26 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectIntoInlinableProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			projections := _projectExpr.Projections()
-			if _f.funcs.CanInline(projections) {
-				if !_f.funcs.HasCorrelatedSubquery(filter) {
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if _f.funcs.CanInlineProjections(projections) {
+				passthrough := _project.Passthrough
+				if !_f.funcs.FilterHasCorrelatedSubquery(filters) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoInlinableProject) {
-						_group = _f.ConstructProject(
+						_expr := _f.ConstructProject(
 							_f.ConstructSelect(
 								input,
-								_f.funcs.InlineProjections(filter, projections),
+								_f.funcs.InlineSelectProject(filters, projections),
 							),
 							projections,
+							passthrough,
 						)
-						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushSelectIntoInlinableProject, _group, 0, 0)
+							_f.appliedRule(opt.PushSelectIntoInlinableProject, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -813,106 +674,93 @@ func (_f *Factory) ConstructSelect(
 
 	// [RejectNullsGroupBy]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp {
-			innerInput := _expr.ChildGroup(_f.Memo(), 0)
-			aggregations := _expr.ChildGroup(_f.Memo(), 1)
-			def := _expr.PrivateID()
-			_filtersExpr := _f.mem.NormExpr(filter).AsFilters()
-			if _filtersExpr != nil {
-				rejectCols := _f.funcs.RejectNullCols(input)
-				if _f.funcs.HasNullRejectingFilter(filter, rejectCols) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
-						_group = _f.ConstructSelect(
-							_f.DynamicConstruct(
-								_f.mem.NormOp(input),
-								memo.DynamicOperands{
-									memo.DynamicID(_f.ConstructSelect(
-										innerInput,
-										_f.ConstructFilters(
-											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-												_f.funcs.NullRejectAggVar(aggregations, rejectCols),
-												_f.ConstructNull(
-													_f.funcs.AnyType(),
-												),
-											)}),
+		if input.Op() == opt.GroupByOp || input.Op() == opt.ScalarGroupByOp {
+			innerInput := input.Child(0).(memo.RelExpr)
+			aggregations := *input.Child(1).(*memo.AggregationsExpr)
+			groupingPrivate := input.Private().(*memo.GroupingPrivate)
+			rejectCols := _f.funcs.RejectNullCols(input)
+			if _f.funcs.HasNullRejectingFilter(filters, rejectCols) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsGroupBy) {
+					aggregations := aggregations
+					_expr := _f.ConstructSelect(
+						_f.DynamicConstruct(
+							input.Op(),
+							_f.ConstructSelect(
+								innerInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.ConstructIsNot(
+											_f.funcs.NullRejectAggVar(aggregations, rejectCols),
+											_f.ConstructNull(
+												_f.funcs.AnyType(),
+											),
 										),
-									)),
-									memo.DynamicID(aggregations),
-									memo.DynamicID(def),
+									},
 								},
 							),
-							filter,
-						)
-						_f.mem.AddAltFingerprint(_selectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.RejectNullsGroupBy, _group, 0, 0)
-						}
-						return _group
+							&aggregations,
+							groupingPrivate,
+						).(memo.RelExpr),
+						filters,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.RejectNullsGroupBy, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_selectExpr))
+	e := _f.mem.MemoizeSelect(input, filters)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructProject constructs an expression for the Project operator.
 // Project modifies the set of columns returned by the input result set. Columns
 // can be removed, reordered, or renamed. In addition, new columns can be
 // synthesized.
-// Projections is a scalar Projections list operator that contains information
-// about the projected columns and any expressions that describe newly
-// synthesized output columns.
+//
+// Projections describes the synthesized columns constructed by Project, and
+// Passthrough describes the input columns that are passed through as Project
+// output columns.
 func (_f *Factory) ConstructProject(
-	input memo.GroupID,
-	projections memo.GroupID,
-) memo.GroupID {
-	_projectExpr := memo.MakeProjectExpr(input, projections)
-	_group := _f.mem.GroupByFingerprint(_projectExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	projections memo.ProjectionsExpr,
+	passthrough opt.ColSet,
+) memo.RelExpr {
 	// [EliminateProject]
 	{
-		_projectionsExpr := _f.mem.NormExpr(projections).AsProjections()
-		if _projectionsExpr != nil {
-			if _projectionsExpr.Elems().Length == 0 {
-				if _f.funcs.HasSameCols(input, projections) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProject) {
-						_group = input
-						_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.EliminateProject, _group, 0, 0)
-						}
-						return _group
+		if len(projections) == 0 {
+			if _f.funcs.ColsAreEqual(passthrough, _f.funcs.OutputCols(input)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProject) {
+					_expr := input
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateProject, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
 	}
 
-	// [EliminateProjectProject]
+	// [MergeProjects]
 	{
-		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr2 != nil {
-			innerInput := _projectExpr2.Input()
-			_projectionsExpr := _f.mem.NormExpr(_projectExpr2.Projections()).AsProjections()
-			if _projectionsExpr != nil {
-				if _projectionsExpr.Elems().Length == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.EliminateProjectProject) {
-						_group = _f.ConstructProject(
-							innerInput,
-							projections,
-						)
-						_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.EliminateProjectProject, _group, 0, 0)
-						}
-						return _group
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			innerProjections := _project.Projections
+			if _f.funcs.CanMergeProjections(projections, innerProjections) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.MergeProjects) {
+					_expr := _f.ConstructProject(
+						innerInput,
+						_f.funcs.MergeProjections(projections, innerProjections, passthrough),
+						_f.funcs.DifferenceCols(passthrough, _f.funcs.ProjectionCols(innerProjections)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.MergeProjects, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -920,24 +768,21 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneProjectCols]
 	{
-		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr2 != nil {
-			innerInput := _projectExpr2.Input()
-			innerProjections := _projectExpr2.Projections()
-			if _f.funcs.CanPruneCols(innerProjections, _f.funcs.NeededCols(projections)) {
+		project := input
+		_project, _ := project.(*memo.ProjectExpr)
+		if _project != nil {
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(project, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneProjectCols) {
-					_group = _f.ConstructProject(
-						_f.ConstructProject(
-							innerInput,
-							_f.funcs.PruneCols(innerProjections, _f.funcs.NeededCols(projections)),
-						),
+					_expr := _f.ConstructProject(
+						_f.funcs.PruneCols(project, needed),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneProjectCols, _group, 0, 0)
+						_f.appliedRule(opt.PruneProjectCols, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -945,19 +790,20 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneScanCols]
 	{
-		_scanExpr := _f.mem.NormExpr(input).AsScan()
-		if _scanExpr != nil {
-			if _f.funcs.CanPruneCols(input, _f.funcs.NeededCols(projections)) {
+		_scan, _ := input.(*memo.ScanExpr)
+		if _scan != nil {
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneScanCols) {
-					_group = _f.ConstructProject(
-						_f.funcs.PruneCols(input, _f.funcs.NeededCols(projections)),
+					_expr := _f.ConstructProject(
+						_f.funcs.PruneCols(input, needed),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneScanCols, _group, 0, 0)
+						_f.appliedRule(opt.PruneScanCols, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -965,30 +811,25 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneSelectCols]
 	{
-		_selectExpr := _f.mem.NormExpr(input).AsSelect()
-		if _selectExpr != nil {
-			input := _selectExpr.Input()
-			filter := _selectExpr.Filter()
-			if _f.funcs.CanPruneCols(input, _f.funcs.NeededCols2(projections, filter)) {
-				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PruneSelectCols) {
-						_f.ruleCycles.push(_projectExpr.Fingerprint())
-						_group = _f.ConstructProject(
-							_f.ConstructSelect(
-								_f.funcs.PruneCols(input, _f.funcs.NeededCols2(projections, filter)),
-								filter,
-							),
-							projections,
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PruneSelectCols, _group, 0, 0)
-						}
-						return _group
+		_select, _ := input.(*memo.SelectExpr)
+		if _select != nil {
+			input := _select.Input
+			filters := _select.Filters
+			needed := _f.funcs.UnionCols3(_f.funcs.FilterOuterCols(filters), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneSelectCols) {
+					_expr := _f.ConstructProject(
+						_f.ConstructSelect(
+							_f.funcs.PruneCols(input, needed),
+							filters,
+						),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneSelectCols, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -996,33 +837,27 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneLimitCols]
 	{
-		_limitExpr := _f.mem.NormExpr(input).AsLimit()
-		if _limitExpr != nil {
-			input := _limitExpr.Input()
-			limit := _limitExpr.Limit()
-			ordering := _limitExpr.Ordering()
-			if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsLimit(projections, ordering)) {
-				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PruneLimitCols) {
-						_f.ruleCycles.push(_projectExpr.Fingerprint())
-						newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering))
-						_group = _f.ConstructProject(
-							_f.ConstructLimit(
-								newInput,
-								limit,
-								_f.funcs.PruneOrdering(newInput, ordering),
-							),
-							projections,
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PruneLimitCols, _group, 0, 0)
-						}
-						return _group
+		_limit, _ := input.(*memo.LimitExpr)
+		if _limit != nil {
+			input := _limit.Input
+			limit := _limit.Limit
+			ordering := _limit.Ordering
+			needed := _f.funcs.UnionCols3(_f.funcs.OrderingCols(ordering), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneLimitCols) {
+					_expr := _f.ConstructProject(
+						_f.ConstructLimit(
+							_f.funcs.PruneCols(input, needed),
+							limit,
+							_f.funcs.PruneOrdering(ordering, needed),
+						),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneLimitCols, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -1030,33 +865,27 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneOffsetCols]
 	{
-		_offsetExpr := _f.mem.NormExpr(input).AsOffset()
-		if _offsetExpr != nil {
-			input := _offsetExpr.Input()
-			offset := _offsetExpr.Offset()
-			ordering := _offsetExpr.Ordering()
-			if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsLimit(projections, ordering)) {
-				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PruneOffsetCols) {
-						_f.ruleCycles.push(_projectExpr.Fingerprint())
-						newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsLimit(projections, ordering))
-						_group = _f.ConstructProject(
-							_f.ConstructOffset(
-								newInput,
-								offset,
-								_f.funcs.PruneOrdering(newInput, ordering),
-							),
-							projections,
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PruneOffsetCols, _group, 0, 0)
-						}
-						return _group
+		_offset, _ := input.(*memo.OffsetExpr)
+		if _offset != nil {
+			input := _offset.Input
+			offset := _offset.Offset
+			ordering := _offset.Ordering
+			needed := _f.funcs.UnionCols3(_f.funcs.OrderingCols(ordering), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneOffsetCols) {
+					_expr := _f.ConstructProject(
+						_f.ConstructOffset(
+							_f.funcs.PruneCols(input, needed),
+							offset,
+							_f.funcs.PruneOrdering(ordering, needed),
+						),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneOffsetCols, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -1064,29 +893,28 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneJoinLeftCols]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.IsJoin() {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			if _f.funcs.CanPruneCols(left, _f.funcs.NeededCols3(projections, right, on)) {
+		if opt.IsJoinOp(input) {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			needed := _f.funcs.UnionCols4(_f.funcs.OuterCols(right), _f.funcs.FilterOuterCols(on), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(left, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinLeftCols) {
-					_group = _f.ConstructProject(
+					on := on
+					_expr := _f.ConstructProject(
 						_f.DynamicConstruct(
-							_f.mem.NormOp(input),
-							memo.DynamicOperands{
-								memo.DynamicID(_f.funcs.PruneCols(left, _f.funcs.NeededCols3(projections, right, on))),
-								memo.DynamicID(right),
-								memo.DynamicID(on),
-							},
-						),
+							input.Op(),
+							_f.funcs.PruneCols(left, needed),
+							right,
+							&on,
+						).(memo.RelExpr),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneJoinLeftCols, _group, 0, 0)
+						_f.appliedRule(opt.PruneJoinLeftCols, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -1094,35 +922,28 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneJoinRightCols]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.IsJoin() {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			on := _expr.ChildGroup(_f.Memo(), 2)
-			if _f.funcs.CanPruneCols(right, _f.funcs.NeededCols2(projections, on)) {
-				if !_f.ruleCycles.detectCycle(_projectExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
-						_f.ruleCycles.push(_projectExpr.Fingerprint())
-						_group = _f.ConstructProject(
-							_f.DynamicConstruct(
-								_f.mem.NormOp(input),
-								memo.DynamicOperands{
-									memo.DynamicID(left),
-									memo.DynamicID(_f.funcs.PruneCols(right, _f.funcs.NeededCols2(projections, on))),
-									memo.DynamicID(on),
-								},
-							),
-							projections,
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_projectExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PruneJoinRightCols, _group, 0, 0)
-						}
-						return _group
+		if opt.IsJoinOp(input) {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			needed := _f.funcs.UnionCols3(_f.funcs.FilterOuterCols(on), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(right, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
+					on := on
+					_expr := _f.ConstructProject(
+						_f.DynamicConstruct(
+							input.Op(),
+							left,
+							_f.funcs.PruneCols(right, needed),
+							&on,
+						).(memo.RelExpr),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneJoinRightCols, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -1130,29 +951,28 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneAggCols]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.ScalarGroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			innerInput := _expr.ChildGroup(_f.Memo(), 0)
-			aggregations := _expr.ChildGroup(_f.Memo(), 1)
-			def := _expr.PrivateID()
-			if _f.funcs.CanPruneCols(aggregations, _f.funcs.NeededCols(projections)) {
+		if input.Op() == opt.GroupByOp || input.Op() == opt.ScalarGroupByOp || input.Op() == opt.DistinctOnOp {
+			innerInput := input.Child(0).(memo.RelExpr)
+			aggregations := *input.Child(1).(*memo.AggregationsExpr)
+			groupingPrivate := input.Private().(*memo.GroupingPrivate)
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneAggCols(aggregations, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneAggCols) {
-					_group = _f.ConstructProject(
+					_arg := _f.funcs.PruneAggCols(aggregations, needed)
+					_expr := _f.ConstructProject(
 						_f.DynamicConstruct(
-							_f.mem.NormOp(input),
-							memo.DynamicOperands{
-								memo.DynamicID(innerInput),
-								memo.DynamicID(_f.funcs.PruneCols(aggregations, _f.funcs.NeededCols(projections))),
-								memo.DynamicID(def),
-							},
-						),
+							input.Op(),
+							innerInput,
+							&_arg,
+							groupingPrivate,
+						).(memo.RelExpr),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneAggCols, _group, 0, 0)
+						_f.appliedRule(opt.PruneAggCols, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -1160,19 +980,20 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneValuesCols]
 	{
-		_valuesExpr := _f.mem.NormExpr(input).AsValues()
-		if _valuesExpr != nil {
-			if _f.funcs.CanPruneCols(input, _f.funcs.NeededCols(projections)) {
+		_values, _ := input.(*memo.ValuesExpr)
+		if _values != nil {
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneValuesCols) {
-					_group = _f.ConstructProject(
-						_f.funcs.PruneCols(input, _f.funcs.NeededCols(projections)),
+					_expr := _f.ConstructProject(
+						_f.funcs.PruneCols(input, needed),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneValuesCols, _group, 0, 0)
+						_f.appliedRule(opt.PruneValuesCols, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -1180,25 +1001,25 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneRowNumberCols]
 	{
-		_rowNumberExpr := _f.mem.NormExpr(input).AsRowNumber()
-		if _rowNumberExpr != nil {
-			input := _rowNumberExpr.Input()
-			def := _rowNumberExpr.Def()
-			if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsRowNumber(projections, def)) {
+		_rowNumber, _ := input.(*memo.RowNumberExpr)
+		if _rowNumber != nil {
+			input := _rowNumber.Input
+			rowNumberPrivate := &_rowNumber.RowNumberPrivate
+			needed := _f.funcs.UnionCols3(_f.funcs.NeededColsRowNumber(rowNumberPrivate), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneRowNumberCols) {
-					newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsRowNumber(projections, def))
-					_group = _f.ConstructProject(
+					_expr := _f.ConstructProject(
 						_f.ConstructRowNumber(
-							newInput,
-							_f.funcs.PruneOrderingRowNumber(newInput, def),
+							_f.funcs.PruneCols(input, needed),
+							_f.funcs.PruneOrderingRowNumber(rowNumberPrivate, needed),
 						),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneRowNumberCols, _group, 0, 0)
+						_f.appliedRule(opt.PruneRowNumberCols, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -1206,41 +1027,39 @@ func (_f *Factory) ConstructProject(
 
 	// [HoistProjectSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(projections) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSubquery) {
-				_group = _f.funcs.HoistProjectSubquery(input, projections)
-				_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.HoistProjectSubquery, _group, 0, 0)
+		for i := range projections {
+			_item := &projections[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSubquery) {
+					_expr := _f.funcs.HoistProjectSubquery(input, projections, passthrough).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistProjectSubquery, nil, _expr)
+					}
+					return _expr
 				}
-				return _group
 			}
 		}
 	}
 
 	// [InlineProjectInProject]
 	{
-		_projectExpr2 := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr2 != nil {
-			innerInput := _projectExpr2.Input()
-			innerProjections := _projectExpr2.Projections()
-			if !_f.funcs.HasDuplicateRefs(projections) {
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			if !_f.funcs.HasDuplicateRefs(projections, passthrough) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.InlineProjectInProject) {
-					_group = _f.ConstructProject(
-						innerInput,
-						_f.funcs.InlineProjections(projections, innerProjections),
-					)
-					_f.mem.AddAltFingerprint(_projectExpr.Fingerprint(), _group)
+					_expr := _f.funcs.InlineProjectProject(input, projections, passthrough).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.InlineProjectInProject, _group, 0, 0)
+						_f.appliedRule(opt.InlineProjectInProject, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_projectExpr))
+	e := _f.mem.MemoizeProject(input, projections, passthrough)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructInnerJoin constructs an expression for the InnerJoin operator.
@@ -1250,77 +1069,49 @@ func (_f *Factory) ConstructProject(
 // columns projected by either the left or right inputs, the inputs are not
 // allowed to refer to the other's projected columns.
 func (_f *Factory) ConstructInnerJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_innerJoinExpr := memo.MakeInnerJoinExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [TryDecorrelateSelect]
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
 	{
-		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_innerJoinExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_innerJoinExpr.Fingerprint())
-						_group = _f.ConstructInnerJoin(
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructInnerJoin(
 							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
+							right,
+							_f.funcs.SimplifyFilters(on),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	// [TryDecorrelateInnerJoin]
+	// [TryDecorrelateSelect]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_innerJoinExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_innerJoinExpr.Fingerprint())
-						_group = _f.ConstructInnerJoin(
-							left,
-							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
-							_f.funcs.ConcatFilters(on, innerOn),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_innerJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
-						}
-						return _group
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructInnerJoin(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -1329,27 +1120,57 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateProject]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_projectExpr := _f.mem.NormExpr(right).AsProject()
-			if _projectExpr != nil {
-				input := _projectExpr.Input()
-				projections := _projectExpr.Projections()
+			_project, _ := right.(*memo.ProjectExpr)
+			if _project != nil {
+				input := _project.Input
+				projections := _project.Projections
+				passthrough := _project.Passthrough
 				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
-					_group = _f.ConstructSelect(
+					_expr := _f.ConstructSelect(
 						_f.ConstructProject(
 							_f.ConstructInnerJoin(
 								left,
 								input,
-								_f.ConstructTrue(),
+								memo.EmptyFiltersExpr,
 							),
-							_f.funcs.ProjectColsFromBoth(projections, left),
+							projections,
+							_f.funcs.UnionCols(_f.funcs.OutputCols(left), passthrough),
 						),
 						on,
 					)
-					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.TryDecorrelateProject, _group, 0, 0)
+						_f.appliedRule(opt.TryDecorrelateProject, nil, _expr)
 					}
-					return _group
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_expr := _f.ConstructInnerJoin(
+							left,
+							_f.DynamicConstruct(
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
+						}
+						return _expr
+					}
 				}
 			}
 		}
@@ -1358,14 +1179,14 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateInnerLeftJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_leftJoinExpr := _f.mem.NormExpr(right).AsLeftJoin()
-			if _leftJoinExpr != nil {
-				innerLeft := _leftJoinExpr.Left()
-				innerRight := _leftJoinExpr.Right()
-				innerOn := _leftJoinExpr.On()
-				if _f.funcs.IsBoundBy(on, _f.funcs.OutputCols2(left, innerLeft)) {
+			_leftJoin, _ := right.(*memo.LeftJoinExpr)
+			if _leftJoin != nil {
+				innerLeft := _leftJoin.Left
+				innerRight := _leftJoin.Right
+				innerOn := _leftJoin.On
+				if _f.funcs.FiltersBoundBy(on, _f.funcs.OutputCols2(left, innerLeft)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerLeftJoin) {
-						_group = _f.ConstructLeftJoinApply(
+						_expr := _f.ConstructLeftJoinApply(
 							_f.ConstructInnerJoin(
 								left,
 								innerLeft,
@@ -1374,11 +1195,10 @@ func (_f *Factory) ConstructInnerJoin(
 							innerRight,
 							innerOn,
 						)
-						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerLeftJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateInnerLeftJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -1388,34 +1208,31 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-				input := _expr.ChildGroup(_f.Memo(), 0)
-				aggregations := _expr.ChildGroup(_f.Memo(), 1)
-				def := _expr.PrivateID()
-				if _f.funcs.IsUnorderedGroupBy(def) {
+			if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp {
+				input := right.Child(0).(memo.RelExpr)
+				aggregations := *right.Child(1).(*memo.AggregationsExpr)
+				groupingPrivate := right.Private().(*memo.GroupingPrivate)
+				if _f.funcs.IsUnorderedGrouping(groupingPrivate) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
 						newLeft := _f.funcs.EnsureKey(left)
-						_group = _f.ConstructSelect(
+						_arg := _f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))
+						_expr := _f.ConstructSelect(
 							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(_f.ConstructInnerJoinApply(
-										newLeft,
-										input,
-										_f.ConstructTrue(),
-									)),
-									memo.DynamicID(_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))),
-									memo.DynamicID(_f.funcs.AddColsToGroupByDef(def, _f.funcs.KeyCols(newLeft))),
-								},
-							),
+								right.Op(),
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+								),
+								&_arg,
+								_f.funcs.AddColsToGrouping(groupingPrivate, _f.funcs.KeyCols(newLeft)),
+							).(memo.RelExpr),
 							on,
 						)
-						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateGroupBy, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -1425,34 +1242,33 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateScalarGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_scalarGroupByExpr := _f.mem.NormExpr(right).AsScalarGroupBy()
-			if _scalarGroupByExpr != nil {
-				input := _scalarGroupByExpr.Input()
-				aggregations := _scalarGroupByExpr.Aggregations()
-				def := _scalarGroupByExpr.Def()
+			_scalarGroupBy, _ := right.(*memo.ScalarGroupByExpr)
+			if _scalarGroupBy != nil {
+				input := _scalarGroupBy.Input
+				aggregations := _scalarGroupBy.Aggregations
+				groupingPrivate := &_scalarGroupBy.GroupingPrivate
 				if _f.funcs.AggsCanBeDecorrelated(aggregations) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
 						leftWithKey := _f.funcs.EnsureKey(left)
 						canaryCol := _f.funcs.EnsureCanaryCol(input, aggregations)
 						rightWithCanary := _f.funcs.EnsureCanary(input, canaryCol)
 						translatedAggs := _f.funcs.EnsureAggsCanIgnoreNulls(rightWithCanary, aggregations)
-						_group = _f.ConstructSelect(
+						_expr := _f.ConstructSelect(
 							_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
 								_f.ConstructLeftJoinApply(
 									leftWithKey,
 									rightWithCanary,
-									_f.ConstructTrue(),
+									memo.EmptyFiltersExpr,
 								),
 								_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
-								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupByOrdering(def)),
+								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
 							), translatedAggs, rightWithCanary, aggregations, canaryCol),
 							on,
 						)
-						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateScalarGroupBy, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -1462,31 +1278,133 @@ func (_f *Factory) ConstructInnerJoin(
 	// [TryDecorrelateLimitOne]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_limitExpr := _f.mem.NormExpr(right).AsLimit()
-			if _limitExpr != nil {
-				input := _limitExpr.Input()
-				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
-				if _constExpr != nil {
-					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
-						ordering := _limitExpr.Ordering()
+			_limit, _ := right.(*memo.LimitExpr)
+			if _limit != nil {
+				input := _limit.Input
+				_const, _ := _limit.Limit.(*memo.ConstExpr)
+				if _const != nil {
+					if _f.funcs.EqualsNumber(_const.Value, 1) {
+						ordering := _limit.Ordering
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_group = _f.ConstructDistinctOn(
+							_expr := _f.ConstructDistinctOn(
 								_f.ConstructInnerJoin(
 									newLeft,
 									input,
 									on,
 								),
 								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 							)
-							_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
+								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
 							}
-							return _group
+							return _expr
 						}
 					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructInnerJoin(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructInnerJoin(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructInnerJoin(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -1496,51 +1414,48 @@ func (_f *Factory) ConstructInnerJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				filters := on
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						condition := _item
-						_match := false
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-							if _variableExpr != nil {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									_match = true
-								}
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_match := false
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						_variable, _ := _eq.Left.(*memo.VariableExpr)
+						if _variable != nil {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								_match = true
 							}
 						}
+					}
 
-						if !_match {
-							if _f.funcs.CanMap(filters, condition, left) {
-								if _f.funcs.CanMap(filters, condition, right) {
-									if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
-										_group = _f.ConstructInnerJoin(
-											_f.ConstructSelect(
-												left,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, left)}),
-												),
-											),
-											_f.ConstructSelect(
-												right,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, right)}),
-												),
-											),
-											_f.ConstructFilters(
-												_f.funcs.RemoveListItem(list, condition),
-											),
-										)
-										_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-										if _f.appliedRule != nil {
-											_f.appliedRule(opt.PushFilterIntoJoinLeftAndRight, _group, 0, 0)
-										}
-										return _group
+					if !_match {
+						if _f.funcs.CanMap(on, item, left) {
+							if _f.funcs.CanMap(on, item, right) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
+									_expr := _f.ConstructInnerJoin(
+										_f.ConstructSelect(
+											left,
+											memo.FiltersExpr{
+												{
+													Condition: _f.funcs.Map(on, item, left),
+												},
+											},
+										),
+										_f.ConstructSelect(
+											right,
+											memo.FiltersExpr{
+												{
+													Condition: _f.funcs.Map(on, item, right),
+												},
+											},
+										),
+										_f.funcs.RemoveFiltersItem(on, item),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.PushFilterIntoJoinLeftAndRight, nil, _expr)
 									}
+									return _expr
 								}
 							}
 						}
@@ -1552,40 +1467,35 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [MapFilterIntoJoinLeft]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(filters, condition, left) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+						if _f.funcs.CanMap(on, item, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_group = _f.ConstructInnerJoin(
+								_expr := _f.ConstructInnerJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, left)),
 								)
-								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -1596,40 +1506,35 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructInnerJoin(
+								_expr := _f.ConstructInnerJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -1640,31 +1545,25 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [PushFilterIntoJoinLeft]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(condition, leftCols) {
+				if _f.funcs.IsBoundBy(item, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_group = _f.ConstructInnerJoin(
+						_expr := _f.ConstructInnerJoin(
 							_f.ConstructSelect(
 								left,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, leftCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, leftCols),
 							),
 							right,
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, leftCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, leftCols),
 						)
-						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -1673,31 +1572,25 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructInnerJoin(
+						_expr := _f.ConstructInnerJoin(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -1709,15 +1602,14 @@ func (_f *Factory) ConstructInnerJoin(
 		if _f.funcs.HasNoCols(left) {
 			if _f.funcs.HasOneRow(left) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsLeft) {
-					_group = _f.ConstructSelect(
+					_expr := _f.ConstructSelect(
 						right,
 						on,
 					)
-					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateJoinNoColsLeft, _group, 0, 0)
+						_f.appliedRule(opt.EliminateJoinNoColsLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -1728,15 +1620,14 @@ func (_f *Factory) ConstructInnerJoin(
 		if _f.funcs.HasNoCols(right) {
 			if _f.funcs.HasOneRow(right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsRight) {
-					_group = _f.ConstructSelect(
+					_expr := _f.ConstructSelect(
 						left,
 						on,
 					)
-					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateJoinNoColsRight, _group, 0, 0)
+						_f.appliedRule(opt.EliminateJoinNoColsRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -1744,27 +1635,25 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [HoistJoinProject]
 	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
-			if _projectionsExpr != nil {
-				if _projectionsExpr.Elems().Length == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
-						_group = _f.ConstructProject(
-							_f.ConstructInnerJoin(
-								left,
-								input,
-								on,
-							),
-							_f.funcs.ProjectColsFromBoth(left, right),
-						)
-						_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
-						}
-						return _group
+		_project, _ := right.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+					_expr := _f.ConstructProject(
+						_f.ConstructInnerJoin(
+							left,
+							input,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -1772,41 +1661,34 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructInnerJoin(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructInnerJoin(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -1822,22 +1704,23 @@ func (_f *Factory) ConstructInnerJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							a := _eqExpr.Left()
-							b := _eqExpr.Right()
-							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-									_group = _f.funcs.ExtractJoinEqualities(opt.InnerJoinOp, left, right, list)
-									_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						a := _eq.Left
+						if !(opt.IsConstValueOp(a)) {
+							b := _eq.Right
+							if !(opt.IsConstValueOp(b)) {
+								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+										_expr := _f.funcs.ExtractJoinEquality(opt.InnerJoinOp, left, right, on, item).(memo.RelExpr)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+										}
+										return _expr
 									}
-									return _group
 								}
 							}
 						}
@@ -1849,60 +1732,70 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.InnerJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_innerJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.InnerJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_innerJoinExpr))
+	e := _f.mem.MemoizeInnerJoin(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructLeftJoin constructs an expression for the LeftJoin operator.
 func (_f *Factory) ConstructLeftJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_leftJoinExpr := memo.MakeLeftJoinExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructLeftJoin(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
 	}
 
 	// [TryDecorrelateSelect]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_leftJoinExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_leftJoinExpr.Fingerprint())
-						_group = _f.ConstructLeftJoin(
-							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
-						}
-						return _group
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructLeftJoin(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -1911,34 +1804,26 @@ func (_f *Factory) ConstructLeftJoin(
 	// [TryDecorrelateInnerJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_leftJoinExpr.Fingerprint()) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_leftJoinExpr.Fingerprint())
-						_group = _f.ConstructLeftJoin(
+						_expr := _f.ConstructLeftJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_leftJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -1948,29 +1833,28 @@ func (_f *Factory) ConstructLeftJoin(
 	// [TryDecorrelateLimitOne]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_limitExpr := _f.mem.NormExpr(right).AsLimit()
-			if _limitExpr != nil {
-				input := _limitExpr.Input()
-				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
-				if _constExpr != nil {
-					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
-						ordering := _limitExpr.Ordering()
+			_limit, _ := right.(*memo.LimitExpr)
+			if _limit != nil {
+				input := _limit.Input
+				_const, _ := _limit.Limit.(*memo.ConstExpr)
+				if _const != nil {
+					if _f.funcs.EqualsNumber(_const.Value, 1) {
+						ordering := _limit.Ordering
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_group = _f.ConstructDistinctOn(
+							_expr := _f.ConstructDistinctOn(
 								_f.ConstructLeftJoin(
 									newLeft,
 									input,
 									on,
 								),
 								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 							)
-							_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
+								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
 							}
-							return _group
+							return _expr
 						}
 					}
 				}
@@ -1978,42 +1862,140 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructLeftJoin(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructLeftJoin(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructLeftJoin(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructLeftJoin(
+								_expr := _f.ConstructLeftJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -2024,31 +2006,25 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructLeftJoin(
+						_expr := _f.ConstructLeftJoin(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -2058,15 +2034,13 @@ func (_f *Factory) ConstructLeftJoin(
 	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2074,16 +2048,14 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2091,27 +2063,25 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [HoistJoinProject]
 	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
-			if _projectionsExpr != nil {
-				if _projectionsExpr.Elems().Length == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
-						_group = _f.ConstructProject(
-							_f.ConstructLeftJoin(
-								left,
-								input,
-								on,
-							),
-							_f.funcs.ProjectColsFromBoth(left, right),
-						)
-						_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
-						}
-						return _group
+		_project, _ := right.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+					_expr := _f.ConstructProject(
+						_f.ConstructLeftJoin(
+							left,
+							input,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -2119,41 +2089,34 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructLeftJoin(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructLeftJoin(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -2169,22 +2132,23 @@ func (_f *Factory) ConstructLeftJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							a := _eqExpr.Left()
-							b := _eqExpr.Right()
-							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-									_group = _f.funcs.ExtractJoinEqualities(opt.LeftJoinOp, left, right, list)
-									_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						a := _eq.Left
+						if !(opt.IsConstValueOp(a)) {
+							b := _eq.Right
+							if !(opt.IsConstValueOp(b)) {
+								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+										_expr := _f.funcs.ExtractJoinEquality(opt.LeftJoinOp, left, right, on, item).(memo.RelExpr)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+										}
+										return _expr
 									}
-									return _group
 								}
 							}
 						}
@@ -2196,72 +2160,187 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.LeftJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.LeftJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_leftJoinExpr))
+	e := _f.mem.MemoizeLeftJoin(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructRightJoin constructs an expression for the RightJoin operator.
 func (_f *Factory) ConstructRightJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_rightJoinExpr := memo.MakeRightJoinExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_rightJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructRightJoin(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructRightJoin(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructRightJoin(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructRightJoin(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
 	}
 
 	// [MapFilterIntoJoinLeft]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(filters, condition, left) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+						if _f.funcs.CanMap(on, item, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_group = _f.ConstructRightJoin(
+								_expr := _f.ConstructRightJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, left)),
 								)
-								_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -2272,31 +2351,25 @@ func (_f *Factory) ConstructRightJoin(
 
 	// [PushFilterIntoJoinLeft]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(condition, leftCols) {
+				if _f.funcs.IsBoundBy(item, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_group = _f.ConstructRightJoin(
+						_expr := _f.ConstructRightJoin(
 							_f.ConstructSelect(
 								left,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, leftCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, leftCols),
 							),
 							right,
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, leftCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, leftCols),
 						)
-						_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -2306,15 +2379,13 @@ func (_f *Factory) ConstructRightJoin(
 	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2322,16 +2393,14 @@ func (_f *Factory) ConstructRightJoin(
 
 	// [SimplifyRightJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2339,41 +2408,34 @@ func (_f *Factory) ConstructRightJoin(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructRightJoin(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructRightJoin(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -2389,22 +2451,23 @@ func (_f *Factory) ConstructRightJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							a := _eqExpr.Left()
-							b := _eqExpr.Right()
-							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-									_group = _f.funcs.ExtractJoinEqualities(opt.RightJoinOp, left, right, list)
-									_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						a := _eq.Left
+						if !(opt.IsConstValueOp(a)) {
+							b := _eq.Right
+							if !(opt.IsConstValueOp(b)) {
+								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+										_expr := _f.funcs.ExtractJoinEquality(opt.RightJoinOp, left, right, on, item).(memo.RelExpr)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+										}
+										return _expr
 									}
-									return _group
 								}
 							}
 						}
@@ -2416,48 +2479,166 @@ func (_f *Factory) ConstructRightJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.RightJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.RightJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_rightJoinExpr))
+	e := _f.mem.MemoizeRightJoin(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructFullJoin constructs an expression for the FullJoin operator.
 func (_f *Factory) ConstructFullJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_fullJoinExpr := memo.MakeFullJoinExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_fullJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructFullJoin(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructFullJoin(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructFullJoin(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructFullJoin(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
 	}
 
 	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2466,15 +2647,13 @@ func (_f *Factory) ConstructFullJoin(
 	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2482,16 +2661,14 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2499,16 +2676,14 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [SimplifyRightJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2516,41 +2691,34 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructFullJoin(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructFullJoin(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -2566,22 +2734,23 @@ func (_f *Factory) ConstructFullJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							a := _eqExpr.Left()
-							b := _eqExpr.Right()
-							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-									_group = _f.funcs.ExtractJoinEqualities(opt.FullJoinOp, left, right, list)
-									_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						a := _eq.Left
+						if !(opt.IsConstValueOp(a)) {
+							b := _eq.Right
+							if !(opt.IsConstValueOp(b)) {
+								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+										_expr := _f.funcs.ExtractJoinEquality(opt.FullJoinOp, left, right, on, item).(memo.RelExpr)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+										}
+										return _expr
 									}
-									return _group
 								}
 							}
 						}
@@ -2593,60 +2762,70 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.FullJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.FullJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_fullJoinExpr))
+	e := _f.mem.MemoizeFullJoin(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructSemiJoin constructs an expression for the SemiJoin operator.
 func (_f *Factory) ConstructSemiJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_semiJoinExpr := memo.MakeSemiJoinExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructSemiJoin(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
 	}
 
 	// [TryDecorrelateSelect]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_semiJoinExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_semiJoinExpr.Fingerprint())
-						_group = _f.ConstructSemiJoin(
-							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
-						}
-						return _group
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructSemiJoin(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -2655,34 +2834,26 @@ func (_f *Factory) ConstructSemiJoin(
 	// [TryDecorrelateInnerJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_semiJoinExpr.Fingerprint()) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_semiJoinExpr.Fingerprint())
-						_group = _f.ConstructSemiJoin(
+						_expr := _f.ConstructSemiJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_semiJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -2693,25 +2864,126 @@ func (_f *Factory) ConstructSemiJoin(
 	{
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
-				_expr := _f.mem.NormExpr(right)
-				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp || _expr.Operator() == opt.ProjectOp {
+				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
-						_group = _f.ConstructGroupBy(
+						_expr := _f.ConstructGroupBy(
 							_f.ConstructInnerJoinApply(
 								newLeft,
 								right,
 								on,
 							),
 							_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-							_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
+							_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
 						)
-						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSemiJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateSemiJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructSemiJoin(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructSemiJoin(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructSemiJoin(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -2721,51 +2993,48 @@ func (_f *Factory) ConstructSemiJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				filters := on
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						condition := _item
-						_match := false
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-							if _variableExpr != nil {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									_match = true
-								}
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_match := false
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						_variable, _ := _eq.Left.(*memo.VariableExpr)
+						if _variable != nil {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								_match = true
 							}
 						}
+					}
 
-						if !_match {
-							if _f.funcs.CanMap(filters, condition, left) {
-								if _f.funcs.CanMap(filters, condition, right) {
-									if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
-										_group = _f.ConstructSemiJoin(
-											_f.ConstructSelect(
-												left,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, left)}),
-												),
-											),
-											_f.ConstructSelect(
-												right,
-												_f.ConstructFilters(
-													_f.mem.InternList([]memo.GroupID{_f.funcs.Map(filters, condition, right)}),
-												),
-											),
-											_f.ConstructFilters(
-												_f.funcs.RemoveListItem(list, condition),
-											),
-										)
-										_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-										if _f.appliedRule != nil {
-											_f.appliedRule(opt.PushFilterIntoJoinLeftAndRight, _group, 0, 0)
-										}
-										return _group
+					if !_match {
+						if _f.funcs.CanMap(on, item, left) {
+							if _f.funcs.CanMap(on, item, right) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
+									_expr := _f.ConstructSemiJoin(
+										_f.ConstructSelect(
+											left,
+											memo.FiltersExpr{
+												{
+													Condition: _f.funcs.Map(on, item, left),
+												},
+											},
+										),
+										_f.ConstructSelect(
+											right,
+											memo.FiltersExpr{
+												{
+													Condition: _f.funcs.Map(on, item, right),
+												},
+											},
+										),
+										_f.funcs.RemoveFiltersItem(on, item),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.PushFilterIntoJoinLeftAndRight, nil, _expr)
 									}
+									return _expr
 								}
 							}
 						}
@@ -2777,40 +3046,35 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [MapFilterIntoJoinLeft]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(filters, condition, left) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+						if _f.funcs.CanMap(on, item, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_group = _f.ConstructSemiJoin(
+								_expr := _f.ConstructSemiJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, left)),
 								)
-								_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -2821,40 +3085,35 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructSemiJoin(
+								_expr := _f.ConstructSemiJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -2865,31 +3124,25 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [PushFilterIntoJoinLeft]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(condition, leftCols) {
+				if _f.funcs.IsBoundBy(item, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_group = _f.ConstructSemiJoin(
+						_expr := _f.ConstructSemiJoin(
 							_f.ConstructSelect(
 								left,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, leftCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, leftCols),
 							),
 							right,
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, leftCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, leftCols),
 						)
-						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -2898,31 +3151,25 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructSemiJoin(
+						_expr := _f.ConstructSemiJoin(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -2932,15 +3179,13 @@ func (_f *Factory) ConstructSemiJoin(
 	// [EliminateSemiJoin]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
-					_group = left
-					_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateSemiJoin, _group, 0, 0)
+						_f.appliedRule(opt.EliminateSemiJoin, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -2948,41 +3193,34 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructSemiJoin(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructSemiJoin(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -2998,22 +3236,23 @@ func (_f *Factory) ConstructSemiJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							a := _eqExpr.Left()
-							b := _eqExpr.Right()
-							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-									_group = _f.funcs.ExtractJoinEqualities(opt.SemiJoinOp, left, right, list)
-									_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						a := _eq.Left
+						if !(opt.IsConstValueOp(a)) {
+							b := _eq.Right
+							if !(opt.IsConstValueOp(b)) {
+								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+										_expr := _f.funcs.ExtractJoinEquality(opt.SemiJoinOp, left, right, on, item).(memo.RelExpr)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+										}
+										return _expr
 									}
-									return _group
 								}
 							}
 						}
@@ -3025,60 +3264,70 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.SemiJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_semiJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.SemiJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_semiJoinExpr))
+	e := _f.mem.MemoizeSemiJoin(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructAntiJoin constructs an expression for the AntiJoin operator.
 func (_f *Factory) ConstructAntiJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_antiJoinExpr := memo.MakeAntiJoinExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructAntiJoin(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
 	}
 
 	// [TryDecorrelateSelect]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_antiJoinExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_antiJoinExpr.Fingerprint())
-						_group = _f.ConstructAntiJoin(
-							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
-						}
-						return _group
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructAntiJoin(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -3087,35 +3336,130 @@ func (_f *Factory) ConstructAntiJoin(
 	// [TryDecorrelateInnerJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_antiJoinExpr.Fingerprint()) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_antiJoinExpr.Fingerprint())
-						_group = _f.ConstructAntiJoin(
+						_expr := _f.ConstructAntiJoin(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_antiJoinExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructAntiJoin(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructAntiJoin(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructAntiJoin(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -3123,40 +3467,35 @@ func (_f *Factory) ConstructAntiJoin(
 
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructAntiJoin(
+								_expr := _f.ConstructAntiJoin(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -3167,31 +3506,25 @@ func (_f *Factory) ConstructAntiJoin(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructAntiJoin(
+						_expr := _f.ConstructAntiJoin(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3202,53 +3535,45 @@ func (_f *Factory) ConstructAntiJoin(
 	{
 		if _f.funcs.HasZeroRows(right) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAntiJoin) {
-				_group = left
-				_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+				_expr := left
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAntiJoin, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAntiJoin, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructAntiJoin(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructAntiJoin(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -3264,22 +3589,23 @@ func (_f *Factory) ConstructAntiJoin(
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
-				_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-				if _filtersExpr != nil {
-					list := _filtersExpr.Conditions()
-					for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-						_eqExpr := _f.mem.NormExpr(_item).AsEq()
-						if _eqExpr != nil {
-							a := _eqExpr.Left()
-							b := _eqExpr.Right()
-							if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-									_group = _f.funcs.ExtractJoinEqualities(opt.AntiJoinOp, left, right, list)
-									_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.ExtractJoinEqualities, _group, 0, 0)
+				for i := range on {
+					_item := &on[i]
+					item := _item
+					_eq, _ := item.Condition.(*memo.EqExpr)
+					if _eq != nil {
+						a := _eq.Left
+						if !(opt.IsConstValueOp(a)) {
+							b := _eq.Right
+							if !(opt.IsConstValueOp(b)) {
+								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
+										_expr := _f.funcs.ExtractJoinEquality(opt.AntiJoinOp, left, right, on, item).(memo.RelExpr)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+										}
+										return _expr
 									}
-									return _group
 								}
 							}
 						}
@@ -3291,22 +3617,23 @@ func (_f *Factory) ConstructAntiJoin(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.AntiJoinOp, left, right, on)
-					_f.mem.AddAltFingerprint(_antiJoinExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.AntiJoinOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_antiJoinExpr))
+	e := _f.mem.MemoizeAntiJoin(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructIndexJoin constructs an expression for the IndexJoin operator.
@@ -3318,52 +3645,38 @@ func (_f *Factory) ConstructAntiJoin(
 // IndexJoin operators are created from Scan operators (unlike lookup joins which
 // are created from Join operators).
 func (_f *Factory) ConstructIndexJoin(
-	input memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_indexJoinExpr := memo.MakeIndexJoinExpr(input, def)
-	_group := _f.mem.GroupByFingerprint(_indexJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_indexJoinExpr))
+	input memo.RelExpr,
+	indexJoinPrivate *memo.IndexJoinPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeIndexJoin(input, indexJoinPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructLookupJoin constructs an expression for the LookupJoin operator.
-// LookupJoin represents a join between an input expression and an index.
-// The type of join is in the Def private.
+// LookupJoin represents a join between an input expression and an index. The
+// type of join is in the LookupJoinPrivate field.
 func (_f *Factory) ConstructLookupJoin(
-	input memo.GroupID,
-	on memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_lookupJoinExpr := memo.MakeLookupJoinExpr(input, on, def)
-	_group := _f.mem.GroupByFingerprint(_lookupJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_lookupJoinExpr))
+	input memo.RelExpr,
+	on memo.FiltersExpr,
+	lookupJoinPrivate *memo.LookupJoinPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeLookupJoin(input, on, lookupJoinPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructMergeJoin constructs an expression for the MergeJoin operator.
 // MergeJoin represents a join that is executed using merge-join.
 // MergeOn is a scalar which contains the ON condition and merge-join ordering
 // information; see the MergeOn scalar operator.
-// It can be any type of join (identified in the private of MergeOn).
+// It can be any type of join (identified in the MergeJoinPrivate field).
 func (_f *Factory) ConstructMergeJoin(
-	left memo.GroupID,
-	right memo.GroupID,
-	mergeOn memo.GroupID,
-) memo.GroupID {
-	_mergeJoinExpr := memo.MakeMergeJoinExpr(left, right, mergeOn)
-	_group := _f.mem.GroupByFingerprint(_mergeJoinExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_mergeJoinExpr))
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+	mergeJoinPrivate *memo.MergeJoinPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeMergeJoin(left, right, on, mergeJoinPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructInnerJoinApply constructs an expression for the InnerJoinApply operator.
@@ -3371,76 +3684,26 @@ func (_f *Factory) ConstructMergeJoin(
 // InnerJoin, it allows the right input to refer to columns projected by the
 // left input.
 func (_f *Factory) ConstructInnerJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_innerJoinApplyExpr := memo.MakeInnerJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [TryDecorrelateSelect]
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
 	{
-		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_innerJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_innerJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructInnerJoinApply(
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructInnerJoinApply(
 							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
+							right,
+							_f.funcs.SimplifyFilters(on),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
 						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	// [TryDecorrelateInnerJoin]
-	{
-		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_innerJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_innerJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructInnerJoinApply(
-							left,
-							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
-							_f.funcs.ConcatFilters(on, innerOn),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_innerJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
-						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3451,12 +3714,33 @@ func (_f *Factory) ConstructInnerJoinApply(
 	{
 		if !_f.funcs.IsCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.funcs.ConstructNonApplyJoin(opt.InnerJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+				_expr := _f.funcs.ConstructNonApplyJoin(opt.InnerJoinApplyOp, left, right, on).(memo.RelExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
+					_f.appliedRule(opt.DecorrelateJoin, nil, _expr)
 				}
-				return _group
+				return _expr
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructInnerJoinApply(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
@@ -3464,27 +3748,57 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateProject]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_projectExpr := _f.mem.NormExpr(right).AsProject()
-			if _projectExpr != nil {
-				input := _projectExpr.Input()
-				projections := _projectExpr.Projections()
+			_project, _ := right.(*memo.ProjectExpr)
+			if _project != nil {
+				input := _project.Input
+				projections := _project.Projections
+				passthrough := _project.Passthrough
 				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProject) {
-					_group = _f.ConstructSelect(
+					_expr := _f.ConstructSelect(
 						_f.ConstructProject(
 							_f.ConstructInnerJoinApply(
 								left,
 								input,
-								_f.ConstructTrue(),
+								memo.EmptyFiltersExpr,
 							),
-							_f.funcs.ProjectColsFromBoth(projections, left),
+							projections,
+							_f.funcs.UnionCols(_f.funcs.OutputCols(left), passthrough),
 						),
 						on,
 					)
-					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.TryDecorrelateProject, _group, 0, 0)
+						_f.appliedRule(opt.TryDecorrelateProject, nil, _expr)
 					}
-					return _group
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_expr := _f.ConstructInnerJoinApply(
+							left,
+							_f.DynamicConstruct(
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
+						}
+						return _expr
+					}
 				}
 			}
 		}
@@ -3493,14 +3807,14 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateInnerLeftJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_leftJoinExpr := _f.mem.NormExpr(right).AsLeftJoin()
-			if _leftJoinExpr != nil {
-				innerLeft := _leftJoinExpr.Left()
-				innerRight := _leftJoinExpr.Right()
-				innerOn := _leftJoinExpr.On()
-				if _f.funcs.IsBoundBy(on, _f.funcs.OutputCols2(left, innerLeft)) {
+			_leftJoin, _ := right.(*memo.LeftJoinExpr)
+			if _leftJoin != nil {
+				innerLeft := _leftJoin.Left
+				innerRight := _leftJoin.Right
+				innerOn := _leftJoin.On
+				if _f.funcs.FiltersBoundBy(on, _f.funcs.OutputCols2(left, innerLeft)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerLeftJoin) {
-						_group = _f.ConstructLeftJoinApply(
+						_expr := _f.ConstructLeftJoinApply(
 							_f.ConstructInnerJoinApply(
 								left,
 								innerLeft,
@@ -3509,11 +3823,10 @@ func (_f *Factory) ConstructInnerJoinApply(
 							innerRight,
 							innerOn,
 						)
-						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerLeftJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateInnerLeftJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3523,34 +3836,31 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-				input := _expr.ChildGroup(_f.Memo(), 0)
-				aggregations := _expr.ChildGroup(_f.Memo(), 1)
-				def := _expr.PrivateID()
-				if _f.funcs.IsUnorderedGroupBy(def) {
+			if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp {
+				input := right.Child(0).(memo.RelExpr)
+				aggregations := *right.Child(1).(*memo.AggregationsExpr)
+				groupingPrivate := right.Private().(*memo.GroupingPrivate)
+				if _f.funcs.IsUnorderedGrouping(groupingPrivate) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
 						newLeft := _f.funcs.EnsureKey(left)
-						_group = _f.ConstructSelect(
+						_arg := _f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))
+						_expr := _f.ConstructSelect(
 							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(_f.ConstructInnerJoinApply(
-										newLeft,
-										input,
-										_f.ConstructTrue(),
-									)),
-									memo.DynamicID(_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))),
-									memo.DynamicID(_f.funcs.AddColsToGroupByDef(def, _f.funcs.KeyCols(newLeft))),
-								},
-							),
+								right.Op(),
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+								),
+								&_arg,
+								_f.funcs.AddColsToGrouping(groupingPrivate, _f.funcs.KeyCols(newLeft)),
+							).(memo.RelExpr),
 							on,
 						)
-						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateGroupBy, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateGroupBy, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3560,34 +3870,33 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateScalarGroupBy]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_scalarGroupByExpr := _f.mem.NormExpr(right).AsScalarGroupBy()
-			if _scalarGroupByExpr != nil {
-				input := _scalarGroupByExpr.Input()
-				aggregations := _scalarGroupByExpr.Aggregations()
-				def := _scalarGroupByExpr.Def()
+			_scalarGroupBy, _ := right.(*memo.ScalarGroupByExpr)
+			if _scalarGroupBy != nil {
+				input := _scalarGroupBy.Input
+				aggregations := _scalarGroupBy.Aggregations
+				groupingPrivate := &_scalarGroupBy.GroupingPrivate
 				if _f.funcs.AggsCanBeDecorrelated(aggregations) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateScalarGroupBy) {
 						leftWithKey := _f.funcs.EnsureKey(left)
 						canaryCol := _f.funcs.EnsureCanaryCol(input, aggregations)
 						rightWithCanary := _f.funcs.EnsureCanary(input, canaryCol)
 						translatedAggs := _f.funcs.EnsureAggsCanIgnoreNulls(rightWithCanary, aggregations)
-						_group = _f.ConstructSelect(
+						_expr := _f.ConstructSelect(
 							_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
 								_f.ConstructLeftJoinApply(
 									leftWithKey,
 									rightWithCanary,
-									_f.ConstructTrue(),
+									memo.EmptyFiltersExpr,
 								),
 								_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
-								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupByOrdering(def)),
+								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
 							), translatedAggs, rightWithCanary, aggregations, canaryCol),
 							on,
 						)
-						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateScalarGroupBy, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateScalarGroupBy, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3597,29 +3906,28 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [TryDecorrelateLimitOne]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_limitExpr := _f.mem.NormExpr(right).AsLimit()
-			if _limitExpr != nil {
-				input := _limitExpr.Input()
-				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
-				if _constExpr != nil {
-					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
-						ordering := _limitExpr.Ordering()
+			_limit, _ := right.(*memo.LimitExpr)
+			if _limit != nil {
+				input := _limit.Input
+				_const, _ := _limit.Limit.(*memo.ConstExpr)
+				if _const != nil {
+					if _f.funcs.EqualsNumber(_const.Value, 1) {
+						ordering := _limit.Ordering
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_group = _f.ConstructDistinctOn(
+							_expr := _f.ConstructDistinctOn(
 								_f.ConstructInnerJoinApply(
 									newLeft,
 									input,
 									on,
 								),
 								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 							)
-							_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
+								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
 							}
-							return _group
+							return _expr
 						}
 					}
 				}
@@ -3629,28 +3937,130 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [TryDecorrelateZip]
 	{
-		_innerJoinApplyExpr2 := _f.mem.NormExpr(right).AsInnerJoinApply()
-		if _innerJoinApplyExpr2 != nil {
-			innerLeft := _innerJoinApplyExpr2.Left()
-			innerRight := _innerJoinApplyExpr2.Right()
-			_zipExpr := _f.mem.NormExpr(_innerJoinApplyExpr2.Right()).AsZip()
-			if _zipExpr != nil {
-				innerOn := _innerJoinApplyExpr2.On()
+		_innerJoinApply, _ := right.(*memo.InnerJoinApplyExpr)
+		if _innerJoinApply != nil {
+			innerLeft := _innerJoinApply.Left
+			innerRight := _innerJoinApply.Right
+			_zip, _ := innerRight.(*memo.ZipExpr)
+			if _zip != nil {
+				innerOn := _innerJoinApply.On
 				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateZip) {
-					_group = _f.ConstructInnerJoinApply(
+					_expr := _f.ConstructInnerJoinApply(
 						_f.ConstructInnerJoinApply(
 							left,
 							innerLeft,
-							_f.ConstructTrue(),
+							memo.EmptyFiltersExpr,
 						),
 						innerRight,
 						_f.funcs.ConcatFilters(on, innerOn),
 					)
-					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.TryDecorrelateZip, _group, 0, 0)
+						_f.appliedRule(opt.TryDecorrelateZip, nil, _expr)
 					}
-					return _group
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructInnerJoinApply(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructInnerJoinApply(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructInnerJoinApply(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -3658,40 +4068,35 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [MapFilterIntoJoinLeft]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(filters, condition, left) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+						if _f.funcs.CanMap(on, item, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_group = _f.ConstructInnerJoinApply(
+								_expr := _f.ConstructInnerJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, left)),
 								)
-								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -3702,40 +4107,35 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructInnerJoinApply(
+								_expr := _f.ConstructInnerJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -3746,31 +4146,25 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [PushFilterIntoJoinLeft]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(condition, leftCols) {
+				if _f.funcs.IsBoundBy(item, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_group = _f.ConstructInnerJoinApply(
+						_expr := _f.ConstructInnerJoinApply(
 							_f.ConstructSelect(
 								left,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, leftCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, leftCols),
 							),
 							right,
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, leftCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, leftCols),
 						)
-						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3779,31 +4173,25 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructInnerJoinApply(
+						_expr := _f.ConstructInnerJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -3815,15 +4203,14 @@ func (_f *Factory) ConstructInnerJoinApply(
 		if _f.funcs.HasNoCols(left) {
 			if _f.funcs.HasOneRow(left) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsLeft) {
-					_group = _f.ConstructSelect(
+					_expr := _f.ConstructSelect(
 						right,
 						on,
 					)
-					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateJoinNoColsLeft, _group, 0, 0)
+						_f.appliedRule(opt.EliminateJoinNoColsLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -3834,15 +4221,14 @@ func (_f *Factory) ConstructInnerJoinApply(
 		if _f.funcs.HasNoCols(right) {
 			if _f.funcs.HasOneRow(right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsRight) {
-					_group = _f.ConstructSelect(
+					_expr := _f.ConstructSelect(
 						left,
 						on,
 					)
-					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateJoinNoColsRight, _group, 0, 0)
+						_f.appliedRule(opt.EliminateJoinNoColsRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -3850,27 +4236,25 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [HoistJoinProject]
 	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
-			if _projectionsExpr != nil {
-				if _projectionsExpr.Elems().Length == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
-						_group = _f.ConstructProject(
-							_f.ConstructInnerJoinApply(
-								left,
-								input,
-								on,
-							),
-							_f.funcs.ProjectColsFromBoth(left, right),
-						)
-						_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
-						}
-						return _group
+		_project, _ := right.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+					_expr := _f.ConstructProject(
+						_f.ConstructInnerJoinApply(
+							left,
+							input,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -3878,41 +4262,34 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructInnerJoinApply(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructInnerJoinApply(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -3926,183 +4303,88 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.InnerJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_innerJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.InnerJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_innerJoinApplyExpr))
+	e := _f.mem.MemoizeInnerJoinApply(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructLeftJoinApply constructs an expression for the LeftJoinApply operator.
 func (_f *Factory) ConstructLeftJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_leftJoinApplyExpr := memo.MakeLeftJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [TryDecorrelateSelect]
-	{
-		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructLeftJoinApply(
-							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	// [TryDecorrelateProjectSelect]
-	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			_selectExpr := _f.mem.NormExpr(_projectExpr.Input()).AsSelect()
-			if _selectExpr != nil {
-				selectInput := _selectExpr.Input()
-				filters := _selectExpr.Filter()
-				if !_f.funcs.IsBoundBy(filters, _f.funcs.OutputCols(selectInput)) {
-					projections := _projectExpr.Projections()
-					if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
-							_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
-							_group = _f.ConstructProject(
-								_f.ConstructLeftJoinApply(
-									left,
-									_f.ConstructProject(
-										selectInput,
-										_f.funcs.ProjectColsFromBoth(projections, selectInput),
-									),
-									_f.funcs.ConcatFilters(on, filters),
-								),
-								_f.funcs.ProjectColsFromBoth(left, right),
-							)
-							_f.ruleCycles.pop()
-							if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
-								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-							}
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateProjectSelect, _group, 0, 0)
-							}
-							return _group
-						}
-					}
-				}
-			}
-		}
-	}
-
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
 	// [TryDecorrelateProjectInnerJoin]
 	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			join := _projectExpr.Input()
-			_expr := _f.mem.NormExpr(_projectExpr.Input())
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.funcs.IsBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
-					projections := _projectExpr.Projections()
-					if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectInnerJoin) {
-							_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
-							_group = _f.ConstructProject(
-								_f.ConstructLeftJoinApply(
-									left,
-									_f.ConstructProject(
-										_f.DynamicConstruct(
-											_f.mem.NormOp(join),
-											memo.DynamicOperands{
-												memo.DynamicID(innerLeft),
-												memo.DynamicID(innerRight),
-												memo.DynamicID(_f.ConstructTrue()),
-											},
-										),
-										_f.funcs.ProjectColsFromBoth(projections, join),
-									),
-									_f.funcs.ConcatFilters(on, innerOn),
+		_project, _ := right.(*memo.ProjectExpr)
+		if _project != nil {
+			join := _project.Input
+			if join.Op() == opt.InnerJoinOp || join.Op() == opt.InnerJoinApplyOp {
+				innerLeft := join.Child(0).(memo.RelExpr)
+				innerRight := join.Child(1).(memo.RelExpr)
+				innerOn := *join.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
+					projections := _project.Projections
+					passthrough := _project.Passthrough
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectInnerJoin) {
+						_expr := _f.ConstructProject(
+							_f.ConstructLeftJoinApply(
+								left,
+								_f.ConstructProject(
+									_f.DynamicConstruct(
+										join.Op(),
+										innerLeft,
+										innerRight,
+										&memo.EmptyFiltersExpr,
+									).(memo.RelExpr),
+									projections,
+									_f.funcs.UnionCols(passthrough, _f.funcs.OutputCols(join)),
 								),
-								_f.funcs.ProjectColsFromBoth(left, right),
-							)
-							_f.ruleCycles.pop()
-							if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
-								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-							}
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateProjectInnerJoin, _group, 0, 0)
-							}
-							return _group
+								_f.funcs.ConcatFilters(on, innerOn),
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateProjectInnerJoin, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	// [TryDecorrelateInnerJoin]
+	// [SimplifyJoinFilters]
 	{
-		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_leftJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_leftJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructLeftJoinApply(
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructLeftJoinApply(
 							left,
-							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
-							_f.funcs.ConcatFilters(on, innerOn),
+							right,
+							_f.funcs.SimplifyFilters(on),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_leftJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -4113,12 +4395,97 @@ func (_f *Factory) ConstructLeftJoinApply(
 	{
 		if !_f.funcs.IsCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.funcs.ConstructNonApplyJoin(opt.LeftJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+				_expr := _f.funcs.ConstructNonApplyJoin(opt.LeftJoinApplyOp, left, right, on).(memo.RelExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
+					_f.appliedRule(opt.DecorrelateJoin, nil, _expr)
 				}
-				return _group
+				return _expr
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructLeftJoinApply(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateProjectSelect]
+	{
+		_project, _ := right.(*memo.ProjectExpr)
+		if _project != nil {
+			_select, _ := _project.Input.(*memo.SelectExpr)
+			if _select != nil {
+				selectInput := _select.Input
+				filters := _select.Filters
+				if !_f.funcs.FiltersBoundBy(filters, _f.funcs.OutputCols(selectInput)) {
+					projections := _project.Projections
+					passthrough := _project.Passthrough
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSelect) {
+						_expr := _f.ConstructProject(
+							_f.ConstructLeftJoinApply(
+								left,
+								_f.ConstructProject(
+									selectInput,
+									projections,
+									_f.funcs.UnionCols(passthrough, _f.funcs.OutputCols(selectInput)),
+								),
+								_f.funcs.ConcatFilters(on, filters),
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateProjectSelect, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_expr := _f.ConstructLeftJoinApply(
+							left,
+							_f.DynamicConstruct(
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
+						}
+						return _expr
+					}
+				}
 			}
 		}
 	}
@@ -4126,29 +4493,28 @@ func (_f *Factory) ConstructLeftJoinApply(
 	// [TryDecorrelateLimitOne]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_limitExpr := _f.mem.NormExpr(right).AsLimit()
-			if _limitExpr != nil {
-				input := _limitExpr.Input()
-				_constExpr := _f.mem.NormExpr(_limitExpr.Limit()).AsConst()
-				if _constExpr != nil {
-					if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
-						ordering := _limitExpr.Ordering()
+			_limit, _ := right.(*memo.LimitExpr)
+			if _limit != nil {
+				input := _limit.Input
+				_const, _ := _limit.Limit.(*memo.ConstExpr)
+				if _const != nil {
+					if _f.funcs.EqualsNumber(_const.Value, 1) {
+						ordering := _limit.Ordering
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_group = _f.ConstructDistinctOn(
+							_expr := _f.ConstructDistinctOn(
 								_f.ConstructLeftJoinApply(
 									newLeft,
 									input,
 									on,
 								),
 								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGroupByDef(_f.funcs.KeyCols(newLeft), _f.funcs.ExtractOrdering(ordering)),
+								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 							)
-							_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.TryDecorrelateLimitOne, _group, 0, 0)
+								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
 							}
-							return _group
+							return _expr
 						}
 					}
 				}
@@ -4156,42 +4522,140 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructLeftJoinApply(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructLeftJoinApply(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructLeftJoinApply(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructLeftJoinApply(
+								_expr := _f.ConstructLeftJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -4202,31 +4666,25 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructLeftJoinApply(
+						_expr := _f.ConstructLeftJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -4236,15 +4694,13 @@ func (_f *Factory) ConstructLeftJoinApply(
 	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4252,16 +4708,14 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4269,27 +4723,25 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [HoistJoinProject]
 	{
-		_projectExpr := _f.mem.NormExpr(right).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			_projectionsExpr := _f.mem.NormExpr(_projectExpr.Projections()).AsProjections()
-			if _projectionsExpr != nil {
-				if _projectionsExpr.Elems().Length == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
-						_group = _f.ConstructProject(
-							_f.ConstructLeftJoinApply(
-								left,
-								input,
-								on,
-							),
-							_f.funcs.ProjectColsFromBoth(left, right),
-						)
-						_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.HoistJoinProject, _group, 0, 0)
-						}
-						return _group
+		_project, _ := right.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+					_expr := _f.ConstructProject(
+						_f.ConstructLeftJoinApply(
+							left,
+							input,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -4297,41 +4749,34 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructLeftJoinApply(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructLeftJoinApply(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -4345,86 +4790,200 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.LeftJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_leftJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.LeftJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_leftJoinApplyExpr))
+	e := _f.mem.MemoizeLeftJoinApply(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructRightJoinApply constructs an expression for the RightJoinApply operator.
 func (_f *Factory) ConstructRightJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_rightJoinApplyExpr := memo.MakeRightJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_rightJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructRightJoinApply(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
 	}
 
 	// [DecorrelateJoin]
 	{
 		if !_f.funcs.IsCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.funcs.ConstructNonApplyJoin(opt.RightJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+				_expr := _f.funcs.ConstructNonApplyJoin(opt.RightJoinApplyOp, left, right, on).(memo.RelExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
+					_f.appliedRule(opt.DecorrelateJoin, nil, _expr)
 				}
-				return _group
+				return _expr
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructRightJoinApply(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructRightJoinApply(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructRightJoinApply(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
 
 	// [MapFilterIntoJoinLeft]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(filters, condition, left) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+						if _f.funcs.CanMap(on, item, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_group = _f.ConstructRightJoinApply(
+								_expr := _f.ConstructRightJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, left)),
 								)
-								_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -4435,31 +4994,25 @@ func (_f *Factory) ConstructRightJoinApply(
 
 	// [PushFilterIntoJoinLeft]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(condition, leftCols) {
+				if _f.funcs.IsBoundBy(item, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_group = _f.ConstructRightJoinApply(
+						_expr := _f.ConstructRightJoinApply(
 							_f.ConstructSelect(
 								left,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, leftCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, leftCols),
 							),
 							right,
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, leftCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, leftCols),
 						)
-						_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -4469,15 +5022,13 @@ func (_f *Factory) ConstructRightJoinApply(
 	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.RightJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4485,16 +5036,14 @@ func (_f *Factory) ConstructRightJoinApply(
 
 	// [SimplifyRightJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.RightJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.RightJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4502,41 +5051,34 @@ func (_f *Factory) ConstructRightJoinApply(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructRightJoinApply(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructRightJoinApply(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -4550,46 +5092,165 @@ func (_f *Factory) ConstructRightJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.RightJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_rightJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.RightJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_rightJoinApplyExpr))
+	e := _f.mem.MemoizeRightJoinApply(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructFullJoinApply constructs an expression for the FullJoinApply operator.
 func (_f *Factory) ConstructFullJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_fullJoinApplyExpr := memo.MakeFullJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_fullJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructFullJoinApply(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
 	}
 
 	// [DecorrelateJoin]
 	{
 		if !_f.funcs.IsCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.funcs.ConstructNonApplyJoin(opt.FullJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+				_expr := _f.funcs.ConstructNonApplyJoin(opt.FullJoinApplyOp, left, right, on).(memo.RelExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
+					_f.appliedRule(opt.DecorrelateJoin, nil, _expr)
 				}
-				return _group
+				return _expr
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructFullJoinApply(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructFullJoinApply(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructFullJoinApply(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
@@ -4597,15 +5258,13 @@ func (_f *Factory) ConstructFullJoinApply(
 	// [SimplifyLeftJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.FullJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4614,15 +5273,13 @@ func (_f *Factory) ConstructFullJoinApply(
 	// [SimplifyRightJoinWithoutFilters]
 	{
 		if !_f.funcs.CanHaveZeroRows(left) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.FullJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4630,16 +5287,14 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_group = _f.funcs.ConstructNonLeftJoin(opt.FullJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonLeftJoin(opt.FullJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4647,16 +5302,14 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [SimplifyRightJoinWithFilters]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
+		if len(on) != 0 {
 			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_group = _f.funcs.ConstructNonRightJoin(opt.FullJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.ConstructNonRightJoin(opt.FullJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithFilters, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -4664,41 +5317,34 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructFullJoinApply(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructFullJoinApply(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -4712,60 +5358,83 @@ func (_f *Factory) ConstructFullJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.FullJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_fullJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.FullJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_fullJoinApplyExpr))
+	e := _f.mem.MemoizeFullJoinApply(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructSemiJoinApply constructs an expression for the SemiJoinApply operator.
 func (_f *Factory) ConstructSemiJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_semiJoinApplyExpr := memo.MakeSemiJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
+	{
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructSemiJoinApply(
+							left,
+							right,
+							_f.funcs.SimplifyFilters(on),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DecorrelateJoin]
+	{
+		if !_f.funcs.IsCorrelated(right, left) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
+				_expr := _f.funcs.ConstructNonApplyJoin(opt.SemiJoinApplyOp, left, right, on).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DecorrelateJoin, nil, _expr)
+				}
+				return _expr
+			}
+		}
 	}
 
 	// [TryDecorrelateSelect]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_semiJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_semiJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructSemiJoinApply(
-							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
-						}
-						return _group
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructSemiJoinApply(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -4774,50 +5443,28 @@ func (_f *Factory) ConstructSemiJoinApply(
 	// [TryDecorrelateInnerJoin]
 	{
 		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_semiJoinApplyExpr.Fingerprint()) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_semiJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructSemiJoinApply(
+						_expr := _f.ConstructSemiJoinApply(
 							left,
 							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
 							_f.funcs.ConcatFilters(on, innerOn),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_semiJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
-			}
-		}
-	}
-
-	// [DecorrelateJoin]
-	{
-		if !_f.funcs.IsCorrelated(right, left) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.funcs.ConstructNonApplyJoin(opt.SemiJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
-				}
-				return _group
 			}
 		}
 	}
@@ -4826,25 +5473,126 @@ func (_f *Factory) ConstructSemiJoinApply(
 	{
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
-				_expr := _f.mem.NormExpr(right)
-				if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp || _expr.Operator() == opt.ProjectOp {
+				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
-						_group = _f.ConstructGroupBy(
+						_expr := _f.ConstructGroupBy(
 							_f.ConstructInnerJoinApply(
 								newLeft,
 								right,
 								on,
 							),
 							_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-							_f.funcs.MakeGroupByDef(_f.funcs.KeyCols(newLeft)),
+							_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
 						)
-						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSemiJoin, _group, 0, 0)
+							_f.appliedRule(opt.TryDecorrelateSemiJoin, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructSemiJoinApply(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructSemiJoinApply(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructSemiJoinApply(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -4852,40 +5600,35 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [MapFilterIntoJoinLeft]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMap(filters, condition, left) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
+						if _f.funcs.CanMap(on, item, left) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_group = _f.ConstructSemiJoinApply(
+								_expr := _f.ConstructSemiJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, left)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, left)),
 								)
-								_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -4896,40 +5639,35 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructSemiJoinApply(
+								_expr := _f.ConstructSemiJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -4940,31 +5678,25 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [PushFilterIntoJoinLeft]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(left) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(condition, leftCols) {
+				if _f.funcs.IsBoundBy(item, leftCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_group = _f.ConstructSemiJoinApply(
+						_expr := _f.ConstructSemiJoinApply(
 							_f.ConstructSelect(
 								left,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, leftCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, leftCols),
 							),
 							right,
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, leftCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, leftCols),
 						)
-						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -4973,31 +5705,25 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructSemiJoinApply(
+						_expr := _f.ConstructSemiJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -5007,15 +5733,13 @@ func (_f *Factory) ConstructSemiJoinApply(
 	// [EliminateSemiJoin]
 	{
 		if !_f.funcs.CanHaveZeroRows(right) {
-			_trueExpr := _f.mem.NormExpr(on).AsTrue()
-			if _trueExpr != nil {
+			if len(on) == 0 {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
-					_group = left
-					_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateSemiJoin, _group, 0, 0)
+						_f.appliedRule(opt.EliminateSemiJoin, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -5023,41 +5747,34 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructSemiJoinApply(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructSemiJoinApply(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -5071,96 +5788,47 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.SemiJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_semiJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.SemiJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_semiJoinApplyExpr))
+	e := _f.mem.MemoizeSemiJoinApply(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructAntiJoinApply constructs an expression for the AntiJoinApply operator.
 func (_f *Factory) ConstructAntiJoinApply(
-	left memo.GroupID,
-	right memo.GroupID,
-	on memo.GroupID,
-) memo.GroupID {
-	_antiJoinApplyExpr := memo.MakeAntiJoinApplyExpr(left, right, on)
-	_group := _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [TryDecorrelateSelect]
+	left memo.RelExpr,
+	right memo.RelExpr,
+	on memo.FiltersExpr,
+) memo.RelExpr {
+	// [SimplifyJoinFilters]
 	{
-		if _f.funcs.HasOuterCols(right) {
-			_selectExpr := _f.mem.NormExpr(right).AsSelect()
-			if _selectExpr != nil {
-				input := _selectExpr.Input()
-				filter := _selectExpr.Filter()
-				if !_f.ruleCycles.detectCycle(_antiJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
-						_f.ruleCycles.push(_antiJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructAntiJoinApply(
+		for i := range on {
+			_item := &on[i]
+			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
+				if !_f.funcs.IsFilterFalse(on) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+						_expr := _f.ConstructAntiJoinApply(
 							left,
-							input,
-							_f.funcs.ConcatFilters(on, filter),
+							right,
+							_f.funcs.SimplifyFilters(on),
 						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-						}
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateSelect, _group, 0, 0)
+							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
 						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	// [TryDecorrelateInnerJoin]
-	{
-		if _f.funcs.HasOuterCols(right) {
-			_expr := _f.mem.NormExpr(right)
-			if _expr.Operator() == opt.InnerJoinOp || _expr.Operator() == opt.InnerJoinApplyOp {
-				innerLeft := _expr.ChildGroup(_f.Memo(), 0)
-				innerRight := _expr.ChildGroup(_f.Memo(), 1)
-				innerOn := _expr.ChildGroup(_f.Memo(), 2)
-				if !_f.ruleCycles.detectCycle(_antiJoinApplyExpr.Fingerprint()) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
-						_f.ruleCycles.push(_antiJoinApplyExpr.Fingerprint())
-						_group = _f.ConstructAntiJoinApply(
-							left,
-							_f.DynamicConstruct(
-								_f.mem.NormOp(right),
-								memo.DynamicOperands{
-									memo.DynamicID(innerLeft),
-									memo.DynamicID(innerRight),
-									memo.DynamicID(_f.ConstructTrue()),
-								},
-							),
-							_f.funcs.ConcatFilters(on, innerOn),
-						)
-						_f.ruleCycles.pop()
-						if _f.mem.GroupByFingerprint(_antiJoinApplyExpr.Fingerprint()) == 0 {
-							_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-						}
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.TryDecorrelateInnerJoin, _group, 0, 0)
-						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -5171,52 +5839,200 @@ func (_f *Factory) ConstructAntiJoinApply(
 	{
 		if !_f.funcs.IsCorrelated(right, left) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
-				_group = _f.funcs.ConstructNonApplyJoin(opt.AntiJoinApplyOp, left, right, on)
-				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+				_expr := _f.funcs.ConstructNonApplyJoin(opt.AntiJoinApplyOp, left, right, on).(memo.RelExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.DecorrelateJoin, _group, 0, 0)
+					_f.appliedRule(opt.DecorrelateJoin, nil, _expr)
 				}
-				return _group
+				return _expr
+			}
+		}
+	}
+
+	// [TryDecorrelateSelect]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_select, _ := right.(*memo.SelectExpr)
+			if _select != nil {
+				input := _select.Input
+				filters := _select.Filters
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSelect) {
+					_expr := _f.ConstructAntiJoinApply(
+						left,
+						input,
+						_f.funcs.ConcatFilters(on, filters),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateSelect, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateInnerJoin]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			if right.Op() == opt.InnerJoinOp || right.Op() == opt.InnerJoinApplyOp {
+				innerLeft := right.Child(0).(memo.RelExpr)
+				innerRight := right.Child(1).(memo.RelExpr)
+				innerOn := *right.Child(2).(*memo.FiltersExpr)
+				if !_f.funcs.FiltersBoundBy(innerOn, _f.funcs.OutputCols2(innerLeft, innerRight)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateInnerJoin) {
+						_expr := _f.ConstructAntiJoinApply(
+							left,
+							_f.DynamicConstruct(
+								right.Op(),
+								innerLeft,
+								innerRight,
+								&memo.EmptyFiltersExpr,
+							).(memo.RelExpr),
+							_f.funcs.ConcatFilters(on, innerOn),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateInnerJoin, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_any, _ := item.Condition.(*memo.AnyExpr)
+			if _any != nil {
+				anyInput := _any.Input
+				scalar := _any.Scalar
+				anyPrivate := &_any.SubqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinAnyFilter) {
+					_expr := _f.ConstructAntiJoinApply(
+						left,
+						right,
+						_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructExists(
+							_f.ConstructSelect(
+								anyInput,
+								memo.FiltersExpr{
+									{
+										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									},
+								},
+							),
+							anyPrivate,
+						)),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.NormalizeJoinAnyFilter, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [NormalizeJoinNotAnyFilter]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			_not, _ := item.Condition.(*memo.NotExpr)
+			if _not != nil {
+				_any, _ := _not.Input.(*memo.AnyExpr)
+				if _any != nil {
+					anyInput := _any.Input
+					scalar := _any.Scalar
+					anyPrivate := &_any.SubqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJoinNotAnyFilter) {
+						_expr := _f.ConstructAntiJoinApply(
+							left,
+							right,
+							_f.funcs.ReplaceFiltersItem(on, item, _f.ConstructNot(
+								_f.ConstructExists(
+									_f.ConstructSelect(
+										anyInput,
+										memo.FiltersExpr{
+											{
+												Condition: _f.ConstructIsNot(
+													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+													_f.ConstructFalse(),
+												),
+											},
+										},
+									),
+									anyPrivate,
+								),
+							)),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [DetectJoinContradiction]
+	{
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.IsContradiction(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+					_expr := _f.ConstructAntiJoinApply(
+						left,
+						right,
+						memo.FiltersExpr{
+							{
+								Condition: _f.ConstructFalse(),
+							},
+						},
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
 
 	// [MapFilterIntoJoinRight]
 	{
-		filters := on
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				_match := false
-				_eqExpr := _f.mem.NormExpr(_item).AsEq()
-				if _eqExpr != nil {
-					_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-					if _variableExpr != nil {
-						_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-						if _variableExpr2 != nil {
+				_eq, _ := item.Condition.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						_variable2, _ := _eq.Right.(*memo.VariableExpr)
+						if _variable2 != nil {
 							_match = true
 						}
 					}
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(condition, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMap(filters, condition, right) {
+					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
+						if _f.funcs.CanMap(on, item, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
-								_group = _f.ConstructAntiJoinApply(
+								_expr := _f.ConstructAntiJoinApply(
 									left,
 									right,
-									_f.ConstructFilters(
-										_f.funcs.ReplaceListItem(list, condition, _f.funcs.Map(filters, condition, right)),
-									),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.Map(on, item, right)),
 								)
-								_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinRight, _group, 0, 0)
+									_f.appliedRule(opt.MapFilterIntoJoinRight, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -5227,31 +6043,25 @@ func (_f *Factory) ConstructAntiJoinApply(
 
 	// [PushFilterIntoJoinRight]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
+		if !_f.funcs.HasOuterCols(right) {
+			for i := range on {
+				_item := &on[i]
+				item := _item
 				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(condition, rightCols) {
+				if _f.funcs.IsBoundBy(item, rightCols) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinRight) {
-						_group = _f.ConstructAntiJoinApply(
+						_expr := _f.ConstructAntiJoinApply(
 							left,
 							_f.ConstructSelect(
 								right,
-								_f.ConstructFilters(
-									_f.funcs.ExtractBoundConditions(list, rightCols),
-								),
+								_f.funcs.ExtractBoundConditions(on, rightCols),
 							),
-							_f.ConstructFilters(
-								_f.funcs.ExtractUnboundConditions(list, rightCols),
-							),
+							_f.funcs.ExtractUnboundConditions(on, rightCols),
 						)
-						_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinRight, _group, 0, 0)
+							_f.appliedRule(opt.PushFilterIntoJoinRight, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -5262,53 +6072,45 @@ func (_f *Factory) ConstructAntiJoinApply(
 	{
 		if _f.funcs.HasZeroRows(right) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAntiJoin) {
-				_group = left
-				_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+				_expr := left
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAntiJoin, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAntiJoin, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyJoinNotNullEquality]
 	{
-		_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-		if _filtersExpr != nil {
-			list := _filtersExpr.Conditions()
-			for _, _item := range _f.mem.LookupList(_filtersExpr.Conditions()) {
-				condition := _item
-				_expr := _f.mem.NormExpr(_item)
-				if _expr.Operator() == opt.IsOp || _expr.Operator() == opt.IsNotOp {
-					eq := _expr.ChildGroup(_f.Memo(), 0)
-					_eqExpr := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 0)).AsEq()
-					if _eqExpr != nil {
-						_variableExpr := _f.mem.NormExpr(_eqExpr.Left()).AsVariable()
-						if _variableExpr != nil {
-							col1 := _variableExpr.Col()
-							if _f.funcs.IsColNotNull2(col1, left, right) {
-								_variableExpr2 := _f.mem.NormExpr(_eqExpr.Right()).AsVariable()
-								if _variableExpr2 != nil {
-									col2 := _variableExpr2.Col()
-									if _f.funcs.IsColNotNull2(col2, left, right) {
-										cnst := _expr.ChildGroup(_f.Memo(), 1)
-										_expr2 := _f.mem.NormExpr(_expr.ChildGroup(_f.Memo(), 1))
-										if _expr2.Operator() == opt.TrueOp || _expr2.Operator() == opt.FalseOp || _expr2.Operator() == opt.NullOp {
-											if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
-												_group = _f.ConstructAntiJoinApply(
-													left,
-													right,
-													_f.ConstructFilters(
-														_f.funcs.ReplaceListItem(list, condition, _f.funcs.SimplifyNotNullEquality(eq, _f.mem.NormExpr(condition).Operator(), _f.mem.NormExpr(cnst).Operator())),
-													),
-												)
-												_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
-												if _f.appliedRule != nil {
-													_f.appliedRule(opt.SimplifyJoinNotNullEquality, _group, 0, 0)
-												}
-												return _group
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			condition := item.Condition
+			if condition.Op() == opt.IsOp || condition.Op() == opt.IsNotOp {
+				eq := condition.Child(0).(opt.ScalarExpr)
+				_eq, _ := eq.(*memo.EqExpr)
+				if _eq != nil {
+					_variable, _ := _eq.Left.(*memo.VariableExpr)
+					if _variable != nil {
+						col1 := _variable.Col
+						if _f.funcs.IsColNotNull2(col1, left, right) {
+							_variable2, _ := _eq.Right.(*memo.VariableExpr)
+							if _variable2 != nil {
+								col2 := _variable2.Col
+								if _f.funcs.IsColNotNull2(col2, left, right) {
+									cnst := condition.Child(1).(opt.ScalarExpr)
+									if cnst.Op() == opt.TrueOp || cnst.Op() == opt.FalseOp || cnst.Op() == opt.NullOp {
+										if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinNotNullEquality) {
+											_expr := _f.ConstructAntiJoinApply(
+												left,
+												right,
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+											)
+											if _f.appliedRule != nil {
+												_f.appliedRule(opt.SimplifyJoinNotNullEquality, nil, _expr)
 											}
+											return _expr
 										}
 									}
 								}
@@ -5322,22 +6124,23 @@ func (_f *Factory) ConstructAntiJoinApply(
 
 	// [HoistJoinSubquery]
 	{
-		if _f.funcs.HasHoistableSubquery(on) {
-			_filtersExpr := _f.mem.NormExpr(on).AsFilters()
-			if _filtersExpr != nil {
+		for i := range on {
+			_item := &on[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinSubquery) {
-					_group = _f.funcs.HoistJoinSubquery(opt.AntiJoinApplyOp, left, right, on)
-					_f.mem.AddAltFingerprint(_antiJoinApplyExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistJoinSubquery(opt.AntiJoinApplyOp, left, right, on).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_antiJoinApplyExpr))
+	e := _f.mem.MemoizeAntiJoinApply(left, right, on)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructGroupBy constructs an expression for the GroupBy operator.
@@ -5354,57 +6157,49 @@ func (_f *Factory) ConstructAntiJoinApply(
 // form a single group. GroupBy is used for queries with aggregate functions,
 // HAVING clauses and/or GROUP BY expressions.
 //
-// The Def private contains an ordering; this ordering is used to determine
-// intra-group ordering and is only useful if there is an order-dependent
-// aggregation (like ARRAY_AGG). Grouping columns are inconsequential in this
-// ordering; we currently set all grouping columns as optional in this ordering
-// (but note that this is not required by the operator).
+// The GroupingPrivate field contains an ordering; this ordering is used to
+// determine intra-group ordering and is only useful if there is an order-
+// dependent aggregation (like ARRAY_AGG). Grouping columns are inconsequential
+// in this ordering; we currently set all grouping columns as optional in this
+// ordering (but note that this is not required by the operator).
 func (_f *Factory) ConstructGroupBy(
-	input memo.GroupID,
-	aggregations memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_groupByExpr := memo.MakeGroupByExpr(input, aggregations, def)
-	_group := _f.mem.GroupByFingerprint(_groupByExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	aggregations memo.AggregationsExpr,
+	groupingPrivate *memo.GroupingPrivate,
+) memo.RelExpr {
 	// [ConvertGroupByToDistinct]
 	{
-		if _f.funcs.HasNoCols(aggregations) {
+		if len(aggregations) == 0 {
 			if _f.matchedRule == nil || _f.matchedRule(opt.ConvertGroupByToDistinct) {
-				_group = _f.ConstructDistinctOn(
+				_expr := _f.ConstructDistinctOn(
 					input,
 					aggregations,
-					def,
+					groupingPrivate,
 				)
-				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.ConvertGroupByToDistinct, _group, 0, 0)
+					_f.appliedRule(opt.ConvertGroupByToDistinct, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [EliminateGroupByProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			innerInput := _projectExpr.Input()
-			if _f.funcs.HasSubsetCols(input, innerInput) {
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
-					_group = _f.ConstructGroupBy(
+					_expr := _f.ConstructGroupBy(
 						innerInput,
 						aggregations,
-						def,
+						groupingPrivate,
 					)
-					_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateGroupByProject, _group, 0, 0)
+						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -5412,78 +6207,75 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [ReduceGroupingCols]
 	{
-		if _f.funcs.CanReduceGroupingCols(input, def) {
+		if _f.funcs.CanReduceGroupingCols(input, groupingPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceGroupingCols) {
-				_group = _f.ConstructGroupBy(
+				_expr := _f.ConstructGroupBy(
 					input,
-					_f.funcs.AppendReducedGroupingCols(input, aggregations, def),
-					_f.funcs.ReduceGroupingCols(input, def),
+					_f.funcs.AppendReducedGroupingCols(input, aggregations, groupingPrivate),
+					_f.funcs.ReduceGroupingCols(input, groupingPrivate),
 				)
-				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.ReduceGroupingCols, _group, 0, 0)
+					_f.appliedRule(opt.ReduceGroupingCols, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [EliminateAggDistinctForKeys]
 	{
-		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, def, input) {
+		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, groupingPrivate, input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
-				_group = _f.ConstructGroupBy(
+				_expr := _f.ConstructGroupBy(
 					input,
-					_f.funcs.RemoveAggDistinctForKeys(aggregations, def, input),
-					def,
+					_f.funcs.RemoveAggDistinctForKeys(aggregations, groupingPrivate, input),
+					groupingPrivate,
 				)
-				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinctForKeys, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAggDistinctForKeys, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyGroupByOrdering]
 	{
-		if _f.funcs.CanSimplifyGroupByOrdering(input, def) {
+		if _f.funcs.CanSimplifyGroupingOrdering(input, groupingPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyGroupByOrdering) {
-				_group = _f.ConstructGroupBy(
+				_expr := _f.ConstructGroupBy(
 					input,
 					aggregations,
-					_f.funcs.SimplifyGroupByOrdering(input, def),
+					_f.funcs.SimplifyGroupingOrdering(input, groupingPrivate),
 				)
-				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyGroupByOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyGroupByOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [PruneGroupByCols]
 	{
-		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def)) {
+		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededColsGrouping(groupingPrivate))
+		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
-				newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def))
-				_group = _f.ConstructGroupBy(
-					newInput,
+				_expr := _f.ConstructGroupBy(
+					_f.funcs.PruneCols(input, needed),
 					aggregations,
-					_f.funcs.PruneOrderingGroupBy(newInput, def),
+					_f.funcs.PruneOrderingGroupBy(groupingPrivate, needed),
 				)
-				_f.mem.AddAltFingerprint(_groupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneGroupByCols, _group, 0, 0)
+					_f.appliedRule(opt.PruneGroupByCols, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_groupByExpr))
+	e := _f.mem.MemoizeGroupBy(input, aggregations, groupingPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructScalarGroupBy constructs an expression for the ScalarGroupBy operator.
@@ -5495,37 +6287,31 @@ func (_f *Factory) ConstructGroupBy(
 // null or zero, depending on the function). ScalarGroupBy always returns exactly
 // one row - either the single-group aggregates or the default aggregate values.
 //
-// ScalarGroupBy uses the same GroupByDef private so that it's polymorphic with
+// ScalarGroupBy uses the GroupingPrivate struct so that it's polymorphic with
 // GroupBy and can be used in the same rules (when appropriate). In the
-// ScalarGroupBy case, the grouping column field in GroupByDef is always empty.
+// ScalarGroupBy case, the grouping column field in GroupingPrivate is always
+// empty.
 func (_f *Factory) ConstructScalarGroupBy(
-	input memo.GroupID,
-	aggregations memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_scalarGroupByExpr := memo.MakeScalarGroupByExpr(input, aggregations, def)
-	_group := _f.mem.GroupByFingerprint(_scalarGroupByExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	aggregations memo.AggregationsExpr,
+	groupingPrivate *memo.GroupingPrivate,
+) memo.RelExpr {
 	// [EliminateGroupByProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			innerInput := _projectExpr.Input()
-			if _f.funcs.HasSubsetCols(input, innerInput) {
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
-					_group = _f.ConstructScalarGroupBy(
+					_expr := _f.ConstructScalarGroupBy(
 						innerInput,
 						aggregations,
-						def,
+						groupingPrivate,
 					)
-					_f.mem.AddAltFingerprint(_scalarGroupByExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateGroupByProject, _group, 0, 0)
+						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -5533,41 +6319,40 @@ func (_f *Factory) ConstructScalarGroupBy(
 
 	// [EliminateAggDistinctForKeys]
 	{
-		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, def, input) {
+		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, groupingPrivate, input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
-				_group = _f.ConstructScalarGroupBy(
+				_expr := _f.ConstructScalarGroupBy(
 					input,
-					_f.funcs.RemoveAggDistinctForKeys(aggregations, def, input),
-					def,
+					_f.funcs.RemoveAggDistinctForKeys(aggregations, groupingPrivate, input),
+					groupingPrivate,
 				)
-				_f.mem.AddAltFingerprint(_scalarGroupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinctForKeys, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAggDistinctForKeys, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyGroupByOrdering]
 	{
-		if _f.funcs.CanSimplifyGroupByOrdering(input, def) {
+		if _f.funcs.CanSimplifyGroupingOrdering(input, groupingPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyGroupByOrdering) {
-				_group = _f.ConstructScalarGroupBy(
+				_expr := _f.ConstructScalarGroupBy(
 					input,
 					aggregations,
-					_f.funcs.SimplifyGroupByOrdering(input, def),
+					_f.funcs.SimplifyGroupingOrdering(input, groupingPrivate),
 				)
-				_f.mem.AddAltFingerprint(_scalarGroupByExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyGroupByOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyGroupByOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_scalarGroupByExpr))
+	e := _f.mem.MemoizeScalarGroupBy(input, aggregations, groupingPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructDistinctOn constructs an expression for the DistinctOn operator.
@@ -5588,11 +6373,11 @@ func (_f *Factory) ConstructScalarGroupBy(
 // and is either passed through or discarded. In particular, note that this
 // preserves the input ordering.
 //
-// The ordering in the private will be required of the input; it determines which
-// row can get "chosen" for each group of values on the grouping columns.
-// There is no restriction on the ordering; but note that grouping columns are
-// inconsequential - they can appear anywhere in the ordering and they won't
-// change the results (other than the result ordering).
+// The ordering in the GroupingPrivate field will be required of the input; it
+// determines which row can get "chosen" for each group of values on the grouping
+// columns. There is no restriction on the ordering; but note that grouping
+// columns are inconsequential - they can appear anywhere in the ordering and
+// they won't change the results (other than the result ordering).
 //
 // Currently when we build DistinctOn, we set all grouping columns as optional
 // cols in Ordering (but this is not required by the operator).
@@ -5601,51 +6386,44 @@ func (_f *Factory) ConstructScalarGroupBy(
 // specific interesting orderings because execution is more efficient when we can
 // rely on an ordering on the grouping columns (or a subset of them).
 //
-// DistinctOn uses an Aggregations child and the GroupByDef private so that it's
-// polymorphic with GroupBy and can be used in the same rules (when appropriate).
-// In the DistinctOn case, the aggregations can be only FirstAgg or ConstAgg.
+// DistinctOn uses an Aggregations child and the GroupingPrivate struct so that
+// it's polymorphic with GroupBy and can be used in the same rules (when
+// appropriate). In the DistinctOn case, the aggregations can be only FirstAgg or
+// ConstAgg.
 func (_f *Factory) ConstructDistinctOn(
-	input memo.GroupID,
-	aggregations memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_distinctOnExpr := memo.MakeDistinctOnExpr(input, aggregations, def)
-	_group := _f.mem.GroupByFingerprint(_distinctOnExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	aggregations memo.AggregationsExpr,
+	groupingPrivate *memo.GroupingPrivate,
+) memo.RelExpr {
 	// [EliminateDistinct]
 	{
-		if _f.funcs.GroupingColsAreKey(def, input) {
+		if _f.funcs.GroupingColsAreKey(groupingPrivate, input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-				_group = input
-				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
+				_expr := input
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateDistinct, _group, 0, 0)
+					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [EliminateGroupByProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			innerInput := _projectExpr.Input()
-			if _f.funcs.HasSubsetCols(input, innerInput) {
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
-					_group = _f.ConstructDistinctOn(
+					_expr := _f.ConstructDistinctOn(
 						innerInput,
 						aggregations,
-						def,
+						groupingPrivate,
 					)
-					_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateGroupByProject, _group, 0, 0)
+						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -5653,80 +6431,73 @@ func (_f *Factory) ConstructDistinctOn(
 
 	// [ReduceGroupingCols]
 	{
-		if _f.funcs.CanReduceGroupingCols(input, def) {
+		if _f.funcs.CanReduceGroupingCols(input, groupingPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceGroupingCols) {
-				_group = _f.ConstructDistinctOn(
+				_expr := _f.ConstructDistinctOn(
 					input,
-					_f.funcs.AppendReducedGroupingCols(input, aggregations, def),
-					_f.funcs.ReduceGroupingCols(input, def),
+					_f.funcs.AppendReducedGroupingCols(input, aggregations, groupingPrivate),
+					_f.funcs.ReduceGroupingCols(input, groupingPrivate),
 				)
-				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.ReduceGroupingCols, _group, 0, 0)
+					_f.appliedRule(opt.ReduceGroupingCols, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyGroupByOrdering]
 	{
-		if _f.funcs.CanSimplifyGroupByOrdering(input, def) {
+		if _f.funcs.CanSimplifyGroupingOrdering(input, groupingPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyGroupByOrdering) {
-				_group = _f.ConstructDistinctOn(
+				_expr := _f.ConstructDistinctOn(
 					input,
 					aggregations,
-					_f.funcs.SimplifyGroupByOrdering(input, def),
+					_f.funcs.SimplifyGroupingOrdering(input, groupingPrivate),
 				)
-				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyGroupByOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyGroupByOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [PruneGroupByCols]
 	{
-		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def)) {
+		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededColsGrouping(groupingPrivate))
+		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
-				newInput := _f.funcs.PruneCols(input, _f.funcs.NeededColsGroupBy(aggregations, def))
-				_group = _f.ConstructDistinctOn(
-					newInput,
+				_expr := _f.ConstructDistinctOn(
+					_f.funcs.PruneCols(input, needed),
 					aggregations,
-					_f.funcs.PruneOrderingGroupBy(newInput, def),
+					_f.funcs.PruneOrderingGroupBy(groupingPrivate, needed),
 				)
-				_f.mem.AddAltFingerprint(_distinctOnExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneGroupByCols, _group, 0, 0)
+					_f.appliedRule(opt.PruneGroupByCols, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_distinctOnExpr))
+	e := _f.mem.MemoizeDistinctOn(input, aggregations, groupingPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructUnion constructs an expression for the Union operator.
 // Union is an operator used to combine the Left and Right input relations into
 // a single set containing rows from both inputs. Duplicate rows are discarded.
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the Union with the output columns. See the comment above opt.SetOpColMap
-// for more details.
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// Union with the output columns. See the comment above SetPrivate for more
+// details.
 func (_f *Factory) ConstructUnion(
-	left memo.GroupID,
-	right memo.GroupID,
-	colMap memo.PrivateID,
-) memo.GroupID {
-	_unionExpr := memo.MakeUnionExpr(left, right, colMap)
-	_group := _f.mem.GroupByFingerprint(_unionExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_unionExpr))
+	left memo.RelExpr,
+	right memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeUnion(left, right, setPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructIntersect constructs an expression for the Intersect operator.
@@ -5734,48 +6505,38 @@ func (_f *Factory) ConstructUnion(
 // and Right input relations. The result consists only of rows in the Left
 // relation that are also present in the Right relation. Duplicate rows are
 // discarded.
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the Intersect with the output columns. See the comment above
-// opt.SetOpColMap for more details.
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// Intersect with the output columns. See the comment above SetPrivate for more
+// details.
 func (_f *Factory) ConstructIntersect(
-	left memo.GroupID,
-	right memo.GroupID,
-	colMap memo.PrivateID,
-) memo.GroupID {
-	_intersectExpr := memo.MakeIntersectExpr(left, right, colMap)
-	_group := _f.mem.GroupByFingerprint(_intersectExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_intersectExpr))
+	left memo.RelExpr,
+	right memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeIntersect(left, right, setPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructExcept constructs an expression for the Except operator.
 // Except is an operator used to perform a set difference between the Left and
 // Right input relations. The result consists only of rows in the Left relation
 // that are not present in the Right relation. Duplicate rows are discarded.
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the Except with the output columns. See the comment above opt.SetOpColMap
-// for more details.
+// The SetPrivate field matches columns from the Left and Right inputs of the Except
+// with the output columns. See the comment above SetPrivate for more details.
 func (_f *Factory) ConstructExcept(
-	left memo.GroupID,
-	right memo.GroupID,
-	colMap memo.PrivateID,
-) memo.GroupID {
-	_exceptExpr := memo.MakeExceptExpr(left, right, colMap)
-	_group := _f.mem.GroupByFingerprint(_exceptExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_exceptExpr))
+	left memo.RelExpr,
+	right memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeExcept(left, right, setPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructUnionAll constructs an expression for the UnionAll operator.
 // UnionAll is an operator used to combine the Left and Right input relations
 // into a single set containing rows from both inputs. Duplicate rows are
 // not discarded. For example:
+//
 //   SELECT x FROM xx UNION ALL SELECT y FROM yy
 //     x       y         out
 //   -----   -----      -----
@@ -5786,34 +6547,28 @@ func (_f *Factory) ConstructExcept(
 //                        2
 //                        3
 //
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the UnionAll with the output columns. See the comment above
-// opt.SetOpColMap for more details.
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// UnionAll with the output columns. See the comment above SetPrivate for more
+// details.
 func (_f *Factory) ConstructUnionAll(
-	left memo.GroupID,
-	right memo.GroupID,
-	colMap memo.PrivateID,
-) memo.GroupID {
-	_unionAllExpr := memo.MakeUnionAllExpr(left, right, colMap)
-	_group := _f.mem.GroupByFingerprint(_unionAllExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left memo.RelExpr,
+	right memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
 	// [EliminateUnionAllLeft]
 	{
 		if _f.funcs.HasZeroRows(right) {
-			colmap := colMap
+			colmap := setPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionAllLeft) {
-				_group = _f.ConstructProject(
+				_expr := _f.ConstructProject(
 					left,
 					_f.funcs.ProjectColMapLeft(colmap),
+					_f.funcs.MakeEmptyColSet(),
 				)
-				_f.mem.AddAltFingerprint(_unionAllExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnionAllLeft, _group, 0, 0)
+					_f.appliedRule(opt.EliminateUnionAllLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
@@ -5821,22 +6576,23 @@ func (_f *Factory) ConstructUnionAll(
 	// [EliminateUnionAllRight]
 	{
 		if _f.funcs.HasZeroRows(left) {
-			colmap := colMap
+			colmap := setPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionAllRight) {
-				_group = _f.ConstructProject(
+				_expr := _f.ConstructProject(
 					right,
 					_f.funcs.ProjectColMapRight(colmap),
+					_f.funcs.MakeEmptyColSet(),
 				)
-				_f.mem.AddAltFingerprint(_unionAllExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnionAllRight, _group, 0, 0)
+					_f.appliedRule(opt.EliminateUnionAllRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_unionAllExpr))
+	e := _f.mem.MemoizeUnionAll(left, right, setPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructIntersectAll constructs an expression for the IntersectAll operator.
@@ -5845,6 +6601,7 @@ func (_f *Factory) ConstructUnionAll(
 // relation that have a corresponding row in the Right relation. Duplicate rows
 // are not discarded. This effectively creates a one-to-one mapping between the
 // Left and Right rows. For example:
+//
 //   SELECT x FROM xx INTERSECT ALL SELECT y FROM yy
 //     x       y         out
 //   -----   -----      -----
@@ -5855,21 +6612,16 @@ func (_f *Factory) ConstructUnionAll(
 //     2       3
 //     4
 //
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the IntersectAll with the output columns. See the comment above
-// opt.SetOpColMap for more details.
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// IntersectAll with the output columns. See the comment above SetPrivate for more
+// details.
 func (_f *Factory) ConstructIntersectAll(
-	left memo.GroupID,
-	right memo.GroupID,
-	colMap memo.PrivateID,
-) memo.GroupID {
-	_intersectAllExpr := memo.MakeIntersectAllExpr(left, right, colMap)
-	_group := _f.mem.GroupByFingerprint(_intersectAllExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_intersectAllExpr))
+	left memo.RelExpr,
+	right memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeIntersectAll(left, right, setPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructExceptAll constructs an expression for the ExceptAll operator.
@@ -5888,53 +6640,41 @@ func (_f *Factory) ConstructIntersectAll(
 //     2       3
 //     4
 //
-// The private field, ColMap, matches columns from the Left and Right inputs
-// of the ExceptAll with the output columns. See the comment above
-// opt.SetOpColMap for more details.
+// The SetPrivate field matches columns from the Left and Right inputs of the
+// ExceptAll with the output columns. See the comment above SetPrivate for more
+// details.
 func (_f *Factory) ConstructExceptAll(
-	left memo.GroupID,
-	right memo.GroupID,
-	colMap memo.PrivateID,
-) memo.GroupID {
-	_exceptAllExpr := memo.MakeExceptAllExpr(left, right, colMap)
-	_group := _f.mem.GroupByFingerprint(_exceptAllExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_exceptAllExpr))
+	left memo.RelExpr,
+	right memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeExceptAll(left, right, setPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructLimit constructs an expression for the Limit operator.
-// Limit returns a limited subset of the results in the input relation.
-// The limit expression is a scalar value; the operator returns at most this many
-// rows. The private field is a props.OrderingChoice which indicates the row
-// ordering required from the input (the first rows with respect to this ordering
-// are returned).
+// Limit returns a limited subset of the results in the input relation. The limit
+// expression is a scalar value; the operator returns at most this many rows. The
+// Orering field is a props.OrderingChoice which indicates the row ordering
+// required from the input (the first rows with respect to this ordering are
+// returned).
 func (_f *Factory) ConstructLimit(
-	input memo.GroupID,
-	limit memo.GroupID,
-	ordering memo.PrivateID,
-) memo.GroupID {
-	_limitExpr := memo.MakeLimitExpr(input, limit, ordering)
-	_group := _f.mem.GroupByFingerprint(_limitExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	limit opt.ScalarExpr,
+	ordering props.OrderingChoice,
+) memo.RelExpr {
 	// [EliminateLimit]
 	{
-		_constExpr := _f.mem.NormExpr(limit).AsConst()
-		if _constExpr != nil {
-			limit := _constExpr.Value()
+		_const, _ := limit.(*memo.ConstExpr)
+		if _const != nil {
+			limit := _const.Value
 			if _f.funcs.LimitGeMaxRows(limit, input) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateLimit) {
-					_group = input
-					_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
+					_expr := input
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateLimit, _group, 0, 0)
+						_f.appliedRule(opt.EliminateLimit, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -5942,25 +6682,26 @@ func (_f *Factory) ConstructLimit(
 
 	// [PushLimitIntoProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			projections := _projectExpr.Projections()
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			passthrough := _project.Passthrough
 			if _f.funcs.HasColsInOrdering(input, ordering) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoProject) {
-					_group = _f.ConstructProject(
+					_expr := _f.ConstructProject(
 						_f.ConstructLimit(
 							input,
 							limit,
-							_f.funcs.PruneOrdering(input, ordering),
+							_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(input)),
 						),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PushLimitIntoProject, _group, 0, 0)
+						_f.appliedRule(opt.PushLimitIntoProject, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -5970,58 +6711,53 @@ func (_f *Factory) ConstructLimit(
 	{
 		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLimitOrdering) {
-				_group = _f.ConstructLimit(
+				_expr := _f.ConstructLimit(
 					input,
 					limit,
 					_f.funcs.SimplifyLimitOffsetOrdering(input, ordering),
 				)
-				_f.mem.AddAltFingerprint(_limitExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyLimitOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyLimitOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_limitExpr))
+	e := _f.mem.MemoizeLimit(input, limit, ordering)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructOffset constructs an expression for the Offset operator.
 // Offset filters out the first Offset rows of the input relation; used in
 // conjunction with Limit.
 func (_f *Factory) ConstructOffset(
-	input memo.GroupID,
-	offset memo.GroupID,
-	ordering memo.PrivateID,
-) memo.GroupID {
-	_offsetExpr := memo.MakeOffsetExpr(input, offset, ordering)
-	_group := _f.mem.GroupByFingerprint(_offsetExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	offset opt.ScalarExpr,
+	ordering props.OrderingChoice,
+) memo.RelExpr {
 	// [PushOffsetIntoProject]
 	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			projections := _projectExpr.Projections()
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			passthrough := _project.Passthrough
 			if _f.funcs.HasColsInOrdering(input, ordering) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PushOffsetIntoProject) {
-					_group = _f.ConstructProject(
+					_expr := _f.ConstructProject(
 						_f.ConstructOffset(
 							input,
 							offset,
-							_f.funcs.PruneOrdering(input, ordering),
+							_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(input)),
 						),
 						projections,
+						passthrough,
 					)
-					_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PushOffsetIntoProject, _group, 0, 0)
+						_f.appliedRule(opt.PushOffsetIntoProject, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -6031,21 +6767,21 @@ func (_f *Factory) ConstructOffset(
 	{
 		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOffsetOrdering) {
-				_group = _f.ConstructOffset(
+				_expr := _f.ConstructOffset(
 					input,
 					offset,
 					_f.funcs.SimplifyLimitOffsetOrdering(input, ordering),
 				)
-				_f.mem.AddAltFingerprint(_offsetExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyOffsetOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyOffsetOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_offsetExpr))
+	e := _f.mem.MemoizeOffset(input, offset, ordering)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructMax1Row constructs an expression for the Max1Row operator.
@@ -6053,126 +6789,103 @@ func (_f *Factory) ConstructOffset(
 // input to the Subquery operator. See the comment above Subquery for more
 // details.
 func (_f *Factory) ConstructMax1Row(
-	input memo.GroupID,
-) memo.GroupID {
-	_max1RowExpr := memo.MakeMax1RowExpr(input)
-	_group := _f.mem.GroupByFingerprint(_max1RowExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+) memo.RelExpr {
 	// [EliminateMax1Row]
 	{
 		if _f.funcs.HasZeroOrOneRow(input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateMax1Row) {
-				_group = input
-				_f.mem.AddAltFingerprint(_max1RowExpr.Fingerprint(), _group)
+				_expr := input
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateMax1Row, _group, 0, 0)
+					_f.appliedRule(opt.EliminateMax1Row, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_max1RowExpr))
+	e := _f.mem.MemoizeMax1Row(input)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructExplain constructs an expression for the Explain operator.
 // Explain returns information about the execution plan of the "input"
 // expression.
 func (_f *Factory) ConstructExplain(
-	input memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_explainExpr := memo.MakeExplainExpr(input, def)
-	_group := _f.mem.GroupByFingerprint(_explainExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	explainPrivate *memo.ExplainPrivate,
+) memo.RelExpr {
 	// [SimplifyExplainOrdering]
 	{
-		if _f.funcs.CanSimplifyExplainOrdering(input, def) {
+		if _f.funcs.CanSimplifyExplainOrdering(input, explainPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyExplainOrdering) {
-				_group = _f.ConstructExplain(
+				_expr := _f.ConstructExplain(
 					input,
-					_f.funcs.SimplifyExplainOrdering(input, def),
+					_f.funcs.SimplifyExplainOrdering(input, explainPrivate),
 				)
-				_f.mem.AddAltFingerprint(_explainExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyExplainOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyExplainOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [PruneExplainCols]
 	{
-		if _f.funcs.CanPruneCols(input, _f.funcs.NeededColsExplain(def)) {
+		needed := _f.funcs.NeededColsExplain(explainPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneExplainCols) {
-				_group = _f.ConstructExplain(
-					_f.funcs.PruneCols(input, _f.funcs.NeededColsExplain(def)),
-					def,
+				_expr := _f.ConstructExplain(
+					_f.funcs.PruneCols(input, needed),
+					explainPrivate,
 				)
-				_f.mem.AddAltFingerprint(_explainExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneExplainCols, _group, 0, 0)
+					_f.appliedRule(opt.PruneExplainCols, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_explainExpr))
+	e := _f.mem.MemoizeExplain(input, explainPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructShowTraceForSession constructs an expression for the ShowTraceForSession operator.
 // ShowTraceForSession returns the current session traces.
 func (_f *Factory) ConstructShowTraceForSession(
-	def memo.PrivateID,
-) memo.GroupID {
-	_showTraceForSessionExpr := memo.MakeShowTraceForSessionExpr(def)
-	_group := _f.mem.GroupByFingerprint(_showTraceForSessionExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_showTraceForSessionExpr))
+	showTracePrivate *memo.ShowTracePrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeShowTraceForSession(showTracePrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructRowNumber constructs an expression for the RowNumber operator.
 // RowNumber adds a column to each row in its input containing a unique,
 // increasing number.
 func (_f *Factory) ConstructRowNumber(
-	input memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_rowNumberExpr := memo.MakeRowNumberExpr(input, def)
-	_group := _f.mem.GroupByFingerprint(_rowNumberExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input memo.RelExpr,
+	rowNumberPrivate *memo.RowNumberPrivate,
+) memo.RelExpr {
 	// [SimplifyRowNumberOrdering]
 	{
-		if _f.funcs.CanSimplifyRowNumberOrdering(input, def) {
+		if _f.funcs.CanSimplifyRowNumberOrdering(input, rowNumberPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRowNumberOrdering) {
-				_group = _f.ConstructRowNumber(
+				_expr := _f.ConstructRowNumber(
 					input,
-					_f.funcs.SimplifyRowNumberOrdering(input, def),
+					_f.funcs.SimplifyRowNumberOrdering(input, rowNumberPrivate),
 				)
-				_f.mem.AddAltFingerprint(_rowNumberExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyRowNumberOrdering, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyRowNumberOrdering, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_rowNumberExpr))
+	e := _f.mem.MemoizeRowNumber(input, rowNumberPrivate)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructZip constructs an expression for the Zip operator.
@@ -6197,33 +6910,28 @@ func (_f *Factory) ConstructRowNumber(
 // the same length since a single function may output multiple columns
 // (e.g., pg_get_keywords() outputs three columns).
 func (_f *Factory) ConstructZip(
-	funcs memo.ListID,
-	cols memo.PrivateID,
-) memo.GroupID {
-	_zipExpr := memo.MakeZipExpr(funcs, cols)
-	_group := _f.mem.GroupByFingerprint(_zipExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	funcs memo.ScalarListExpr,
+	cols opt.ColList,
+) memo.RelExpr {
 	// [HoistZipSubquery]
 	{
-		for _, _item := range _f.mem.LookupList(funcs) {
+		for i := range funcs {
+			_item := funcs[i]
 			item := _item
 			if _f.funcs.HasHoistableSubquery(item) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistZipSubquery) {
-					_group = _f.funcs.HoistZipSubquery(funcs, cols)
-					_f.mem.AddAltFingerprint(_zipExpr.Fingerprint(), _group)
+					_expr := _f.funcs.HoistZipSubquery(funcs, cols).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistZipSubquery, _group, 0, 0)
+						_f.appliedRule(opt.HoistZipSubquery, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_zipExpr))
+	e := _f.mem.MemoizeZip(funcs, cols)
+	return _f.onConstructRelational(e)
 }
 
 // ConstructSubquery constructs an expression for the Subquery operator.
@@ -6245,16 +6953,11 @@ func (_f *Factory) ConstructZip(
 // row, then that column is bound to the single column value in that row. If the
 // subquery returns zero rows, then that column is bound to NULL.
 func (_f *Factory) ConstructSubquery(
-	input memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_subqueryExpr := memo.MakeSubqueryExpr(input, def)
-	_group := _f.mem.GroupByFingerprint(_subqueryExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_subqueryExpr))
+	input memo.RelExpr,
+	subqueryPrivate *memo.SubqueryPrivate,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSubquery(input, subqueryPrivate)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructAny constructs an expression for the Any operator.
@@ -6269,57 +6972,88 @@ func (_f *Factory) ConstructSubquery(
 //   <scalar> NOT IN (<subquery>)
 //   ==> (Not (Any <subquery> <scalar> EqOp))
 //
-//   <scalar> <comp> {SOME|ANY}(<subquery>)
-//   ==> (Any <subquery> <scalar> <comp>)
+//   <scalar> <cmp> {SOME|ANY}(<subquery>)
+//   ==> (Any <subquery> <scalar> <cmp>)
 //
-//   <scalar> <comp> ALL(<subquery>)
-//   ==> (Not (Any <subquery> <scalar> <negated-comp>))
+//   <scalar> <cmp> ALL(<subquery>)
+//   ==> (Not (Any <subquery> <scalar> <negated-cmp>))
 //
 // Any expects the input subquery to return a single column of any data type. The
 // scalar value is compared with that column using the specified comparison
 // operator.
 func (_f *Factory) ConstructAny(
-	input memo.GroupID,
-	scalar memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_anyExpr := memo.MakeAnyExpr(input, scalar, def)
-	_group := _f.mem.GroupByFingerprint(_anyExpr.Fingerprint())
-	if _group != 0 {
-		return _group
+	input memo.RelExpr,
+	scalar opt.ScalarExpr,
+	subqueryPrivate *memo.SubqueryPrivate,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeAny(input, scalar, subqueryPrivate)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructExists constructs an expression for the Exists operator.
+// Exists takes a relational query as its input, and evaluates to true if the
+// query returns at least one row.
+func (_f *Factory) ConstructExists(
+	input memo.RelExpr,
+	subqueryPrivate *memo.SubqueryPrivate,
+) opt.ScalarExpr {
+	// [EliminateExistsProject]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsProject) {
+				_expr := _f.ConstructExists(
+					input,
+					subqueryPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateExistsProject, nil, _expr)
+				}
+				return _expr
+			}
+		}
 	}
 
-	return _f.onConstruct(memo.Expr(_anyExpr))
+	// [EliminateExistsGroupBy]
+	{
+		if input.Op() == opt.GroupByOp || input.Op() == opt.DistinctOnOp {
+			input := input.Child(0).(memo.RelExpr)
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
+				_expr := _f.ConstructExists(
+					input,
+					subqueryPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateExistsGroupBy, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeExists(input, subqueryPrivate)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructVariable constructs an expression for the Variable operator.
-// Variable is the typed scalar value of a column in the query. The private
-// field is a Metadata.ColumnID that references the column by index.
+// Variable is the typed scalar value of a column in the query. The Col field is
+// a metadata ColumnID value that references the column by index.
 func (_f *Factory) ConstructVariable(
-	col memo.PrivateID,
-) memo.GroupID {
-	_variableExpr := memo.MakeVariableExpr(col)
-	_group := _f.mem.GroupByFingerprint(_variableExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_variableExpr))
+	col opt.ColumnID,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeVariable(col)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructConst constructs an expression for the Const operator.
-// Const is a typed scalar constant value. The private field is a tree.Datum
-// value having any datum type that's legal in the expression's context.
+// Const is a typed scalar constant value. The Value field is a tree.Datum value
+// having any datum type that's legal in the expression's context.
 func (_f *Factory) ConstructConst(
-	value memo.PrivateID,
-) memo.GroupID {
-	_constExpr := memo.MakeConstExpr(value)
-	_group := _f.mem.GroupByFingerprint(_constExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_constExpr))
+	value tree.Datum,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeConst(value)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNull constructs an expression for the Null operator.
@@ -6340,559 +7074,304 @@ func (_f *Factory) ConstructConst(
 // and replacement easier and more efficient, as patterns can contain (Null)
 // expressions.
 func (_f *Factory) ConstructNull(
-	typ memo.PrivateID,
-) memo.GroupID {
-	_nullExpr := memo.MakeNullExpr(typ)
-	_group := _f.mem.GroupByFingerprint(_nullExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_nullExpr))
+	typ types.T,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeNull(typ)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructTrue constructs an expression for the True operator.
 // True is the boolean true value that is equivalent to the tree.DBoolTrue datum
 // value. It is a separate operator to make matching and replacement simpler and
 // more efficient, as patterns can contain (True) expressions.
-func (_f *Factory) ConstructTrue() memo.GroupID {
-	_trueExpr := memo.MakeTrueExpr()
-	_group := _f.mem.GroupByFingerprint(_trueExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_trueExpr))
+func (_f *Factory) ConstructTrue() opt.ScalarExpr {
+	e := _f.mem.MemoizeTrue()
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFalse constructs an expression for the False operator.
 // False is the boolean false value that is equivalent to the tree.DBoolFalse
 // datum value. It is a separate operator to make matching and replacement
 // simpler and more efficient, as patterns can contain (False) expressions.
-func (_f *Factory) ConstructFalse() memo.GroupID {
-	_falseExpr := memo.MakeFalseExpr()
-	_group := _f.mem.GroupByFingerprint(_falseExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_falseExpr))
+func (_f *Factory) ConstructFalse() opt.ScalarExpr {
+	e := _f.mem.MemoizeFalse()
+	return _f.onConstructScalar(e)
 }
 
 // ConstructPlaceholder constructs an expression for the Placeholder operator.
 func (_f *Factory) ConstructPlaceholder(
-	value memo.PrivateID,
-) memo.GroupID {
-	_placeholderExpr := memo.MakePlaceholderExpr(value)
-	_group := _f.mem.GroupByFingerprint(_placeholderExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_placeholderExpr))
+	value tree.TypedExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizePlaceholder(value)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructTuple constructs an expression for the Tuple operator.
 func (_f *Factory) ConstructTuple(
-	elems memo.ListID,
-	typ memo.PrivateID,
-) memo.GroupID {
-	_tupleExpr := memo.MakeTupleExpr(elems, typ)
-	_group := _f.mem.GroupByFingerprint(_tupleExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_tupleExpr))
-}
-
-// ConstructProjections constructs an expression for the Projections operator.
-// Projections is a set of typed scalar expressions that will become output
-// columns for a containing Project operator.
-//
-// The private Defs field contains the list of column indexes returned by each
-// expression, and a list of pass-through columns.
-//
-// Elems cannot contain a simple VariableOp with the same ColumnID as the
-// synthesized column (in Def.SynthesizedCols); that is a pass-through column.
-// Elems can contain a VariableOp when a new ColumnID is being assigned, such as
-// in the case of an outer column reference.
-func (_f *Factory) ConstructProjections(
-	elems memo.ListID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_projectionsExpr := memo.MakeProjectionsExpr(elems, def)
-	_group := _f.mem.GroupByFingerprint(_projectionsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_projectionsExpr))
-}
-
-// ConstructAggregations constructs an expression for the Aggregations operator.
-// Aggregations is a set of aggregate expressions that will become output columns
-// for a containing GroupBy operator. The expressions can only consist of
-// aggregate functions, variable references, and modifiers like AggDistinct.
-// Examples of valid expressions:
-//   (Min (Variable 1))
-//   (Count (AggDistinct (Variable 1)))
-//
-// More complex arguments must be formulated using a Project operator as input to
-// the GroupBy operator.
-//
-// The private Cols field contains the list of column indexes returned by the
-// expression, as an opt.ColList. It is legal for Cols to be empty.
-func (_f *Factory) ConstructAggregations(
-	aggs memo.ListID,
-	cols memo.PrivateID,
-) memo.GroupID {
-	_aggregationsExpr := memo.MakeAggregationsExpr(aggs, cols)
-	_group := _f.mem.GroupByFingerprint(_aggregationsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_aggregationsExpr))
-}
-
-// ConstructMergeOn constructs an expression for the MergeOn operator.
-// MergeOn contains the ON condition and the metadata for a merge join; it is
-// always a child of MergeJoin.
-func (_f *Factory) ConstructMergeOn(
-	on memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_mergeOnExpr := memo.MakeMergeOnExpr(on, def)
-	_group := _f.mem.GroupByFingerprint(_mergeOnExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_mergeOnExpr))
-}
-
-// ConstructExists constructs an expression for the Exists operator.
-// Exists takes a relational query as its input, and evaluates to true if the
-// query returns at least one row.
-func (_f *Factory) ConstructExists(
-	input memo.GroupID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_existsExpr := memo.MakeExistsExpr(input, def)
-	_group := _f.mem.GroupByFingerprint(_existsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [EliminateExistsProject]
-	{
-		_projectExpr := _f.mem.NormExpr(input).AsProject()
-		if _projectExpr != nil {
-			input := _projectExpr.Input()
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsProject) {
-				_group = _f.ConstructExists(
-					input,
-					def,
-				)
-				_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateExistsProject, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [EliminateExistsGroupBy]
-	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.Operator() == opt.GroupByOp || _expr.Operator() == opt.DistinctOnOp {
-			input := _expr.ChildGroup(_f.Memo(), 0)
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsGroupBy) {
-				_group = _f.ConstructExists(
-					input,
-					def,
-				)
-				_f.mem.AddAltFingerprint(_existsExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateExistsGroupBy, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	return _f.onConstruct(memo.Expr(_existsExpr))
-}
-
-// ConstructFilters constructs an expression for the Filters operator.
-// Filters is a boolean And operator that only appears as the Filters child of
-// a Select operator, or the On child of a Join operator. For example:
-//   (Select
-//     (Scan a)
-//     (Filters (Gt (Variable a) 1) (Lt (Variable a) 5))
-//   )
-//
-// Normalization rules ensure that a Filters expression is always created if
-// there is at least one condition, so that other rules can rely on its presence
-// when matching, even in the case where there is only one condition. The
-// semantics of the Filters operator are identical to those of the And operator.
-func (_f *Factory) ConstructFilters(
-	conditions memo.ListID,
-) memo.GroupID {
-	_filtersExpr := memo.MakeFiltersExpr(conditions)
-	_group := _f.mem.GroupByFingerprint(_filtersExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [EliminateEmptyFilters]
-	{
-		if conditions.Length == 0 {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEmptyFilters) {
-				_group = _f.ConstructTrue()
-				_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateEmptyFilters, _group, 0, 0)
-				}
-				return _group
-			}
-		}
-	}
-
-	// [SimplifyFilters]
-	{
-		for _, _item := range _f.mem.LookupList(conditions) {
-			_expr := _f.mem.NormExpr(_item)
-			if _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp || _expr.Operator() == opt.NullOp {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyFilters) {
-					_group = _f.funcs.SimplifyFilters(conditions)
-					_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyFilters, _group, 0, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
-	// [NormalizeAnyFilter]
-	{
-		list := conditions
-		for _, _item := range _f.mem.LookupList(conditions) {
-			any := _item
-			_anyExpr := _f.mem.NormExpr(_item).AsAny()
-			if _anyExpr != nil {
-				input := _anyExpr.Input()
-				scalar := _anyExpr.Scalar()
-				subqueryDef := _anyExpr.Def()
-				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeAnyFilter) {
-					_group = _f.ConstructFilters(
-						_f.funcs.ReplaceListItem(list, any, _f.ConstructExists(
-							_f.ConstructSelect(
-								input,
-								_f.ConstructFilters(
-									_f.mem.InternList([]memo.GroupID{_f.funcs.ConstructAnyCondition(input, scalar, subqueryDef)}),
-								),
-							),
-							subqueryDef,
-						)),
-					)
-					_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.NormalizeAnyFilter, _group, 0, 0)
-					}
-					return _group
-				}
-			}
-		}
-	}
-
-	// [NormalizeNotAnyFilter]
-	{
-		list := conditions
-		for _, _item := range _f.mem.LookupList(conditions) {
-			notany := _item
-			_notExpr := _f.mem.NormExpr(_item).AsNot()
-			if _notExpr != nil {
-				_anyExpr := _f.mem.NormExpr(_notExpr.Input()).AsAny()
-				if _anyExpr != nil {
-					input := _anyExpr.Input()
-					scalar := _anyExpr.Scalar()
-					subqueryDef := _anyExpr.Def()
-					if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeNotAnyFilter) {
-						_group = _f.ConstructFilters(
-							_f.funcs.ReplaceListItem(list, notany, _f.ConstructNot(
-								_f.ConstructExists(
-									_f.ConstructSelect(
-										input,
-										_f.ConstructFilters(
-											_f.mem.InternList([]memo.GroupID{_f.ConstructIsNot(
-												_f.funcs.ConstructAnyCondition(input, scalar, subqueryDef),
-												_f.ConstructFalse(),
-											)}),
-										),
-									),
-									subqueryDef,
-								),
-							)),
-						)
-						_f.mem.AddAltFingerprint(_filtersExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.NormalizeNotAnyFilter, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	return _f.onConstruct(memo.Expr(_filtersExpr))
+	elems memo.ScalarListExpr,
+	typ types.T,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeTuple(elems, typ)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructAnd constructs an expression for the And operator.
-// And is the boolean conjunction operator that evalutes to true if all of its
-// conditions evaluate to true. If the conditions list is empty, it evalutes to
-// true.
+// And is the boolean conjunction operator that evalutes to true only if both of
+// its conditions evaluate to true.
 func (_f *Factory) ConstructAnd(
-	conditions memo.ListID,
-) memo.GroupID {
-	_andExpr := memo.MakeAndExpr(conditions)
-	_group := _f.mem.GroupByFingerprint(_andExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [EliminateSingletonAndOr]
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [NormalizeNestedAnds]
 	{
-		if conditions.Length == 1 {
-			_item := _f.mem.LookupList(conditions)[0]
-			item := _item
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSingletonAndOr) {
-				_group = item
-				_f.mem.AddAltFingerprint(_andExpr.Fingerprint(), _group)
+		_and, _ := right.(*memo.AndExpr)
+		if _and != nil {
+			innerLeft := _and.Left
+			innerRight := _and.Right
+			if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeNestedAnds) {
+				_expr := _f.ConstructAnd(
+					_f.funcs.ConcatLeftDeepAnds(left, innerLeft),
+					innerRight,
+				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateSingletonAndOr, _group, 0, 0)
+					_f.appliedRule(opt.NormalizeNestedAnds, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	// [SimplifyAnd]
+	// [SimplifyTrueAnd]
 	{
-		for _, _item := range _f.mem.LookupList(conditions) {
-			_expr := _f.mem.NormExpr(_item)
-			if _expr.Operator() == opt.AndOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAnd) {
-					_group = _f.funcs.SimplifyAnd(conditions)
-					_f.mem.AddAltFingerprint(_andExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyAnd, _group, 0, 0)
-					}
-					return _group
+		_true, _ := left.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyTrueAnd) {
+				_expr := right
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyTrueAnd, nil, _expr)
 				}
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyAndTrue]
+	{
+		_true, _ := right.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAndTrue) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyAndTrue, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyFalseAnd]
+	{
+		_false, _ := left.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyFalseAnd) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyFalseAnd, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyAndFalse]
+	{
+		_false, _ := right.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAndFalse) {
+				_expr := right
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyAndFalse, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullAndOr]
 	{
-		if conditions.Length > 0 {
-			_item := _f.mem.LookupList(conditions)[0]
-			_nullExpr := _f.mem.NormExpr(_item).AsNull()
-			if _nullExpr != nil {
-				if _f.funcs.ListOnlyHasNulls(conditions) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullAndOr) {
-						_group = _f.ConstructNull(
-							_f.funcs.BoolType(),
-						)
-						_f.mem.AddAltFingerprint(_andExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullAndOr, _group, 0, 0)
-						}
-						return _group
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_null2, _ := right.(*memo.NullExpr)
+			if _null2 != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullAndOr) {
+					_expr := _f.ConstructNull(
+						_f.funcs.BoolType(),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullAndOr, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_andExpr))
+	e := _f.mem.MemoizeAnd(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructOr constructs an expression for the Or operator.
-// Or is the boolean disjunction operator that evalutes to true if any of its
-// conditions evaluate to true. If the conditions list is empty, it evaluates to
-// false.
+// Or is the boolean disjunction operator that evaluates to true if either one of
+// its conditions evaluates to true.
 func (_f *Factory) ConstructOr(
-	conditions memo.ListID,
-) memo.GroupID {
-	_orExpr := memo.MakeOrExpr(conditions)
-	_group := _f.mem.GroupByFingerprint(_orExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	// [EliminateSingletonAndOr]
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [SimplifyTrueOr]
 	{
-		if conditions.Length == 1 {
-			_item := _f.mem.LookupList(conditions)[0]
-			item := _item
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSingletonAndOr) {
-				_group = item
-				_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
+		_true, _ := left.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyTrueOr) {
+				_expr := left
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateSingletonAndOr, _group, 0, 0)
+					_f.appliedRule(opt.SimplifyTrueOr, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	// [SimplifyOr]
+	// [SimplifyOrTrue]
 	{
-		for _, _item := range _f.mem.LookupList(conditions) {
-			_expr := _f.mem.NormExpr(_item)
-			if _expr.Operator() == opt.OrOp || _expr.Operator() == opt.TrueOp || _expr.Operator() == opt.FalseOp {
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOr) {
-					_group = _f.funcs.SimplifyOr(conditions)
-					_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyOr, _group, 0, 0)
-					}
-					return _group
+		_true, _ := right.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOrTrue) {
+				_expr := right
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyOrTrue, nil, _expr)
 				}
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyFalseOr]
+	{
+		_false, _ := left.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyFalseOr) {
+				_expr := right
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyFalseOr, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyOrFalse]
+	{
+		_false, _ := right.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOrFalse) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyOrFalse, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullAndOr]
 	{
-		if conditions.Length > 0 {
-			_item := _f.mem.LookupList(conditions)[0]
-			_nullExpr := _f.mem.NormExpr(_item).AsNull()
-			if _nullExpr != nil {
-				if _f.funcs.ListOnlyHasNulls(conditions) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullAndOr) {
-						_group = _f.ConstructNull(
-							_f.funcs.BoolType(),
-						)
-						_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullAndOr, _group, 0, 0)
-						}
-						return _group
-					}
-				}
-			}
-		}
-	}
-
-	// [ExtractRedundantClause]
-	{
-		if conditions.Length > 0 {
-			_item := _f.mem.LookupList(conditions)[0]
-			item := _item
-			if _f.funcs.IsRedundantSubclause(conditions, item) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.ExtractRedundantClause) {
-					_group = item
-					_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_null2, _ := right.(*memo.NullExpr)
+			if _null2 != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullAndOr) {
+					_expr := _f.ConstructNull(
+						_f.funcs.BoolType(),
+					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.ExtractRedundantClause, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullAndOr, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	// [ExtractRedundantSubclause]
+	// [ExtractRedundantConjunct]
 	{
-		if conditions.Length > 0 {
-			_item := _f.mem.LookupList(conditions)[0]
-			_andExpr := _f.mem.NormExpr(_item).AsAnd()
-			if _andExpr != nil {
-				for _, _item := range _f.mem.LookupList(_andExpr.Conditions()) {
-					item := _item
-					if _f.funcs.IsRedundantSubclause(conditions, item) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.ExtractRedundantSubclause) {
-							_group = _f.funcs.ExtractRedundantSubclause(conditions, item)
-							_f.mem.AddAltFingerprint(_orExpr.Fingerprint(), _group)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.ExtractRedundantSubclause, _group, 0, 0)
-							}
-							return _group
+		_or, _ := left.(*memo.OrExpr)
+		if _or == nil {
+			_or2, _ := right.(*memo.OrExpr)
+			if _or2 == nil {
+				conjunct := _f.funcs.FindRedundantConjunct(left, right)
+				if _f.funcs.Succeeded(conjunct) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.ExtractRedundantConjunct) {
+						_expr := _f.funcs.ExtractRedundantConjunct(conjunct, left, right).(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.ExtractRedundantConjunct, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_orExpr))
+	e := _f.mem.MemoizeOr(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNot constructs an expression for the Not operator.
 // Not is the boolean negation operator that evaluates to true if its input
-// evalutes to false.
+// evaluates to false.
 func (_f *Factory) ConstructNot(
-	input memo.GroupID,
-) memo.GroupID {
-	_notExpr := memo.MakeNotExpr(input)
-	_group := _f.mem.GroupByFingerprint(_notExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNotTrue]
 	{
-		_trueExpr := _f.mem.NormExpr(input).AsTrue()
-		if _trueExpr != nil {
+		_true, _ := input.(*memo.TrueExpr)
+		if _true != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNotTrue) {
-				_group = _f.ConstructFalse()
-				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
+				_expr := _f.ConstructFalse()
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNotTrue, _group, 0, 0)
+					_f.appliedRule(opt.FoldNotTrue, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNotFalse]
 	{
-		_falseExpr := _f.mem.NormExpr(input).AsFalse()
-		if _falseExpr != nil {
+		_false, _ := input.(*memo.FalseExpr)
+		if _false != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNotFalse) {
-				_group = _f.ConstructTrue()
-				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
+				_expr := _f.ConstructTrue()
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNotFalse, _group, 0, 0)
+					_f.appliedRule(opt.FoldNotFalse, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [NegateComparison]
 	{
-		_expr := _f.mem.NormExpr(input)
-		if _expr.IsComparison() {
-			left := _expr.ChildGroup(_f.Memo(), 0)
-			right := _expr.ChildGroup(_f.Memo(), 1)
-			_expr2 := _f.mem.NormExpr(input)
-			if !(_expr2.Operator() == opt.ContainsOp || _expr2.Operator() == opt.JsonExistsOp || _expr2.Operator() == opt.JsonSomeExistsOp || _expr2.Operator() == opt.JsonAllExistsOp) {
+		if opt.IsComparisonOp(input) {
+			left := input.Child(0).(opt.ScalarExpr)
+			right := input.Child(1).(opt.ScalarExpr)
+			if !(input.Op() == opt.ContainsOp || input.Op() == opt.JsonExistsOp || input.Op() == opt.JsonSomeExistsOp || input.Op() == opt.JsonAllExistsOp) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NegateComparison) {
-					_group = _f.funcs.NegateComparison(_f.mem.NormExpr(input).Operator(), left, right)
-					_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
+					_expr := _f.funcs.NegateComparison(input.Op(), left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.NegateComparison, _group, 0, 0)
+						_f.appliedRule(opt.NegateComparison, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -6900,93 +7379,96 @@ func (_f *Factory) ConstructNot(
 
 	// [EliminateNot]
 	{
-		_notExpr2 := _f.mem.NormExpr(input).AsNot()
-		if _notExpr2 != nil {
-			input := _notExpr2.Input()
+		_not, _ := input.(*memo.NotExpr)
+		if _not != nil {
+			input := _not.Input
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateNot) {
-				_group = input
-				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
+				_expr := input
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateNot, _group, 0, 0)
+					_f.appliedRule(opt.EliminateNot, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [NegateAnd]
 	{
-		_andExpr := _f.mem.NormExpr(input).AsAnd()
-		if _andExpr != nil {
-			conditions := _andExpr.Conditions()
+		_and, _ := input.(*memo.AndExpr)
+		if _and != nil {
+			left := _and.Left
+			right := _and.Right
 			if _f.matchedRule == nil || _f.matchedRule(opt.NegateAnd) {
-				_group = _f.ConstructOr(
-					_f.funcs.NegateConditions(conditions),
+				_expr := _f.ConstructOr(
+					_f.ConstructNot(
+						left,
+					),
+					_f.ConstructNot(
+						right,
+					),
 				)
-				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.NegateAnd, _group, 0, 0)
+					_f.appliedRule(opt.NegateAnd, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [NegateOr]
 	{
-		_orExpr := _f.mem.NormExpr(input).AsOr()
-		if _orExpr != nil {
-			conditions := _orExpr.Conditions()
+		_or, _ := input.(*memo.OrExpr)
+		if _or != nil {
+			left := _or.Left
+			right := _or.Right
 			if _f.matchedRule == nil || _f.matchedRule(opt.NegateOr) {
-				_group = _f.ConstructAnd(
-					_f.funcs.NegateConditions(conditions),
+				_expr := _f.ConstructAnd(
+					_f.ConstructNot(
+						left,
+					),
+					_f.ConstructNot(
+						right,
+					),
 				)
-				_f.mem.AddAltFingerprint(_notExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.NegateOr, _group, 0, 0)
+					_f.appliedRule(opt.NegateOr, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notExpr))
+	e := _f.mem.MemoizeNot(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructEq constructs an expression for the Eq operator.
 func (_f *Factory) ConstructEq(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_eqExpr := memo.MakeEqExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_eqExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [NormalizeCmpPlusConst]
 	{
-		_plusExpr := _f.mem.NormExpr(left).AsPlus()
-		if _plusExpr != nil {
-			leftLeft := _plusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _plusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_plus, _ := left.(*memo.PlusExpr)
+		if _plus != nil {
+			leftLeft := _plus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _plus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-								_group = _f.ConstructEq(
+								_expr := _f.ConstructEq(
 									leftLeft,
 									_f.ConstructMinus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpPlusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -6997,27 +7479,26 @@ func (_f *Factory) ConstructEq(
 
 	// [NormalizeCmpMinusConst]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _minus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-								_group = _f.ConstructEq(
+								_expr := _f.ConstructEq(
 									leftLeft,
 									_f.ConstructPlus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpMinusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7028,27 +7509,26 @@ func (_f *Factory) ConstructEq(
 
 	// [NormalizeCmpConstMinus]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if _f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if !_f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if opt.IsConstValueOp(leftLeft) {
+				leftRight := _minus.Right
+				if !(opt.IsConstValueOp(leftRight)) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-								_group = _f.ConstructEq(
+								_expr := _f.ConstructEq(
 									_f.ConstructMinus(
 										leftLeft,
 										right,
 									),
 									leftRight,
 								)
-								_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpConstMinus, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7059,19 +7539,18 @@ func (_f *Factory) ConstructEq(
 
 	// [NormalizeTupleEquality]
 	{
-		_tupleExpr := _f.mem.NormExpr(left).AsTuple()
-		if _tupleExpr != nil {
-			left := _tupleExpr.Elems()
-			_tupleExpr2 := _f.mem.NormExpr(right).AsTuple()
-			if _tupleExpr2 != nil {
-				right := _tupleExpr2.Elems()
+		_tuple, _ := left.(*memo.TupleExpr)
+		if _tuple != nil {
+			left := _tuple.Elems
+			_tuple2, _ := right.(*memo.TupleExpr)
+			if _tuple2 != nil {
+				right := _tuple2.Elems
 				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeTupleEquality) {
-					_group = _f.funcs.NormalizeTupleEquality(left, right)
-					_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
+					_expr := _f.funcs.NormalizeTupleEquality(left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.NormalizeTupleEquality, _group, 0, 0)
+						_f.appliedRule(opt.NormalizeTupleEquality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7079,54 +7558,51 @@ func (_f *Factory) ConstructEq(
 
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructEq(
+					_expr := _f.ConstructEq(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7134,18 +7610,17 @@ func (_f *Factory) ConstructEq(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructEq(
+					_expr := _f.ConstructEq(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7153,22 +7628,21 @@ func (_f *Factory) ConstructEq(
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructEq(
+						_expr := _f.ConstructEq(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -7177,25 +7651,24 @@ func (_f *Factory) ConstructEq(
 
 	// [NormalizeJSONFieldAccess]
 	{
-		_fetchValExpr := _f.mem.NormExpr(left).AsFetchVal()
-		if _fetchValExpr != nil {
-			val := _fetchValExpr.Json()
-			key := _fetchValExpr.Index()
-			_constExpr := _f.mem.NormExpr(_fetchValExpr.Index()).AsConst()
-			if _constExpr != nil {
+		_fetchVal, _ := left.(*memo.FetchValExpr)
+		if _fetchVal != nil {
+			val := _fetchVal.Json
+			key := _fetchVal.Index
+			_const, _ := key.(*memo.ConstExpr)
+			if _const != nil {
 				if _f.funcs.IsString(key) {
-					_constExpr2 := _f.mem.NormExpr(right).AsConst()
-					if _constExpr2 != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
 						if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONFieldAccess) {
-							_group = _f.ConstructContains(
+							_expr := _f.ConstructContains(
 								val,
 								_f.funcs.MakeSingleKeyJSONObject(key, right),
 							)
-							_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.NormalizeJSONFieldAccess, _group, 0, 0)
+								_f.appliedRule(opt.NormalizeJSONFieldAccess, nil, _expr)
 							}
-							return _group
+							return _expr
 						}
 					}
 				}
@@ -7210,45 +7683,38 @@ func (_f *Factory) ConstructEq(
 				result := _f.funcs.FoldComparison(opt.EqOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_eqExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_eqExpr))
+	e := _f.mem.MemoizeEq(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructLt constructs an expression for the Lt operator.
 func (_f *Factory) ConstructLt(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_ltExpr := memo.MakeLtExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_ltExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVarInequality]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_group = _f.funcs.CommuteInequality(opt.LtOp, left, right)
-					_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.LtOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVarInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7256,15 +7722,14 @@ func (_f *Factory) ConstructLt(
 
 	// [CommuteConstInequality]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConstInequality) {
-					_group = _f.funcs.CommuteInequality(opt.LtOp, left, right)
-					_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.LtOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConstInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConstInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7272,27 +7737,26 @@ func (_f *Factory) ConstructLt(
 
 	// [NormalizeCmpPlusConst]
 	{
-		_plusExpr := _f.mem.NormExpr(left).AsPlus()
-		if _plusExpr != nil {
-			leftLeft := _plusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _plusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_plus, _ := left.(*memo.PlusExpr)
+		if _plus != nil {
+			leftLeft := _plus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _plus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-								_group = _f.ConstructLt(
+								_expr := _f.ConstructLt(
 									leftLeft,
 									_f.ConstructMinus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpPlusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7303,27 +7767,26 @@ func (_f *Factory) ConstructLt(
 
 	// [NormalizeCmpMinusConst]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _minus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-								_group = _f.ConstructLt(
+								_expr := _f.ConstructLt(
 									leftLeft,
 									_f.ConstructPlus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpMinusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7334,27 +7797,26 @@ func (_f *Factory) ConstructLt(
 
 	// [NormalizeCmpConstMinus]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if _f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if !_f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if opt.IsConstValueOp(leftLeft) {
+				leftRight := _minus.Right
+				if !(opt.IsConstValueOp(leftRight)) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-								_group = _f.ConstructLt(
+								_expr := _f.ConstructLt(
 									_f.ConstructMinus(
 										leftLeft,
 										right,
 									),
 									leftRight,
 								)
-								_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpConstMinus, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7365,56 +7827,53 @@ func (_f *Factory) ConstructLt(
 
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructLt(
+						_expr := _f.ConstructLt(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -7428,45 +7887,38 @@ func (_f *Factory) ConstructLt(
 				result := _f.funcs.FoldComparison(opt.LtOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_ltExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_ltExpr))
+	e := _f.mem.MemoizeLt(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructGt constructs an expression for the Gt operator.
 func (_f *Factory) ConstructGt(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_gtExpr := memo.MakeGtExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_gtExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVarInequality]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_group = _f.funcs.CommuteInequality(opt.GtOp, left, right)
-					_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.GtOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVarInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7474,15 +7926,14 @@ func (_f *Factory) ConstructGt(
 
 	// [CommuteConstInequality]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConstInequality) {
-					_group = _f.funcs.CommuteInequality(opt.GtOp, left, right)
-					_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.GtOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConstInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConstInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7490,27 +7941,26 @@ func (_f *Factory) ConstructGt(
 
 	// [NormalizeCmpPlusConst]
 	{
-		_plusExpr := _f.mem.NormExpr(left).AsPlus()
-		if _plusExpr != nil {
-			leftLeft := _plusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _plusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_plus, _ := left.(*memo.PlusExpr)
+		if _plus != nil {
+			leftLeft := _plus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _plus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-								_group = _f.ConstructGt(
+								_expr := _f.ConstructGt(
 									leftLeft,
 									_f.ConstructMinus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpPlusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7521,27 +7971,26 @@ func (_f *Factory) ConstructGt(
 
 	// [NormalizeCmpMinusConst]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _minus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-								_group = _f.ConstructGt(
+								_expr := _f.ConstructGt(
 									leftLeft,
 									_f.ConstructPlus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpMinusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7552,27 +8001,26 @@ func (_f *Factory) ConstructGt(
 
 	// [NormalizeCmpConstMinus]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if _f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if !_f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if opt.IsConstValueOp(leftLeft) {
+				leftRight := _minus.Right
+				if !(opt.IsConstValueOp(leftRight)) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-								_group = _f.ConstructGt(
+								_expr := _f.ConstructGt(
 									_f.ConstructMinus(
 										leftLeft,
 										right,
 									),
 									leftRight,
 								)
-								_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpConstMinus, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7583,56 +8031,53 @@ func (_f *Factory) ConstructGt(
 
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructGt(
+						_expr := _f.ConstructGt(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -7646,45 +8091,38 @@ func (_f *Factory) ConstructGt(
 				result := _f.funcs.FoldComparison(opt.GtOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_gtExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_gtExpr))
+	e := _f.mem.MemoizeGt(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructLe constructs an expression for the Le operator.
 func (_f *Factory) ConstructLe(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_leExpr := memo.MakeLeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_leExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVarInequality]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_group = _f.funcs.CommuteInequality(opt.LeOp, left, right)
-					_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.LeOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVarInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7692,15 +8130,14 @@ func (_f *Factory) ConstructLe(
 
 	// [CommuteConstInequality]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConstInequality) {
-					_group = _f.funcs.CommuteInequality(opt.LeOp, left, right)
-					_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.LeOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConstInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConstInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7708,27 +8145,26 @@ func (_f *Factory) ConstructLe(
 
 	// [NormalizeCmpPlusConst]
 	{
-		_plusExpr := _f.mem.NormExpr(left).AsPlus()
-		if _plusExpr != nil {
-			leftLeft := _plusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _plusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_plus, _ := left.(*memo.PlusExpr)
+		if _plus != nil {
+			leftLeft := _plus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _plus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-								_group = _f.ConstructLe(
+								_expr := _f.ConstructLe(
 									leftLeft,
 									_f.ConstructMinus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpPlusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7739,27 +8175,26 @@ func (_f *Factory) ConstructLe(
 
 	// [NormalizeCmpMinusConst]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _minus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-								_group = _f.ConstructLe(
+								_expr := _f.ConstructLe(
 									leftLeft,
 									_f.ConstructPlus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpMinusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7770,27 +8205,26 @@ func (_f *Factory) ConstructLe(
 
 	// [NormalizeCmpConstMinus]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if _f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if !_f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if opt.IsConstValueOp(leftLeft) {
+				leftRight := _minus.Right
+				if !(opt.IsConstValueOp(leftRight)) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-								_group = _f.ConstructLe(
+								_expr := _f.ConstructLe(
 									_f.ConstructMinus(
 										leftLeft,
 										right,
 									),
 									leftRight,
 								)
-								_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpConstMinus, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7801,56 +8235,53 @@ func (_f *Factory) ConstructLe(
 
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructLe(
+						_expr := _f.ConstructLe(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -7864,45 +8295,38 @@ func (_f *Factory) ConstructLe(
 				result := _f.funcs.FoldComparison(opt.LeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_leExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_leExpr))
+	e := _f.mem.MemoizeLe(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructGe constructs an expression for the Ge operator.
 func (_f *Factory) ConstructGe(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_geExpr := memo.MakeGeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_geExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVarInequality]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_group = _f.funcs.CommuteInequality(opt.GeOp, left, right)
-					_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.GeOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVarInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7910,15 +8334,14 @@ func (_f *Factory) ConstructGe(
 
 	// [CommuteConstInequality]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConstInequality) {
-					_group = _f.funcs.CommuteInequality(opt.GeOp, left, right)
-					_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
+					_expr := _f.funcs.CommuteInequality(opt.GeOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConstInequality, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConstInequality, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -7926,27 +8349,26 @@ func (_f *Factory) ConstructGe(
 
 	// [NormalizeCmpPlusConst]
 	{
-		_plusExpr := _f.mem.NormExpr(left).AsPlus()
-		if _plusExpr != nil {
-			leftLeft := _plusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _plusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_plus, _ := left.(*memo.PlusExpr)
+		if _plus != nil {
+			leftLeft := _plus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _plus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-								_group = _f.ConstructGe(
+								_expr := _f.ConstructGe(
 									leftLeft,
 									_f.ConstructMinus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpPlusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7957,27 +8379,26 @@ func (_f *Factory) ConstructGe(
 
 	// [NormalizeCmpMinusConst]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if !_f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if _f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if !(opt.IsConstValueOp(leftLeft)) {
+				leftRight := _minus.Right
+				if opt.IsConstValueOp(leftRight) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-								_group = _f.ConstructGe(
+								_expr := _f.ConstructGe(
 									leftLeft,
 									_f.ConstructPlus(
 										right,
 										leftRight,
 									),
 								)
-								_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpMinusConst, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -7988,27 +8409,26 @@ func (_f *Factory) ConstructGe(
 
 	// [NormalizeCmpConstMinus]
 	{
-		_minusExpr := _f.mem.NormExpr(left).AsMinus()
-		if _minusExpr != nil {
-			leftLeft := _minusExpr.Left()
-			if _f.funcs.OnlyConstants(leftLeft) {
-				leftRight := _minusExpr.Right()
-				if !_f.funcs.OnlyConstants(leftRight) {
-					if _f.funcs.OnlyConstants(right) {
+		_minus, _ := left.(*memo.MinusExpr)
+		if _minus != nil {
+			leftLeft := _minus.Left
+			if opt.IsConstValueOp(leftLeft) {
+				leftRight := _minus.Right
+				if !(opt.IsConstValueOp(leftRight)) {
+					if opt.IsConstValueOp(right) {
 						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-								_group = _f.ConstructGe(
+								_expr := _f.ConstructGe(
 									_f.ConstructMinus(
 										leftLeft,
 										right,
 									),
 									leftRight,
 								)
-								_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeCmpConstMinus, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -8019,56 +8439,53 @@ func (_f *Factory) ConstructGe(
 
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructGe(
+						_expr := _f.ConstructGe(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8082,82 +8499,73 @@ func (_f *Factory) ConstructGe(
 				result := _f.funcs.FoldComparison(opt.GeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_geExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_geExpr))
+	e := _f.mem.MemoizeGe(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNe constructs an expression for the Ne operator.
 func (_f *Factory) ConstructNe(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_neExpr := memo.MakeNeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_neExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructNe(
+					_expr := _f.ConstructNe(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -8165,18 +8573,17 @@ func (_f *Factory) ConstructNe(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructNe(
+					_expr := _f.ConstructNe(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -8184,22 +8591,21 @@ func (_f *Factory) ConstructNe(
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNe(
+						_expr := _f.ConstructNe(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8213,48 +8619,41 @@ func (_f *Factory) ConstructNe(
 				result := _f.funcs.FoldComparison(opt.NeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_neExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_neExpr))
+	e := _f.mem.MemoizeNe(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructIn constructs an expression for the In operator.
 func (_f *Factory) ConstructIn(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_inExpr := memo.MakeInExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_inExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullInNonEmpty]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-			if _tupleExpr != nil {
-				if _tupleExpr.Elems().Length != 0 {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_tuple, _ := right.(*memo.TupleExpr)
+			if _tuple != nil {
+				if len(_tuple.Elems) != 0 {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullInNonEmpty) {
-						_group = _f.ConstructNull(
+						_expr := _f.ConstructNull(
 							_f.funcs.BoolType(),
 						)
-						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullInNonEmpty, _group, 0, 0)
+							_f.appliedRule(opt.FoldNullInNonEmpty, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8263,18 +8662,17 @@ func (_f *Factory) ConstructIn(
 
 	// [FoldNullInEmpty]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-			if _tupleExpr != nil {
-				if _tupleExpr.Elems().Length == 0 {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_tuple, _ := right.(*memo.TupleExpr)
+			if _tuple != nil {
+				if len(_tuple.Elems) == 0 {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullInEmpty) {
-						_group = _f.ConstructFalse()
-						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
+						_expr := _f.ConstructFalse()
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullInEmpty, _group, 0, 0)
+							_f.appliedRule(opt.FoldNullInEmpty, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8283,22 +8681,21 @@ func (_f *Factory) ConstructIn(
 
 	// [NormalizeInConst]
 	{
-		_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-		if _tupleExpr != nil {
-			elems := _tupleExpr.Elems()
-			if !_f.funcs.IsSortedUniqueList(elems) {
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			elems := _tuple.Elems
+			if _f.funcs.NeedSortedUniqueList(elems) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeInConst) {
-					_group = _f.ConstructIn(
+					_expr := _f.ConstructIn(
 						left,
 						_f.ConstructTuple(
 							_f.funcs.ConstructSortedUniqueList(elems),
 						),
 					)
-					_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.NormalizeInConst, _group, 0, 0)
+						_f.appliedRule(opt.NormalizeInConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -8306,21 +8703,20 @@ func (_f *Factory) ConstructIn(
 
 	// [FoldInNull]
 	{
-		_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-		if _tupleExpr != nil {
-			if _tupleExpr.Elems().Length == 1 {
-				_item := _f.mem.LookupList(_tupleExpr.Elems())[0]
-				_nullExpr := _f.mem.NormExpr(_item).AsNull()
-				if _nullExpr != nil {
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			if len(_tuple.Elems) == 1 {
+				_item := _tuple.Elems[0]
+				_null, _ := _item.(*memo.NullExpr)
+				if _null != nil {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldInNull) {
-						_group = _f.ConstructNull(
+						_expr := _f.ConstructNull(
 							_f.funcs.BoolType(),
 						)
-						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldInNull, _group, 0, 0)
+							_f.appliedRule(opt.FoldInNull, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8329,22 +8725,21 @@ func (_f *Factory) ConstructIn(
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructIn(
+						_expr := _f.ConstructIn(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8358,48 +8753,41 @@ func (_f *Factory) ConstructIn(
 				result := _f.funcs.FoldComparison(opt.InOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_inExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_inExpr))
+	e := _f.mem.MemoizeIn(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNotIn constructs an expression for the NotIn operator.
 func (_f *Factory) ConstructNotIn(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_notInExpr := memo.MakeNotInExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_notInExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullInNonEmpty]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-			if _tupleExpr != nil {
-				if _tupleExpr.Elems().Length != 0 {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_tuple, _ := right.(*memo.TupleExpr)
+			if _tuple != nil {
+				if len(_tuple.Elems) != 0 {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullInNonEmpty) {
-						_group = _f.ConstructNull(
+						_expr := _f.ConstructNull(
 							_f.funcs.BoolType(),
 						)
-						_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullInNonEmpty, _group, 0, 0)
+							_f.appliedRule(opt.FoldNullInNonEmpty, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8408,18 +8796,17 @@ func (_f *Factory) ConstructNotIn(
 
 	// [FoldNullNotInEmpty]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-			if _tupleExpr != nil {
-				if _tupleExpr.Elems().Length == 0 {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_tuple, _ := right.(*memo.TupleExpr)
+			if _tuple != nil {
+				if len(_tuple.Elems) == 0 {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullNotInEmpty) {
-						_group = _f.ConstructTrue()
-						_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
+						_expr := _f.ConstructTrue()
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullNotInEmpty, _group, 0, 0)
+							_f.appliedRule(opt.FoldNullNotInEmpty, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8428,22 +8815,21 @@ func (_f *Factory) ConstructNotIn(
 
 	// [NormalizeInConst]
 	{
-		_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-		if _tupleExpr != nil {
-			elems := _tupleExpr.Elems()
-			if !_f.funcs.IsSortedUniqueList(elems) {
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			elems := _tuple.Elems
+			if _f.funcs.NeedSortedUniqueList(elems) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeInConst) {
-					_group = _f.ConstructNotIn(
+					_expr := _f.ConstructNotIn(
 						left,
 						_f.ConstructTuple(
 							_f.funcs.ConstructSortedUniqueList(elems),
 						),
 					)
-					_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.NormalizeInConst, _group, 0, 0)
+						_f.appliedRule(opt.NormalizeInConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -8451,21 +8837,20 @@ func (_f *Factory) ConstructNotIn(
 
 	// [FoldInNull]
 	{
-		_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-		if _tupleExpr != nil {
-			if _tupleExpr.Elems().Length == 1 {
-				_item := _f.mem.LookupList(_tupleExpr.Elems())[0]
-				_nullExpr := _f.mem.NormExpr(_item).AsNull()
-				if _nullExpr != nil {
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			if len(_tuple.Elems) == 1 {
+				_item := _tuple.Elems[0]
+				_null, _ := _item.(*memo.NullExpr)
+				if _null != nil {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldInNull) {
-						_group = _f.ConstructNull(
+						_expr := _f.ConstructNull(
 							_f.funcs.BoolType(),
 						)
-						_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldInNull, _group, 0, 0)
+							_f.appliedRule(opt.FoldInNull, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8474,22 +8859,21 @@ func (_f *Factory) ConstructNotIn(
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNotIn(
+						_expr := _f.ConstructNotIn(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8503,84 +8887,75 @@ func (_f *Factory) ConstructNotIn(
 				result := _f.funcs.FoldComparison(opt.NotInOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_notInExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notInExpr))
+	e := _f.mem.MemoizeNotIn(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructLike constructs an expression for the Like operator.
 func (_f *Factory) ConstructLike(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_likeExpr := memo.MakeLikeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_likeExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_likeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_likeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructLike(
+						_expr := _f.ConstructLike(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_likeExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8594,84 +8969,75 @@ func (_f *Factory) ConstructLike(
 				result := _f.funcs.FoldComparison(opt.LikeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_likeExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_likeExpr))
+	e := _f.mem.MemoizeLike(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNotLike constructs an expression for the NotLike operator.
 func (_f *Factory) ConstructNotLike(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_notLikeExpr := memo.MakeNotLikeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_notLikeExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notLikeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notLikeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNotLike(
+						_expr := _f.ConstructNotLike(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_notLikeExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8685,84 +9051,75 @@ func (_f *Factory) ConstructNotLike(
 				result := _f.funcs.FoldComparison(opt.NotLikeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_notLikeExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notLikeExpr))
+	e := _f.mem.MemoizeNotLike(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructILike constructs an expression for the ILike operator.
 func (_f *Factory) ConstructILike(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_iLikeExpr := memo.MakeILikeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_iLikeExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_iLikeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_iLikeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructILike(
+						_expr := _f.ConstructILike(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_iLikeExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8776,84 +9133,75 @@ func (_f *Factory) ConstructILike(
 				result := _f.funcs.FoldComparison(opt.ILikeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_iLikeExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_iLikeExpr))
+	e := _f.mem.MemoizeILike(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNotILike constructs an expression for the NotILike operator.
 func (_f *Factory) ConstructNotILike(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_notILikeExpr := memo.MakeNotILikeExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_notILikeExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notILikeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notILikeExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNotILike(
+						_expr := _f.ConstructNotILike(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_notILikeExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8867,84 +9215,75 @@ func (_f *Factory) ConstructNotILike(
 				result := _f.funcs.FoldComparison(opt.NotILikeOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_notILikeExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notILikeExpr))
+	e := _f.mem.MemoizeNotILike(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructSimilarTo constructs an expression for the SimilarTo operator.
 func (_f *Factory) ConstructSimilarTo(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_similarToExpr := memo.MakeSimilarToExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_similarToExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_similarToExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_similarToExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructSimilarTo(
+						_expr := _f.ConstructSimilarTo(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_similarToExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -8958,84 +9297,75 @@ func (_f *Factory) ConstructSimilarTo(
 				result := _f.funcs.FoldComparison(opt.SimilarToOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_similarToExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_similarToExpr))
+	e := _f.mem.MemoizeSimilarTo(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNotSimilarTo constructs an expression for the NotSimilarTo operator.
 func (_f *Factory) ConstructNotSimilarTo(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_notSimilarToExpr := memo.MakeNotSimilarToExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_notSimilarToExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notSimilarToExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notSimilarToExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNotSimilarTo(
+						_expr := _f.ConstructNotSimilarTo(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_notSimilarToExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9049,84 +9379,75 @@ func (_f *Factory) ConstructNotSimilarTo(
 				result := _f.funcs.FoldComparison(opt.NotSimilarToOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_notSimilarToExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notSimilarToExpr))
+	e := _f.mem.MemoizeNotSimilarTo(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructRegMatch constructs an expression for the RegMatch operator.
 func (_f *Factory) ConstructRegMatch(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_regMatchExpr := memo.MakeRegMatchExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_regMatchExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_regMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_regMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructRegMatch(
+						_expr := _f.ConstructRegMatch(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_regMatchExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9140,84 +9461,75 @@ func (_f *Factory) ConstructRegMatch(
 				result := _f.funcs.FoldComparison(opt.RegMatchOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_regMatchExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_regMatchExpr))
+	e := _f.mem.MemoizeRegMatch(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNotRegMatch constructs an expression for the NotRegMatch operator.
 func (_f *Factory) ConstructNotRegMatch(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_notRegMatchExpr := memo.MakeNotRegMatchExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_notRegMatchExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notRegMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notRegMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNotRegMatch(
+						_expr := _f.ConstructNotRegMatch(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_notRegMatchExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9231,84 +9543,75 @@ func (_f *Factory) ConstructNotRegMatch(
 				result := _f.funcs.FoldComparison(opt.NotRegMatchOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_notRegMatchExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notRegMatchExpr))
+	e := _f.mem.MemoizeNotRegMatch(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructRegIMatch constructs an expression for the RegIMatch operator.
 func (_f *Factory) ConstructRegIMatch(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_regIMatchExpr := memo.MakeRegIMatchExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_regIMatchExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_regIMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_regIMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructRegIMatch(
+						_expr := _f.ConstructRegIMatch(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_regIMatchExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9322,84 +9625,75 @@ func (_f *Factory) ConstructRegIMatch(
 				result := _f.funcs.FoldComparison(opt.RegIMatchOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_regIMatchExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_regIMatchExpr))
+	e := _f.mem.MemoizeRegIMatch(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructNotRegIMatch constructs an expression for the NotRegIMatch operator.
 func (_f *Factory) ConstructNotRegIMatch(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_notRegIMatchExpr := memo.MakeNotRegIMatchExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_notRegIMatchExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notRegIMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_notRegIMatchExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructNotRegIMatch(
+						_expr := _f.ConstructNotRegIMatch(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_notRegIMatchExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9413,45 +9707,38 @@ func (_f *Factory) ConstructNotRegIMatch(
 				result := _f.funcs.FoldComparison(opt.NotRegIMatchOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_notRegIMatchExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_notRegIMatchExpr))
+	e := _f.mem.MemoizeNotRegIMatch(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructIs constructs an expression for the Is operator.
 func (_f *Factory) ConstructIs(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_isExpr := memo.MakeIsExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_isExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldIsNull]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_nullExpr2 := _f.mem.NormExpr(right).AsNull()
-			if _nullExpr2 != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_null2, _ := right.(*memo.NullExpr)
+			if _null2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldIsNull) {
-					_group = _f.ConstructTrue()
-					_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
+					_expr := _f.ConstructTrue()
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldIsNull, _group, 0, 0)
+						_f.appliedRule(opt.FoldIsNull, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9459,18 +9746,17 @@ func (_f *Factory) ConstructIs(
 
 	// [FoldNonNullIsNull]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr == nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null == nil {
 			if _f.funcs.IsConstValueOrTuple(left) {
-				_nullExpr2 := _f.mem.NormExpr(right).AsNull()
-				if _nullExpr2 != nil {
+				_null2, _ := right.(*memo.NullExpr)
+				if _null2 != nil {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullIsNull) {
-						_group = _f.ConstructFalse()
-						_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
+						_expr := _f.ConstructFalse()
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNonNullIsNull, _group, 0, 0)
+							_f.appliedRule(opt.FoldNonNullIsNull, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9479,20 +9765,19 @@ func (_f *Factory) ConstructIs(
 
 	// [CommuteNullIs]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_nullExpr2 := _f.mem.NormExpr(right).AsNull()
-			if _nullExpr2 == nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_null2, _ := right.(*memo.NullExpr)
+			if _null2 == nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteNullIs) {
-					_group = _f.ConstructIs(
+					_expr := _f.ConstructIs(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteNullIs, _group, 0, 0)
+						_f.appliedRule(opt.CommuteNullIs, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9500,20 +9785,19 @@ func (_f *Factory) ConstructIs(
 
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructIs(
+					_expr := _f.ConstructIs(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9521,18 +9805,17 @@ func (_f *Factory) ConstructIs(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructIs(
+					_expr := _f.ConstructIs(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9540,22 +9823,21 @@ func (_f *Factory) ConstructIs(
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructIs(
+						_expr := _f.ConstructIs(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9569,45 +9851,38 @@ func (_f *Factory) ConstructIs(
 				result := _f.funcs.FoldComparison(opt.IsOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_isExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_isExpr))
+	e := _f.mem.MemoizeIs(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructIsNot constructs an expression for the IsNot operator.
 func (_f *Factory) ConstructIsNot(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_isNotExpr := memo.MakeIsNotExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_isNotExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldIsNotNull]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_nullExpr2 := _f.mem.NormExpr(right).AsNull()
-			if _nullExpr2 != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_null2, _ := right.(*memo.NullExpr)
+			if _null2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldIsNotNull) {
-					_group = _f.ConstructFalse()
-					_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
+					_expr := _f.ConstructFalse()
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldIsNotNull, _group, 0, 0)
+						_f.appliedRule(opt.FoldIsNotNull, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9615,18 +9890,17 @@ func (_f *Factory) ConstructIsNot(
 
 	// [FoldNonNullIsNotNull]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr == nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null == nil {
 			if _f.funcs.IsConstValueOrTuple(left) {
-				_nullExpr2 := _f.mem.NormExpr(right).AsNull()
-				if _nullExpr2 != nil {
+				_null2, _ := right.(*memo.NullExpr)
+				if _null2 != nil {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullIsNotNull) {
-						_group = _f.ConstructTrue()
-						_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
+						_expr := _f.ConstructTrue()
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNonNullIsNotNull, _group, 0, 0)
+							_f.appliedRule(opt.FoldNonNullIsNotNull, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9635,20 +9909,19 @@ func (_f *Factory) ConstructIsNot(
 
 	// [CommuteNullIs]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
-			_nullExpr2 := _f.mem.NormExpr(right).AsNull()
-			if _nullExpr2 == nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			_null2, _ := right.(*memo.NullExpr)
+			if _null2 == nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteNullIs) {
-					_group = _f.ConstructIsNot(
+					_expr := _f.ConstructIsNot(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteNullIs, _group, 0, 0)
+						_f.appliedRule(opt.CommuteNullIs, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9656,20 +9929,19 @@ func (_f *Factory) ConstructIsNot(
 
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructIsNot(
+					_expr := _f.ConstructIsNot(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9677,18 +9949,17 @@ func (_f *Factory) ConstructIsNot(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructIsNot(
+					_expr := _f.ConstructIsNot(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -9696,22 +9967,21 @@ func (_f *Factory) ConstructIsNot(
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructIsNot(
+						_expr := _f.ConstructIsNot(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9725,84 +9995,75 @@ func (_f *Factory) ConstructIsNot(
 				result := _f.funcs.FoldComparison(opt.IsNotOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_isNotExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_isNotExpr))
+	e := _f.mem.MemoizeIsNot(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructContains constructs an expression for the Contains operator.
 func (_f *Factory) ConstructContains(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_containsExpr := memo.MakeContainsExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_containsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructContains(
+						_expr := _f.ConstructContains(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9811,26 +10072,25 @@ func (_f *Factory) ConstructContains(
 
 	// [NormalizeJSONContains]
 	{
-		_fetchValExpr := _f.mem.NormExpr(left).AsFetchVal()
-		if _fetchValExpr != nil {
-			val := _fetchValExpr.Json()
-			key := _fetchValExpr.Index()
-			_constExpr := _f.mem.NormExpr(_fetchValExpr.Index()).AsConst()
-			if _constExpr != nil {
+		_fetchVal, _ := left.(*memo.FetchValExpr)
+		if _fetchVal != nil {
+			val := _fetchVal.Json
+			key := _fetchVal.Index
+			_const, _ := key.(*memo.ConstExpr)
+			if _const != nil {
 				if _f.funcs.IsString(key) {
-					_constExpr2 := _f.mem.NormExpr(right).AsConst()
-					if _constExpr2 != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
 						if !_f.funcs.IsJSONScalar(right) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONContains) {
-								_group = _f.ConstructContains(
+								_expr := _f.ConstructContains(
 									val,
 									_f.funcs.MakeSingleKeyJSONObject(key, right),
 								)
-								_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
 								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeJSONContains, _group, 0, 0)
+									_f.appliedRule(opt.NormalizeJSONContains, nil, _expr)
 								}
-								return _group
+								return _expr
 							}
 						}
 					}
@@ -9846,84 +10106,75 @@ func (_f *Factory) ConstructContains(
 				result := _f.funcs.FoldComparison(opt.ContainsOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_containsExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_containsExpr))
+	e := _f.mem.MemoizeContains(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructJsonExists constructs an expression for the JsonExists operator.
 func (_f *Factory) ConstructJsonExists(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_jsonExistsExpr := memo.MakeJsonExistsExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_jsonExistsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_jsonExistsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_jsonExistsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructJsonExists(
+						_expr := _f.ConstructJsonExists(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_jsonExistsExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -9937,84 +10188,75 @@ func (_f *Factory) ConstructJsonExists(
 				result := _f.funcs.FoldComparison(opt.JsonExistsOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_jsonExistsExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_jsonExistsExpr))
+	e := _f.mem.MemoizeJsonExists(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructJsonAllExists constructs an expression for the JsonAllExists operator.
 func (_f *Factory) ConstructJsonAllExists(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_jsonAllExistsExpr := memo.MakeJsonAllExistsExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_jsonAllExistsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_jsonAllExistsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_jsonAllExistsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructJsonAllExists(
+						_expr := _f.ConstructJsonAllExists(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_jsonAllExistsExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -10028,84 +10270,75 @@ func (_f *Factory) ConstructJsonAllExists(
 				result := _f.funcs.FoldComparison(opt.JsonAllExistsOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_jsonAllExistsExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_jsonAllExistsExpr))
+	e := _f.mem.MemoizeJsonAllExists(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructJsonSomeExists constructs an expression for the JsonSomeExists operator.
 func (_f *Factory) ConstructJsonSomeExists(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_jsonSomeExistsExpr := memo.MakeJsonSomeExistsExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_jsonSomeExistsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullComparisonLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_jsonSomeExistsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonLeft, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullComparisonRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.BoolType(),
 				)
-				_f.mem.AddAltFingerprint(_jsonSomeExistsExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullComparisonRight, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [UnifyComparisonTypes]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr != nil {
-			_constExpr := _f.mem.NormExpr(right).AsConst()
-			if _constExpr != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
 				result := _f.funcs.UnifyComparison(left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
-						_group = _f.ConstructJsonSomeExists(
+						_expr := _f.ConstructJsonSomeExists(
 							left,
 							result,
 						)
-						_f.mem.AddAltFingerprint(_jsonSomeExistsExpr.Fingerprint(), _group)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.UnifyComparisonTypes, _group, 0, 0)
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
@@ -10119,52 +10352,45 @@ func (_f *Factory) ConstructJsonSomeExists(
 				result := _f.funcs.FoldComparison(opt.JsonSomeExistsOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_group = result
-						_f.mem.AddAltFingerprint(_jsonSomeExistsExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, _group, 0, 0)
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_jsonSomeExistsExpr))
+	e := _f.mem.MemoizeJsonSomeExists(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructAnyScalar constructs an expression for the AnyScalar operator.
 // AnyScalar is the form of ANY which refers to an ANY operation on a
 // tuple or array, as opposed to Any which operates on a subquery.
 func (_f *Factory) ConstructAnyScalar(
-	left memo.GroupID,
-	right memo.GroupID,
-	cmp memo.PrivateID,
-) memo.GroupID {
-	_anyScalarExpr := memo.MakeAnyScalarExpr(left, right, cmp)
-	_group := _f.mem.GroupByFingerprint(_anyScalarExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+	cmp opt.Operator,
+) opt.ScalarExpr {
 	// [SimplifyEqualsAnyTuple]
 	{
 		input := left
 		tuple := right
-		_tupleExpr := _f.mem.NormExpr(right).AsTuple()
-		if _tupleExpr != nil {
-			if _f.funcs.IsEquality(cmp) {
+		_tuple, _ := tuple.(*memo.TupleExpr)
+		if _tuple != nil {
+			if _f.funcs.OpsAreSame(cmp, opt.EqOp) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyEqualsAnyTuple) {
-					_group = _f.ConstructIn(
+					_expr := _f.ConstructIn(
 						input,
 						tuple,
 					)
-					_f.mem.AddAltFingerprint(_anyScalarExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyEqualsAnyTuple, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyEqualsAnyTuple, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10174,55 +10400,48 @@ func (_f *Factory) ConstructAnyScalar(
 	{
 		input := left
 		ary := right
-		_constExpr := _f.mem.NormExpr(right).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.IsArray(ary) {
+		_const, _ := ary.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.IsConstArray(ary) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAnyScalarArray) {
-					_group = _f.ConstructAnyScalar(
+					_expr := _f.ConstructAnyScalar(
 						input,
 						_f.funcs.ConvertConstArrayToTuple(ary),
 						cmp,
 					)
-					_f.mem.AddAltFingerprint(_anyScalarExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyAnyScalarArray, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyAnyScalarArray, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_anyScalarExpr))
+	e := _f.mem.MemoizeAnyScalar(left, right, cmp)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructBitand constructs an expression for the Bitand operator.
 func (_f *Factory) ConstructBitand(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_bitandExpr := memo.MakeBitandExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_bitandExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructBitand(
+					_expr := _f.ConstructBitand(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10230,18 +10449,17 @@ func (_f *Factory) ConstructBitand(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructBitand(
+					_expr := _f.ConstructBitand(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10249,16 +10467,15 @@ func (_f *Factory) ConstructBitand(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.BitandOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.BitandOp, left, right)
-					_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.BitandOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10266,16 +10483,15 @@ func (_f *Factory) ConstructBitand(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.BitandOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.BitandOp, left, right)
-					_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.BitandOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10288,48 +10504,41 @@ func (_f *Factory) ConstructBitand(
 				result := _f.funcs.FoldBinary(opt.BitandOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_bitandExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_bitandExpr))
+	e := _f.mem.MemoizeBitand(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructBitor constructs an expression for the Bitor operator.
 func (_f *Factory) ConstructBitor(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_bitorExpr := memo.MakeBitorExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_bitorExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructBitor(
+					_expr := _f.ConstructBitor(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10337,18 +10546,17 @@ func (_f *Factory) ConstructBitor(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructBitor(
+					_expr := _f.ConstructBitor(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10356,16 +10564,15 @@ func (_f *Factory) ConstructBitor(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.BitorOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.BitorOp, left, right)
-					_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.BitorOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10373,16 +10580,15 @@ func (_f *Factory) ConstructBitor(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.BitorOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.BitorOp, left, right)
-					_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.BitorOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10395,48 +10601,41 @@ func (_f *Factory) ConstructBitor(
 				result := _f.funcs.FoldBinary(opt.BitorOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_bitorExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_bitorExpr))
+	e := _f.mem.MemoizeBitor(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructBitxor constructs an expression for the Bitxor operator.
 func (_f *Factory) ConstructBitxor(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_bitxorExpr := memo.MakeBitxorExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_bitxorExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructBitxor(
+					_expr := _f.ConstructBitxor(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10444,18 +10643,17 @@ func (_f *Factory) ConstructBitxor(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructBitxor(
+					_expr := _f.ConstructBitxor(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10463,16 +10661,15 @@ func (_f *Factory) ConstructBitxor(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.BitxorOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.BitxorOp, left, right)
-					_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.BitxorOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10480,16 +10677,15 @@ func (_f *Factory) ConstructBitxor(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.BitxorOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.BitxorOp, left, right)
-					_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.BitxorOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10502,44 +10698,37 @@ func (_f *Factory) ConstructBitxor(
 				result := _f.funcs.FoldBinary(opt.BitxorOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_bitxorExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_bitxorExpr))
+	e := _f.mem.MemoizeBitxor(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructPlus constructs an expression for the Plus operator.
 func (_f *Factory) ConstructPlus(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_plusExpr := memo.MakePlusExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_plusExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldPlusZero]
 	{
-		_constExpr := _f.mem.NormExpr(right).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 0) {
+		_const, _ := right.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldPlusZero) {
-					_group = left
-					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldPlusZero, _group, 0, 0)
+						_f.appliedRule(opt.FoldPlusZero, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10547,16 +10736,15 @@ func (_f *Factory) ConstructPlus(
 
 	// [FoldZeroPlus]
 	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 0) {
+		_const, _ := left.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldZeroPlus) {
-					_group = right
-					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
+					_expr := right
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldZeroPlus, _group, 0, 0)
+						_f.appliedRule(opt.FoldZeroPlus, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10564,20 +10752,19 @@ func (_f *Factory) ConstructPlus(
 
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructPlus(
+					_expr := _f.ConstructPlus(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10585,18 +10772,17 @@ func (_f *Factory) ConstructPlus(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructPlus(
+					_expr := _f.ConstructPlus(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10604,16 +10790,15 @@ func (_f *Factory) ConstructPlus(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.PlusOp, left, right)
-					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10621,16 +10806,15 @@ func (_f *Factory) ConstructPlus(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.PlusOp, left, right)
-					_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10643,44 +10827,37 @@ func (_f *Factory) ConstructPlus(
 				result := _f.funcs.FoldBinary(opt.PlusOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_plusExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_plusExpr))
+	e := _f.mem.MemoizePlus(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructMinus constructs an expression for the Minus operator.
 func (_f *Factory) ConstructMinus(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_minusExpr := memo.MakeMinusExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_minusExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldMinusZero]
 	{
-		_constExpr := _f.mem.NormExpr(right).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 0) {
+		_const, _ := right.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
-					_group = left
-					_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldMinusZero, _group, 0, 0)
+						_f.appliedRule(opt.FoldMinusZero, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10688,16 +10865,15 @@ func (_f *Factory) ConstructMinus(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.MinusOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.MinusOp, left, right)
-					_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.MinusOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10705,16 +10881,15 @@ func (_f *Factory) ConstructMinus(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.MinusOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.MinusOp, left, right)
-					_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.MinusOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10727,44 +10902,37 @@ func (_f *Factory) ConstructMinus(
 				result := _f.funcs.FoldBinary(opt.MinusOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_minusExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_minusExpr))
+	e := _f.mem.MemoizeMinus(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructMult constructs an expression for the Mult operator.
 func (_f *Factory) ConstructMult(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_multExpr := memo.MakeMultExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_multExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldMultOne]
 	{
-		_constExpr := _f.mem.NormExpr(right).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+		_const, _ := right.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMultOne) {
-					_group = left
-					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldMultOne, _group, 0, 0)
+						_f.appliedRule(opt.FoldMultOne, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10772,16 +10940,15 @@ func (_f *Factory) ConstructMult(
 
 	// [FoldOneMult]
 	{
-		_constExpr := _f.mem.NormExpr(left).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+		_const, _ := left.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldOneMult) {
-					_group = right
-					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
+					_expr := right
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldOneMult, _group, 0, 0)
+						_f.appliedRule(opt.FoldOneMult, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10789,20 +10956,19 @@ func (_f *Factory) ConstructMult(
 
 	// [CommuteVar]
 	{
-		_variableExpr := _f.mem.NormExpr(left).AsVariable()
-		if _variableExpr == nil {
-			_variableExpr2 := _f.mem.NormExpr(right).AsVariable()
-			if _variableExpr2 != nil {
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_group = _f.ConstructMult(
+					_expr := _f.ConstructMult(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, _group, 0, 0)
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10810,18 +10976,17 @@ func (_f *Factory) ConstructMult(
 
 	// [CommuteConst]
 	{
-		if _f.funcs.OnlyConstants(left) {
-			if !_f.funcs.OnlyConstants(right) {
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_group = _f.ConstructMult(
+					_expr := _f.ConstructMult(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, _group, 0, 0)
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10829,16 +10994,15 @@ func (_f *Factory) ConstructMult(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.MultOp, left, right)
-					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10846,16 +11010,15 @@ func (_f *Factory) ConstructMult(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.MultOp, left, right)
-					_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10868,44 +11031,37 @@ func (_f *Factory) ConstructMult(
 				result := _f.funcs.FoldBinary(opt.MultOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_multExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_multExpr))
+	e := _f.mem.MemoizeMult(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructDiv constructs an expression for the Div operator.
 func (_f *Factory) ConstructDiv(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_divExpr := memo.MakeDivExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_divExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldDivOne]
 	{
-		_constExpr := _f.mem.NormExpr(right).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+		_const, _ := right.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
-					_group = left
-					_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldDivOne, _group, 0, 0)
+						_f.appliedRule(opt.FoldDivOne, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10913,16 +11069,15 @@ func (_f *Factory) ConstructDiv(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.DivOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.DivOp, left, right)
-					_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.DivOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10930,16 +11085,15 @@ func (_f *Factory) ConstructDiv(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.DivOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.DivOp, left, right)
-					_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.DivOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10952,44 +11106,37 @@ func (_f *Factory) ConstructDiv(
 				result := _f.funcs.FoldBinary(opt.DivOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_divExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_divExpr))
+	e := _f.mem.MemoizeDiv(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFloorDiv constructs an expression for the FloorDiv operator.
 func (_f *Factory) ConstructFloorDiv(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_floorDivExpr := memo.MakeFloorDivExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_floorDivExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldDivOne]
 	{
-		_constExpr := _f.mem.NormExpr(right).AsConst()
-		if _constExpr != nil {
-			if _f.funcs.EqualsNumber(_constExpr.Value(), 1) {
+		_const, _ := right.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
-					_group = left
-					_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
+					_expr := left
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldDivOne, _group, 0, 0)
+						_f.appliedRule(opt.FoldDivOne, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -10997,16 +11144,15 @@ func (_f *Factory) ConstructFloorDiv(
 
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.FloorDivOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.FloorDivOp, left, right)
-					_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FloorDivOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11014,16 +11160,15 @@ func (_f *Factory) ConstructFloorDiv(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.FloorDivOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.FloorDivOp, left, right)
-					_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FloorDivOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11036,44 +11181,37 @@ func (_f *Factory) ConstructFloorDiv(
 				result := _f.funcs.FoldBinary(opt.FloorDivOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_floorDivExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_floorDivExpr))
+	e := _f.mem.MemoizeFloorDiv(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructMod constructs an expression for the Mod operator.
 func (_f *Factory) ConstructMod(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_modExpr := memo.MakeModExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_modExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.ModOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.ModOp, left, right)
-					_f.mem.AddAltFingerprint(_modExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.ModOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11081,16 +11219,15 @@ func (_f *Factory) ConstructMod(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.ModOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.ModOp, left, right)
-					_f.mem.AddAltFingerprint(_modExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.ModOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11103,44 +11240,37 @@ func (_f *Factory) ConstructMod(
 				result := _f.funcs.FoldBinary(opt.ModOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_modExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_modExpr))
+	e := _f.mem.MemoizeMod(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructPow constructs an expression for the Pow operator.
 func (_f *Factory) ConstructPow(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_powExpr := memo.MakePowExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_powExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.PowOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.PowOp, left, right)
-					_f.mem.AddAltFingerprint(_powExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.PowOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11148,16 +11278,15 @@ func (_f *Factory) ConstructPow(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.PowOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.PowOp, left, right)
-					_f.mem.AddAltFingerprint(_powExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.PowOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11170,44 +11299,37 @@ func (_f *Factory) ConstructPow(
 				result := _f.funcs.FoldBinary(opt.PowOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_powExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_powExpr))
+	e := _f.mem.MemoizePow(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructConcat constructs an expression for the Concat operator.
 func (_f *Factory) ConstructConcat(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_concatExpr := memo.MakeConcatExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_concatExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.ConcatOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.ConcatOp, left, right)
-					_f.mem.AddAltFingerprint(_concatExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.ConcatOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11215,16 +11337,15 @@ func (_f *Factory) ConstructConcat(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.ConcatOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.ConcatOp, left, right)
-					_f.mem.AddAltFingerprint(_concatExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.ConcatOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11237,44 +11358,37 @@ func (_f *Factory) ConstructConcat(
 				result := _f.funcs.FoldBinary(opt.ConcatOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_concatExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_concatExpr))
+	e := _f.mem.MemoizeConcat(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructLShift constructs an expression for the LShift operator.
 func (_f *Factory) ConstructLShift(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_lShiftExpr := memo.MakeLShiftExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_lShiftExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.LShiftOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.LShiftOp, left, right)
-					_f.mem.AddAltFingerprint(_lShiftExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.LShiftOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11282,16 +11396,15 @@ func (_f *Factory) ConstructLShift(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.LShiftOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.LShiftOp, left, right)
-					_f.mem.AddAltFingerprint(_lShiftExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.LShiftOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11304,44 +11417,37 @@ func (_f *Factory) ConstructLShift(
 				result := _f.funcs.FoldBinary(opt.LShiftOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_lShiftExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_lShiftExpr))
+	e := _f.mem.MemoizeLShift(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructRShift constructs an expression for the RShift operator.
 func (_f *Factory) ConstructRShift(
-	left memo.GroupID,
-	right memo.GroupID,
-) memo.GroupID {
-	_rShiftExpr := memo.MakeRShiftExpr(left, right)
-	_group := _f.mem.GroupByFingerprint(_rShiftExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
-		_nullExpr := _f.mem.NormExpr(left).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.RShiftOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.RShiftOp, left, right)
-					_f.mem.AddAltFingerprint(_rShiftExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.RShiftOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11349,16 +11455,15 @@ func (_f *Factory) ConstructRShift(
 
 	// [FoldNullBinaryRight]
 	{
-		_nullExpr := _f.mem.NormExpr(right).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.RShiftOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.RShiftOp, left, right)
-					_f.mem.AddAltFingerprint(_rShiftExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.RShiftOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11371,46 +11476,39 @@ func (_f *Factory) ConstructRShift(
 				result := _f.funcs.FoldBinary(opt.RShiftOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_rShiftExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_rShiftExpr))
+	e := _f.mem.MemoizeRShift(left, right)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFetchVal constructs an expression for the FetchVal operator.
 func (_f *Factory) ConstructFetchVal(
-	json memo.GroupID,
-	index memo.GroupID,
-) memo.GroupID {
-	_fetchValExpr := memo.MakeFetchValExpr(json, index)
-	_group := _f.mem.GroupByFingerprint(_fetchValExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	json opt.ScalarExpr,
+	index opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		left := json
-		_nullExpr := _f.mem.NormExpr(json).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			right := index
 			if !_f.funcs.AllowNullArgs(opt.FetchValOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchValOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchValExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11420,16 +11518,15 @@ func (_f *Factory) ConstructFetchVal(
 	{
 		left := json
 		right := index
-		_nullExpr := _f.mem.NormExpr(index).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.FetchValOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchValOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchValExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11444,46 +11541,39 @@ func (_f *Factory) ConstructFetchVal(
 				result := _f.funcs.FoldBinary(opt.FetchValOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchValExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_fetchValExpr))
+	e := _f.mem.MemoizeFetchVal(json, index)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFetchText constructs an expression for the FetchText operator.
 func (_f *Factory) ConstructFetchText(
-	json memo.GroupID,
-	index memo.GroupID,
-) memo.GroupID {
-	_fetchTextExpr := memo.MakeFetchTextExpr(json, index)
-	_group := _f.mem.GroupByFingerprint(_fetchTextExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	json opt.ScalarExpr,
+	index opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		left := json
-		_nullExpr := _f.mem.NormExpr(json).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			right := index
 			if !_f.funcs.AllowNullArgs(opt.FetchTextOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchTextOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchTextExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11493,16 +11583,15 @@ func (_f *Factory) ConstructFetchText(
 	{
 		left := json
 		right := index
-		_nullExpr := _f.mem.NormExpr(index).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.FetchTextOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchTextOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchTextExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11517,46 +11606,39 @@ func (_f *Factory) ConstructFetchText(
 				result := _f.funcs.FoldBinary(opt.FetchTextOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchTextExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_fetchTextExpr))
+	e := _f.mem.MemoizeFetchText(json, index)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFetchValPath constructs an expression for the FetchValPath operator.
 func (_f *Factory) ConstructFetchValPath(
-	json memo.GroupID,
-	path memo.GroupID,
-) memo.GroupID {
-	_fetchValPathExpr := memo.MakeFetchValPathExpr(json, path)
-	_group := _f.mem.GroupByFingerprint(_fetchValPathExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	json opt.ScalarExpr,
+	path opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		left := json
-		_nullExpr := _f.mem.NormExpr(json).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			right := path
 			if !_f.funcs.AllowNullArgs(opt.FetchValPathOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchValPathExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11566,16 +11648,15 @@ func (_f *Factory) ConstructFetchValPath(
 	{
 		left := json
 		right := path
-		_nullExpr := _f.mem.NormExpr(path).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.FetchValPathOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchValPathExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11590,46 +11671,39 @@ func (_f *Factory) ConstructFetchValPath(
 				result := _f.funcs.FoldBinary(opt.FetchValPathOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchValPathExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_fetchValPathExpr))
+	e := _f.mem.MemoizeFetchValPath(json, path)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFetchTextPath constructs an expression for the FetchTextPath operator.
 func (_f *Factory) ConstructFetchTextPath(
-	json memo.GroupID,
-	path memo.GroupID,
-) memo.GroupID {
-	_fetchTextPathExpr := memo.MakeFetchTextPathExpr(json, path)
-	_group := _f.mem.GroupByFingerprint(_fetchTextPathExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	json opt.ScalarExpr,
+	path opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		left := json
-		_nullExpr := _f.mem.NormExpr(json).AsNull()
-		if _nullExpr != nil {
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
 			right := path
 			if !_f.funcs.AllowNullArgs(opt.FetchTextPathOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchTextPathExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11639,16 +11713,15 @@ func (_f *Factory) ConstructFetchTextPath(
 	{
 		left := json
 		right := path
-		_nullExpr := _f.mem.NormExpr(path).AsNull()
-		if _nullExpr != nil {
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
 			if !_f.funcs.AllowNullArgs(opt.FetchTextPathOp, left, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_group = _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, right)
-					_f.mem.AddAltFingerprint(_fetchTextPathExpr.Fingerprint(), _group)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, _group, 0, 0)
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11663,48 +11736,41 @@ func (_f *Factory) ConstructFetchTextPath(
 				result := _f.funcs.FoldBinary(opt.FetchTextPathOp, left, right)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_group = result
-						_f.mem.AddAltFingerprint(_fetchTextPathExpr.Fingerprint(), _group)
+						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, _group, 0, 0)
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
 						}
-						return _group
+						return _expr
 					}
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_fetchTextPathExpr))
+	e := _f.mem.MemoizeFetchTextPath(json, path)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructUnaryMinus constructs an expression for the UnaryMinus operator.
 func (_f *Factory) ConstructUnaryMinus(
-	input memo.GroupID,
-) memo.GroupID {
-	_unaryMinusExpr := memo.MakeUnaryMinusExpr(input)
-	_group := _f.mem.GroupByFingerprint(_unaryMinusExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [InvertMinus]
 	{
-		_minusExpr := _f.mem.NormExpr(input).AsMinus()
-		if _minusExpr != nil {
-			left := _minusExpr.Left()
-			right := _minusExpr.Right()
+		_minus, _ := input.(*memo.MinusExpr)
+		if _minus != nil {
+			left := _minus.Left
+			right := _minus.Right
 			if _f.funcs.CanConstructBinary(opt.MinusOp, right, left) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.InvertMinus) {
-					_group = _f.ConstructMinus(
+					_expr := _f.ConstructMinus(
 						right,
 						left,
 					)
-					_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.InvertMinus, _group, 0, 0)
+						_f.appliedRule(opt.InvertMinus, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
@@ -11712,31 +11778,29 @@ func (_f *Factory) ConstructUnaryMinus(
 
 	// [EliminateUnaryMinus]
 	{
-		_unaryMinusExpr2 := _f.mem.NormExpr(input).AsUnaryMinus()
-		if _unaryMinusExpr2 != nil {
-			input := _unaryMinusExpr2.Input()
+		_unaryMinus, _ := input.(*memo.UnaryMinusExpr)
+		if _unaryMinus != nil {
+			input := _unaryMinus.Input
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnaryMinus) {
-				_group = input
-				_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
+				_expr := input
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnaryMinus, _group, 0, 0)
+					_f.appliedRule(opt.EliminateUnaryMinus, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullUnary]
 	{
-		_nullExpr := _f.mem.NormExpr(input).AsNull()
-		if _nullExpr != nil {
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_group = _f.funcs.FoldNullUnary(opt.UnaryMinusOp, input)
-				_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryMinusOp, input).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullUnary, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
@@ -11747,41 +11811,34 @@ func (_f *Factory) ConstructUnaryMinus(
 			result := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
 			if _f.funcs.Succeeded(result) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
-					_group = result
-					_f.mem.AddAltFingerprint(_unaryMinusExpr.Fingerprint(), _group)
+					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldUnary, _group, 0, 0)
+						_f.appliedRule(opt.FoldUnary, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_unaryMinusExpr))
+	e := _f.mem.MemoizeUnaryMinus(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructUnaryComplement constructs an expression for the UnaryComplement operator.
 func (_f *Factory) ConstructUnaryComplement(
-	input memo.GroupID,
-) memo.GroupID {
-	_unaryComplementExpr := memo.MakeUnaryComplementExpr(input)
-	_group := _f.mem.GroupByFingerprint(_unaryComplementExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullUnary]
 	{
-		_nullExpr := _f.mem.NormExpr(input).AsNull()
-		if _nullExpr != nil {
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_group = _f.funcs.FoldNullUnary(opt.UnaryComplementOp, input)
-				_f.mem.AddAltFingerprint(_unaryComplementExpr.Fingerprint(), _group)
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryComplementOp, input).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullUnary, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
@@ -11792,18 +11849,18 @@ func (_f *Factory) ConstructUnaryComplement(
 			result := _f.funcs.FoldUnary(opt.UnaryComplementOp, input)
 			if _f.funcs.Succeeded(result) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
-					_group = result
-					_f.mem.AddAltFingerprint(_unaryComplementExpr.Fingerprint(), _group)
+					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldUnary, _group, 0, 0)
+						_f.appliedRule(opt.FoldUnary, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_unaryComplementExpr))
+	e := _f.mem.MemoizeUnaryComplement(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructCast constructs an expression for the Cast operator.
@@ -11818,51 +11875,45 @@ func (_f *Factory) ConstructUnaryComplement(
 // the target data type allows a maximum of two characters. This is one example
 // of a "lossy" cast.
 func (_f *Factory) ConstructCast(
-	input memo.GroupID,
-	targetTyp memo.PrivateID,
-) memo.GroupID {
-	_castExpr := memo.MakeCastExpr(input, targetTyp)
-	_group := _f.mem.GroupByFingerprint(_castExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+	targetTyp coltypes.T,
+) opt.ScalarExpr {
 	// [EliminateCast]
 	{
 		if _f.funcs.HasColType(input, targetTyp) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
-				_group = input
-				_f.mem.AddAltFingerprint(_castExpr.Fingerprint(), _group)
+				_expr := input
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateCast, _group, 0, 0)
+					_f.appliedRule(opt.EliminateCast, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [FoldNullCast]
 	{
-		_nullExpr := _f.mem.NormExpr(input).AsNull()
-		if _nullExpr != nil {
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullCast) {
-				_group = _f.ConstructNull(
+				_expr := _f.ConstructNull(
 					_f.funcs.ColTypeToDatumType(targetTyp),
 				)
-				_f.mem.AddAltFingerprint(_castExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullCast, _group, 0, 0)
+					_f.appliedRule(opt.FoldNullCast, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_castExpr))
+	e := _f.mem.MemoizeCast(input, targetTyp)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructCase constructs an expression for the Case operator.
 // Case is a CASE statement of the form:
+//
 //   CASE [ <Input> ]
 //       WHEN <condval1> THEN <expr1>
 //     [ WHEN <condval2> THEN <expr2> ] ...
@@ -11870,41 +11921,36 @@ func (_f *Factory) ConstructCast(
 //   END
 //
 // The Case operator evaluates <Input> (if not provided, Input is set to True),
-// then picks the WHEN branch where <condval> is equal to
-// <Input>, then evaluates and returns the corresponding THEN expression. If no
-// WHEN branch matches, the ELSE expression is evaluated and returned, if any.
-// Otherwise, NULL is returned.
+// then picks the WHEN branch where <condval> is equal to <Input>, then evaluates
+// and returns the corresponding THEN expression. If no WHEN branch matches, the
+// ELSE expression is evaluated and returned, if any. Otherwise, NULL is
+// returned.
 //
 // Note that the Whens list inside Case is used to represent all the WHEN
 // branches as well as the ELSE statement if it exists. It is of the form:
-// [(When <condval1> <expr1>),(When <condval2> <expr2>),...,<expr>]
+//
+//   [(When <condval1> <expr1>),(When <condval2> <expr2>),...,<expr>]
+//
 func (_f *Factory) ConstructCase(
-	input memo.GroupID,
-	whens memo.ListID,
-) memo.GroupID {
-	_caseExpr := memo.MakeCaseExpr(input, whens)
-	_group := _f.mem.GroupByFingerprint(_caseExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+	whens memo.ScalarListExpr,
+	orElse opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [SimplifyCaseWhenConstValue]
 	{
 		condition := input
-		_expr := _f.mem.NormExpr(input)
-		if _expr.IsConstValue() {
-			for _, _item := range _f.mem.LookupList(whens) {
-				_whenExpr := _f.mem.NormExpr(_item).AsWhen()
-				if _whenExpr != nil {
-					_expr2 := _f.mem.NormExpr(_whenExpr.Condition())
-					if _expr2.IsConstValue() {
+		if opt.IsConstValueOp(condition) {
+			for i := range whens {
+				_item := whens[i]
+				_when, _ := _item.(*memo.WhenExpr)
+				if _when != nil {
+					if opt.IsConstValueOp(_when.Condition) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyCaseWhenConstValue) {
-							_group = _f.funcs.SimplifyWhens(condition, whens)
-							_f.mem.AddAltFingerprint(_caseExpr.Fingerprint(), _group)
+							_expr := _f.funcs.SimplifyWhens(condition, whens, orElse).(opt.ScalarExpr)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.SimplifyCaseWhenConstValue, _group, 0, 0)
+								_f.appliedRule(opt.SimplifyCaseWhenConstValue, nil, _expr)
 							}
-							return _group
+							return _expr
 						}
 					}
 				}
@@ -11912,7 +11958,8 @@ func (_f *Factory) ConstructCase(
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_caseExpr))
+	e := _f.mem.MemoizeCase(input, whens, orElse)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructWhen constructs an expression for the When operator.
@@ -11920,45 +11967,34 @@ func (_f *Factory) ConstructCase(
 // It is the type of each list item in Whens (except for the last item which is
 // a raw expression for the ELSE statement).
 func (_f *Factory) ConstructWhen(
-	condition memo.GroupID,
-	value memo.GroupID,
-) memo.GroupID {
-	_whenExpr := memo.MakeWhenExpr(condition, value)
-	_group := _f.mem.GroupByFingerprint(_whenExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_whenExpr))
+	condition opt.ScalarExpr,
+	value opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeWhen(condition, value)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructArray constructs an expression for the Array operator.
 // Array is an ARRAY literal of the form ARRAY[<expr1>, <expr2>, ..., <exprN>].
 func (_f *Factory) ConstructArray(
-	elems memo.ListID,
-	typ memo.PrivateID,
-) memo.GroupID {
-	_arrayExpr := memo.MakeArrayExpr(elems, typ)
-	_group := _f.mem.GroupByFingerprint(_arrayExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	elems memo.ScalarListExpr,
+	typ types.T,
+) opt.ScalarExpr {
 	// [FoldArray]
 	{
 		if _f.funcs.IsListOfConstants(elems) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldArray) {
-				_group = _f.funcs.FoldArray(elems, typ)
-				_f.mem.AddAltFingerprint(_arrayExpr.Fingerprint(), _group)
+				_expr := _f.funcs.FoldArray(elems, typ).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldArray, _group, 0, 0)
+					_f.appliedRule(opt.FoldArray, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_arrayExpr))
+	e := _f.mem.MemoizeArray(elems, typ)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructIndirection constructs an expression for the Indirection operator.
@@ -11966,80 +12002,63 @@ func (_f *Factory) ConstructArray(
 // Input must be an Array type and Index must be an int. Multiple indirections
 // and slicing are not supported.
 func (_f *Factory) ConstructIndirection(
-	input memo.GroupID,
-	index memo.GroupID,
-) memo.GroupID {
-	_indirectionExpr := memo.MakeIndirectionExpr(input, index)
-	_group := _f.mem.GroupByFingerprint(_indirectionExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_indirectionExpr))
+	input opt.ScalarExpr,
+	index opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeIndirection(input, index)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFunction constructs an expression for the Function operator.
 // Function invokes a builtin SQL function like CONCAT or NOW, passing the given
-// arguments. The private field is a *opt.FuncOpDef struct that provides the
-// name of the function as well as a pointer to the builtin overload definition.
+// arguments. The FunctionPrivate field contains the name of the function as well
+// as pointers to its type and properties.
 func (_f *Factory) ConstructFunction(
-	args memo.ListID,
-	def memo.PrivateID,
-) memo.GroupID {
-	_functionExpr := memo.MakeFunctionExpr(args, def)
-	_group := _f.mem.GroupByFingerprint(_functionExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_functionExpr))
+	args memo.ScalarListExpr,
+	functionPrivate *memo.FunctionPrivate,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeFunction(args, functionPrivate)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructCoalesce constructs an expression for the Coalesce operator.
 func (_f *Factory) ConstructCoalesce(
-	args memo.ListID,
-) memo.GroupID {
-	_coalesceExpr := memo.MakeCoalesceExpr(args)
-	_group := _f.mem.GroupByFingerprint(_coalesceExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	args memo.ScalarListExpr,
+) opt.ScalarExpr {
 	// [EliminateCoalesce]
 	{
-		if args.Length == 1 {
-			_item := _f.mem.LookupList(args)[0]
+		if len(args) == 1 {
+			_item := args[0]
 			item := _item
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCoalesce) {
-				_group = item
-				_f.mem.AddAltFingerprint(_coalesceExpr.Fingerprint(), _group)
+				_expr := item.(opt.ScalarExpr)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateCoalesce, _group, 0, 0)
+					_f.appliedRule(opt.EliminateCoalesce, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyCoalesce]
 	{
-		if args.Length > 0 {
-			_item := _f.mem.LookupList(args)[0]
+		if len(args) > 0 {
+			_item := args[0]
 			arg := _item
 			if _f.funcs.IsConstValueOrTuple(arg) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyCoalesce) {
-					_group = _f.funcs.SimplifyCoalesce(args)
-					_f.mem.AddAltFingerprint(_coalesceExpr.Fingerprint(), _group)
+					_expr := _f.funcs.SimplifyCoalesce(args).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyCoalesce, _group, 0, 0)
+						_f.appliedRule(opt.SimplifyCoalesce, nil, _expr)
 					}
-					return _group
+					return _expr
 				}
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_coalesceExpr))
+	e := _f.mem.MemoizeCoalesce(args)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructColumnAccess constructs an expression for the ColumnAccess operator.
@@ -12047,322 +12066,223 @@ func (_f *Factory) ConstructCoalesce(
 // input expression (which is assumed to be of type Tuple). Idx is the ordinal
 // index of the column in Input.
 func (_f *Factory) ConstructColumnAccess(
-	input memo.GroupID,
-	idx memo.PrivateID,
-) memo.GroupID {
-	_columnAccessExpr := memo.MakeColumnAccessExpr(input, idx)
-	_group := _f.mem.GroupByFingerprint(_columnAccessExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_columnAccessExpr))
+	input opt.ScalarExpr,
+	idx memo.TupleOrdinal,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeColumnAccess(input, idx)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructUnsupportedExpr constructs an expression for the UnsupportedExpr operator.
 // UnsupportedExpr is used for interfacing with the old planner code. It can
 // encapsulate a TypedExpr that is otherwise not supported by the optimizer.
 func (_f *Factory) ConstructUnsupportedExpr(
-	value memo.PrivateID,
-) memo.GroupID {
-	_unsupportedExprExpr := memo.MakeUnsupportedExprExpr(value)
-	_group := _f.mem.GroupByFingerprint(_unsupportedExprExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_unsupportedExprExpr))
+	value tree.TypedExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeUnsupportedExpr(value)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructArrayAgg constructs an expression for the ArrayAgg operator.
 func (_f *Factory) ConstructArrayAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_arrayAggExpr := memo.MakeArrayAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_arrayAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_arrayAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeArrayAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructAvg constructs an expression for the Avg operator.
 func (_f *Factory) ConstructAvg(
-	input memo.GroupID,
-) memo.GroupID {
-	_avgExpr := memo.MakeAvgExpr(input)
-	_group := _f.mem.GroupByFingerprint(_avgExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_avgExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeAvg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructBoolAnd constructs an expression for the BoolAnd operator.
 func (_f *Factory) ConstructBoolAnd(
-	input memo.GroupID,
-) memo.GroupID {
-	_boolAndExpr := memo.MakeBoolAndExpr(input)
-	_group := _f.mem.GroupByFingerprint(_boolAndExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [EliminateAggDistinct]
 	{
-		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
-		if _aggDistinctExpr != nil {
-			in := _aggDistinctExpr.Input()
+		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
+		if _aggDistinct != nil {
+			in := _aggDistinct.Input
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_group = _f.ConstructBoolAnd(
+				_expr := _f.ConstructBoolAnd(
 					in,
 				)
-				_f.mem.AddAltFingerprint(_boolAndExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_boolAndExpr))
+	e := _f.mem.MemoizeBoolAnd(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructBoolOr constructs an expression for the BoolOr operator.
 func (_f *Factory) ConstructBoolOr(
-	input memo.GroupID,
-) memo.GroupID {
-	_boolOrExpr := memo.MakeBoolOrExpr(input)
-	_group := _f.mem.GroupByFingerprint(_boolOrExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [EliminateAggDistinct]
 	{
-		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
-		if _aggDistinctExpr != nil {
-			in := _aggDistinctExpr.Input()
+		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
+		if _aggDistinct != nil {
+			in := _aggDistinct.Input
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_group = _f.ConstructBoolOr(
+				_expr := _f.ConstructBoolOr(
 					in,
 				)
-				_f.mem.AddAltFingerprint(_boolOrExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_boolOrExpr))
+	e := _f.mem.MemoizeBoolOr(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructConcatAgg constructs an expression for the ConcatAgg operator.
 func (_f *Factory) ConstructConcatAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_concatAggExpr := memo.MakeConcatAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_concatAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_concatAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeConcatAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructCount constructs an expression for the Count operator.
 func (_f *Factory) ConstructCount(
-	input memo.GroupID,
-) memo.GroupID {
-	_countExpr := memo.MakeCountExpr(input)
-	_group := _f.mem.GroupByFingerprint(_countExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_countExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeCount(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructCountRows constructs an expression for the CountRows operator.
-func (_f *Factory) ConstructCountRows() memo.GroupID {
-	_countRowsExpr := memo.MakeCountRowsExpr()
-	_group := _f.mem.GroupByFingerprint(_countRowsExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_countRowsExpr))
+func (_f *Factory) ConstructCountRows() opt.ScalarExpr {
+	e := _f.mem.MemoizeCountRows()
+	return _f.onConstructScalar(e)
 }
 
 // ConstructMax constructs an expression for the Max operator.
 func (_f *Factory) ConstructMax(
-	input memo.GroupID,
-) memo.GroupID {
-	_maxExpr := memo.MakeMaxExpr(input)
-	_group := _f.mem.GroupByFingerprint(_maxExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [EliminateAggDistinct]
 	{
-		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
-		if _aggDistinctExpr != nil {
-			in := _aggDistinctExpr.Input()
+		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
+		if _aggDistinct != nil {
+			in := _aggDistinct.Input
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_group = _f.ConstructMax(
+				_expr := _f.ConstructMax(
 					in,
 				)
-				_f.mem.AddAltFingerprint(_maxExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_maxExpr))
+	e := _f.mem.MemoizeMax(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructMin constructs an expression for the Min operator.
 func (_f *Factory) ConstructMin(
-	input memo.GroupID,
-) memo.GroupID {
-	_minExpr := memo.MakeMinExpr(input)
-	_group := _f.mem.GroupByFingerprint(_minExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [EliminateAggDistinct]
 	{
-		_aggDistinctExpr := _f.mem.NormExpr(input).AsAggDistinct()
-		if _aggDistinctExpr != nil {
-			in := _aggDistinctExpr.Input()
+		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
+		if _aggDistinct != nil {
+			in := _aggDistinct.Input
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_group = _f.ConstructMin(
+				_expr := _f.ConstructMin(
 					in,
 				)
-				_f.mem.AddAltFingerprint(_minExpr.Fingerprint(), _group)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, _group, 0, 0)
+					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
 				}
-				return _group
+				return _expr
 			}
 		}
 	}
 
-	return _f.onConstruct(memo.Expr(_minExpr))
+	e := _f.mem.MemoizeMin(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructSumInt constructs an expression for the SumInt operator.
 func (_f *Factory) ConstructSumInt(
-	input memo.GroupID,
-) memo.GroupID {
-	_sumIntExpr := memo.MakeSumIntExpr(input)
-	_group := _f.mem.GroupByFingerprint(_sumIntExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_sumIntExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSumInt(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructSum constructs an expression for the Sum operator.
 func (_f *Factory) ConstructSum(
-	input memo.GroupID,
-) memo.GroupID {
-	_sumExpr := memo.MakeSumExpr(input)
-	_group := _f.mem.GroupByFingerprint(_sumExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_sumExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSum(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructSqrDiff constructs an expression for the SqrDiff operator.
 func (_f *Factory) ConstructSqrDiff(
-	input memo.GroupID,
-) memo.GroupID {
-	_sqrDiffExpr := memo.MakeSqrDiffExpr(input)
-	_group := _f.mem.GroupByFingerprint(_sqrDiffExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_sqrDiffExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSqrDiff(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructVariance constructs an expression for the Variance operator.
 func (_f *Factory) ConstructVariance(
-	input memo.GroupID,
-) memo.GroupID {
-	_varianceExpr := memo.MakeVarianceExpr(input)
-	_group := _f.mem.GroupByFingerprint(_varianceExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_varianceExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeVariance(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructStdDev constructs an expression for the StdDev operator.
 func (_f *Factory) ConstructStdDev(
-	input memo.GroupID,
-) memo.GroupID {
-	_stdDevExpr := memo.MakeStdDevExpr(input)
-	_group := _f.mem.GroupByFingerprint(_stdDevExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_stdDevExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeStdDev(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructXorAgg constructs an expression for the XorAgg operator.
 func (_f *Factory) ConstructXorAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_xorAggExpr := memo.MakeXorAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_xorAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_xorAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeXorAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructJsonAgg constructs an expression for the JsonAgg operator.
 func (_f *Factory) ConstructJsonAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_jsonAggExpr := memo.MakeJsonAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_jsonAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_jsonAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeJsonAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructJsonbAgg constructs an expression for the JsonbAgg operator.
 func (_f *Factory) ConstructJsonbAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_jsonbAggExpr := memo.MakeJsonbAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_jsonbAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_jsonbAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeJsonbAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructConstAgg constructs an expression for the ConstAgg operator.
@@ -12373,15 +12293,10 @@ func (_f *Factory) ConstructJsonbAgg(
 // ConstAgg is not part of SQL, but it's used internally to rewrite correlated
 // subqueries into an efficient and convenient form.
 func (_f *Factory) ConstructConstAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_constAggExpr := memo.MakeConstAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_constAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_constAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeConstAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructConstNotNullAgg constructs an expression for the ConstNotNullAgg operator.
@@ -12394,15 +12309,10 @@ func (_f *Factory) ConstructConstAgg(
 // ConstNotNullAgg is not part of SQL, but it's used internally to rewrite
 // correlated subqueries into an efficient and convenient form.
 func (_f *Factory) ConstructConstNotNullAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_constNotNullAggExpr := memo.MakeConstNotNullAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_constNotNullAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_constNotNullAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeConstNotNullAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructAnyNotNullAgg constructs an expression for the AnyNotNullAgg operator.
@@ -12412,15 +12322,10 @@ func (_f *Factory) ConstructConstNotNullAgg(
 // AnyNotNullAgg is not part of SQL, but it's used internally to rewrite
 // correlated subqueries into an efficient and convenient form.
 func (_f *Factory) ConstructAnyNotNullAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_anyNotNullAggExpr := memo.MakeAnyNotNullAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_anyNotNullAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_anyNotNullAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeAnyNotNullAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructFirstAgg constructs an expression for the FirstAgg operator.
@@ -12429,15 +12334,10 @@ func (_f *Factory) ConstructAnyNotNullAgg(
 // specified), it is an arbitrary ordering but it must be the same across all
 // FirstAggs in a DistinctOn.
 func (_f *Factory) ConstructFirstAgg(
-	input memo.GroupID,
-) memo.GroupID {
-	_firstAggExpr := memo.MakeFirstAggExpr(input)
-	_group := _f.mem.GroupByFingerprint(_firstAggExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_firstAggExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeFirstAgg(input)
+	return _f.onConstructScalar(e)
 }
 
 // ConstructAggDistinct constructs an expression for the AggDistinct operator.
@@ -12445,1799 +12345,2429 @@ func (_f *Factory) ConstructFirstAgg(
 // function. It causes the respective aggregation to only process each distinct
 // value once.
 func (_f *Factory) ConstructAggDistinct(
-	input memo.GroupID,
-) memo.GroupID {
-	_aggDistinctExpr := memo.MakeAggDistinctExpr(input)
-	_group := _f.mem.GroupByFingerprint(_aggDistinctExpr.Fingerprint())
-	if _group != 0 {
-		return _group
-	}
-
-	return _f.onConstruct(memo.Expr(_aggDistinctExpr))
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeAggDistinct(input)
+	return _f.onConstructScalar(e)
 }
 
-func (f *Factory) assignPlaceholders(group memo.GroupID) (memo.GroupID, error) {
-	if !f.mem.GroupProperties(group).HasPlaceholder() {
-		return group, nil
+// Reconstruct enables an expression subtree to be rewritten under the control
+// of the caller. It passes each child of the given expression to the replace
+// callback. The caller can continue traversing the expression tree within the
+// callback by recursively calling Reconstruct. It can also return a replacement
+// expression; if it does, then Reconstruct will rebuild the operator via a call
+// to the corresponding factory Construct method. Here is example usage:
+//
+//   var replace func(e opt.Expr, replace ReconstructFunc) opt.Expr
+//   replace = func(e opt.Expr, replace ReconstructFunc) opt.Expr {
+//     if e.Op() == opt.VariableOp {
+//       return ReplaceVar(e)
+//     }
+//     return e.Reconstruct(e, replace)
+//   }
+//   replace(root, replace)
+//
+// Here, all variables in the tree are being replaced by some other expression
+// in a pre-order traversal of the tree. Post-order traversal is trivially
+// achieved by moving the e.Reconstruct call to the top of the replace function
+// rather than bottom.
+func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
+	switch t := e.(type) {
+	case *memo.ScanExpr:
+		return t
+
+	case *memo.VirtualScanExpr:
+		return t
+
+	case *memo.ValuesExpr:
+		rows, rowsChanged := f.reconstructScalarListExpr(t.Rows, replace)
+		if rowsChanged {
+			return f.ConstructValues(rows, t.Cols)
+		}
+		return t
+
+	case *memo.SelectExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		filters, filtersChanged := f.reconstructFiltersExpr(t.Filters, replace)
+		if input != t.Input || filtersChanged {
+			return f.ConstructSelect(input, filters)
+		}
+		return t
+
+	case *memo.ProjectExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		projections, projectionsChanged := f.reconstructProjectionsExpr(t.Projections, replace)
+		if input != t.Input || projectionsChanged {
+			return f.ConstructProject(input, projections, t.Passthrough)
+		}
+		return t
+
+	case *memo.InnerJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructInnerJoin(left, right, on)
+		}
+		return t
+
+	case *memo.LeftJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructLeftJoin(left, right, on)
+		}
+		return t
+
+	case *memo.RightJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructRightJoin(left, right, on)
+		}
+		return t
+
+	case *memo.FullJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructFullJoin(left, right, on)
+		}
+		return t
+
+	case *memo.SemiJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructSemiJoin(left, right, on)
+		}
+		return t
+
+	case *memo.AntiJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructAntiJoin(left, right, on)
+		}
+		return t
+
+	case *memo.IndexJoinExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructIndexJoin(input, &t.IndexJoinPrivate)
+		}
+		return t
+
+	case *memo.LookupJoinExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if input != t.Input || onChanged {
+			return f.ConstructLookupJoin(input, on, &t.LookupJoinPrivate)
+		}
+		return t
+
+	case *memo.MergeJoinExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructMergeJoin(left, right, on, &t.MergeJoinPrivate)
+		}
+		return t
+
+	case *memo.InnerJoinApplyExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructInnerJoinApply(left, right, on)
+		}
+		return t
+
+	case *memo.LeftJoinApplyExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructLeftJoinApply(left, right, on)
+		}
+		return t
+
+	case *memo.RightJoinApplyExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructRightJoinApply(left, right, on)
+		}
+		return t
+
+	case *memo.FullJoinApplyExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructFullJoinApply(left, right, on)
+		}
+		return t
+
+	case *memo.SemiJoinApplyExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructSemiJoinApply(left, right, on)
+		}
+		return t
+
+	case *memo.AntiJoinApplyExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if left != t.Left || right != t.Right || onChanged {
+			return f.ConstructAntiJoinApply(left, right, on)
+		}
+		return t
+
+	case *memo.GroupByExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		aggregations, aggregationsChanged := f.reconstructAggregationsExpr(t.Aggregations, replace)
+		if input != t.Input || aggregationsChanged {
+			return f.ConstructGroupBy(input, aggregations, &t.GroupingPrivate)
+		}
+		return t
+
+	case *memo.ScalarGroupByExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		aggregations, aggregationsChanged := f.reconstructAggregationsExpr(t.Aggregations, replace)
+		if input != t.Input || aggregationsChanged {
+			return f.ConstructScalarGroupBy(input, aggregations, &t.GroupingPrivate)
+		}
+		return t
+
+	case *memo.DistinctOnExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		aggregations, aggregationsChanged := f.reconstructAggregationsExpr(t.Aggregations, replace)
+		if input != t.Input || aggregationsChanged {
+			return f.ConstructDistinctOn(input, aggregations, &t.GroupingPrivate)
+		}
+		return t
+
+	case *memo.UnionExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructUnion(left, right, &t.SetPrivate)
+		}
+		return t
+
+	case *memo.IntersectExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructIntersect(left, right, &t.SetPrivate)
+		}
+		return t
+
+	case *memo.ExceptExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructExcept(left, right, &t.SetPrivate)
+		}
+		return t
+
+	case *memo.UnionAllExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructUnionAll(left, right, &t.SetPrivate)
+		}
+		return t
+
+	case *memo.IntersectAllExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructIntersectAll(left, right, &t.SetPrivate)
+		}
+		return t
+
+	case *memo.ExceptAllExpr:
+		left := replace(t.Left).(memo.RelExpr)
+		right := replace(t.Right).(memo.RelExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructExceptAll(left, right, &t.SetPrivate)
+		}
+		return t
+
+	case *memo.LimitExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		limit := replace(t.Limit).(opt.ScalarExpr)
+		if input != t.Input || limit != t.Limit {
+			return f.ConstructLimit(input, limit, t.Ordering)
+		}
+		return t
+
+	case *memo.OffsetExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		offset := replace(t.Offset).(opt.ScalarExpr)
+		if input != t.Input || offset != t.Offset {
+			return f.ConstructOffset(input, offset, t.Ordering)
+		}
+		return t
+
+	case *memo.Max1RowExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructMax1Row(input)
+		}
+		return t
+
+	case *memo.ExplainExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructExplain(input, &t.ExplainPrivate)
+		}
+		return t
+
+	case *memo.ShowTraceForSessionExpr:
+		return t
+
+	case *memo.RowNumberExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructRowNumber(input, &t.RowNumberPrivate)
+		}
+		return t
+
+	case *memo.ZipExpr:
+		funcs, funcsChanged := f.reconstructScalarListExpr(t.Funcs, replace)
+		if funcsChanged {
+			return f.ConstructZip(funcs, t.Cols)
+		}
+		return t
+
+	case *memo.SubqueryExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructSubquery(input, &t.SubqueryPrivate)
+		}
+		return t
+
+	case *memo.AnyExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		scalar := replace(t.Scalar).(opt.ScalarExpr)
+		if input != t.Input || scalar != t.Scalar {
+			return f.ConstructAny(input, scalar, &t.SubqueryPrivate)
+		}
+		return t
+
+	case *memo.ExistsExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructExists(input, &t.SubqueryPrivate)
+		}
+		return t
+
+	case *memo.VariableExpr:
+		return t
+
+	case *memo.ConstExpr:
+		return t
+
+	case *memo.NullExpr:
+		return t
+
+	case *memo.TrueExpr:
+		return t
+
+	case *memo.FalseExpr:
+		return t
+
+	case *memo.PlaceholderExpr:
+		return t
+
+	case *memo.TupleExpr:
+		elems, elemsChanged := f.reconstructScalarListExpr(t.Elems, replace)
+		if elemsChanged {
+			return f.ConstructTuple(elems, t.Typ)
+		}
+		return t
+
+	case *memo.ProjectionsExpr:
+		if after, changed := f.reconstructProjectionsExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
+	case *memo.AggregationsExpr:
+		if after, changed := f.reconstructAggregationsExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
+	case *memo.FiltersExpr:
+		if after, changed := f.reconstructFiltersExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
+	case *memo.AndExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructAnd(left, right)
+		}
+		return t
+
+	case *memo.OrExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructOr(left, right)
+		}
+		return t
+
+	case *memo.NotExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructNot(input)
+		}
+		return t
+
+	case *memo.EqExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructEq(left, right)
+		}
+		return t
+
+	case *memo.LtExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructLt(left, right)
+		}
+		return t
+
+	case *memo.GtExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructGt(left, right)
+		}
+		return t
+
+	case *memo.LeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructLe(left, right)
+		}
+		return t
+
+	case *memo.GeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructGe(left, right)
+		}
+		return t
+
+	case *memo.NeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNe(left, right)
+		}
+		return t
+
+	case *memo.InExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructIn(left, right)
+		}
+		return t
+
+	case *memo.NotInExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNotIn(left, right)
+		}
+		return t
+
+	case *memo.LikeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructLike(left, right)
+		}
+		return t
+
+	case *memo.NotLikeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNotLike(left, right)
+		}
+		return t
+
+	case *memo.ILikeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructILike(left, right)
+		}
+		return t
+
+	case *memo.NotILikeExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNotILike(left, right)
+		}
+		return t
+
+	case *memo.SimilarToExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructSimilarTo(left, right)
+		}
+		return t
+
+	case *memo.NotSimilarToExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNotSimilarTo(left, right)
+		}
+		return t
+
+	case *memo.RegMatchExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructRegMatch(left, right)
+		}
+		return t
+
+	case *memo.NotRegMatchExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNotRegMatch(left, right)
+		}
+		return t
+
+	case *memo.RegIMatchExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructRegIMatch(left, right)
+		}
+		return t
+
+	case *memo.NotRegIMatchExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructNotRegIMatch(left, right)
+		}
+		return t
+
+	case *memo.IsExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructIs(left, right)
+		}
+		return t
+
+	case *memo.IsNotExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructIsNot(left, right)
+		}
+		return t
+
+	case *memo.ContainsExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructContains(left, right)
+		}
+		return t
+
+	case *memo.JsonExistsExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructJsonExists(left, right)
+		}
+		return t
+
+	case *memo.JsonAllExistsExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructJsonAllExists(left, right)
+		}
+		return t
+
+	case *memo.JsonSomeExistsExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructJsonSomeExists(left, right)
+		}
+		return t
+
+	case *memo.AnyScalarExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructAnyScalar(left, right, t.Cmp)
+		}
+		return t
+
+	case *memo.BitandExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructBitand(left, right)
+		}
+		return t
+
+	case *memo.BitorExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructBitor(left, right)
+		}
+		return t
+
+	case *memo.BitxorExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructBitxor(left, right)
+		}
+		return t
+
+	case *memo.PlusExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructPlus(left, right)
+		}
+		return t
+
+	case *memo.MinusExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructMinus(left, right)
+		}
+		return t
+
+	case *memo.MultExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructMult(left, right)
+		}
+		return t
+
+	case *memo.DivExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructDiv(left, right)
+		}
+		return t
+
+	case *memo.FloorDivExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructFloorDiv(left, right)
+		}
+		return t
+
+	case *memo.ModExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructMod(left, right)
+		}
+		return t
+
+	case *memo.PowExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructPow(left, right)
+		}
+		return t
+
+	case *memo.ConcatExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructConcat(left, right)
+		}
+		return t
+
+	case *memo.LShiftExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructLShift(left, right)
+		}
+		return t
+
+	case *memo.RShiftExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructRShift(left, right)
+		}
+		return t
+
+	case *memo.FetchValExpr:
+		json := replace(t.Json).(opt.ScalarExpr)
+		index := replace(t.Index).(opt.ScalarExpr)
+		if json != t.Json || index != t.Index {
+			return f.ConstructFetchVal(json, index)
+		}
+		return t
+
+	case *memo.FetchTextExpr:
+		json := replace(t.Json).(opt.ScalarExpr)
+		index := replace(t.Index).(opt.ScalarExpr)
+		if json != t.Json || index != t.Index {
+			return f.ConstructFetchText(json, index)
+		}
+		return t
+
+	case *memo.FetchValPathExpr:
+		json := replace(t.Json).(opt.ScalarExpr)
+		path := replace(t.Path).(opt.ScalarExpr)
+		if json != t.Json || path != t.Path {
+			return f.ConstructFetchValPath(json, path)
+		}
+		return t
+
+	case *memo.FetchTextPathExpr:
+		json := replace(t.Json).(opt.ScalarExpr)
+		path := replace(t.Path).(opt.ScalarExpr)
+		if json != t.Json || path != t.Path {
+			return f.ConstructFetchTextPath(json, path)
+		}
+		return t
+
+	case *memo.UnaryMinusExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructUnaryMinus(input)
+		}
+		return t
+
+	case *memo.UnaryComplementExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructUnaryComplement(input)
+		}
+		return t
+
+	case *memo.CastExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructCast(input, t.TargetTyp)
+		}
+		return t
+
+	case *memo.CaseExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		whens, whensChanged := f.reconstructScalarListExpr(t.Whens, replace)
+		orElse := replace(t.OrElse).(opt.ScalarExpr)
+		if input != t.Input || whensChanged || orElse != t.OrElse {
+			return f.ConstructCase(input, whens, orElse)
+		}
+		return t
+
+	case *memo.WhenExpr:
+		condition := replace(t.Condition).(opt.ScalarExpr)
+		value := replace(t.Value).(opt.ScalarExpr)
+		if condition != t.Condition || value != t.Value {
+			return f.ConstructWhen(condition, value)
+		}
+		return t
+
+	case *memo.ArrayExpr:
+		elems, elemsChanged := f.reconstructScalarListExpr(t.Elems, replace)
+		if elemsChanged {
+			return f.ConstructArray(elems, t.Typ)
+		}
+		return t
+
+	case *memo.IndirectionExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		index := replace(t.Index).(opt.ScalarExpr)
+		if input != t.Input || index != t.Index {
+			return f.ConstructIndirection(input, index)
+		}
+		return t
+
+	case *memo.FunctionExpr:
+		args, argsChanged := f.reconstructScalarListExpr(t.Args, replace)
+		if argsChanged {
+			return f.ConstructFunction(args, &t.FunctionPrivate)
+		}
+		return t
+
+	case *memo.CoalesceExpr:
+		args, argsChanged := f.reconstructScalarListExpr(t.Args, replace)
+		if argsChanged {
+			return f.ConstructCoalesce(args)
+		}
+		return t
+
+	case *memo.ColumnAccessExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructColumnAccess(input, t.Idx)
+		}
+		return t
+
+	case *memo.UnsupportedExprExpr:
+		return t
+
+	case *memo.ArrayAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructArrayAgg(input)
+		}
+		return t
+
+	case *memo.AvgExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructAvg(input)
+		}
+		return t
+
+	case *memo.BoolAndExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructBoolAnd(input)
+		}
+		return t
+
+	case *memo.BoolOrExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructBoolOr(input)
+		}
+		return t
+
+	case *memo.ConcatAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructConcatAgg(input)
+		}
+		return t
+
+	case *memo.CountExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructCount(input)
+		}
+		return t
+
+	case *memo.CountRowsExpr:
+		return t
+
+	case *memo.MaxExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructMax(input)
+		}
+		return t
+
+	case *memo.MinExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructMin(input)
+		}
+		return t
+
+	case *memo.SumIntExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSumInt(input)
+		}
+		return t
+
+	case *memo.SumExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSum(input)
+		}
+		return t
+
+	case *memo.SqrDiffExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSqrDiff(input)
+		}
+		return t
+
+	case *memo.VarianceExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructVariance(input)
+		}
+		return t
+
+	case *memo.StdDevExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructStdDev(input)
+		}
+		return t
+
+	case *memo.XorAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructXorAgg(input)
+		}
+		return t
+
+	case *memo.JsonAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructJsonAgg(input)
+		}
+		return t
+
+	case *memo.JsonbAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructJsonbAgg(input)
+		}
+		return t
+
+	case *memo.ConstAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructConstAgg(input)
+		}
+		return t
+
+	case *memo.ConstNotNullAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructConstNotNullAgg(input)
+		}
+		return t
+
+	case *memo.AnyNotNullAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructAnyNotNullAgg(input)
+		}
+		return t
+
+	case *memo.FirstAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructFirstAgg(input)
+		}
+		return t
+
+	case *memo.AggDistinctExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructAggDistinct(input)
+		}
+		return t
+
+	case *memo.ScalarListExpr:
+		if after, changed := f.reconstructScalarListExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
 	}
-	expr := f.mem.NormExpr(group)
-	switch expr.Operator() {
+	panic(fmt.Sprintf("unhandled op %s", e.Op()))
+}
+
+func (f *Factory) reconstructProjectionsExpr(list memo.ProjectionsExpr, replace ReconstructFunc) (_ memo.ProjectionsExpr, changed bool) {
+	var newList []memo.ProjectionsItem
+	for i := range list {
+		before := list[i].Element
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.ProjectionsItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Element = after
+			newList[i].Col = list[i].Col
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) reconstructAggregationsExpr(list memo.AggregationsExpr, replace ReconstructFunc) (_ memo.AggregationsExpr, changed bool) {
+	var newList []memo.AggregationsItem
+	for i := range list {
+		before := list[i].Agg
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.AggregationsItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Agg = after
+			newList[i].Col = list[i].Col
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) reconstructFiltersExpr(list memo.FiltersExpr, replace ReconstructFunc) (_ memo.FiltersExpr, changed bool) {
+	var newList []memo.FiltersItem
+	for i := range list {
+		before := list[i].Condition
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.FiltersItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Condition = after
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) reconstructScalarListExpr(list memo.ScalarListExpr, replace ReconstructFunc) (_ memo.ScalarListExpr, changed bool) {
+	var newList []opt.ScalarExpr
+	for i := range list {
+		before := list[i]
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]opt.ScalarExpr, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i] = after
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
+	switch t := src.(type) {
+	case *memo.ScanExpr:
+		return f.mem.MemoizeScan(&t.ScanPrivate)
+
+	case *memo.VirtualScanExpr:
+		return f.mem.MemoizeVirtualScan(&t.VirtualScanPrivate)
+
+	case *memo.ValuesExpr:
+		return f.ConstructValues(
+			f.assignScalarListExprPlaceholders(t.Rows),
+			t.Cols,
+		)
+
+	case *memo.SelectExpr:
+		return f.ConstructSelect(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.Filters),
+		)
+
+	case *memo.ProjectExpr:
+		return f.ConstructProject(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignProjectionsExprPlaceholders(t.Projections),
+			t.Passthrough,
+		)
+
+	case *memo.InnerJoinExpr:
+		return f.ConstructInnerJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.LeftJoinExpr:
+		return f.ConstructLeftJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.RightJoinExpr:
+		return f.ConstructRightJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.FullJoinExpr:
+		return f.ConstructFullJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.SemiJoinExpr:
+		return f.ConstructSemiJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.AntiJoinExpr:
+		return f.ConstructAntiJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.IndexJoinExpr:
+		return f.ConstructIndexJoin(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.IndexJoinPrivate,
+		)
+
+	case *memo.LookupJoinExpr:
+		return f.ConstructLookupJoin(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+			&t.LookupJoinPrivate,
+		)
+
+	case *memo.MergeJoinExpr:
+		return f.ConstructMergeJoin(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+			&t.MergeJoinPrivate,
+		)
+
+	case *memo.InnerJoinApplyExpr:
+		return f.ConstructInnerJoinApply(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.LeftJoinApplyExpr:
+		return f.ConstructLeftJoinApply(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.RightJoinApplyExpr:
+		return f.ConstructRightJoinApply(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.FullJoinApplyExpr:
+		return f.ConstructFullJoinApply(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.SemiJoinApplyExpr:
+		return f.ConstructSemiJoinApply(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.AntiJoinApplyExpr:
+		return f.ConstructAntiJoinApply(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.assignFiltersExprPlaceholders(t.On),
+		)
+
+	case *memo.GroupByExpr:
+		return f.ConstructGroupBy(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignAggregationsExprPlaceholders(t.Aggregations),
+			&t.GroupingPrivate,
+		)
+
+	case *memo.ScalarGroupByExpr:
+		return f.ConstructScalarGroupBy(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignAggregationsExprPlaceholders(t.Aggregations),
+			&t.GroupingPrivate,
+		)
+
+	case *memo.DistinctOnExpr:
+		return f.ConstructDistinctOn(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignAggregationsExprPlaceholders(t.Aggregations),
+			&t.GroupingPrivate,
+		)
+
+	case *memo.UnionExpr:
+		return f.ConstructUnion(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
+	case *memo.IntersectExpr:
+		return f.ConstructIntersect(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
+	case *memo.ExceptExpr:
+		return f.ConstructExcept(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
+	case *memo.UnionAllExpr:
+		return f.ConstructUnionAll(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
+	case *memo.IntersectAllExpr:
+		return f.ConstructIntersectAll(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
+	case *memo.ExceptAllExpr:
+		return f.ConstructExceptAll(
+			f.assignPlaceholders(t.Left).(memo.RelExpr),
+			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
+	case *memo.LimitExpr:
+		return f.ConstructLimit(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignPlaceholders(t.Limit).(opt.ScalarExpr),
+			t.Ordering,
+		)
+
+	case *memo.OffsetExpr:
+		return f.ConstructOffset(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignPlaceholders(t.Offset).(opt.ScalarExpr),
+			t.Ordering,
+		)
+
+	case *memo.Max1RowExpr:
+		return f.ConstructMax1Row(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+		)
+
+	case *memo.ExplainExpr:
+		return f.ConstructExplain(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.ExplainPrivate,
+		)
+
+	case *memo.ShowTraceForSessionExpr:
+		return f.mem.MemoizeShowTraceForSession(&t.ShowTracePrivate)
+
+	case *memo.RowNumberExpr:
+		return f.ConstructRowNumber(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.RowNumberPrivate,
+		)
+
+	case *memo.ZipExpr:
+		return f.ConstructZip(
+			f.assignScalarListExprPlaceholders(t.Funcs),
+			t.Cols,
+		)
+
+	case *memo.SubqueryExpr:
+		return f.ConstructSubquery(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.SubqueryPrivate,
+		)
+
+	case *memo.AnyExpr:
+		return f.ConstructAny(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignPlaceholders(t.Scalar).(opt.ScalarExpr),
+			&t.SubqueryPrivate,
+		)
+
+	case *memo.ExistsExpr:
+		return f.ConstructExists(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.SubqueryPrivate,
+		)
+
+	case *memo.VariableExpr:
+		return t
+
+	case *memo.ConstExpr:
+		return t
+
+	case *memo.NullExpr:
+		return t
+
+	case *memo.TrueExpr:
+		return t
+
+	case *memo.FalseExpr:
+		return t
+
+	case *memo.PlaceholderExpr:
+		d, err := t.Value.Eval(f.evalCtx)
+		if err != nil {
+			panic(placeholderError{err})
+		}
+		return f.ConstructConstVal(d)
+
+	case *memo.TupleExpr:
+		return f.ConstructTuple(
+			f.assignScalarListExprPlaceholders(t.Elems),
+			t.Typ,
+		)
+
+	case *memo.AndExpr:
+		return f.ConstructAnd(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.OrExpr:
+		return f.ConstructOr(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotExpr:
+		return f.ConstructNot(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.EqExpr:
+		return f.ConstructEq(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.LtExpr:
+		return f.ConstructLt(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.GtExpr:
+		return f.ConstructGt(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.LeExpr:
+		return f.ConstructLe(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.GeExpr:
+		return f.ConstructGe(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NeExpr:
+		return f.ConstructNe(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.InExpr:
+		return f.ConstructIn(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotInExpr:
+		return f.ConstructNotIn(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.LikeExpr:
+		return f.ConstructLike(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotLikeExpr:
+		return f.ConstructNotLike(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.ILikeExpr:
+		return f.ConstructILike(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotILikeExpr:
+		return f.ConstructNotILike(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.SimilarToExpr:
+		return f.ConstructSimilarTo(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotSimilarToExpr:
+		return f.ConstructNotSimilarTo(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.RegMatchExpr:
+		return f.ConstructRegMatch(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotRegMatchExpr:
+		return f.ConstructNotRegMatch(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.RegIMatchExpr:
+		return f.ConstructRegIMatch(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.NotRegIMatchExpr:
+		return f.ConstructNotRegIMatch(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.IsExpr:
+		return f.ConstructIs(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.IsNotExpr:
+		return f.ConstructIsNot(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.ContainsExpr:
+		return f.ConstructContains(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.JsonExistsExpr:
+		return f.ConstructJsonExists(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.JsonAllExistsExpr:
+		return f.ConstructJsonAllExists(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.JsonSomeExistsExpr:
+		return f.ConstructJsonSomeExists(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.AnyScalarExpr:
+		return f.ConstructAnyScalar(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			t.Cmp,
+		)
+
+	case *memo.BitandExpr:
+		return f.ConstructBitand(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.BitorExpr:
+		return f.ConstructBitor(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.BitxorExpr:
+		return f.ConstructBitxor(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.PlusExpr:
+		return f.ConstructPlus(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.MinusExpr:
+		return f.ConstructMinus(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.MultExpr:
+		return f.ConstructMult(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.DivExpr:
+		return f.ConstructDiv(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.FloorDivExpr:
+		return f.ConstructFloorDiv(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.ModExpr:
+		return f.ConstructMod(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.PowExpr:
+		return f.ConstructPow(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.ConcatExpr:
+		return f.ConstructConcat(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.LShiftExpr:
+		return f.ConstructLShift(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.RShiftExpr:
+		return f.ConstructRShift(
+			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+		)
+
+	case *memo.FetchValExpr:
+		return f.ConstructFetchVal(
+			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
+		)
+
+	case *memo.FetchTextExpr:
+		return f.ConstructFetchText(
+			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
+		)
+
+	case *memo.FetchValPathExpr:
+		return f.ConstructFetchValPath(
+			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Path).(opt.ScalarExpr),
+		)
+
+	case *memo.FetchTextPathExpr:
+		return f.ConstructFetchTextPath(
+			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Path).(opt.ScalarExpr),
+		)
+
+	case *memo.UnaryMinusExpr:
+		return f.ConstructUnaryMinus(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.UnaryComplementExpr:
+		return f.ConstructUnaryComplement(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.CastExpr:
+		return f.ConstructCast(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			t.TargetTyp,
+		)
+
+	case *memo.CaseExpr:
+		return f.ConstructCase(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.assignScalarListExprPlaceholders(t.Whens),
+			f.assignPlaceholders(t.OrElse).(opt.ScalarExpr),
+		)
+
+	case *memo.WhenExpr:
+		return f.ConstructWhen(
+			f.assignPlaceholders(t.Condition).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Value).(opt.ScalarExpr),
+		)
+
+	case *memo.ArrayExpr:
+		return f.ConstructArray(
+			f.assignScalarListExprPlaceholders(t.Elems),
+			t.Typ,
+		)
+
+	case *memo.IndirectionExpr:
+		return f.ConstructIndirection(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
+		)
+
+	case *memo.FunctionExpr:
+		return f.ConstructFunction(
+			f.assignScalarListExprPlaceholders(t.Args),
+			&t.FunctionPrivate,
+		)
+
+	case *memo.CoalesceExpr:
+		return f.ConstructCoalesce(
+			f.assignScalarListExprPlaceholders(t.Args),
+		)
+
+	case *memo.ColumnAccessExpr:
+		return f.ConstructColumnAccess(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			t.Idx,
+		)
+
+	case *memo.UnsupportedExprExpr:
+		return t
+
+	case *memo.ArrayAggExpr:
+		return f.ConstructArrayAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.AvgExpr:
+		return f.ConstructAvg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.BoolAndExpr:
+		return f.ConstructBoolAnd(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.BoolOrExpr:
+		return f.ConstructBoolOr(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.ConcatAggExpr:
+		return f.ConstructConcatAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.CountExpr:
+		return f.ConstructCount(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.CountRowsExpr:
+		return t
+
+	case *memo.MaxExpr:
+		return f.ConstructMax(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.MinExpr:
+		return f.ConstructMin(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.SumIntExpr:
+		return f.ConstructSumInt(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.SumExpr:
+		return f.ConstructSum(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.SqrDiffExpr:
+		return f.ConstructSqrDiff(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.VarianceExpr:
+		return f.ConstructVariance(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.StdDevExpr:
+		return f.ConstructStdDev(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.XorAggExpr:
+		return f.ConstructXorAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.JsonAggExpr:
+		return f.ConstructJsonAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.JsonbAggExpr:
+		return f.ConstructJsonbAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.ConstAggExpr:
+		return f.ConstructConstAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.ConstNotNullAggExpr:
+		return f.ConstructConstNotNullAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.AnyNotNullAggExpr:
+		return f.ConstructAnyNotNullAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.FirstAggExpr:
+		return f.ConstructFirstAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	case *memo.AggDistinctExpr:
+		return f.ConstructAggDistinct(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+		)
+
+	}
+	panic(fmt.Sprintf("unhandled op %s", src.Op()))
+}
+
+func (f *Factory) assignProjectionsExprPlaceholders(src memo.ProjectionsExpr) (dst memo.ProjectionsExpr) {
+	dst = make(memo.ProjectionsExpr, len(src))
+	for i := range src {
+		dst[i].Element = f.assignPlaceholders(src[i].Element).(opt.ScalarExpr)
+		dst[i].Col = src[i].Col
+	}
+	return dst
+}
+
+func (f *Factory) assignAggregationsExprPlaceholders(src memo.AggregationsExpr) (dst memo.AggregationsExpr) {
+	dst = make(memo.AggregationsExpr, len(src))
+	for i := range src {
+		dst[i].Agg = f.assignPlaceholders(src[i].Agg).(opt.ScalarExpr)
+		dst[i].Col = src[i].Col
+	}
+	return dst
+}
+
+func (f *Factory) assignFiltersExprPlaceholders(src memo.FiltersExpr) (dst memo.FiltersExpr) {
+	dst = make(memo.FiltersExpr, len(src))
+	for i := range src {
+		dst[i].Condition = f.assignPlaceholders(src[i].Condition).(opt.ScalarExpr)
+	}
+	return dst
+}
+
+func (f *Factory) assignScalarListExprPlaceholders(src memo.ScalarListExpr) (dst memo.ScalarListExpr) {
+	dst = make(memo.ScalarListExpr, len(src))
+	for i := range src {
+		dst[i] = f.assignPlaceholders(src[i]).(opt.ScalarExpr)
+	}
+	return dst
+}
+
+func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Expr {
+	switch op {
+	case opt.ScanOp:
+		return f.ConstructScan(
+			args[0].(*memo.ScanPrivate),
+		)
+	case opt.VirtualScanOp:
+		return f.ConstructVirtualScan(
+			args[0].(*memo.VirtualScanPrivate),
+		)
 	case opt.ValuesOp:
-		valuesExpr := expr.AsValues()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(valuesExpr.Rows()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		rows := lb.BuildList()
-		cols := valuesExpr.Cols()
-		return f.ConstructValues(rows, cols), nil
+		return f.ConstructValues(
+			*args[0].(*memo.ScalarListExpr),
+			*args[1].(*opt.ColList),
+		)
 	case opt.SelectOp:
-		selectExpr := expr.AsSelect()
-		input, err := f.assignPlaceholders(selectExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		filter, err := f.assignPlaceholders(selectExpr.Filter())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructSelect(input, filter), nil
+		return f.ConstructSelect(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FiltersExpr),
+		)
 	case opt.ProjectOp:
-		projectExpr := expr.AsProject()
-		input, err := f.assignPlaceholders(projectExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		projections, err := f.assignPlaceholders(projectExpr.Projections())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructProject(input, projections), nil
+		return f.ConstructProject(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.ProjectionsExpr),
+			*args[2].(*opt.ColSet),
+		)
 	case opt.InnerJoinOp:
-		innerJoinExpr := expr.AsInnerJoin()
-		left, err := f.assignPlaceholders(innerJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(innerJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(innerJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructInnerJoin(left, right, on), nil
+		return f.ConstructInnerJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.LeftJoinOp:
-		leftJoinExpr := expr.AsLeftJoin()
-		left, err := f.assignPlaceholders(leftJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(leftJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(leftJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructLeftJoin(left, right, on), nil
+		return f.ConstructLeftJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.RightJoinOp:
-		rightJoinExpr := expr.AsRightJoin()
-		left, err := f.assignPlaceholders(rightJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(rightJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(rightJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructRightJoin(left, right, on), nil
+		return f.ConstructRightJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.FullJoinOp:
-		fullJoinExpr := expr.AsFullJoin()
-		left, err := f.assignPlaceholders(fullJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(fullJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(fullJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFullJoin(left, right, on), nil
+		return f.ConstructFullJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.SemiJoinOp:
-		semiJoinExpr := expr.AsSemiJoin()
-		left, err := f.assignPlaceholders(semiJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(semiJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(semiJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructSemiJoin(left, right, on), nil
+		return f.ConstructSemiJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.AntiJoinOp:
-		antiJoinExpr := expr.AsAntiJoin()
-		left, err := f.assignPlaceholders(antiJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(antiJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(antiJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructAntiJoin(left, right, on), nil
+		return f.ConstructAntiJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.IndexJoinOp:
-		indexJoinExpr := expr.AsIndexJoin()
-		input, err := f.assignPlaceholders(indexJoinExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		def := indexJoinExpr.Def()
-		return f.ConstructIndexJoin(input, def), nil
+		return f.ConstructIndexJoin(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.IndexJoinPrivate),
+		)
 	case opt.LookupJoinOp:
-		lookupJoinExpr := expr.AsLookupJoin()
-		input, err := f.assignPlaceholders(lookupJoinExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(lookupJoinExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		def := lookupJoinExpr.Def()
-		return f.ConstructLookupJoin(input, on, def), nil
+		return f.ConstructLookupJoin(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FiltersExpr),
+			args[2].(*memo.LookupJoinPrivate),
+		)
 	case opt.MergeJoinOp:
-		mergeJoinExpr := expr.AsMergeJoin()
-		left, err := f.assignPlaceholders(mergeJoinExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(mergeJoinExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		mergeOn, err := f.assignPlaceholders(mergeJoinExpr.MergeOn())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructMergeJoin(left, right, mergeOn), nil
+		return f.ConstructMergeJoin(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+			args[3].(*memo.MergeJoinPrivate),
+		)
 	case opt.InnerJoinApplyOp:
-		innerJoinApplyExpr := expr.AsInnerJoinApply()
-		left, err := f.assignPlaceholders(innerJoinApplyExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(innerJoinApplyExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(innerJoinApplyExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructInnerJoinApply(left, right, on), nil
+		return f.ConstructInnerJoinApply(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.LeftJoinApplyOp:
-		leftJoinApplyExpr := expr.AsLeftJoinApply()
-		left, err := f.assignPlaceholders(leftJoinApplyExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(leftJoinApplyExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(leftJoinApplyExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructLeftJoinApply(left, right, on), nil
+		return f.ConstructLeftJoinApply(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.RightJoinApplyOp:
-		rightJoinApplyExpr := expr.AsRightJoinApply()
-		left, err := f.assignPlaceholders(rightJoinApplyExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(rightJoinApplyExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(rightJoinApplyExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructRightJoinApply(left, right, on), nil
+		return f.ConstructRightJoinApply(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.FullJoinApplyOp:
-		fullJoinApplyExpr := expr.AsFullJoinApply()
-		left, err := f.assignPlaceholders(fullJoinApplyExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(fullJoinApplyExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(fullJoinApplyExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFullJoinApply(left, right, on), nil
+		return f.ConstructFullJoinApply(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.SemiJoinApplyOp:
-		semiJoinApplyExpr := expr.AsSemiJoinApply()
-		left, err := f.assignPlaceholders(semiJoinApplyExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(semiJoinApplyExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(semiJoinApplyExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructSemiJoinApply(left, right, on), nil
+		return f.ConstructSemiJoinApply(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.AntiJoinApplyOp:
-		antiJoinApplyExpr := expr.AsAntiJoinApply()
-		left, err := f.assignPlaceholders(antiJoinApplyExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(antiJoinApplyExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		on, err := f.assignPlaceholders(antiJoinApplyExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructAntiJoinApply(left, right, on), nil
+		return f.ConstructAntiJoinApply(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			*args[2].(*memo.FiltersExpr),
+		)
 	case opt.GroupByOp:
-		groupByExpr := expr.AsGroupBy()
-		input, err := f.assignPlaceholders(groupByExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		aggregations, err := f.assignPlaceholders(groupByExpr.Aggregations())
-		if err != nil {
-			return 0, err
-		}
-		def := groupByExpr.Def()
-		return f.ConstructGroupBy(input, aggregations, def), nil
+		return f.ConstructGroupBy(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.AggregationsExpr),
+			args[2].(*memo.GroupingPrivate),
+		)
 	case opt.ScalarGroupByOp:
-		scalarGroupByExpr := expr.AsScalarGroupBy()
-		input, err := f.assignPlaceholders(scalarGroupByExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		aggregations, err := f.assignPlaceholders(scalarGroupByExpr.Aggregations())
-		if err != nil {
-			return 0, err
-		}
-		def := scalarGroupByExpr.Def()
-		return f.ConstructScalarGroupBy(input, aggregations, def), nil
+		return f.ConstructScalarGroupBy(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.AggregationsExpr),
+			args[2].(*memo.GroupingPrivate),
+		)
 	case opt.DistinctOnOp:
-		distinctOnExpr := expr.AsDistinctOn()
-		input, err := f.assignPlaceholders(distinctOnExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		aggregations, err := f.assignPlaceholders(distinctOnExpr.Aggregations())
-		if err != nil {
-			return 0, err
-		}
-		def := distinctOnExpr.Def()
-		return f.ConstructDistinctOn(input, aggregations, def), nil
+		return f.ConstructDistinctOn(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.AggregationsExpr),
+			args[2].(*memo.GroupingPrivate),
+		)
 	case opt.UnionOp:
-		unionExpr := expr.AsUnion()
-		left, err := f.assignPlaceholders(unionExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(unionExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		colMap := unionExpr.ColMap()
-		return f.ConstructUnion(left, right, colMap), nil
+		return f.ConstructUnion(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
 	case opt.IntersectOp:
-		intersectExpr := expr.AsIntersect()
-		left, err := f.assignPlaceholders(intersectExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(intersectExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		colMap := intersectExpr.ColMap()
-		return f.ConstructIntersect(left, right, colMap), nil
+		return f.ConstructIntersect(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
 	case opt.ExceptOp:
-		exceptExpr := expr.AsExcept()
-		left, err := f.assignPlaceholders(exceptExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(exceptExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		colMap := exceptExpr.ColMap()
-		return f.ConstructExcept(left, right, colMap), nil
+		return f.ConstructExcept(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
 	case opt.UnionAllOp:
-		unionAllExpr := expr.AsUnionAll()
-		left, err := f.assignPlaceholders(unionAllExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(unionAllExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		colMap := unionAllExpr.ColMap()
-		return f.ConstructUnionAll(left, right, colMap), nil
+		return f.ConstructUnionAll(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
 	case opt.IntersectAllOp:
-		intersectAllExpr := expr.AsIntersectAll()
-		left, err := f.assignPlaceholders(intersectAllExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(intersectAllExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		colMap := intersectAllExpr.ColMap()
-		return f.ConstructIntersectAll(left, right, colMap), nil
+		return f.ConstructIntersectAll(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
 	case opt.ExceptAllOp:
-		exceptAllExpr := expr.AsExceptAll()
-		left, err := f.assignPlaceholders(exceptAllExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(exceptAllExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		colMap := exceptAllExpr.ColMap()
-		return f.ConstructExceptAll(left, right, colMap), nil
+		return f.ConstructExceptAll(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
 	case opt.LimitOp:
-		limitExpr := expr.AsLimit()
-		input, err := f.assignPlaceholders(limitExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		limit, err := f.assignPlaceholders(limitExpr.Limit())
-		if err != nil {
-			return 0, err
-		}
-		ordering := limitExpr.Ordering()
-		return f.ConstructLimit(input, limit, ordering), nil
+		return f.ConstructLimit(
+			args[0].(memo.RelExpr),
+			args[1].(opt.ScalarExpr),
+			*args[2].(*props.OrderingChoice),
+		)
 	case opt.OffsetOp:
-		offsetExpr := expr.AsOffset()
-		input, err := f.assignPlaceholders(offsetExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		offset, err := f.assignPlaceholders(offsetExpr.Offset())
-		if err != nil {
-			return 0, err
-		}
-		ordering := offsetExpr.Ordering()
-		return f.ConstructOffset(input, offset, ordering), nil
+		return f.ConstructOffset(
+			args[0].(memo.RelExpr),
+			args[1].(opt.ScalarExpr),
+			*args[2].(*props.OrderingChoice),
+		)
 	case opt.Max1RowOp:
-		max1RowExpr := expr.AsMax1Row()
-		input, err := f.assignPlaceholders(max1RowExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructMax1Row(input), nil
+		return f.ConstructMax1Row(
+			args[0].(memo.RelExpr),
+		)
 	case opt.ExplainOp:
-		explainExpr := expr.AsExplain()
-		input, err := f.assignPlaceholders(explainExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		def := explainExpr.Def()
-		return f.ConstructExplain(input, def), nil
+		return f.ConstructExplain(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.ExplainPrivate),
+		)
+	case opt.ShowTraceForSessionOp:
+		return f.ConstructShowTraceForSession(
+			args[0].(*memo.ShowTracePrivate),
+		)
 	case opt.RowNumberOp:
-		rowNumberExpr := expr.AsRowNumber()
-		input, err := f.assignPlaceholders(rowNumberExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		def := rowNumberExpr.Def()
-		return f.ConstructRowNumber(input, def), nil
+		return f.ConstructRowNumber(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.RowNumberPrivate),
+		)
 	case opt.ZipOp:
-		zipExpr := expr.AsZip()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(zipExpr.Funcs()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		funcs := lb.BuildList()
-		cols := zipExpr.Cols()
-		return f.ConstructZip(funcs, cols), nil
+		return f.ConstructZip(
+			*args[0].(*memo.ScalarListExpr),
+			*args[1].(*opt.ColList),
+		)
 	case opt.SubqueryOp:
-		subqueryExpr := expr.AsSubquery()
-		input, err := f.assignPlaceholders(subqueryExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		def := subqueryExpr.Def()
-		return f.ConstructSubquery(input, def), nil
+		return f.ConstructSubquery(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.SubqueryPrivate),
+		)
 	case opt.AnyOp:
-		anyExpr := expr.AsAny()
-		input, err := f.assignPlaceholders(anyExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		scalar, err := f.assignPlaceholders(anyExpr.Scalar())
-		if err != nil {
-			return 0, err
-		}
-		def := anyExpr.Def()
-		return f.ConstructAny(input, scalar, def), nil
-	case opt.TupleOp:
-		tupleExpr := expr.AsTuple()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(tupleExpr.Elems()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		elems := lb.BuildList()
-		typ := tupleExpr.Typ()
-		return f.ConstructTuple(elems, typ), nil
-	case opt.ProjectionsOp:
-		projectionsExpr := expr.AsProjections()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(projectionsExpr.Elems()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		elems := lb.BuildList()
-		def := projectionsExpr.Def()
-		return f.ConstructProjections(elems, def), nil
-	case opt.AggregationsOp:
-		aggregationsExpr := expr.AsAggregations()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(aggregationsExpr.Aggs()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		aggs := lb.BuildList()
-		cols := aggregationsExpr.Cols()
-		return f.ConstructAggregations(aggs, cols), nil
-	case opt.MergeOnOp:
-		mergeOnExpr := expr.AsMergeOn()
-		on, err := f.assignPlaceholders(mergeOnExpr.On())
-		if err != nil {
-			return 0, err
-		}
-		def := mergeOnExpr.Def()
-		return f.ConstructMergeOn(on, def), nil
+		return f.ConstructAny(
+			args[0].(memo.RelExpr),
+			args[1].(opt.ScalarExpr),
+			args[2].(*memo.SubqueryPrivate),
+		)
 	case opt.ExistsOp:
-		existsExpr := expr.AsExists()
-		input, err := f.assignPlaceholders(existsExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		def := existsExpr.Def()
-		return f.ConstructExists(input, def), nil
-	case opt.FiltersOp:
-		filtersExpr := expr.AsFilters()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(filtersExpr.Conditions()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		conditions := lb.BuildList()
-		return f.ConstructFilters(conditions), nil
-	case opt.AndOp:
-		andExpr := expr.AsAnd()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(andExpr.Conditions()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		conditions := lb.BuildList()
-		return f.ConstructAnd(conditions), nil
-	case opt.OrOp:
-		orExpr := expr.AsOr()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(orExpr.Conditions()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		conditions := lb.BuildList()
-		return f.ConstructOr(conditions), nil
-	case opt.NotOp:
-		notExpr := expr.AsNot()
-		input, err := f.assignPlaceholders(notExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNot(input), nil
-	case opt.EqOp:
-		eqExpr := expr.AsEq()
-		left, err := f.assignPlaceholders(eqExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(eqExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructEq(left, right), nil
-	case opt.LtOp:
-		ltExpr := expr.AsLt()
-		left, err := f.assignPlaceholders(ltExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(ltExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructLt(left, right), nil
-	case opt.GtOp:
-		gtExpr := expr.AsGt()
-		left, err := f.assignPlaceholders(gtExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(gtExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructGt(left, right), nil
-	case opt.LeOp:
-		leExpr := expr.AsLe()
-		left, err := f.assignPlaceholders(leExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(leExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructLe(left, right), nil
-	case opt.GeOp:
-		geExpr := expr.AsGe()
-		left, err := f.assignPlaceholders(geExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(geExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructGe(left, right), nil
-	case opt.NeOp:
-		neExpr := expr.AsNe()
-		left, err := f.assignPlaceholders(neExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(neExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNe(left, right), nil
-	case opt.InOp:
-		inExpr := expr.AsIn()
-		left, err := f.assignPlaceholders(inExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(inExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructIn(left, right), nil
-	case opt.NotInOp:
-		notInExpr := expr.AsNotIn()
-		left, err := f.assignPlaceholders(notInExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(notInExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNotIn(left, right), nil
-	case opt.LikeOp:
-		likeExpr := expr.AsLike()
-		left, err := f.assignPlaceholders(likeExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(likeExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructLike(left, right), nil
-	case opt.NotLikeOp:
-		notLikeExpr := expr.AsNotLike()
-		left, err := f.assignPlaceholders(notLikeExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(notLikeExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNotLike(left, right), nil
-	case opt.ILikeOp:
-		iLikeExpr := expr.AsILike()
-		left, err := f.assignPlaceholders(iLikeExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(iLikeExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructILike(left, right), nil
-	case opt.NotILikeOp:
-		notILikeExpr := expr.AsNotILike()
-		left, err := f.assignPlaceholders(notILikeExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(notILikeExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNotILike(left, right), nil
-	case opt.SimilarToOp:
-		similarToExpr := expr.AsSimilarTo()
-		left, err := f.assignPlaceholders(similarToExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(similarToExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructSimilarTo(left, right), nil
-	case opt.NotSimilarToOp:
-		notSimilarToExpr := expr.AsNotSimilarTo()
-		left, err := f.assignPlaceholders(notSimilarToExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(notSimilarToExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNotSimilarTo(left, right), nil
-	case opt.RegMatchOp:
-		regMatchExpr := expr.AsRegMatch()
-		left, err := f.assignPlaceholders(regMatchExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(regMatchExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructRegMatch(left, right), nil
-	case opt.NotRegMatchOp:
-		notRegMatchExpr := expr.AsNotRegMatch()
-		left, err := f.assignPlaceholders(notRegMatchExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(notRegMatchExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNotRegMatch(left, right), nil
-	case opt.RegIMatchOp:
-		regIMatchExpr := expr.AsRegIMatch()
-		left, err := f.assignPlaceholders(regIMatchExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(regIMatchExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructRegIMatch(left, right), nil
-	case opt.NotRegIMatchOp:
-		notRegIMatchExpr := expr.AsNotRegIMatch()
-		left, err := f.assignPlaceholders(notRegIMatchExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(notRegIMatchExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructNotRegIMatch(left, right), nil
-	case opt.IsOp:
-		isExpr := expr.AsIs()
-		left, err := f.assignPlaceholders(isExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(isExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructIs(left, right), nil
-	case opt.IsNotOp:
-		isNotExpr := expr.AsIsNot()
-		left, err := f.assignPlaceholders(isNotExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(isNotExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructIsNot(left, right), nil
-	case opt.ContainsOp:
-		containsExpr := expr.AsContains()
-		left, err := f.assignPlaceholders(containsExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(containsExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructContains(left, right), nil
-	case opt.JsonExistsOp:
-		jsonExistsExpr := expr.AsJsonExists()
-		left, err := f.assignPlaceholders(jsonExistsExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(jsonExistsExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructJsonExists(left, right), nil
-	case opt.JsonAllExistsOp:
-		jsonAllExistsExpr := expr.AsJsonAllExists()
-		left, err := f.assignPlaceholders(jsonAllExistsExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(jsonAllExistsExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructJsonAllExists(left, right), nil
-	case opt.JsonSomeExistsOp:
-		jsonSomeExistsExpr := expr.AsJsonSomeExists()
-		left, err := f.assignPlaceholders(jsonSomeExistsExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(jsonSomeExistsExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructJsonSomeExists(left, right), nil
-	case opt.AnyScalarOp:
-		anyScalarExpr := expr.AsAnyScalar()
-		left, err := f.assignPlaceholders(anyScalarExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(anyScalarExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		cmp := anyScalarExpr.Cmp()
-		return f.ConstructAnyScalar(left, right, cmp), nil
-	case opt.BitandOp:
-		bitandExpr := expr.AsBitand()
-		left, err := f.assignPlaceholders(bitandExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(bitandExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructBitand(left, right), nil
-	case opt.BitorOp:
-		bitorExpr := expr.AsBitor()
-		left, err := f.assignPlaceholders(bitorExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(bitorExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructBitor(left, right), nil
-	case opt.BitxorOp:
-		bitxorExpr := expr.AsBitxor()
-		left, err := f.assignPlaceholders(bitxorExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(bitxorExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructBitxor(left, right), nil
-	case opt.PlusOp:
-		plusExpr := expr.AsPlus()
-		left, err := f.assignPlaceholders(plusExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(plusExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructPlus(left, right), nil
-	case opt.MinusOp:
-		minusExpr := expr.AsMinus()
-		left, err := f.assignPlaceholders(minusExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(minusExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructMinus(left, right), nil
-	case opt.MultOp:
-		multExpr := expr.AsMult()
-		left, err := f.assignPlaceholders(multExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(multExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructMult(left, right), nil
-	case opt.DivOp:
-		divExpr := expr.AsDiv()
-		left, err := f.assignPlaceholders(divExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(divExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructDiv(left, right), nil
-	case opt.FloorDivOp:
-		floorDivExpr := expr.AsFloorDiv()
-		left, err := f.assignPlaceholders(floorDivExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(floorDivExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFloorDiv(left, right), nil
-	case opt.ModOp:
-		modExpr := expr.AsMod()
-		left, err := f.assignPlaceholders(modExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(modExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructMod(left, right), nil
-	case opt.PowOp:
-		powExpr := expr.AsPow()
-		left, err := f.assignPlaceholders(powExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(powExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructPow(left, right), nil
-	case opt.ConcatOp:
-		concatExpr := expr.AsConcat()
-		left, err := f.assignPlaceholders(concatExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(concatExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructConcat(left, right), nil
-	case opt.LShiftOp:
-		lShiftExpr := expr.AsLShift()
-		left, err := f.assignPlaceholders(lShiftExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(lShiftExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructLShift(left, right), nil
-	case opt.RShiftOp:
-		rShiftExpr := expr.AsRShift()
-		left, err := f.assignPlaceholders(rShiftExpr.Left())
-		if err != nil {
-			return 0, err
-		}
-		right, err := f.assignPlaceholders(rShiftExpr.Right())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructRShift(left, right), nil
-	case opt.FetchValOp:
-		fetchValExpr := expr.AsFetchVal()
-		json, err := f.assignPlaceholders(fetchValExpr.Json())
-		if err != nil {
-			return 0, err
-		}
-		index, err := f.assignPlaceholders(fetchValExpr.Index())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFetchVal(json, index), nil
-	case opt.FetchTextOp:
-		fetchTextExpr := expr.AsFetchText()
-		json, err := f.assignPlaceholders(fetchTextExpr.Json())
-		if err != nil {
-			return 0, err
-		}
-		index, err := f.assignPlaceholders(fetchTextExpr.Index())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFetchText(json, index), nil
-	case opt.FetchValPathOp:
-		fetchValPathExpr := expr.AsFetchValPath()
-		json, err := f.assignPlaceholders(fetchValPathExpr.Json())
-		if err != nil {
-			return 0, err
-		}
-		path, err := f.assignPlaceholders(fetchValPathExpr.Path())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFetchValPath(json, path), nil
-	case opt.FetchTextPathOp:
-		fetchTextPathExpr := expr.AsFetchTextPath()
-		json, err := f.assignPlaceholders(fetchTextPathExpr.Json())
-		if err != nil {
-			return 0, err
-		}
-		path, err := f.assignPlaceholders(fetchTextPathExpr.Path())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructFetchTextPath(json, path), nil
-	case opt.UnaryMinusOp:
-		unaryMinusExpr := expr.AsUnaryMinus()
-		input, err := f.assignPlaceholders(unaryMinusExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructUnaryMinus(input), nil
-	case opt.UnaryComplementOp:
-		unaryComplementExpr := expr.AsUnaryComplement()
-		input, err := f.assignPlaceholders(unaryComplementExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructUnaryComplement(input), nil
-	case opt.CastOp:
-		castExpr := expr.AsCast()
-		input, err := f.assignPlaceholders(castExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		targetTyp := castExpr.TargetTyp()
-		return f.ConstructCast(input, targetTyp), nil
-	case opt.CaseOp:
-		caseExpr := expr.AsCase()
-		lb := MakeListBuilder(&f.funcs)
-		input, err := f.assignPlaceholders(caseExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		for _, item := range f.mem.LookupList(caseExpr.Whens()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		whens := lb.BuildList()
-		return f.ConstructCase(input, whens), nil
-	case opt.WhenOp:
-		whenExpr := expr.AsWhen()
-		condition, err := f.assignPlaceholders(whenExpr.Condition())
-		if err != nil {
-			return 0, err
-		}
-		value, err := f.assignPlaceholders(whenExpr.Value())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructWhen(condition, value), nil
-	case opt.ArrayOp:
-		arrayExpr := expr.AsArray()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(arrayExpr.Elems()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		elems := lb.BuildList()
-		typ := arrayExpr.Typ()
-		return f.ConstructArray(elems, typ), nil
-	case opt.IndirectionOp:
-		indirectionExpr := expr.AsIndirection()
-		input, err := f.assignPlaceholders(indirectionExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		index, err := f.assignPlaceholders(indirectionExpr.Index())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructIndirection(input, index), nil
-	case opt.FunctionOp:
-		functionExpr := expr.AsFunction()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(functionExpr.Args()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		args := lb.BuildList()
-		def := functionExpr.Def()
-		return f.ConstructFunction(args, def), nil
-	case opt.CoalesceOp:
-		coalesceExpr := expr.AsCoalesce()
-		lb := MakeListBuilder(&f.funcs)
-		for _, item := range f.mem.LookupList(coalesceExpr.Args()) {
-			newItem, err := f.assignPlaceholders(item)
-			if err != nil {
-				return 0, err
-			}
-			lb.AddItem(newItem)
-		}
-		args := lb.BuildList()
-		return f.ConstructCoalesce(args), nil
-	case opt.ColumnAccessOp:
-		columnAccessExpr := expr.AsColumnAccess()
-		input, err := f.assignPlaceholders(columnAccessExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		idx := columnAccessExpr.Idx()
-		return f.ConstructColumnAccess(input, idx), nil
-	case opt.AggDistinctOp:
-		aggDistinctExpr := expr.AsAggDistinct()
-		input, err := f.assignPlaceholders(aggDistinctExpr.Input())
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructAggDistinct(input), nil
-	case opt.PlaceholderOp:
-		value := expr.AsPlaceholder().Value()
-		placeholder := f.mem.LookupPrivate(value).(*tree.Placeholder)
-		d, err := placeholder.Eval(f.evalCtx)
-		if err != nil {
-			return 0, err
-		}
-		return f.ConstructConstVal(d), nil
-	}
-	panic("unhandled operator")
-}
-
-type dynConstructFunc func(f *Factory, operands memo.DynamicOperands) memo.GroupID
-
-var dynConstructLookup [opt.NumOperators]dynConstructFunc
-
-func init() {
-	// UnknownOp
-	dynConstructLookup[opt.UnknownOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		panic("op type not initialized")
-	}
-
-	// ScanOp
-	dynConstructLookup[opt.ScanOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructScan(memo.PrivateID(operands[0]))
-	}
-
-	// VirtualScanOp
-	dynConstructLookup[opt.VirtualScanOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructVirtualScan(memo.PrivateID(operands[0]))
-	}
-
-	// ValuesOp
-	dynConstructLookup[opt.ValuesOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructValues(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// SelectOp
-	dynConstructLookup[opt.SelectOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSelect(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// ProjectOp
-	dynConstructLookup[opt.ProjectOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructProject(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// InnerJoinOp
-	dynConstructLookup[opt.InnerJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructInnerJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// LeftJoinOp
-	dynConstructLookup[opt.LeftJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLeftJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// RightJoinOp
-	dynConstructLookup[opt.RightJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructRightJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// FullJoinOp
-	dynConstructLookup[opt.FullJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFullJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// SemiJoinOp
-	dynConstructLookup[opt.SemiJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSemiJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// AntiJoinOp
-	dynConstructLookup[opt.AntiJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAntiJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// IndexJoinOp
-	dynConstructLookup[opt.IndexJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIndexJoin(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// LookupJoinOp
-	dynConstructLookup[opt.LookupJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLookupJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// MergeJoinOp
-	dynConstructLookup[opt.MergeJoinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMergeJoin(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// InnerJoinApplyOp
-	dynConstructLookup[opt.InnerJoinApplyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructInnerJoinApply(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// LeftJoinApplyOp
-	dynConstructLookup[opt.LeftJoinApplyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLeftJoinApply(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// RightJoinApplyOp
-	dynConstructLookup[opt.RightJoinApplyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructRightJoinApply(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// FullJoinApplyOp
-	dynConstructLookup[opt.FullJoinApplyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFullJoinApply(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// SemiJoinApplyOp
-	dynConstructLookup[opt.SemiJoinApplyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSemiJoinApply(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// AntiJoinApplyOp
-	dynConstructLookup[opt.AntiJoinApplyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAntiJoinApply(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.GroupID(operands[2]))
-	}
-
-	// GroupByOp
-	dynConstructLookup[opt.GroupByOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructGroupBy(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// ScalarGroupByOp
-	dynConstructLookup[opt.ScalarGroupByOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructScalarGroupBy(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// DistinctOnOp
-	dynConstructLookup[opt.DistinctOnOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructDistinctOn(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// UnionOp
-	dynConstructLookup[opt.UnionOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructUnion(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// IntersectOp
-	dynConstructLookup[opt.IntersectOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIntersect(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// ExceptOp
-	dynConstructLookup[opt.ExceptOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructExcept(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// UnionAllOp
-	dynConstructLookup[opt.UnionAllOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructUnionAll(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// IntersectAllOp
-	dynConstructLookup[opt.IntersectAllOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIntersectAll(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// ExceptAllOp
-	dynConstructLookup[opt.ExceptAllOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructExceptAll(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// LimitOp
-	dynConstructLookup[opt.LimitOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLimit(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// OffsetOp
-	dynConstructLookup[opt.OffsetOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructOffset(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// Max1RowOp
-	dynConstructLookup[opt.Max1RowOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMax1Row(memo.GroupID(operands[0]))
-	}
-
-	// ExplainOp
-	dynConstructLookup[opt.ExplainOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructExplain(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// ShowTraceForSessionOp
-	dynConstructLookup[opt.ShowTraceForSessionOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructShowTraceForSession(memo.PrivateID(operands[0]))
-	}
-
-	// RowNumberOp
-	dynConstructLookup[opt.RowNumberOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructRowNumber(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// ZipOp
-	dynConstructLookup[opt.ZipOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructZip(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// SubqueryOp
-	dynConstructLookup[opt.SubqueryOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSubquery(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// AnyOp
-	dynConstructLookup[opt.AnyOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAny(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// VariableOp
-	dynConstructLookup[opt.VariableOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructVariable(memo.PrivateID(operands[0]))
-	}
-
-	// ConstOp
-	dynConstructLookup[opt.ConstOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructConst(memo.PrivateID(operands[0]))
-	}
-
-	// NullOp
-	dynConstructLookup[opt.NullOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNull(memo.PrivateID(operands[0]))
-	}
-
-	// TrueOp
-	dynConstructLookup[opt.TrueOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+		return f.ConstructExists(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.SubqueryPrivate),
+		)
+	case opt.VariableOp:
+		return f.ConstructVariable(
+			*args[0].(*opt.ColumnID),
+		)
+	case opt.ConstOp:
+		return f.ConstructConst(
+			args[0].(tree.Datum),
+		)
+	case opt.NullOp:
+		return f.ConstructNull(
+			args[0].(types.T),
+		)
+	case opt.TrueOp:
 		return f.ConstructTrue()
-	}
-
-	// FalseOp
-	dynConstructLookup[opt.FalseOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+	case opt.FalseOp:
 		return f.ConstructFalse()
-	}
-
-	// PlaceholderOp
-	dynConstructLookup[opt.PlaceholderOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructPlaceholder(memo.PrivateID(operands[0]))
-	}
-
-	// TupleOp
-	dynConstructLookup[opt.TupleOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructTuple(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// ProjectionsOp
-	dynConstructLookup[opt.ProjectionsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructProjections(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// AggregationsOp
-	dynConstructLookup[opt.AggregationsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAggregations(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// MergeOnOp
-	dynConstructLookup[opt.MergeOnOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMergeOn(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// ExistsOp
-	dynConstructLookup[opt.ExistsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructExists(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// FiltersOp
-	dynConstructLookup[opt.FiltersOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFilters(operands[0].ListID())
-	}
-
-	// AndOp
-	dynConstructLookup[opt.AndOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAnd(operands[0].ListID())
-	}
-
-	// OrOp
-	dynConstructLookup[opt.OrOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructOr(operands[0].ListID())
-	}
-
-	// NotOp
-	dynConstructLookup[opt.NotOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNot(memo.GroupID(operands[0]))
-	}
-
-	// EqOp
-	dynConstructLookup[opt.EqOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructEq(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// LtOp
-	dynConstructLookup[opt.LtOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLt(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// GtOp
-	dynConstructLookup[opt.GtOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructGt(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// LeOp
-	dynConstructLookup[opt.LeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLe(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// GeOp
-	dynConstructLookup[opt.GeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructGe(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NeOp
-	dynConstructLookup[opt.NeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNe(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// InOp
-	dynConstructLookup[opt.InOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIn(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NotInOp
-	dynConstructLookup[opt.NotInOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNotIn(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// LikeOp
-	dynConstructLookup[opt.LikeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLike(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NotLikeOp
-	dynConstructLookup[opt.NotLikeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNotLike(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// ILikeOp
-	dynConstructLookup[opt.ILikeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructILike(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NotILikeOp
-	dynConstructLookup[opt.NotILikeOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNotILike(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// SimilarToOp
-	dynConstructLookup[opt.SimilarToOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSimilarTo(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NotSimilarToOp
-	dynConstructLookup[opt.NotSimilarToOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNotSimilarTo(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// RegMatchOp
-	dynConstructLookup[opt.RegMatchOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructRegMatch(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NotRegMatchOp
-	dynConstructLookup[opt.NotRegMatchOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNotRegMatch(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// RegIMatchOp
-	dynConstructLookup[opt.RegIMatchOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructRegIMatch(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// NotRegIMatchOp
-	dynConstructLookup[opt.NotRegIMatchOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructNotRegIMatch(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// IsOp
-	dynConstructLookup[opt.IsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIs(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// IsNotOp
-	dynConstructLookup[opt.IsNotOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIsNot(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// ContainsOp
-	dynConstructLookup[opt.ContainsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructContains(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// JsonExistsOp
-	dynConstructLookup[opt.JsonExistsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructJsonExists(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// JsonAllExistsOp
-	dynConstructLookup[opt.JsonAllExistsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructJsonAllExists(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// JsonSomeExistsOp
-	dynConstructLookup[opt.JsonSomeExistsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructJsonSomeExists(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// AnyScalarOp
-	dynConstructLookup[opt.AnyScalarOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAnyScalar(memo.GroupID(operands[0]), memo.GroupID(operands[1]), memo.PrivateID(operands[2]))
-	}
-
-	// BitandOp
-	dynConstructLookup[opt.BitandOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructBitand(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// BitorOp
-	dynConstructLookup[opt.BitorOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructBitor(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// BitxorOp
-	dynConstructLookup[opt.BitxorOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructBitxor(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// PlusOp
-	dynConstructLookup[opt.PlusOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructPlus(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// MinusOp
-	dynConstructLookup[opt.MinusOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMinus(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// MultOp
-	dynConstructLookup[opt.MultOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMult(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// DivOp
-	dynConstructLookup[opt.DivOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructDiv(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// FloorDivOp
-	dynConstructLookup[opt.FloorDivOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFloorDiv(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// ModOp
-	dynConstructLookup[opt.ModOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMod(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// PowOp
-	dynConstructLookup[opt.PowOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructPow(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// ConcatOp
-	dynConstructLookup[opt.ConcatOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructConcat(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// LShiftOp
-	dynConstructLookup[opt.LShiftOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructLShift(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// RShiftOp
-	dynConstructLookup[opt.RShiftOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructRShift(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// FetchValOp
-	dynConstructLookup[opt.FetchValOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFetchVal(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// FetchTextOp
-	dynConstructLookup[opt.FetchTextOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFetchText(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// FetchValPathOp
-	dynConstructLookup[opt.FetchValPathOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFetchValPath(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// FetchTextPathOp
-	dynConstructLookup[opt.FetchTextPathOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFetchTextPath(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// UnaryMinusOp
-	dynConstructLookup[opt.UnaryMinusOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructUnaryMinus(memo.GroupID(operands[0]))
-	}
-
-	// UnaryComplementOp
-	dynConstructLookup[opt.UnaryComplementOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructUnaryComplement(memo.GroupID(operands[0]))
-	}
-
-	// CastOp
-	dynConstructLookup[opt.CastOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructCast(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// CaseOp
-	dynConstructLookup[opt.CaseOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructCase(memo.GroupID(operands[0]), operands[1].ListID())
-	}
-
-	// WhenOp
-	dynConstructLookup[opt.WhenOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructWhen(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// ArrayOp
-	dynConstructLookup[opt.ArrayOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructArray(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// IndirectionOp
-	dynConstructLookup[opt.IndirectionOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructIndirection(memo.GroupID(operands[0]), memo.GroupID(operands[1]))
-	}
-
-	// FunctionOp
-	dynConstructLookup[opt.FunctionOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFunction(operands[0].ListID(), memo.PrivateID(operands[1]))
-	}
-
-	// CoalesceOp
-	dynConstructLookup[opt.CoalesceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructCoalesce(operands[0].ListID())
-	}
-
-	// ColumnAccessOp
-	dynConstructLookup[opt.ColumnAccessOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructColumnAccess(memo.GroupID(operands[0]), memo.PrivateID(operands[1]))
-	}
-
-	// UnsupportedExprOp
-	dynConstructLookup[opt.UnsupportedExprOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructUnsupportedExpr(memo.PrivateID(operands[0]))
-	}
-
-	// ArrayAggOp
-	dynConstructLookup[opt.ArrayAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructArrayAgg(memo.GroupID(operands[0]))
-	}
-
-	// AvgOp
-	dynConstructLookup[opt.AvgOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAvg(memo.GroupID(operands[0]))
-	}
-
-	// BoolAndOp
-	dynConstructLookup[opt.BoolAndOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructBoolAnd(memo.GroupID(operands[0]))
-	}
-
-	// BoolOrOp
-	dynConstructLookup[opt.BoolOrOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructBoolOr(memo.GroupID(operands[0]))
-	}
-
-	// ConcatAggOp
-	dynConstructLookup[opt.ConcatAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructConcatAgg(memo.GroupID(operands[0]))
-	}
-
-	// CountOp
-	dynConstructLookup[opt.CountOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructCount(memo.GroupID(operands[0]))
-	}
-
-	// CountRowsOp
-	dynConstructLookup[opt.CountRowsOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
+	case opt.PlaceholderOp:
+		return f.ConstructPlaceholder(
+			args[0].(tree.TypedExpr),
+		)
+	case opt.TupleOp:
+		return f.ConstructTuple(
+			*args[0].(*memo.ScalarListExpr),
+			args[1].(types.T),
+		)
+	case opt.AndOp:
+		return f.ConstructAnd(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.OrOp:
+		return f.ConstructOr(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotOp:
+		return f.ConstructNot(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.EqOp:
+		return f.ConstructEq(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.LtOp:
+		return f.ConstructLt(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.GtOp:
+		return f.ConstructGt(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.LeOp:
+		return f.ConstructLe(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.GeOp:
+		return f.ConstructGe(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NeOp:
+		return f.ConstructNe(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.InOp:
+		return f.ConstructIn(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotInOp:
+		return f.ConstructNotIn(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.LikeOp:
+		return f.ConstructLike(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotLikeOp:
+		return f.ConstructNotLike(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.ILikeOp:
+		return f.ConstructILike(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotILikeOp:
+		return f.ConstructNotILike(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.SimilarToOp:
+		return f.ConstructSimilarTo(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotSimilarToOp:
+		return f.ConstructNotSimilarTo(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegMatchOp:
+		return f.ConstructRegMatch(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotRegMatchOp:
+		return f.ConstructNotRegMatch(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegIMatchOp:
+		return f.ConstructRegIMatch(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.NotRegIMatchOp:
+		return f.ConstructNotRegIMatch(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.IsOp:
+		return f.ConstructIs(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.IsNotOp:
+		return f.ConstructIsNot(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.ContainsOp:
+		return f.ConstructContains(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.JsonExistsOp:
+		return f.ConstructJsonExists(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.JsonAllExistsOp:
+		return f.ConstructJsonAllExists(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.JsonSomeExistsOp:
+		return f.ConstructJsonSomeExists(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.AnyScalarOp:
+		return f.ConstructAnyScalar(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+			*args[2].(*opt.Operator),
+		)
+	case opt.BitandOp:
+		return f.ConstructBitand(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.BitorOp:
+		return f.ConstructBitor(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.BitxorOp:
+		return f.ConstructBitxor(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.PlusOp:
+		return f.ConstructPlus(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.MinusOp:
+		return f.ConstructMinus(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.MultOp:
+		return f.ConstructMult(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.DivOp:
+		return f.ConstructDiv(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.FloorDivOp:
+		return f.ConstructFloorDiv(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.ModOp:
+		return f.ConstructMod(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.PowOp:
+		return f.ConstructPow(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.ConcatOp:
+		return f.ConstructConcat(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.LShiftOp:
+		return f.ConstructLShift(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RShiftOp:
+		return f.ConstructRShift(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.FetchValOp:
+		return f.ConstructFetchVal(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.FetchTextOp:
+		return f.ConstructFetchText(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.FetchValPathOp:
+		return f.ConstructFetchValPath(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.FetchTextPathOp:
+		return f.ConstructFetchTextPath(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.UnaryMinusOp:
+		return f.ConstructUnaryMinus(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.UnaryComplementOp:
+		return f.ConstructUnaryComplement(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.CastOp:
+		return f.ConstructCast(
+			args[0].(opt.ScalarExpr),
+			args[1].(coltypes.T),
+		)
+	case opt.CaseOp:
+		return f.ConstructCase(
+			args[0].(opt.ScalarExpr),
+			*args[1].(*memo.ScalarListExpr),
+			args[2].(opt.ScalarExpr),
+		)
+	case opt.WhenOp:
+		return f.ConstructWhen(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.ArrayOp:
+		return f.ConstructArray(
+			*args[0].(*memo.ScalarListExpr),
+			args[1].(types.T),
+		)
+	case opt.IndirectionOp:
+		return f.ConstructIndirection(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.FunctionOp:
+		return f.ConstructFunction(
+			*args[0].(*memo.ScalarListExpr),
+			args[1].(*memo.FunctionPrivate),
+		)
+	case opt.CoalesceOp:
+		return f.ConstructCoalesce(
+			*args[0].(*memo.ScalarListExpr),
+		)
+	case opt.ColumnAccessOp:
+		return f.ConstructColumnAccess(
+			args[0].(opt.ScalarExpr),
+			*args[1].(*memo.TupleOrdinal),
+		)
+	case opt.UnsupportedExprOp:
+		return f.ConstructUnsupportedExpr(
+			args[0].(tree.TypedExpr),
+		)
+	case opt.ArrayAggOp:
+		return f.ConstructArrayAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.AvgOp:
+		return f.ConstructAvg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.BoolAndOp:
+		return f.ConstructBoolAnd(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.BoolOrOp:
+		return f.ConstructBoolOr(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.ConcatAggOp:
+		return f.ConstructConcatAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.CountOp:
+		return f.ConstructCount(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.CountRowsOp:
 		return f.ConstructCountRows()
+	case opt.MaxOp:
+		return f.ConstructMax(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.MinOp:
+		return f.ConstructMin(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.SumIntOp:
+		return f.ConstructSumInt(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.SumOp:
+		return f.ConstructSum(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.SqrDiffOp:
+		return f.ConstructSqrDiff(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.VarianceOp:
+		return f.ConstructVariance(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.StdDevOp:
+		return f.ConstructStdDev(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.XorAggOp:
+		return f.ConstructXorAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.JsonAggOp:
+		return f.ConstructJsonAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.JsonbAggOp:
+		return f.ConstructJsonbAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.ConstAggOp:
+		return f.ConstructConstAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.ConstNotNullAggOp:
+		return f.ConstructConstNotNullAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.AnyNotNullAggOp:
+		return f.ConstructAnyNotNullAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.FirstAggOp:
+		return f.ConstructFirstAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.AggDistinctOp:
+		return f.ConstructAggDistinct(
+			args[0].(opt.ScalarExpr),
+		)
 	}
-
-	// MaxOp
-	dynConstructLookup[opt.MaxOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMax(memo.GroupID(operands[0]))
-	}
-
-	// MinOp
-	dynConstructLookup[opt.MinOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructMin(memo.GroupID(operands[0]))
-	}
-
-	// SumIntOp
-	dynConstructLookup[opt.SumIntOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSumInt(memo.GroupID(operands[0]))
-	}
-
-	// SumOp
-	dynConstructLookup[opt.SumOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSum(memo.GroupID(operands[0]))
-	}
-
-	// SqrDiffOp
-	dynConstructLookup[opt.SqrDiffOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructSqrDiff(memo.GroupID(operands[0]))
-	}
-
-	// VarianceOp
-	dynConstructLookup[opt.VarianceOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructVariance(memo.GroupID(operands[0]))
-	}
-
-	// StdDevOp
-	dynConstructLookup[opt.StdDevOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructStdDev(memo.GroupID(operands[0]))
-	}
-
-	// XorAggOp
-	dynConstructLookup[opt.XorAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructXorAgg(memo.GroupID(operands[0]))
-	}
-
-	// JsonAggOp
-	dynConstructLookup[opt.JsonAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructJsonAgg(memo.GroupID(operands[0]))
-	}
-
-	// JsonbAggOp
-	dynConstructLookup[opt.JsonbAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructJsonbAgg(memo.GroupID(operands[0]))
-	}
-
-	// ConstAggOp
-	dynConstructLookup[opt.ConstAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructConstAgg(memo.GroupID(operands[0]))
-	}
-
-	// ConstNotNullAggOp
-	dynConstructLookup[opt.ConstNotNullAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructConstNotNullAgg(memo.GroupID(operands[0]))
-	}
-
-	// AnyNotNullAggOp
-	dynConstructLookup[opt.AnyNotNullAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAnyNotNullAgg(memo.GroupID(operands[0]))
-	}
-
-	// FirstAggOp
-	dynConstructLookup[opt.FirstAggOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructFirstAgg(memo.GroupID(operands[0]))
-	}
-
-	// AggDistinctOp
-	dynConstructLookup[opt.AggDistinctOp] = func(f *Factory, operands memo.DynamicOperands) memo.GroupID {
-		return f.ConstructAggDistinct(memo.GroupID(operands[0]))
-	}
-
-}
-
-func (f *Factory) DynamicConstruct(op opt.Operator, operands memo.DynamicOperands) memo.GroupID {
-	return dynConstructLookup[op](f, operands)
+	panic(fmt.Sprintf("cannot dynamically construct operator %s", op))
 }
