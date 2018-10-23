@@ -25,8 +25,8 @@ func EncDatumRowsToColVec(
 	// rid of the somewhat dubious assumption that Width is unset (0) for column
 	// types where it does not apply.
 
-	if columnType.SemanticType == sqlbase.ColumnType_FLOAT && columnType.Width == 0 {
-		col := vec.Float64()
+	if columnType.SemanticType == sqlbase.ColumnType_BOOL && columnType.Width == 0 {
+		col := vec.Bool()
 		for i := uint16(0); i < nRows; i++ {
 			if rows[i][columnIdx].Datum == nil {
 				if err := rows[i][columnIdx].EnsureDecoded(columnType, alloc); err != nil {
@@ -37,7 +37,43 @@ func EncDatumRowsToColVec(
 			if datum == tree.DNull {
 				vec.SetNull(i)
 			} else {
-				col[i] = float64(*datum.(*tree.DFloat))
+				col[i] = bool(*datum.(*tree.DBool))
+			}
+		}
+		return nil
+	}
+
+	if columnType.SemanticType == sqlbase.ColumnType_NAME && columnType.Width == 0 {
+		col := vec.Bytes()
+		for i := uint16(0); i < nRows; i++ {
+			if rows[i][columnIdx].Datum == nil {
+				if err := rows[i][columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+					return err
+				}
+			}
+			datum := rows[i][columnIdx].Datum
+			if datum == tree.DNull {
+				vec.SetNull(i)
+			} else {
+				col[i] = encoding.UnsafeConvertStringToBytes(string(*datum.(*tree.DString)))
+			}
+		}
+		return nil
+	}
+
+	if columnType.SemanticType == sqlbase.ColumnType_STRING && columnType.Width == 0 {
+		col := vec.Bytes()
+		for i := uint16(0); i < nRows; i++ {
+			if rows[i][columnIdx].Datum == nil {
+				if err := rows[i][columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+					return err
+				}
+			}
+			datum := rows[i][columnIdx].Datum
+			if datum == tree.DNull {
+				vec.SetNull(i)
+			} else {
+				col[i] = encoding.UnsafeConvertStringToBytes(string(*datum.(*tree.DString)))
 			}
 		}
 		return nil
@@ -79,8 +115,8 @@ func EncDatumRowsToColVec(
 		return nil
 	}
 
-	if columnType.SemanticType == sqlbase.ColumnType_NAME && columnType.Width == 0 {
-		col := vec.Bytes()
+	if columnType.SemanticType == sqlbase.ColumnType_FLOAT && columnType.Width == 0 {
+		col := vec.Float64()
 		for i := uint16(0); i < nRows; i++ {
 			if rows[i][columnIdx].Datum == nil {
 				if err := rows[i][columnIdx].EnsureDecoded(columnType, alloc); err != nil {
@@ -91,25 +127,7 @@ func EncDatumRowsToColVec(
 			if datum == tree.DNull {
 				vec.SetNull(i)
 			} else {
-				col[i] = encoding.UnsafeConvertStringToBytes(string(*datum.(*tree.DString)))
-			}
-		}
-		return nil
-	}
-
-	if columnType.SemanticType == sqlbase.ColumnType_BOOL && columnType.Width == 0 {
-		col := vec.Bool()
-		for i := uint16(0); i < nRows; i++ {
-			if rows[i][columnIdx].Datum == nil {
-				if err := rows[i][columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-					return err
-				}
-			}
-			datum := rows[i][columnIdx].Datum
-			if datum == tree.DNull {
-				vec.SetNull(i)
-			} else {
-				col[i] = bool(*datum.(*tree.DBool))
+				col[i] = float64(*datum.(*tree.DFloat))
 			}
 		}
 		return nil
@@ -200,24 +218,6 @@ func EncDatumRowsToColVec(
 				vec.SetNull(i)
 			} else {
 				col[i] = int64(*datum.(*tree.DInt))
-			}
-		}
-		return nil
-	}
-
-	if columnType.SemanticType == sqlbase.ColumnType_STRING && columnType.Width == 0 {
-		col := vec.Bytes()
-		for i := uint16(0); i < nRows; i++ {
-			if rows[i][columnIdx].Datum == nil {
-				if err := rows[i][columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-					return err
-				}
-			}
-			datum := rows[i][columnIdx].Datum
-			if datum == tree.DNull {
-				vec.SetNull(i)
-			} else {
-				col[i] = encoding.UnsafeConvertStringToBytes(string(*datum.(*tree.DString)))
 			}
 		}
 		return nil
