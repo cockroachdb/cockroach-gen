@@ -7660,15 +7660,17 @@ func (_f *Factory) ConstructEq(
 				if _f.funcs.IsString(key) {
 					_const2, _ := right.(*memo.ConstExpr)
 					if _const2 != nil {
-						if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONFieldAccess) {
-							_expr := _f.ConstructContains(
-								val,
-								_f.funcs.MakeSingleKeyJSONObject(key, right),
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.NormalizeJSONFieldAccess, nil, _expr)
+						if _f.funcs.IsJSONScalar(right) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONFieldAccess) {
+								_expr := _f.ConstructContains(
+									val,
+									_f.funcs.MakeSingleKeyJSONObject(key, right),
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.NormalizeJSONFieldAccess, nil, _expr)
+								}
+								return _expr
 							}
-							return _expr
 						}
 					}
 				}
