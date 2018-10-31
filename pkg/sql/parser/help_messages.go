@@ -1227,55 +1227,55 @@ END [TRANSACTION]
 		SeeAlso: `BEGIN, COMMIT, SAVEPOINT, WEBDOCS/rollback-transaction.html
 `,
 	},
-	//line sql.y: 5137
+	//line sql.y: 5138
 	`CREATE DATABASE`: {
 		ShortDescription: `create a new database`,
-		//line sql.y: 5138
-		Category: hDDL,
 		//line sql.y: 5139
+		Category: hDDL,
+		//line sql.y: 5140
 		Text: `CREATE DATABASE [IF NOT EXISTS] <name>
 `,
-		//line sql.y: 5140
+		//line sql.y: 5141
 		SeeAlso: `WEBDOCS/create-database.html
 `,
 	},
-	//line sql.y: 5209
+	//line sql.y: 5210
 	`INSERT`: {
 		ShortDescription: `create new rows in a table`,
-		//line sql.y: 5210
-		Category: hDML,
 		//line sql.y: 5211
+		Category: hDML,
+		//line sql.y: 5212
 		Text: `
 INSERT INTO <tablename> [[AS] <name>] [( <colnames...> )]
        <selectclause>
        [ON CONFLICT [( <colnames...> )] {DO UPDATE SET ... [WHERE <expr>] | DO NOTHING}]
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 5216
+		//line sql.y: 5217
 		SeeAlso: `UPSERT, UPDATE, DELETE, WEBDOCS/insert.html
 `,
 	},
-	//line sql.y: 5235
+	//line sql.y: 5236
 	`UPSERT`: {
 		ShortDescription: `create or replace rows in a table`,
-		//line sql.y: 5236
-		Category: hDML,
 		//line sql.y: 5237
+		Category: hDML,
+		//line sql.y: 5238
 		Text: `
 UPSERT INTO <tablename> [AS <name>] [( <colnames...> )]
        <selectclause>
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 5241
+		//line sql.y: 5242
 		SeeAlso: `INSERT, UPDATE, DELETE, WEBDOCS/upsert.html
 `,
 	},
-	//line sql.y: 5356
+	//line sql.y: 5357
 	`UPDATE`: {
 		ShortDescription: `update rows of a table`,
-		//line sql.y: 5357
-		Category: hDML,
 		//line sql.y: 5358
+		Category: hDML,
+		//line sql.y: 5359
 		Text: `
 UPDATE <tablename> [[AS] <name>]
        SET ...
@@ -1284,16 +1284,16 @@ UPDATE <tablename> [[AS] <name>]
        [LIMIT <expr>]
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 5365
+		//line sql.y: 5366
 		SeeAlso: `INSERT, UPSERT, DELETE, WEBDOCS/update.html
 `,
 	},
-	//line sql.y: 5539
+	//line sql.y: 5540
 	`<SELECTCLAUSE>`: {
 		ShortDescription: `access tabular data`,
-		//line sql.y: 5540
-		Category: hDML,
 		//line sql.y: 5541
+		Category: hDML,
+		//line sql.y: 5542
 		Text: `
 Select clause:
   TABLE <tablename>
@@ -1301,12 +1301,12 @@ Select clause:
   SELECT ... [ { INTERSECT | UNION | EXCEPT } [ ALL | DISTINCT ] <selectclause> ]
 `,
 	},
-	//line sql.y: 5552
+	//line sql.y: 5553
 	`SELECT`: {
 		ShortDescription: `retrieve rows from a data source and compute a result`,
-		//line sql.y: 5553
-		Category: hDML,
 		//line sql.y: 5554
+		Category: hDML,
+		//line sql.y: 5555
 		Text: `
 SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        { <expr> [[AS] <name>] | [ [<dbname>.] <tablename>. ] * } [, ...]
@@ -1320,40 +1320,40 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        [ LIMIT { <expr> | ALL } ]
        [ OFFSET <expr> [ ROW | ROWS ] ]
 `,
-		//line sql.y: 5566
+		//line sql.y: 5567
 		SeeAlso: `WEBDOCS/select-clause.html
 `,
 	},
-	//line sql.y: 5641
+	//line sql.y: 5642
 	`TABLE`: {
 		ShortDescription: `select an entire table`,
-		//line sql.y: 5642
-		Category: hDML,
 		//line sql.y: 5643
+		Category: hDML,
+		//line sql.y: 5644
 		Text: `TABLE <tablename>
 `,
-		//line sql.y: 5644
+		//line sql.y: 5645
 		SeeAlso: `SELECT, VALUES, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 5932
+	//line sql.y: 5933
 	`VALUES`: {
 		ShortDescription: `select a given set of values`,
-		//line sql.y: 5933
-		Category: hDML,
 		//line sql.y: 5934
+		Category: hDML,
+		//line sql.y: 5935
 		Text: `VALUES ( <exprs...> ) [, ...]
 `,
-		//line sql.y: 5935
+		//line sql.y: 5936
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 6025
+	//line sql.y: 6026
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 6026
-		Category: hDML,
 		//line sql.y: 6027
+		Category: hDML,
+		//line sql.y: 6028
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexhint> } ]
@@ -1373,7 +1373,7 @@ Index flags:
   '{' NO_INDEX_JOIN [, ...] '}'
 
 `,
-		//line sql.y: 6045
+		//line sql.y: 6046
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},
