@@ -2,6 +2,295 @@
 
 package exec
 
+import "bytes"
+
+import "github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+import "github.com/cockroachdb/apd"
+
+type projPlusDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projPlusDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Add(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			if _, err := tree.DecimalCtx.Add(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projPlusDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projPlusDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Add(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			if _, err := tree.DecimalCtx.Add(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projPlusDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projMinusDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Sub(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			if _, err := tree.DecimalCtx.Sub(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projMinusDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projMinusDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Sub(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			if _, err := tree.DecimalCtx.Sub(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projMinusDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projMultDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Mul(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			if _, err := tree.DecimalCtx.Mul(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projMultDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projMultDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Mul(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			if _, err := tree.DecimalCtx.Mul(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projMultDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projDivDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Quo(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			if _, err := tree.DecimalCtx.Quo(&projCol[i], &col[i], &p.constArg); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projDivDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projDivDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Decimal()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			if _, err := tree.DecimalCtx.Quo(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			if _, err := tree.DecimalCtx.Quo(&projCol[i], &col1[i], &col2[i]); err != nil {
+				panic(err)
+			}
+		}
+	}
+	return batch
+}
+
+func (p projDivDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
 type projPlusInt8Int8ConstOp struct {
 	input Operator
 
@@ -22,8 +311,8 @@ func (p *projPlusInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v + p.constArg
+		for i := range col {
+			projCol[i] = col[i] + p.constArg
 		}
 	}
 	return batch
@@ -54,8 +343,8 @@ func (p *projPlusInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v + col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] + col2[i]
 		}
 	}
 	return batch
@@ -85,8 +374,8 @@ func (p *projMinusInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v - p.constArg
+		for i := range col {
+			projCol[i] = col[i] - p.constArg
 		}
 	}
 	return batch
@@ -117,8 +406,8 @@ func (p *projMinusInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v - col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] - col2[i]
 		}
 	}
 	return batch
@@ -148,8 +437,8 @@ func (p *projMultInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v * p.constArg
+		for i := range col {
+			projCol[i] = col[i] * p.constArg
 		}
 	}
 	return batch
@@ -180,8 +469,8 @@ func (p *projMultInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v * col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] * col2[i]
 		}
 	}
 	return batch
@@ -211,8 +500,8 @@ func (p *projDivInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v / p.constArg
+		for i := range col {
+			projCol[i] = col[i] / p.constArg
 		}
 	}
 	return batch
@@ -243,8 +532,8 @@ func (p *projDivInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v / col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] / col2[i]
 		}
 	}
 	return batch
@@ -274,8 +563,8 @@ func (p *projPlusInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v + p.constArg
+		for i := range col {
+			projCol[i] = col[i] + p.constArg
 		}
 	}
 	return batch
@@ -306,8 +595,8 @@ func (p *projPlusInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v + col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] + col2[i]
 		}
 	}
 	return batch
@@ -337,8 +626,8 @@ func (p *projMinusInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v - p.constArg
+		for i := range col {
+			projCol[i] = col[i] - p.constArg
 		}
 	}
 	return batch
@@ -369,8 +658,8 @@ func (p *projMinusInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v - col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] - col2[i]
 		}
 	}
 	return batch
@@ -400,8 +689,8 @@ func (p *projMultInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v * p.constArg
+		for i := range col {
+			projCol[i] = col[i] * p.constArg
 		}
 	}
 	return batch
@@ -432,8 +721,8 @@ func (p *projMultInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v * col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] * col2[i]
 		}
 	}
 	return batch
@@ -463,8 +752,8 @@ func (p *projDivInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v / p.constArg
+		for i := range col {
+			projCol[i] = col[i] / p.constArg
 		}
 	}
 	return batch
@@ -495,8 +784,8 @@ func (p *projDivInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v / col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] / col2[i]
 		}
 	}
 	return batch
@@ -526,8 +815,8 @@ func (p *projPlusInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v + p.constArg
+		for i := range col {
+			projCol[i] = col[i] + p.constArg
 		}
 	}
 	return batch
@@ -558,8 +847,8 @@ func (p *projPlusInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v + col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] + col2[i]
 		}
 	}
 	return batch
@@ -589,8 +878,8 @@ func (p *projMinusInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v - p.constArg
+		for i := range col {
+			projCol[i] = col[i] - p.constArg
 		}
 	}
 	return batch
@@ -621,8 +910,8 @@ func (p *projMinusInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v - col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] - col2[i]
 		}
 	}
 	return batch
@@ -652,8 +941,8 @@ func (p *projMultInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v * p.constArg
+		for i := range col {
+			projCol[i] = col[i] * p.constArg
 		}
 	}
 	return batch
@@ -684,8 +973,8 @@ func (p *projMultInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v * col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] * col2[i]
 		}
 	}
 	return batch
@@ -715,8 +1004,8 @@ func (p *projDivInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v / p.constArg
+		for i := range col {
+			projCol[i] = col[i] / p.constArg
 		}
 	}
 	return batch
@@ -747,8 +1036,8 @@ func (p *projDivInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v / col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] / col2[i]
 		}
 	}
 	return batch
@@ -778,8 +1067,8 @@ func (p *projPlusInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v + p.constArg
+		for i := range col {
+			projCol[i] = col[i] + p.constArg
 		}
 	}
 	return batch
@@ -810,8 +1099,8 @@ func (p *projPlusInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v + col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] + col2[i]
 		}
 	}
 	return batch
@@ -841,8 +1130,8 @@ func (p *projMinusInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v - p.constArg
+		for i := range col {
+			projCol[i] = col[i] - p.constArg
 		}
 	}
 	return batch
@@ -873,8 +1162,8 @@ func (p *projMinusInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v - col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] - col2[i]
 		}
 	}
 	return batch
@@ -904,8 +1193,8 @@ func (p *projMultInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v * p.constArg
+		for i := range col {
+			projCol[i] = col[i] * p.constArg
 		}
 	}
 	return batch
@@ -936,8 +1225,8 @@ func (p *projMultInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v * col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] * col2[i]
 		}
 	}
 	return batch
@@ -967,8 +1256,8 @@ func (p *projDivInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v / p.constArg
+		for i := range col {
+			projCol[i] = col[i] / p.constArg
 		}
 	}
 	return batch
@@ -999,8 +1288,8 @@ func (p *projDivInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v / col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] / col2[i]
 		}
 	}
 	return batch
@@ -1030,8 +1319,8 @@ func (p *projPlusFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v + p.constArg
+		for i := range col {
+			projCol[i] = col[i] + p.constArg
 		}
 	}
 	return batch
@@ -1062,8 +1351,8 @@ func (p *projPlusFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v + col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] + col2[i]
 		}
 	}
 	return batch
@@ -1093,8 +1382,8 @@ func (p *projMinusFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v - p.constArg
+		for i := range col {
+			projCol[i] = col[i] - p.constArg
 		}
 	}
 	return batch
@@ -1125,8 +1414,8 @@ func (p *projMinusFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v - col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] - col2[i]
 		}
 	}
 	return batch
@@ -1156,8 +1445,8 @@ func (p *projMultFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v * p.constArg
+		for i := range col {
+			projCol[i] = col[i] * p.constArg
 		}
 	}
 	return batch
@@ -1188,8 +1477,8 @@ func (p *projMultFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v * col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] * col2[i]
 		}
 	}
 	return batch
@@ -1219,8 +1508,8 @@ func (p *projDivFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v / p.constArg
+		for i := range col {
+			projCol[i] = col[i] / p.constArg
 		}
 	}
 	return batch
@@ -1251,8 +1540,8 @@ func (p *projDivFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v / col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] / col2[i]
 		}
 	}
 	return batch
@@ -1282,8 +1571,8 @@ func (p *projPlusFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v + p.constArg
+		for i := range col {
+			projCol[i] = col[i] + p.constArg
 		}
 	}
 	return batch
@@ -1314,8 +1603,8 @@ func (p *projPlusFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v + col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] + col2[i]
 		}
 	}
 	return batch
@@ -1345,8 +1634,8 @@ func (p *projMinusFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v - p.constArg
+		for i := range col {
+			projCol[i] = col[i] - p.constArg
 		}
 	}
 	return batch
@@ -1377,8 +1666,8 @@ func (p *projMinusFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v - col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] - col2[i]
 		}
 	}
 	return batch
@@ -1408,8 +1697,8 @@ func (p *projMultFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v * p.constArg
+		for i := range col {
+			projCol[i] = col[i] * p.constArg
 		}
 	}
 	return batch
@@ -1440,8 +1729,8 @@ func (p *projMultFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v * col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] * col2[i]
 		}
 	}
 	return batch
@@ -1471,8 +1760,8 @@ func (p *projDivFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v / p.constArg
+		for i := range col {
+			projCol[i] = col[i] / p.constArg
 		}
 	}
 	return batch
@@ -1503,14 +1792,1148 @@ func (p *projDivFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v / col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] / col2[i]
 		}
 	}
 	return batch
 }
 
 func (p projDivFloat64Float64Op) Init() {
+	p.input.Init()
+}
+
+type projEQBoolBoolConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg bool
+
+	outputIdx int
+}
+
+func (p *projEQBoolBoolConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = col[i] == p.constArg
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
+		}
+	}
+	return batch
+}
+
+func (p projEQBoolBoolConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQBoolBoolOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projEQBoolBoolOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = col1[i] == col2[i]
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
+		}
+	}
+	return batch
+}
+
+func (p projEQBoolBoolOp) Init() {
+	p.input.Init()
+}
+
+type projNEBoolBoolConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg bool
+
+	outputIdx int
+}
+
+func (p *projNEBoolBoolConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = col[i] != p.constArg
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
+		}
+	}
+	return batch
+}
+
+func (p projNEBoolBoolConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEBoolBoolOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projNEBoolBoolOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = col1[i] != col2[i]
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
+		}
+	}
+	return batch
+}
+
+func (p projNEBoolBoolOp) Init() {
+	p.input.Init()
+}
+
+type projLTBoolBoolConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg bool
+
+	outputIdx int
+}
+
+func (p *projLTBoolBoolConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) < 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) < 0
+		}
+	}
+	return batch
+}
+
+func (p projLTBoolBoolConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTBoolBoolOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projLTBoolBoolOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) < 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) < 0
+		}
+	}
+	return batch
+}
+
+func (p projLTBoolBoolOp) Init() {
+	p.input.Init()
+}
+
+type projLEBoolBoolConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg bool
+
+	outputIdx int
+}
+
+func (p *projLEBoolBoolConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) <= 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) <= 0
+		}
+	}
+	return batch
+}
+
+func (p projLEBoolBoolConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEBoolBoolOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projLEBoolBoolOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) <= 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) <= 0
+		}
+	}
+	return batch
+}
+
+func (p projLEBoolBoolOp) Init() {
+	p.input.Init()
+}
+
+type projGTBoolBoolConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg bool
+
+	outputIdx int
+}
+
+func (p *projGTBoolBoolConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) > 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) > 0
+		}
+	}
+	return batch
+}
+
+func (p projGTBoolBoolConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTBoolBoolOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projGTBoolBoolOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) > 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) > 0
+		}
+	}
+	return batch
+}
+
+func (p projGTBoolBoolOp) Init() {
+	p.input.Init()
+}
+
+type projGEBoolBoolConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg bool
+
+	outputIdx int
+}
+
+func (p *projGEBoolBoolConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) >= 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareBools(col[i], p.constArg) >= 0
+		}
+	}
+	return batch
+}
+
+func (p projGEBoolBoolConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEBoolBoolOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projGEBoolBoolOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) >= 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) >= 0
+		}
+	}
+	return batch
+}
+
+func (p projGEBoolBoolOp) Init() {
+	p.input.Init()
+}
+
+type projEQBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p *projEQBytesBytesConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Equal(col[i], p.constArg)
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = bytes.Equal(col[i], p.constArg)
+		}
+	}
+	return batch
+}
+
+func (p projEQBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQBytesBytesOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projEQBytesBytesOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Equal(col1[i], col2[i])
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = bytes.Equal(col1[i], col2[i])
+		}
+	}
+	return batch
+}
+
+func (p projEQBytesBytesOp) Init() {
+	p.input.Init()
+}
+
+type projNEBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p *projNEBytesBytesConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = !bytes.Equal(col[i], p.constArg)
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = !bytes.Equal(col[i], p.constArg)
+		}
+	}
+	return batch
+}
+
+func (p projNEBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEBytesBytesOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projNEBytesBytesOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = !bytes.Equal(col1[i], col2[i])
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = !bytes.Equal(col1[i], col2[i])
+		}
+	}
+	return batch
+}
+
+func (p projNEBytesBytesOp) Init() {
+	p.input.Init()
+}
+
+type projLTBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p *projLTBytesBytesConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col[i], p.constArg) < 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = bytes.Compare(col[i], p.constArg) < 0
+		}
+	}
+	return batch
+}
+
+func (p projLTBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTBytesBytesOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projLTBytesBytesOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) < 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) < 0
+		}
+	}
+	return batch
+}
+
+func (p projLTBytesBytesOp) Init() {
+	p.input.Init()
+}
+
+type projLEBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p *projLEBytesBytesConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col[i], p.constArg) <= 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = bytes.Compare(col[i], p.constArg) <= 0
+		}
+	}
+	return batch
+}
+
+func (p projLEBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEBytesBytesOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projLEBytesBytesOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) <= 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) <= 0
+		}
+	}
+	return batch
+}
+
+func (p projLEBytesBytesOp) Init() {
+	p.input.Init()
+}
+
+type projGTBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p *projGTBytesBytesConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col[i], p.constArg) > 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = bytes.Compare(col[i], p.constArg) > 0
+		}
+	}
+	return batch
+}
+
+func (p projGTBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTBytesBytesOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projGTBytesBytesOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) > 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) > 0
+		}
+	}
+	return batch
+}
+
+func (p projGTBytesBytesOp) Init() {
+	p.input.Init()
+}
+
+type projGEBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p *projGEBytesBytesConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col[i], p.constArg) >= 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = bytes.Compare(col[i], p.constArg) >= 0
+		}
+	}
+	return batch
+}
+
+func (p projGEBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEBytesBytesOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projGEBytesBytesOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) >= 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = bytes.Compare(col1[i], col2[i]) >= 0
+		}
+	}
+	return batch
+}
+
+func (p projGEBytesBytesOp) Init() {
+	p.input.Init()
+}
+
+type projEQDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projEQDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) == 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) == 0
+		}
+	}
+	return batch
+}
+
+func (p projEQDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projEQDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) == 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) == 0
+		}
+	}
+	return batch
+}
+
+func (p projEQDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projNEDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projNEDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) != 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) != 0
+		}
+	}
+	return batch
+}
+
+func (p projNEDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projNEDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) != 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) != 0
+		}
+	}
+	return batch
+}
+
+func (p projNEDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projLTDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projLTDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) < 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) < 0
+		}
+	}
+	return batch
+}
+
+func (p projLTDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projLTDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) < 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) < 0
+		}
+	}
+	return batch
+}
+
+func (p projLTDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projLEDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projLEDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) <= 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) <= 0
+		}
+	}
+	return batch
+}
+
+func (p projLEDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projLEDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) <= 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) <= 0
+		}
+	}
+	return batch
+}
+
+func (p projLEDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projGTDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projGTDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) > 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) > 0
+		}
+	}
+	return batch
+}
+
+func (p projGTDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projGTDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) > 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) > 0
+		}
+	}
+	return batch
+}
+
+func (p projGTDecimalDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projGEDecimalDecimalConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p *projGEDecimalDecimalConstOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) >= 0
+		}
+	} else {
+		col = col[:n]
+		for i := range col {
+			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) >= 0
+		}
+	}
+	return batch
+}
+
+func (p projGEDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEDecimalDecimalOp struct {
+	input Operator
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p *projGEDecimalDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	projCol := batch.ColVec(p.outputIdx).Bool()[:ColBatchSize]
+	col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
+	col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+	n := batch.Length()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) >= 0
+		}
+	} else {
+		col1 = col1[:n]
+		for i := range col1 {
+			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) >= 0
+		}
+	}
+	return batch
+}
+
+func (p projGEDecimalDecimalOp) Init() {
 	p.input.Init()
 }
 
@@ -1534,8 +2957,8 @@ func (p *projEQInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v == p.constArg
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
 		}
 	}
 	return batch
@@ -1566,8 +2989,8 @@ func (p *projEQInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v == col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
 		}
 	}
 	return batch
@@ -1597,8 +3020,8 @@ func (p *projNEInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v != p.constArg
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
 		}
 	}
 	return batch
@@ -1629,8 +3052,8 @@ func (p *projNEInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v != col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
 		}
 	}
 	return batch
@@ -1660,8 +3083,8 @@ func (p *projLTInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v < p.constArg
+		for i := range col {
+			projCol[i] = col[i] < p.constArg
 		}
 	}
 	return batch
@@ -1692,8 +3115,8 @@ func (p *projLTInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v < col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] < col2[i]
 		}
 	}
 	return batch
@@ -1723,8 +3146,8 @@ func (p *projLEInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v <= p.constArg
+		for i := range col {
+			projCol[i] = col[i] <= p.constArg
 		}
 	}
 	return batch
@@ -1755,8 +3178,8 @@ func (p *projLEInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v <= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] <= col2[i]
 		}
 	}
 	return batch
@@ -1786,8 +3209,8 @@ func (p *projGTInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v > p.constArg
+		for i := range col {
+			projCol[i] = col[i] > p.constArg
 		}
 	}
 	return batch
@@ -1818,8 +3241,8 @@ func (p *projGTInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v > col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] > col2[i]
 		}
 	}
 	return batch
@@ -1849,8 +3272,8 @@ func (p *projGEInt8Int8ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v >= p.constArg
+		for i := range col {
+			projCol[i] = col[i] >= p.constArg
 		}
 	}
 	return batch
@@ -1881,8 +3304,8 @@ func (p *projGEInt8Int8Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v >= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] >= col2[i]
 		}
 	}
 	return batch
@@ -1912,8 +3335,8 @@ func (p *projEQInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v == p.constArg
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
 		}
 	}
 	return batch
@@ -1944,8 +3367,8 @@ func (p *projEQInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v == col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
 		}
 	}
 	return batch
@@ -1975,8 +3398,8 @@ func (p *projNEInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v != p.constArg
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
 		}
 	}
 	return batch
@@ -2007,8 +3430,8 @@ func (p *projNEInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v != col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
 		}
 	}
 	return batch
@@ -2038,8 +3461,8 @@ func (p *projLTInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v < p.constArg
+		for i := range col {
+			projCol[i] = col[i] < p.constArg
 		}
 	}
 	return batch
@@ -2070,8 +3493,8 @@ func (p *projLTInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v < col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] < col2[i]
 		}
 	}
 	return batch
@@ -2101,8 +3524,8 @@ func (p *projLEInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v <= p.constArg
+		for i := range col {
+			projCol[i] = col[i] <= p.constArg
 		}
 	}
 	return batch
@@ -2133,8 +3556,8 @@ func (p *projLEInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v <= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] <= col2[i]
 		}
 	}
 	return batch
@@ -2164,8 +3587,8 @@ func (p *projGTInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v > p.constArg
+		for i := range col {
+			projCol[i] = col[i] > p.constArg
 		}
 	}
 	return batch
@@ -2196,8 +3619,8 @@ func (p *projGTInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v > col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] > col2[i]
 		}
 	}
 	return batch
@@ -2227,8 +3650,8 @@ func (p *projGEInt16Int16ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v >= p.constArg
+		for i := range col {
+			projCol[i] = col[i] >= p.constArg
 		}
 	}
 	return batch
@@ -2259,8 +3682,8 @@ func (p *projGEInt16Int16Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v >= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] >= col2[i]
 		}
 	}
 	return batch
@@ -2290,8 +3713,8 @@ func (p *projEQInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v == p.constArg
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
 		}
 	}
 	return batch
@@ -2322,8 +3745,8 @@ func (p *projEQInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v == col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
 		}
 	}
 	return batch
@@ -2353,8 +3776,8 @@ func (p *projNEInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v != p.constArg
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
 		}
 	}
 	return batch
@@ -2385,8 +3808,8 @@ func (p *projNEInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v != col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
 		}
 	}
 	return batch
@@ -2416,8 +3839,8 @@ func (p *projLTInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v < p.constArg
+		for i := range col {
+			projCol[i] = col[i] < p.constArg
 		}
 	}
 	return batch
@@ -2448,8 +3871,8 @@ func (p *projLTInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v < col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] < col2[i]
 		}
 	}
 	return batch
@@ -2479,8 +3902,8 @@ func (p *projLEInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v <= p.constArg
+		for i := range col {
+			projCol[i] = col[i] <= p.constArg
 		}
 	}
 	return batch
@@ -2511,8 +3934,8 @@ func (p *projLEInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v <= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] <= col2[i]
 		}
 	}
 	return batch
@@ -2542,8 +3965,8 @@ func (p *projGTInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v > p.constArg
+		for i := range col {
+			projCol[i] = col[i] > p.constArg
 		}
 	}
 	return batch
@@ -2574,8 +3997,8 @@ func (p *projGTInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v > col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] > col2[i]
 		}
 	}
 	return batch
@@ -2605,8 +4028,8 @@ func (p *projGEInt32Int32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v >= p.constArg
+		for i := range col {
+			projCol[i] = col[i] >= p.constArg
 		}
 	}
 	return batch
@@ -2637,8 +4060,8 @@ func (p *projGEInt32Int32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v >= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] >= col2[i]
 		}
 	}
 	return batch
@@ -2668,8 +4091,8 @@ func (p *projEQInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v == p.constArg
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
 		}
 	}
 	return batch
@@ -2700,8 +4123,8 @@ func (p *projEQInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v == col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
 		}
 	}
 	return batch
@@ -2731,8 +4154,8 @@ func (p *projNEInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v != p.constArg
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
 		}
 	}
 	return batch
@@ -2763,8 +4186,8 @@ func (p *projNEInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v != col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
 		}
 	}
 	return batch
@@ -2794,8 +4217,8 @@ func (p *projLTInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v < p.constArg
+		for i := range col {
+			projCol[i] = col[i] < p.constArg
 		}
 	}
 	return batch
@@ -2826,8 +4249,8 @@ func (p *projLTInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v < col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] < col2[i]
 		}
 	}
 	return batch
@@ -2857,8 +4280,8 @@ func (p *projLEInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v <= p.constArg
+		for i := range col {
+			projCol[i] = col[i] <= p.constArg
 		}
 	}
 	return batch
@@ -2889,8 +4312,8 @@ func (p *projLEInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v <= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] <= col2[i]
 		}
 	}
 	return batch
@@ -2920,8 +4343,8 @@ func (p *projGTInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v > p.constArg
+		for i := range col {
+			projCol[i] = col[i] > p.constArg
 		}
 	}
 	return batch
@@ -2952,8 +4375,8 @@ func (p *projGTInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v > col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] > col2[i]
 		}
 	}
 	return batch
@@ -2983,8 +4406,8 @@ func (p *projGEInt64Int64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v >= p.constArg
+		for i := range col {
+			projCol[i] = col[i] >= p.constArg
 		}
 	}
 	return batch
@@ -3015,8 +4438,8 @@ func (p *projGEInt64Int64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v >= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] >= col2[i]
 		}
 	}
 	return batch
@@ -3046,8 +4469,8 @@ func (p *projEQFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v == p.constArg
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
 		}
 	}
 	return batch
@@ -3078,8 +4501,8 @@ func (p *projEQFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v == col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
 		}
 	}
 	return batch
@@ -3109,8 +4532,8 @@ func (p *projNEFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v != p.constArg
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
 		}
 	}
 	return batch
@@ -3141,8 +4564,8 @@ func (p *projNEFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v != col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
 		}
 	}
 	return batch
@@ -3172,8 +4595,8 @@ func (p *projLTFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v < p.constArg
+		for i := range col {
+			projCol[i] = col[i] < p.constArg
 		}
 	}
 	return batch
@@ -3204,8 +4627,8 @@ func (p *projLTFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v < col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] < col2[i]
 		}
 	}
 	return batch
@@ -3235,8 +4658,8 @@ func (p *projLEFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v <= p.constArg
+		for i := range col {
+			projCol[i] = col[i] <= p.constArg
 		}
 	}
 	return batch
@@ -3267,8 +4690,8 @@ func (p *projLEFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v <= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] <= col2[i]
 		}
 	}
 	return batch
@@ -3298,8 +4721,8 @@ func (p *projGTFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v > p.constArg
+		for i := range col {
+			projCol[i] = col[i] > p.constArg
 		}
 	}
 	return batch
@@ -3330,8 +4753,8 @@ func (p *projGTFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v > col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] > col2[i]
 		}
 	}
 	return batch
@@ -3361,8 +4784,8 @@ func (p *projGEFloat32Float32ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v >= p.constArg
+		for i := range col {
+			projCol[i] = col[i] >= p.constArg
 		}
 	}
 	return batch
@@ -3393,8 +4816,8 @@ func (p *projGEFloat32Float32Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v >= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] >= col2[i]
 		}
 	}
 	return batch
@@ -3424,8 +4847,8 @@ func (p *projEQFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v == p.constArg
+		for i := range col {
+			projCol[i] = col[i] == p.constArg
 		}
 	}
 	return batch
@@ -3456,8 +4879,8 @@ func (p *projEQFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v == col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] == col2[i]
 		}
 	}
 	return batch
@@ -3487,8 +4910,8 @@ func (p *projNEFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v != p.constArg
+		for i := range col {
+			projCol[i] = col[i] != p.constArg
 		}
 	}
 	return batch
@@ -3519,8 +4942,8 @@ func (p *projNEFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v != col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] != col2[i]
 		}
 	}
 	return batch
@@ -3550,8 +4973,8 @@ func (p *projLTFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v < p.constArg
+		for i := range col {
+			projCol[i] = col[i] < p.constArg
 		}
 	}
 	return batch
@@ -3582,8 +5005,8 @@ func (p *projLTFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v < col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] < col2[i]
 		}
 	}
 	return batch
@@ -3613,8 +5036,8 @@ func (p *projLEFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v <= p.constArg
+		for i := range col {
+			projCol[i] = col[i] <= p.constArg
 		}
 	}
 	return batch
@@ -3645,8 +5068,8 @@ func (p *projLEFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v <= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] <= col2[i]
 		}
 	}
 	return batch
@@ -3676,8 +5099,8 @@ func (p *projGTFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v > p.constArg
+		for i := range col {
+			projCol[i] = col[i] > p.constArg
 		}
 	}
 	return batch
@@ -3708,8 +5131,8 @@ func (p *projGTFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v > col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] > col2[i]
 		}
 	}
 	return batch
@@ -3739,8 +5162,8 @@ func (p *projGEFloat64Float64ConstOp) Next() ColBatch {
 		}
 	} else {
 		col = col[:n]
-		for i, v := range col {
-			projCol[i] = v >= p.constArg
+		for i := range col {
+			projCol[i] = col[i] >= p.constArg
 		}
 	}
 	return batch
@@ -3771,8 +5194,8 @@ func (p *projGEFloat64Float64Op) Next() ColBatch {
 		}
 	} else {
 		col1 = col1[:n]
-		for i, v := range col1 {
-			projCol[i] = v >= col2[i]
+		for i := range col1 {
+			projCol[i] = col1[i] >= col2[i]
 		}
 	}
 	return batch

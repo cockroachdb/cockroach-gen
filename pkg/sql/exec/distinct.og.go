@@ -20,7 +20,10 @@ package exec
 import (
 	"bytes"
 
+	"github.com/cockroachdb/apd"
+
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
 
@@ -58,6 +61,13 @@ func newSingleOrderedDistinct(
 	//
 	case types.Bytes:
 		return &sortedDistinctBytesOp{
+			input:             input,
+			sortedDistinctCol: distinctColIdx,
+			outputCol:         outputCol,
+		}, nil
+	//
+	case types.Decimal:
+		return &sortedDistinctDecimalOp{
 			input:             input,
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
@@ -176,9 +186,7 @@ func (p *sortedDistinctBoolOp) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -191,9 +199,7 @@ func (p *sortedDistinctBoolOp) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -271,9 +277,7 @@ func (p *sortedDistinctBytesOp) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = !bytes.Equal(v, lastVal)
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -286,9 +290,98 @@ func (p *sortedDistinctBytesOp) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = !bytes.Equal(v, lastVal)
-			//
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
+	}
+
+	p.lastVal = lastVal
+	p.foundFirstRow = true
+
+	return batch
+}
+
+//
+
+// sortedDistinctDecimalOp runs a distinct on the column in sortedDistinctCol,
+// writing true to the resultant bool column for every value that differs from
+// the previous one.
+
+type sortedDistinctDecimalOp struct {
+	input Operator
+
+	// sortedDistinctCol is the index of the column to distinct upon.
+	sortedDistinctCol int
+
+	// outputCol is the boolean output column. It is shared by all of the
+	// other distinct operators in a distinct operator set.
+	outputCol []bool
+
+	// Set to true at runtime when we've seen the first row. Distinct always
+	// outputs the first row that it sees.
+	foundFirstRow bool
+
+	// lastVal is the last value seen by the operator, so that the distincting
+	// still works across batch boundaries.
+	lastVal apd.Decimal
+}
+
+var _ Operator = &sortedDistinctDecimalOp{}
+
+func (p *sortedDistinctDecimalOp) Init() {
+	p.input.Init()
+}
+
+func (p *sortedDistinctDecimalOp) Next() ColBatch {
+	batch := p.input.Next()
+	if batch.Length() == 0 {
+		return batch
+	}
+	outputCol := p.outputCol
+	col := batch.ColVec(p.sortedDistinctCol).Decimal()
+
+	// We always output the first row.
+	lastVal := p.lastVal
+	sel := batch.Selection()
+	if !p.foundFirstRow {
+		if sel != nil {
+			lastVal = col[sel[0]]
+			outputCol[sel[0]] = true
+		} else {
+			lastVal = col[0]
+			outputCol[0] = true
+		}
+	}
+
+	startIdx := uint16(0)
+	if !p.foundFirstRow {
+		startIdx = 1
+	}
+
+	n := batch.Length()
+	if sel != nil {
+		// Bounds check elimination.
+		sel = sel[startIdx:n]
+		for _, i := range sel {
+			v := col[i]
+			// Note that not inlining this unique var actually makes a non-trivial
+			// performance difference.
+			var unique bool
+			unique = tree.CompareDecimals(&v, &lastVal) != 0
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
+	} else {
+		// Bounds check elimination.
+		col = col[startIdx:n]
+		outputCol = outputCol[startIdx:n]
+		for i := range col {
+			v := col[i]
+			// Note that not inlining this unique var actually makes a non-trivial
+			// performance difference.
+			var unique bool
+			unique = tree.CompareDecimals(&v, &lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -366,9 +459,7 @@ func (p *sortedDistinctInt8Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -381,9 +472,7 @@ func (p *sortedDistinctInt8Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -461,9 +550,7 @@ func (p *sortedDistinctInt16Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -476,9 +563,7 @@ func (p *sortedDistinctInt16Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -556,9 +641,7 @@ func (p *sortedDistinctInt32Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -571,9 +654,7 @@ func (p *sortedDistinctInt32Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -651,9 +732,7 @@ func (p *sortedDistinctInt64Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -666,9 +745,7 @@ func (p *sortedDistinctInt64Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -746,9 +823,7 @@ func (p *sortedDistinctFloat32Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -761,9 +836,7 @@ func (p *sortedDistinctFloat32Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -841,9 +914,7 @@ func (p *sortedDistinctFloat64Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -856,9 +927,7 @@ func (p *sortedDistinctFloat64Op) Next() ColBatch {
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
 			var unique bool
-			//
 			unique = v != lastVal
-			//
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
