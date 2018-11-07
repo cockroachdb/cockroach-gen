@@ -30,8 +30,12 @@ func (_e *explorer) exploreGroupMember(
 		return _e.exploreSemiJoin(state, t, ordinal)
 	case *memo.AntiJoinExpr:
 		return _e.exploreAntiJoin(state, t, ordinal)
+	case *memo.GroupByExpr:
+		return _e.exploreGroupBy(state, t, ordinal)
 	case *memo.ScalarGroupByExpr:
 		return _e.exploreScalarGroupBy(state, t, ordinal)
+	case *memo.DistinctOnExpr:
+		return _e.exploreDistinctOn(state, t, ordinal)
 	case *memo.LimitExpr:
 		return _e.exploreLimit(state, t, ordinal)
 	}
@@ -605,6 +609,37 @@ func (_e *explorer) exploreAntiJoin(
 	return _fullyExplored
 }
 
+func (_e *explorer) exploreGroupBy(
+	_rootState *exploreState,
+	_root *memo.GroupByExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingGroupBy]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			aggs := _root.Aggregations
+			private := &_root.GroupingPrivate
+			if _e.funcs.IsCanonicalGroupBy(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingGroupBy) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingGroupBy(_root, opt.GroupByOp, input, aggs, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
 func (_e *explorer) exploreScalarGroupBy(
 	_rootState *exploreState,
 	_root *memo.ScalarGroupByExpr,
@@ -626,43 +661,45 @@ func (_e *explorer) exploreScalarGroupBy(
 						col := _variable.Col
 						aggPrivate := &_item.ColPrivate
 						groupingPrivate := &_root.GroupingPrivate
-						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMinWithLimit) {
-							_expr := &memo.ScalarGroupByExpr{
-								Input: _e.f.ConstructLimit(
-									_e.f.ConstructSelect(
-										input,
-										memo.FiltersExpr{
-											{
-												Condition: _e.f.ConstructIsNot(
-													variable,
-													_e.f.ConstructNull(
-														_e.funcs.AnyType(),
+						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMinWithLimit) {
+								_expr := &memo.ScalarGroupByExpr{
+									Input: _e.f.ConstructLimit(
+										_e.f.ConstructSelect(
+											input,
+											memo.FiltersExpr{
+												{
+													Condition: _e.f.ConstructIsNot(
+														variable,
+														_e.f.ConstructNull(
+															_e.funcs.AnyType(),
+														),
 													),
-												),
+												},
 											},
-										},
-									),
-									_e.f.ConstructConst(
-										tree.NewDInt(1),
-									),
-									_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
-								),
-								Aggregations: memo.AggregationsExpr{
-									{
-										Agg: _e.f.ConstructConstAgg(
-											variable,
 										),
-										ColPrivate: *aggPrivate,
+										_e.f.ConstructConst(
+											tree.NewDInt(1),
+										),
+										_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
+									),
+									Aggregations: memo.AggregationsExpr{
+										{
+											Agg: _e.f.ConstructConstAgg(
+												variable,
+											),
+											ColPrivate: *aggPrivate,
+										},
 									},
-								},
-								GroupingPrivate: *groupingPrivate,
-							}
-							_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
-							if _e.o.appliedRule != nil {
-								if _interned != _expr {
-									_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, nil)
-								} else {
-									_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, _interned)
+									GroupingPrivate: *groupingPrivate,
+								}
+								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, _interned)
+									}
 								}
 							}
 						}
@@ -686,46 +723,79 @@ func (_e *explorer) exploreScalarGroupBy(
 						col := _variable.Col
 						aggPrivate := &_item.ColPrivate
 						groupingPrivate := &_root.GroupingPrivate
-						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
-							_expr := &memo.ScalarGroupByExpr{
-								Input: _e.f.ConstructLimit(
-									_e.f.ConstructSelect(
-										input,
-										memo.FiltersExpr{
-											{
-												Condition: _e.f.ConstructIsNot(
-													variable,
-													_e.f.ConstructNull(
-														_e.funcs.AnyType(),
+						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
+								_expr := &memo.ScalarGroupByExpr{
+									Input: _e.f.ConstructLimit(
+										_e.f.ConstructSelect(
+											input,
+											memo.FiltersExpr{
+												{
+													Condition: _e.f.ConstructIsNot(
+														variable,
+														_e.f.ConstructNull(
+															_e.funcs.AnyType(),
+														),
 													),
-												),
+												},
 											},
-										},
-									),
-									_e.f.ConstructConst(
-										tree.NewDInt(1),
-									),
-									_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
-								),
-								Aggregations: memo.AggregationsExpr{
-									{
-										Agg: _e.f.ConstructConstAgg(
-											variable,
 										),
-										ColPrivate: *aggPrivate,
+										_e.f.ConstructConst(
+											tree.NewDInt(1),
+										),
+										_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
+									),
+									Aggregations: memo.AggregationsExpr{
+										{
+											Agg: _e.f.ConstructConstAgg(
+												variable,
+											),
+											ColPrivate: *aggPrivate,
+										},
 									},
-								},
-								GroupingPrivate: *groupingPrivate,
-							}
-							_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
-							if _e.o.appliedRule != nil {
-								if _interned != _expr {
-									_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, nil)
-								} else {
-									_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, _interned)
+									GroupingPrivate: *groupingPrivate,
+								}
+								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, _interned)
+									}
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreDistinctOn(
+	_rootState *exploreState,
+	_root *memo.DistinctOnExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingGroupBy]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			aggs := _root.Aggregations
+			private := &_root.GroupingPrivate
+			if _e.funcs.IsCanonicalGroupBy(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingGroupBy) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingGroupBy(_root, opt.DistinctOnOp, input, aggs, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}
 				}
 			}

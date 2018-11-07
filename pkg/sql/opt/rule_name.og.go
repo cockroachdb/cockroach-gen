@@ -171,6 +171,7 @@ const (
 	// ------------------------------------------------------------
 	ReplaceMinWithLimit
 	ReplaceMaxWithLimit
+	GenerateStreamingGroupBy
 	CommuteJoin
 	CommuteLeftJoin
 	CommuteRightJoin
