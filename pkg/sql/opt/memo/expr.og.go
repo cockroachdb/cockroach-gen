@@ -20,8 +20,7 @@ import (
 // PhysicalProps struct.
 type SortExpr struct {
 	Input RelExpr
-	phys  *props.Physical
-	cst   Cost
+	best  bestProps
 }
 
 func (e *SortExpr) Op() opt.Operator {
@@ -74,11 +73,15 @@ func (e *SortExpr) NextExpr() RelExpr {
 }
 
 func (e *SortExpr) Physical() *props.Physical {
-	return e.phys
+	return e.best.required
 }
 
 func (e *SortExpr) Cost() Cost {
-	return e.cst
+	return e.best.cost
+}
+
+func (e *SortExpr) bestProps() *bestProps {
+	return &e.best
 }
 
 func (e *SortExpr) group() exprGroup {
@@ -153,15 +156,19 @@ func (e *ScanExpr) NextExpr() RelExpr {
 }
 
 func (e *ScanExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ScanExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ScanExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ScanExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ScanExpr) setNext(member RelExpr) {
@@ -182,9 +189,8 @@ func (e *ScanExpr) setGroup(member RelExpr) {
 type scanGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ScanExpr
+	best  bestProps
 }
 
 var _ exprGroup = &scanGroup{}
@@ -197,21 +203,12 @@ func (g *scanGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *scanGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *scanGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *scanGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *scanGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *scanGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type ScanPrivate struct {
@@ -286,15 +283,19 @@ func (e *VirtualScanExpr) NextExpr() RelExpr {
 }
 
 func (e *VirtualScanExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *VirtualScanExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *VirtualScanExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *VirtualScanExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *VirtualScanExpr) setNext(member RelExpr) {
@@ -315,9 +316,8 @@ func (e *VirtualScanExpr) setGroup(member RelExpr) {
 type virtualScanGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first VirtualScanExpr
+	best  bestProps
 }
 
 var _ exprGroup = &virtualScanGroup{}
@@ -330,21 +330,12 @@ func (g *virtualScanGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *virtualScanGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *virtualScanGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *virtualScanGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *virtualScanGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *virtualScanGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type VirtualScanPrivate struct {
@@ -423,15 +414,19 @@ func (e *ValuesExpr) NextExpr() RelExpr {
 }
 
 func (e *ValuesExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ValuesExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ValuesExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ValuesExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ValuesExpr) setNext(member RelExpr) {
@@ -452,9 +447,8 @@ func (e *ValuesExpr) setGroup(member RelExpr) {
 type valuesGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ValuesExpr
+	best  bestProps
 }
 
 var _ exprGroup = &valuesGroup{}
@@ -467,21 +461,12 @@ func (g *valuesGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *valuesGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *valuesGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *valuesGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *valuesGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *valuesGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // SelectExpr filters rows from its input result set, based on the boolean filter
@@ -556,15 +541,19 @@ func (e *SelectExpr) NextExpr() RelExpr {
 }
 
 func (e *SelectExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *SelectExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *SelectExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *SelectExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *SelectExpr) setNext(member RelExpr) {
@@ -585,9 +574,8 @@ func (e *SelectExpr) setGroup(member RelExpr) {
 type selectGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first SelectExpr
+	best  bestProps
 }
 
 var _ exprGroup = &selectGroup{}
@@ -600,21 +588,12 @@ func (g *selectGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *selectGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *selectGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *selectGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *selectGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *selectGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // ProjectExpr modifies the set of columns returned by the input result set. Columns
@@ -692,15 +671,19 @@ func (e *ProjectExpr) NextExpr() RelExpr {
 }
 
 func (e *ProjectExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ProjectExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ProjectExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ProjectExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ProjectExpr) setNext(member RelExpr) {
@@ -721,9 +704,8 @@ func (e *ProjectExpr) setGroup(member RelExpr) {
 type projectGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ProjectExpr
+	best  bestProps
 }
 
 var _ exprGroup = &projectGroup{}
@@ -736,21 +718,12 @@ func (g *projectGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *projectGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *projectGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *projectGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *projectGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *projectGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // InnerJoinExpr creates a result set that combines columns from its left and right
@@ -831,15 +804,19 @@ func (e *InnerJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *InnerJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *InnerJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *InnerJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *InnerJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *InnerJoinExpr) setNext(member RelExpr) {
@@ -860,9 +837,8 @@ func (e *InnerJoinExpr) setGroup(member RelExpr) {
 type innerJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first InnerJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &innerJoinGroup{}
@@ -875,21 +851,12 @@ func (g *innerJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *innerJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *innerJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *innerJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *innerJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *innerJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type LeftJoinExpr struct {
@@ -965,15 +932,19 @@ func (e *LeftJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *LeftJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *LeftJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *LeftJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *LeftJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *LeftJoinExpr) setNext(member RelExpr) {
@@ -994,9 +965,8 @@ func (e *LeftJoinExpr) setGroup(member RelExpr) {
 type leftJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first LeftJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &leftJoinGroup{}
@@ -1009,21 +979,12 @@ func (g *leftJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *leftJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *leftJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *leftJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *leftJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *leftJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type RightJoinExpr struct {
@@ -1099,15 +1060,19 @@ func (e *RightJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *RightJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *RightJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *RightJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *RightJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *RightJoinExpr) setNext(member RelExpr) {
@@ -1128,9 +1093,8 @@ func (e *RightJoinExpr) setGroup(member RelExpr) {
 type rightJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first RightJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &rightJoinGroup{}
@@ -1143,21 +1107,12 @@ func (g *rightJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *rightJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *rightJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *rightJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *rightJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *rightJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type FullJoinExpr struct {
@@ -1233,15 +1188,19 @@ func (e *FullJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *FullJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *FullJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *FullJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *FullJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *FullJoinExpr) setNext(member RelExpr) {
@@ -1262,9 +1221,8 @@ func (e *FullJoinExpr) setGroup(member RelExpr) {
 type fullJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first FullJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &fullJoinGroup{}
@@ -1277,21 +1235,12 @@ func (g *fullJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *fullJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *fullJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *fullJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *fullJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *fullJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type SemiJoinExpr struct {
@@ -1367,15 +1316,19 @@ func (e *SemiJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *SemiJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *SemiJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *SemiJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *SemiJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *SemiJoinExpr) setNext(member RelExpr) {
@@ -1396,9 +1349,8 @@ func (e *SemiJoinExpr) setGroup(member RelExpr) {
 type semiJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first SemiJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &semiJoinGroup{}
@@ -1411,21 +1363,12 @@ func (g *semiJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *semiJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *semiJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *semiJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *semiJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *semiJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type AntiJoinExpr struct {
@@ -1501,15 +1444,19 @@ func (e *AntiJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *AntiJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *AntiJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *AntiJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *AntiJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *AntiJoinExpr) setNext(member RelExpr) {
@@ -1530,9 +1477,8 @@ func (e *AntiJoinExpr) setGroup(member RelExpr) {
 type antiJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first AntiJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &antiJoinGroup{}
@@ -1545,21 +1491,12 @@ func (g *antiJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *antiJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *antiJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *antiJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *antiJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *antiJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // IndexJoinExpr represents an inner join between an input expression and a primary
@@ -1631,15 +1568,19 @@ func (e *IndexJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *IndexJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *IndexJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *IndexJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *IndexJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *IndexJoinExpr) setNext(member RelExpr) {
@@ -1660,9 +1601,8 @@ func (e *IndexJoinExpr) setGroup(member RelExpr) {
 type indexJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first IndexJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &indexJoinGroup{}
@@ -1675,21 +1615,12 @@ func (g *indexJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *indexJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *indexJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *indexJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *indexJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *indexJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type IndexJoinPrivate struct {
@@ -1767,15 +1698,19 @@ func (e *LookupJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *LookupJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *LookupJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *LookupJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *LookupJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *LookupJoinExpr) setNext(member RelExpr) {
@@ -1796,9 +1731,8 @@ func (e *LookupJoinExpr) setGroup(member RelExpr) {
 type lookupJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first LookupJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &lookupJoinGroup{}
@@ -1811,21 +1745,12 @@ func (g *lookupJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *lookupJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *lookupJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *lookupJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *lookupJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *lookupJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type LookupJoinPrivate struct {
@@ -1915,15 +1840,19 @@ func (e *MergeJoinExpr) NextExpr() RelExpr {
 }
 
 func (e *MergeJoinExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *MergeJoinExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *MergeJoinExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *MergeJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *MergeJoinExpr) setNext(member RelExpr) {
@@ -1944,9 +1873,8 @@ func (e *MergeJoinExpr) setGroup(member RelExpr) {
 type mergeJoinGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first MergeJoinExpr
+	best  bestProps
 }
 
 var _ exprGroup = &mergeJoinGroup{}
@@ -1959,21 +1887,12 @@ func (g *mergeJoinGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *mergeJoinGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *mergeJoinGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *mergeJoinGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *mergeJoinGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *mergeJoinGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type MergeJoinPrivate struct {
@@ -2060,15 +1979,19 @@ func (e *InnerJoinApplyExpr) NextExpr() RelExpr {
 }
 
 func (e *InnerJoinApplyExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *InnerJoinApplyExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *InnerJoinApplyExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *InnerJoinApplyExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *InnerJoinApplyExpr) setNext(member RelExpr) {
@@ -2089,9 +2012,8 @@ func (e *InnerJoinApplyExpr) setGroup(member RelExpr) {
 type innerJoinApplyGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first InnerJoinApplyExpr
+	best  bestProps
 }
 
 var _ exprGroup = &innerJoinApplyGroup{}
@@ -2104,21 +2026,12 @@ func (g *innerJoinApplyGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *innerJoinApplyGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *innerJoinApplyGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *innerJoinApplyGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *innerJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *innerJoinApplyGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type LeftJoinApplyExpr struct {
@@ -2194,15 +2107,19 @@ func (e *LeftJoinApplyExpr) NextExpr() RelExpr {
 }
 
 func (e *LeftJoinApplyExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *LeftJoinApplyExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *LeftJoinApplyExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *LeftJoinApplyExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *LeftJoinApplyExpr) setNext(member RelExpr) {
@@ -2223,9 +2140,8 @@ func (e *LeftJoinApplyExpr) setGroup(member RelExpr) {
 type leftJoinApplyGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first LeftJoinApplyExpr
+	best  bestProps
 }
 
 var _ exprGroup = &leftJoinApplyGroup{}
@@ -2238,21 +2154,12 @@ func (g *leftJoinApplyGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *leftJoinApplyGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *leftJoinApplyGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *leftJoinApplyGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *leftJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *leftJoinApplyGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type RightJoinApplyExpr struct {
@@ -2328,15 +2235,19 @@ func (e *RightJoinApplyExpr) NextExpr() RelExpr {
 }
 
 func (e *RightJoinApplyExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *RightJoinApplyExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *RightJoinApplyExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *RightJoinApplyExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *RightJoinApplyExpr) setNext(member RelExpr) {
@@ -2357,9 +2268,8 @@ func (e *RightJoinApplyExpr) setGroup(member RelExpr) {
 type rightJoinApplyGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first RightJoinApplyExpr
+	best  bestProps
 }
 
 var _ exprGroup = &rightJoinApplyGroup{}
@@ -2372,21 +2282,12 @@ func (g *rightJoinApplyGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *rightJoinApplyGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *rightJoinApplyGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *rightJoinApplyGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *rightJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *rightJoinApplyGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type FullJoinApplyExpr struct {
@@ -2462,15 +2363,19 @@ func (e *FullJoinApplyExpr) NextExpr() RelExpr {
 }
 
 func (e *FullJoinApplyExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *FullJoinApplyExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *FullJoinApplyExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *FullJoinApplyExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *FullJoinApplyExpr) setNext(member RelExpr) {
@@ -2491,9 +2396,8 @@ func (e *FullJoinApplyExpr) setGroup(member RelExpr) {
 type fullJoinApplyGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first FullJoinApplyExpr
+	best  bestProps
 }
 
 var _ exprGroup = &fullJoinApplyGroup{}
@@ -2506,21 +2410,12 @@ func (g *fullJoinApplyGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *fullJoinApplyGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *fullJoinApplyGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *fullJoinApplyGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *fullJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *fullJoinApplyGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type SemiJoinApplyExpr struct {
@@ -2596,15 +2491,19 @@ func (e *SemiJoinApplyExpr) NextExpr() RelExpr {
 }
 
 func (e *SemiJoinApplyExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *SemiJoinApplyExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *SemiJoinApplyExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *SemiJoinApplyExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *SemiJoinApplyExpr) setNext(member RelExpr) {
@@ -2625,9 +2524,8 @@ func (e *SemiJoinApplyExpr) setGroup(member RelExpr) {
 type semiJoinApplyGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first SemiJoinApplyExpr
+	best  bestProps
 }
 
 var _ exprGroup = &semiJoinApplyGroup{}
@@ -2640,21 +2538,12 @@ func (g *semiJoinApplyGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *semiJoinApplyGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *semiJoinApplyGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *semiJoinApplyGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *semiJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *semiJoinApplyGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type AntiJoinApplyExpr struct {
@@ -2730,15 +2619,19 @@ func (e *AntiJoinApplyExpr) NextExpr() RelExpr {
 }
 
 func (e *AntiJoinApplyExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *AntiJoinApplyExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *AntiJoinApplyExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *AntiJoinApplyExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *AntiJoinApplyExpr) setNext(member RelExpr) {
@@ -2759,9 +2652,8 @@ func (e *AntiJoinApplyExpr) setGroup(member RelExpr) {
 type antiJoinApplyGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first AntiJoinApplyExpr
+	best  bestProps
 }
 
 var _ exprGroup = &antiJoinApplyGroup{}
@@ -2774,21 +2666,12 @@ func (g *antiJoinApplyGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *antiJoinApplyGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *antiJoinApplyGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *antiJoinApplyGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *antiJoinApplyGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *antiJoinApplyGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // GroupByExpr computes aggregate functions over groups of input rows. Input rows
@@ -2877,15 +2760,19 @@ func (e *GroupByExpr) NextExpr() RelExpr {
 }
 
 func (e *GroupByExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *GroupByExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *GroupByExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *GroupByExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *GroupByExpr) setNext(member RelExpr) {
@@ -2906,9 +2793,8 @@ func (e *GroupByExpr) setGroup(member RelExpr) {
 type groupByGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first GroupByExpr
+	best  bestProps
 }
 
 var _ exprGroup = &groupByGroup{}
@@ -2921,21 +2807,12 @@ func (g *groupByGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *groupByGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *groupByGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *groupByGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *groupByGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *groupByGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // GroupingPrivate is shared between the grouping-related operators: GroupBy
@@ -3026,15 +2903,19 @@ func (e *ScalarGroupByExpr) NextExpr() RelExpr {
 }
 
 func (e *ScalarGroupByExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ScalarGroupByExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ScalarGroupByExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ScalarGroupByExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ScalarGroupByExpr) setNext(member RelExpr) {
@@ -3055,9 +2936,8 @@ func (e *ScalarGroupByExpr) setGroup(member RelExpr) {
 type scalarGroupByGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ScalarGroupByExpr
+	best  bestProps
 }
 
 var _ exprGroup = &scalarGroupByGroup{}
@@ -3070,21 +2950,12 @@ func (g *scalarGroupByGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *scalarGroupByGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *scalarGroupByGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *scalarGroupByGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *scalarGroupByGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *scalarGroupByGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // DistinctOnExpr filters out rows that are identical on the set of grouping columns;
@@ -3189,15 +3060,19 @@ func (e *DistinctOnExpr) NextExpr() RelExpr {
 }
 
 func (e *DistinctOnExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *DistinctOnExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *DistinctOnExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *DistinctOnExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *DistinctOnExpr) setNext(member RelExpr) {
@@ -3218,9 +3093,8 @@ func (e *DistinctOnExpr) setGroup(member RelExpr) {
 type distinctOnGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first DistinctOnExpr
+	best  bestProps
 }
 
 var _ exprGroup = &distinctOnGroup{}
@@ -3233,21 +3107,12 @@ func (g *distinctOnGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *distinctOnGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *distinctOnGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *distinctOnGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *distinctOnGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *distinctOnGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // UnionExpr is an operator used to combine the Left and Right input relations into
@@ -3323,15 +3188,19 @@ func (e *UnionExpr) NextExpr() RelExpr {
 }
 
 func (e *UnionExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *UnionExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *UnionExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *UnionExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *UnionExpr) setNext(member RelExpr) {
@@ -3352,9 +3221,8 @@ func (e *UnionExpr) setGroup(member RelExpr) {
 type unionGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first UnionExpr
+	best  bestProps
 }
 
 var _ exprGroup = &unionGroup{}
@@ -3367,21 +3235,12 @@ func (g *unionGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *unionGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *unionGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *unionGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *unionGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *unionGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // SetPrivate contains fields used by the relational set operators: Union,
@@ -3484,15 +3343,19 @@ func (e *IntersectExpr) NextExpr() RelExpr {
 }
 
 func (e *IntersectExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *IntersectExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *IntersectExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *IntersectExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *IntersectExpr) setNext(member RelExpr) {
@@ -3513,9 +3376,8 @@ func (e *IntersectExpr) setGroup(member RelExpr) {
 type intersectGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first IntersectExpr
+	best  bestProps
 }
 
 var _ exprGroup = &intersectGroup{}
@@ -3528,21 +3390,12 @@ func (g *intersectGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *intersectGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *intersectGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *intersectGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *intersectGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *intersectGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // ExceptExpr is an operator used to perform a set difference between the Left and
@@ -3618,15 +3471,19 @@ func (e *ExceptExpr) NextExpr() RelExpr {
 }
 
 func (e *ExceptExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ExceptExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ExceptExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ExceptExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ExceptExpr) setNext(member RelExpr) {
@@ -3647,9 +3504,8 @@ func (e *ExceptExpr) setGroup(member RelExpr) {
 type exceptGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ExceptExpr
+	best  bestProps
 }
 
 var _ exprGroup = &exceptGroup{}
@@ -3662,21 +3518,12 @@ func (g *exceptGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *exceptGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *exceptGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *exceptGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *exceptGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *exceptGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // UnionAllExpr is an operator used to combine the Left and Right input relations
@@ -3764,15 +3611,19 @@ func (e *UnionAllExpr) NextExpr() RelExpr {
 }
 
 func (e *UnionAllExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *UnionAllExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *UnionAllExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *UnionAllExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *UnionAllExpr) setNext(member RelExpr) {
@@ -3793,9 +3644,8 @@ func (e *UnionAllExpr) setGroup(member RelExpr) {
 type unionAllGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first UnionAllExpr
+	best  bestProps
 }
 
 var _ exprGroup = &unionAllGroup{}
@@ -3808,21 +3658,12 @@ func (g *unionAllGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *unionAllGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *unionAllGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *unionAllGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *unionAllGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *unionAllGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // IntersectAllExpr is an operator used to perform an intersection between the Left
@@ -3912,15 +3753,19 @@ func (e *IntersectAllExpr) NextExpr() RelExpr {
 }
 
 func (e *IntersectAllExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *IntersectAllExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *IntersectAllExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *IntersectAllExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *IntersectAllExpr) setNext(member RelExpr) {
@@ -3941,9 +3786,8 @@ func (e *IntersectAllExpr) setGroup(member RelExpr) {
 type intersectAllGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first IntersectAllExpr
+	best  bestProps
 }
 
 var _ exprGroup = &intersectAllGroup{}
@@ -3956,21 +3800,12 @@ func (g *intersectAllGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *intersectAllGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *intersectAllGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *intersectAllGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *intersectAllGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *intersectAllGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // ExceptAllExpr is an operator used to perform a set difference between the Left
@@ -4059,15 +3894,19 @@ func (e *ExceptAllExpr) NextExpr() RelExpr {
 }
 
 func (e *ExceptAllExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ExceptAllExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ExceptAllExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ExceptAllExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ExceptAllExpr) setNext(member RelExpr) {
@@ -4088,9 +3927,8 @@ func (e *ExceptAllExpr) setGroup(member RelExpr) {
 type exceptAllGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ExceptAllExpr
+	best  bestProps
 }
 
 var _ exprGroup = &exceptAllGroup{}
@@ -4103,21 +3941,12 @@ func (g *exceptAllGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *exceptAllGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *exceptAllGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *exceptAllGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *exceptAllGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *exceptAllGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // LimitExpr returns a limited subset of the results in the input relation. The limit
@@ -4193,15 +4022,19 @@ func (e *LimitExpr) NextExpr() RelExpr {
 }
 
 func (e *LimitExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *LimitExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *LimitExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *LimitExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *LimitExpr) setNext(member RelExpr) {
@@ -4222,9 +4055,8 @@ func (e *LimitExpr) setGroup(member RelExpr) {
 type limitGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first LimitExpr
+	best  bestProps
 }
 
 var _ exprGroup = &limitGroup{}
@@ -4237,21 +4069,12 @@ func (g *limitGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *limitGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *limitGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *limitGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *limitGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *limitGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // OffsetExpr filters out the first Offset rows of the input relation; used in
@@ -4324,15 +4147,19 @@ func (e *OffsetExpr) NextExpr() RelExpr {
 }
 
 func (e *OffsetExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *OffsetExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *OffsetExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *OffsetExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *OffsetExpr) setNext(member RelExpr) {
@@ -4353,9 +4180,8 @@ func (e *OffsetExpr) setGroup(member RelExpr) {
 type offsetGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first OffsetExpr
+	best  bestProps
 }
 
 var _ exprGroup = &offsetGroup{}
@@ -4368,21 +4194,12 @@ func (g *offsetGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *offsetGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *offsetGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *offsetGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *offsetGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *offsetGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // Max1RowExpr enforces that its input must return at most one row. It is used as
@@ -4449,15 +4266,19 @@ func (e *Max1RowExpr) NextExpr() RelExpr {
 }
 
 func (e *Max1RowExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *Max1RowExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *Max1RowExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *Max1RowExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *Max1RowExpr) setNext(member RelExpr) {
@@ -4478,9 +4299,8 @@ func (e *Max1RowExpr) setGroup(member RelExpr) {
 type max1RowGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first Max1RowExpr
+	best  bestProps
 }
 
 var _ exprGroup = &max1RowGroup{}
@@ -4493,21 +4313,12 @@ func (g *max1RowGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *max1RowGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *max1RowGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *max1RowGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *max1RowGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *max1RowGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // ExplainExpr returns information about the execution plan of the "input"
@@ -4574,15 +4385,19 @@ func (e *ExplainExpr) NextExpr() RelExpr {
 }
 
 func (e *ExplainExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ExplainExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ExplainExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ExplainExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ExplainExpr) setNext(member RelExpr) {
@@ -4603,9 +4418,8 @@ func (e *ExplainExpr) setGroup(member RelExpr) {
 type explainGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ExplainExpr
+	best  bestProps
 }
 
 var _ exprGroup = &explainGroup{}
@@ -4618,21 +4432,12 @@ func (g *explainGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *explainGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *explainGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *explainGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *explainGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *explainGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type ExplainPrivate struct {
@@ -4694,15 +4499,19 @@ func (e *ShowTraceForSessionExpr) NextExpr() RelExpr {
 }
 
 func (e *ShowTraceForSessionExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ShowTraceForSessionExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ShowTraceForSessionExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ShowTraceForSessionExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ShowTraceForSessionExpr) setNext(member RelExpr) {
@@ -4723,9 +4532,8 @@ func (e *ShowTraceForSessionExpr) setGroup(member RelExpr) {
 type showTraceForSessionGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ShowTraceForSessionExpr
+	best  bestProps
 }
 
 var _ exprGroup = &showTraceForSessionGroup{}
@@ -4738,21 +4546,12 @@ func (g *showTraceForSessionGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *showTraceForSessionGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *showTraceForSessionGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *showTraceForSessionGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *showTraceForSessionGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *showTraceForSessionGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type ShowTracePrivate struct {
@@ -4825,15 +4624,19 @@ func (e *RowNumberExpr) NextExpr() RelExpr {
 }
 
 func (e *RowNumberExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *RowNumberExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *RowNumberExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *RowNumberExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *RowNumberExpr) setNext(member RelExpr) {
@@ -4854,9 +4657,8 @@ func (e *RowNumberExpr) setGroup(member RelExpr) {
 type rowNumberGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first RowNumberExpr
+	best  bestProps
 }
 
 var _ exprGroup = &rowNumberGroup{}
@@ -4869,21 +4671,12 @@ func (g *rowNumberGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *rowNumberGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *rowNumberGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *rowNumberGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *rowNumberGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *rowNumberGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 type RowNumberPrivate struct {
@@ -4973,15 +4766,19 @@ func (e *ZipExpr) NextExpr() RelExpr {
 }
 
 func (e *ZipExpr) Physical() *props.Physical {
-	return e.grp.physical()
+	return e.grp.bestProps().required
 }
 
 func (e *ZipExpr) Cost() Cost {
-	return e.grp.cost()
+	return e.grp.bestProps().cost
 }
 
 func (e *ZipExpr) group() exprGroup {
 	return e.grp
+}
+
+func (e *ZipExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
 }
 
 func (e *ZipExpr) setNext(member RelExpr) {
@@ -5002,9 +4799,8 @@ func (e *ZipExpr) setGroup(member RelExpr) {
 type zipGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	phys  *props.Physical
-	cst   Cost
 	first ZipExpr
+	best  bestProps
 }
 
 var _ exprGroup = &zipGroup{}
@@ -5017,21 +4813,12 @@ func (g *zipGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *zipGroup) physical() *props.Physical {
-	return g.phys
-}
-
 func (g *zipGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *zipGroup) cost() Cost {
-	return g.cst
-}
-
-func (g *zipGroup) setBestProps(physical *props.Physical, cost Cost) {
-	g.phys = physical
-	g.cst = cost
+func (g *zipGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
