@@ -146,6 +146,41 @@ func (m *memColumn) AppendWithSel(
 	}
 }
 
+func (m *memColumn) Copy(src ColVec, srcStartIdx, srcEndIdx int, typ types.T) {
+	switch typ {
+
+	case types.Bool:
+		copy(m.Bool(), src.Bool()[srcStartIdx:srcEndIdx])
+
+	case types.Bytes:
+		copy(m.Bytes(), src.Bytes()[srcStartIdx:srcEndIdx])
+
+	case types.Decimal:
+		copy(m.Decimal(), src.Decimal()[srcStartIdx:srcEndIdx])
+
+	case types.Int8:
+		copy(m.Int8(), src.Int8()[srcStartIdx:srcEndIdx])
+
+	case types.Int16:
+		copy(m.Int16(), src.Int16()[srcStartIdx:srcEndIdx])
+
+	case types.Int32:
+		copy(m.Int32(), src.Int32()[srcStartIdx:srcEndIdx])
+
+	case types.Int64:
+		copy(m.Int64(), src.Int64()[srcStartIdx:srcEndIdx])
+
+	case types.Float32:
+		copy(m.Float32(), src.Float32()[srcStartIdx:srcEndIdx])
+
+	case types.Float64:
+		copy(m.Float64(), src.Float64()[srcStartIdx:srcEndIdx])
+
+	default:
+		panic(fmt.Sprintf("unhandled type %d", typ))
+	}
+}
+
 func (m *memColumn) CopyWithSelInt64(
 	vec ColVec, sel []uint64, nSel uint16, colType types.T,
 ) {
