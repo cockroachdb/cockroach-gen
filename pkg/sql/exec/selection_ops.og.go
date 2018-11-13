@@ -2,10 +2,15 @@
 
 package exec
 
-import "bytes"
+import (
+	"bytes"
 
-import "github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-import "github.com/cockroachdb/apd"
+	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
+	"github.com/pkg/errors"
+)
 
 type selEQBoolBoolConstOp struct {
 	input Operator
@@ -5513,4 +5518,922 @@ func (p *selGEFloat64Float64Op) Next() ColBatch {
 
 func (p selGEFloat64Float64Op) Init() {
 	p.input.Init()
+}
+
+// GetSelectionConstOperator returns the appropriate constant selection operator
+// for the given column type and comparison.
+func GetSelectionConstOperator(
+	ct sqlbase.ColumnType,
+	cmpOp tree.ComparisonOperator,
+	input Operator,
+	colIdx int,
+	constArg tree.Datum,
+) (Operator, error) {
+	c, err := types.GetDatumToPhysicalFn(ct)(constArg)
+	if err != nil {
+		return nil, err
+	}
+	switch t := types.FromColumnType(ct); t {
+
+	case types.Bool:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQBoolBoolConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(bool),
+			}, nil
+
+		case tree.NE:
+			return &selNEBoolBoolConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(bool),
+			}, nil
+
+		case tree.LT:
+			return &selLTBoolBoolConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(bool),
+			}, nil
+
+		case tree.LE:
+			return &selLEBoolBoolConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(bool),
+			}, nil
+
+		case tree.GT:
+			return &selGTBoolBoolConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(bool),
+			}, nil
+
+		case tree.GE:
+			return &selGEBoolBoolConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(bool),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Bytes:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQBytesBytesConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.([]byte),
+			}, nil
+
+		case tree.NE:
+			return &selNEBytesBytesConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.([]byte),
+			}, nil
+
+		case tree.LT:
+			return &selLTBytesBytesConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.([]byte),
+			}, nil
+
+		case tree.LE:
+			return &selLEBytesBytesConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.([]byte),
+			}, nil
+
+		case tree.GT:
+			return &selGTBytesBytesConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.([]byte),
+			}, nil
+
+		case tree.GE:
+			return &selGEBytesBytesConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.([]byte),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Decimal:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQDecimalDecimalConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(apd.Decimal),
+			}, nil
+
+		case tree.NE:
+			return &selNEDecimalDecimalConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(apd.Decimal),
+			}, nil
+
+		case tree.LT:
+			return &selLTDecimalDecimalConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(apd.Decimal),
+			}, nil
+
+		case tree.LE:
+			return &selLEDecimalDecimalConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(apd.Decimal),
+			}, nil
+
+		case tree.GT:
+			return &selGTDecimalDecimalConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(apd.Decimal),
+			}, nil
+
+		case tree.GE:
+			return &selGEDecimalDecimalConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(apd.Decimal),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int8:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt8Int8ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int8),
+			}, nil
+
+		case tree.NE:
+			return &selNEInt8Int8ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int8),
+			}, nil
+
+		case tree.LT:
+			return &selLTInt8Int8ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int8),
+			}, nil
+
+		case tree.LE:
+			return &selLEInt8Int8ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int8),
+			}, nil
+
+		case tree.GT:
+			return &selGTInt8Int8ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int8),
+			}, nil
+
+		case tree.GE:
+			return &selGEInt8Int8ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int8),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int16:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt16Int16ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int16),
+			}, nil
+
+		case tree.NE:
+			return &selNEInt16Int16ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int16),
+			}, nil
+
+		case tree.LT:
+			return &selLTInt16Int16ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int16),
+			}, nil
+
+		case tree.LE:
+			return &selLEInt16Int16ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int16),
+			}, nil
+
+		case tree.GT:
+			return &selGTInt16Int16ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int16),
+			}, nil
+
+		case tree.GE:
+			return &selGEInt16Int16ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int16),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int32:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt32Int32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int32),
+			}, nil
+
+		case tree.NE:
+			return &selNEInt32Int32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int32),
+			}, nil
+
+		case tree.LT:
+			return &selLTInt32Int32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int32),
+			}, nil
+
+		case tree.LE:
+			return &selLEInt32Int32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int32),
+			}, nil
+
+		case tree.GT:
+			return &selGTInt32Int32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int32),
+			}, nil
+
+		case tree.GE:
+			return &selGEInt32Int32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int32),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int64:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt64Int64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int64),
+			}, nil
+
+		case tree.NE:
+			return &selNEInt64Int64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int64),
+			}, nil
+
+		case tree.LT:
+			return &selLTInt64Int64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int64),
+			}, nil
+
+		case tree.LE:
+			return &selLEInt64Int64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int64),
+			}, nil
+
+		case tree.GT:
+			return &selGTInt64Int64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int64),
+			}, nil
+
+		case tree.GE:
+			return &selGEInt64Int64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(int64),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Float32:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQFloat32Float32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float32),
+			}, nil
+
+		case tree.NE:
+			return &selNEFloat32Float32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float32),
+			}, nil
+
+		case tree.LT:
+			return &selLTFloat32Float32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float32),
+			}, nil
+
+		case tree.LE:
+			return &selLEFloat32Float32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float32),
+			}, nil
+
+		case tree.GT:
+			return &selGTFloat32Float32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float32),
+			}, nil
+
+		case tree.GE:
+			return &selGEFloat32Float32ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float32),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Float64:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQFloat64Float64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float64),
+			}, nil
+
+		case tree.NE:
+			return &selNEFloat64Float64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float64),
+			}, nil
+
+		case tree.LT:
+			return &selLTFloat64Float64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float64),
+			}, nil
+
+		case tree.LE:
+			return &selLEFloat64Float64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float64),
+			}, nil
+
+		case tree.GT:
+			return &selGTFloat64Float64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float64),
+			}, nil
+
+		case tree.GE:
+			return &selGEFloat64Float64ConstOp{
+				input:    input,
+				colIdx:   colIdx,
+				constArg: c.(float64),
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	default:
+		return nil, errors.Errorf("unhandled type: %s", t)
+	}
+}
+
+// GetSelectionOperator returns the appropriate two column selection operator
+// for the given column type and comparison.
+func GetSelectionOperator(
+	ct sqlbase.ColumnType,
+	cmpOp tree.ComparisonOperator,
+	input Operator,
+	col1Idx int,
+	col2Idx int,
+) (Operator, error) {
+	switch t := types.FromColumnType(ct); t {
+
+	case types.Bool:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQBoolBoolOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEBoolBoolOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTBoolBoolOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEBoolBoolOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTBoolBoolOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEBoolBoolOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Bytes:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQBytesBytesOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEBytesBytesOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTBytesBytesOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEBytesBytesOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTBytesBytesOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEBytesBytesOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Decimal:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQDecimalDecimalOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEDecimalDecimalOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTDecimalDecimalOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEDecimalDecimalOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTDecimalDecimalOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEDecimalDecimalOp{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int8:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt8Int8Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEInt8Int8Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTInt8Int8Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEInt8Int8Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTInt8Int8Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEInt8Int8Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int16:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt16Int16Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEInt16Int16Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTInt16Int16Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEInt16Int16Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTInt16Int16Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEInt16Int16Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int32:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt32Int32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEInt32Int32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTInt32Int32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEInt32Int32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTInt32Int32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEInt32Int32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Int64:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQInt64Int64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEInt64Int64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTInt64Int64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEInt64Int64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTInt64Int64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEInt64Int64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Float32:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQFloat32Float32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEFloat32Float32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTFloat32Float32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEFloat32Float32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTFloat32Float32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEFloat32Float32Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	case types.Float64:
+		switch cmpOp {
+
+		case tree.EQ:
+			return &selEQFloat64Float64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.NE:
+			return &selNEFloat64Float64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LT:
+			return &selLTFloat64Float64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.LE:
+			return &selLEFloat64Float64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GT:
+			return &selGTFloat64Float64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		case tree.GE:
+			return &selGEFloat64Float64Op{
+				input:   input,
+				col1Idx: col1Idx,
+				col2Idx: col2Idx,
+			}, nil
+
+		default:
+			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+		}
+
+	default:
+		return nil, errors.Errorf("unhandled type: %s", t)
+	}
 }
