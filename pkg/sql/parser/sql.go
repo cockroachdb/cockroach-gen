@@ -16532,7 +16532,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 		//line sql-gen.y:4924
 		{
-			sqlVAL.union.val = &tree.ReleaseSavepoint{Savepoint: sqlDollar[2].str}
+			sqlVAL.union.val = &tree.ReleaseSavepoint{Savepoint: tree.Name(sqlDollar[2].str)}
 		}
 	case 823:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
@@ -16567,7 +16567,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 		//line sql-gen.y:4957
 		{
-			sqlVAL.union.val = &tree.Savepoint{Name: sqlDollar[2].str}
+			sqlVAL.union.val = &tree.Savepoint{Name: tree.Name(sqlDollar[2].str)}
 		}
 	case 828:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
@@ -16667,7 +16667,7 @@ sqldefault:
 		//line sql-gen.y:5027
 		{
 			if sqlDollar[2].str != "" {
-				sqlVAL.union.val = &tree.RollbackToSavepoint{Savepoint: sqlDollar[2].str}
+				sqlVAL.union.val = &tree.RollbackToSavepoint{Savepoint: tree.Name(sqlDollar[2].str)}
 			} else {
 				sqlVAL.union.val = &tree.RollbackTransaction{}
 			}
