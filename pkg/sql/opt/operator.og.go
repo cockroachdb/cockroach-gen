@@ -505,6 +505,23 @@ const (
 	// output columns.
 	ProjectOp
 
+	// ProjectSet represents a relational operator which zips through a list of
+	// generators for every row of the input.
+	//
+	// As a reminder, a functional zip over generators a,b,c returns tuples of
+	// values from a,b,c picked "simultaneously". NULLs are used when a generator is
+	// "shorter" than another.  For example:
+	//
+	//    zip([1,2,3], ['a','b']) = [(1,'a'), (2,'b'), (3, null)]
+	//
+	// ProjectSet corresponds to a relational operator project(R, a, b, c, ...)
+	// which, for each row in R, produces all the rows produced by zip(a, b, c, ...)
+	// with the values of R prefixed. Formally, this performs a lateral cross join
+	// of R with zip(a,b,c).
+	//
+	// See the Zip header for more details.
+	ProjectSetOp
+
 	// Projections is a set of ProjectionsItem expressions that specify the ColumnIDs
 	// and scalar expressions for the synthesized output columns projected by a
 	// containing Project operator. It is legal for the set to be empty. See the
@@ -736,13 +753,20 @@ const (
 
 	// Zip represents a functional zip over generators a,b,c, which returns tuples of
 	// values from a,b,c picked "simultaneously". NULLs are used when a generator is
-	// "shorter" than another. In SQL, these generators can be either a generator
-	// function such as generate_series(), or a scalar function such as
-	// upper(). For example, consider this query:
+	// "shorter" than another. In SQL, these generators can be either generator
+	// functions such as generate_series(), or scalar functions or expressions such
+	// as upper() or CAST. For example, consider this query:
 	//
 	//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
 	//
-	// It is equivalent to (Zip [(Function generate_series), (Function upper)]).
+	// It is equivalent to:
+	//
+	//    (Zip [
+	//            (ZipItem (Function generate_series)),
+	//            (ZipItem (Function upper))
+	//         ]
+	//    )
+	//
 	// It produces:
 	//
 	//     generate_series | upper
@@ -750,18 +774,25 @@ const (
 	//                   0 | ABC
 	//                   1 | NULL
 	//
-	// In the Zip operation, Funcs represents the list of functions, and Cols
-	// represents the columns output by the functions. Funcs and Cols might not be
-	// the same length since a single function may output multiple columns
-	// (e.g., pg_get_keywords() outputs three columns).
 	ZipOp
+
+	// ZipItem contains a generator function or scalar expression that is contained
+	// in a Zip. See the Zip header for more details.
+	ZipItemOp
+
+	// ZipItemPrivate contains the list of output columns for the generator function
+	// or scalar expression in a ZipItem, as well as a set of lazily-populated
+	// scalar properties that apply to the ZipItem. Cols is a list since a single
+	// function may output multiple columns (e.g., pg_get_keywords() outputs three
+	// columns).
+	ZipItemPrivateOp
 
 	NumOperators
 )
 
-const opNames = "unknownagg-distinctaggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowsdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeinindex-joinindex-join-privateindirectioninner-joininner-join-applyintersectintersect-allisis-notjson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftleleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultnenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonulloffsetorplaceholderpluspowprojectprojectionsprojections-itemr-shiftreg-i-matchreg-matchright-joinright-join-applyrow-numberrow-number-privatescalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applyset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprvaluesvariablevariancevirtual-scanvirtual-scan-privatewhenxor-aggzip"
+const opNames = "unknownagg-distinctaggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowsdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeinindex-joinindex-join-privateindirectioninner-joininner-join-applyintersectintersect-allisis-notjson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftleleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultnenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonulloffsetorplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftreg-i-matchreg-matchright-joinright-join-applyrow-numberrow-number-privatescalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applyset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprvaluesvariablevariancevirtual-scanvirtual-scan-privatewhenxor-aggzipzip-itemzip-item-private"
 
-var opIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 121, 127, 132, 138, 146, 153, 157, 161, 169, 180, 193, 199, 209, 214, 223, 241, 249, 254, 264, 275, 278, 280, 286, 296, 302, 309, 324, 329, 339, 354, 363, 377, 384, 396, 405, 414, 423, 438, 446, 462, 464, 472, 488, 490, 496, 498, 508, 526, 537, 547, 563, 572, 585, 587, 593, 601, 616, 627, 643, 652, 659, 661, 670, 685, 689, 694, 705, 724, 726, 729, 737, 747, 765, 768, 773, 776, 780, 782, 785, 795, 801, 809, 824, 837, 851, 855, 861, 863, 874, 878, 881, 888, 899, 915, 922, 933, 942, 952, 968, 978, 996, 1011, 1022, 1026, 1038, 1044, 1053, 1068, 1079, 1101, 1119, 1129, 1133, 1141, 1148, 1156, 1172, 1175, 1182, 1186, 1191, 1207, 1218, 1223, 1232, 1248, 1254, 1262, 1270, 1282, 1302, 1306, 1313, 1316}
+var opIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 121, 127, 132, 138, 146, 153, 157, 161, 169, 180, 193, 199, 209, 214, 223, 241, 249, 254, 264, 275, 278, 280, 286, 296, 302, 309, 324, 329, 339, 354, 363, 377, 384, 396, 405, 414, 423, 438, 446, 462, 464, 472, 488, 490, 496, 498, 508, 526, 537, 547, 563, 572, 585, 587, 593, 601, 616, 627, 643, 652, 659, 661, 670, 685, 689, 694, 705, 724, 726, 729, 737, 747, 765, 768, 773, 776, 780, 782, 785, 795, 801, 809, 824, 837, 851, 855, 861, 863, 874, 878, 881, 888, 899, 910, 926, 933, 944, 953, 963, 979, 989, 1007, 1022, 1033, 1037, 1049, 1055, 1064, 1079, 1090, 1112, 1130, 1140, 1144, 1152, 1159, 1167, 1183, 1186, 1193, 1197, 1202, 1218, 1229, 1234, 1243, 1259, 1265, 1273, 1281, 1293, 1313, 1317, 1324, 1327, 1335, 1351}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -798,6 +829,7 @@ var RelationalOperators = [...]Operator{
 	MergeJoinOp,
 	OffsetOp,
 	ProjectOp,
+	ProjectSetOp,
 	RightJoinOp,
 	RightJoinApplyOp,
 	RowNumberOp,
@@ -811,7 +843,6 @@ var RelationalOperators = [...]Operator{
 	UnionAllOp,
 	ValuesOp,
 	VirtualScanOp,
-	ZipOp,
 }
 
 func IsRelationalOp(e Expr) bool {
@@ -820,10 +851,10 @@ func IsRelationalOp(e Expr) bool {
 		ExceptAllOp, ExplainOp, FullJoinOp, FullJoinApplyOp, GroupByOp,
 		IndexJoinOp, InnerJoinOp, InnerJoinApplyOp, IntersectOp, IntersectAllOp,
 		LeftJoinOp, LeftJoinApplyOp, LimitOp, LookupJoinOp, Max1RowOp,
-		MergeJoinOp, OffsetOp, ProjectOp, RightJoinOp, RightJoinApplyOp,
-		RowNumberOp, ScalarGroupByOp, ScanOp, SelectOp, SemiJoinOp,
-		SemiJoinApplyOp, ShowTraceForSessionOp, UnionOp, UnionAllOp, ValuesOp,
-		VirtualScanOp, ZipOp:
+		MergeJoinOp, OffsetOp, ProjectOp, ProjectSetOp, RightJoinOp,
+		RightJoinApplyOp, RowNumberOp, ScalarGroupByOp, ScanOp, SelectOp,
+		SemiJoinOp, SemiJoinApplyOp, ShowTraceForSessionOp, UnionOp, UnionAllOp,
+		ValuesOp, VirtualScanOp:
 		return true
 	}
 	return false
@@ -843,13 +874,14 @@ var PrivateOperators = [...]Operator{
 	ShowTracePrivateOp,
 	SubqueryPrivateOp,
 	VirtualScanPrivateOp,
+	ZipItemPrivateOp,
 }
 
 func IsPrivateOp(e Expr) bool {
 	switch e.Op() {
 	case ColPrivateOp, ExplainPrivateOp, FunctionPrivateOp, GroupingPrivateOp,
 		IndexJoinPrivateOp, LookupJoinPrivateOp, MergeJoinPrivateOp, RowNumberPrivateOp, ScanPrivateOp,
-		SetPrivateOp, ShowTracePrivateOp, SubqueryPrivateOp, VirtualScanPrivateOp:
+		SetPrivateOp, ShowTracePrivateOp, SubqueryPrivateOp, VirtualScanPrivateOp, ZipItemPrivateOp:
 		return true
 	}
 	return false
@@ -1044,6 +1076,8 @@ var ScalarOperators = [...]Operator{
 	VarianceOp,
 	WhenOp,
 	XorAggOp,
+	ZipOp,
+	ZipItemOp,
 }
 
 func IsScalarOp(e Expr) bool {
@@ -1067,7 +1101,7 @@ func IsScalarOp(e Expr) bool {
 		ScalarListOp, SimilarToOp, SqrDiffOp, StdDevOp, SubqueryOp,
 		SumOp, SumIntOp, TrueOp, TupleOp, UnaryComplementOp,
 		UnaryMinusOp, UnsupportedExprOp, VariableOp, VarianceOp, WhenOp,
-		XorAggOp:
+		XorAggOp, ZipOp, ZipItemOp:
 		return true
 	}
 	return false
@@ -1112,11 +1146,13 @@ var ListOperators = [...]Operator{
 	FiltersOp,
 	ProjectionsOp,
 	ScalarListOp,
+	ZipOp,
 }
 
 func IsListOp(e Expr) bool {
 	switch e.Op() {
-	case AggregationsOp, FiltersOp, ProjectionsOp, ScalarListOp:
+	case AggregationsOp, FiltersOp, ProjectionsOp, ScalarListOp,
+		ZipOp:
 		return true
 	}
 	return false
@@ -1126,11 +1162,12 @@ var ListItemOperators = [...]Operator{
 	AggregationsItemOp,
 	FiltersItemOp,
 	ProjectionsItemOp,
+	ZipItemOp,
 }
 
 func IsListItemOp(e Expr) bool {
 	switch e.Op() {
-	case AggregationsItemOp, FiltersItemOp, ProjectionsItemOp:
+	case AggregationsItemOp, FiltersItemOp, ProjectionsItemOp, ZipItemOp:
 		return true
 	}
 	return false

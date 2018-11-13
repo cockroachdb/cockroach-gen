@@ -40,6 +40,7 @@ const (
 	FoldNonNullIsNotNull
 	CommuteNullIs
 	DecorrelateJoin
+	DecorrelateProjectSet
 	TryDecorrelateSelect
 	TryDecorrelateProject
 	TryDecorrelateProjectSelect
@@ -50,14 +51,14 @@ const (
 	TryDecorrelateScalarGroupBy
 	TryDecorrelateSemiJoin
 	TryDecorrelateLimitOne
-	TryDecorrelateZip
+	TryDecorrelateProjectSet
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery
 	HoistProjectSubquery
 	HoistJoinSubquery
 	HoistValuesSubquery
-	HoistZipSubquery
+	HoistProjectSetSubquery
 	NormalizeSelectAnyFilter
 	NormalizeJoinAnyFilter
 	NormalizeSelectNotAnyFilter
@@ -122,6 +123,7 @@ const (
 	PruneValuesCols
 	PruneRowNumberCols
 	PruneExplainCols
+	PruneProjectSetCols
 	RejectNullsLeftJoin
 	RejectNullsRightJoin
 	RejectNullsGroupBy

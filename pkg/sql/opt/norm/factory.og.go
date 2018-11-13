@@ -1025,6 +1025,32 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PruneProjectSetCols]
+	{
+		_projectSet, _ := input.(*memo.ProjectSetExpr)
+		if _projectSet != nil {
+			innerInput := _projectSet.Input
+			zip := _projectSet.Zip
+			needed := _f.funcs.UnionCols3(_f.funcs.ZipOuterCols(zip), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneProjectSetCols) {
+					_expr := _f.ConstructProject(
+						_f.ConstructProjectSet(
+							_f.funcs.PruneCols(innerInput, needed),
+							zip,
+						),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneProjectSetCols, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [HoistProjectSubquery]
 	{
 		for i := range projections {
@@ -2864,7 +2890,7 @@ func (_f *Factory) ConstructSemiJoin(
 	{
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
-				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp {
+				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp || right.Op() == opt.ProjectSetOp {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_expr := _f.ConstructGroupBy(
@@ -3935,30 +3961,28 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
-	// [TryDecorrelateZip]
+	// [TryDecorrelateProjectSet]
 	{
-		_innerJoinApply, _ := right.(*memo.InnerJoinApplyExpr)
-		if _innerJoinApply != nil {
-			innerLeft := _innerJoinApply.Left
-			innerRight := _innerJoinApply.Right
-			_zip, _ := innerRight.(*memo.ZipExpr)
-			if _zip != nil {
-				innerOn := _innerJoinApply.On
-				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateZip) {
-					_expr := _f.ConstructInnerJoinApply(
+		_projectSet, _ := right.(*memo.ProjectSetExpr)
+		if _projectSet != nil {
+			input := _projectSet.Input
+			zip := _projectSet.Zip
+			if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateProjectSet) {
+				_expr := _f.ConstructSelect(
+					_f.ConstructProjectSet(
 						_f.ConstructInnerJoinApply(
 							left,
-							innerLeft,
+							input,
 							memo.EmptyFiltersExpr,
 						),
-						innerRight,
-						_f.funcs.ConcatFilters(on, innerOn),
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.TryDecorrelateZip, nil, _expr)
-					}
-					return _expr
+						zip,
+					),
+					on,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.TryDecorrelateProjectSet, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
@@ -5473,7 +5497,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 	{
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
-				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp {
+				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp || right.Op() == opt.ProjectSetOp {
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_expr := _f.ConstructGroupBy(
@@ -6888,41 +6912,42 @@ func (_f *Factory) ConstructRowNumber(
 	return _f.onConstructRelational(e)
 }
 
-// ConstructZip constructs an expression for the Zip operator.
-// Zip represents a functional zip over generators a,b,c, which returns tuples of
+// ConstructProjectSet constructs an expression for the ProjectSet operator.
+// ProjectSet represents a relational operator which zips through a list of
+// generators for every row of the input.
+//
+// As a reminder, a functional zip over generators a,b,c returns tuples of
 // values from a,b,c picked "simultaneously". NULLs are used when a generator is
-// "shorter" than another. In SQL, these generators can be either a generator
-// function such as generate_series(), or a scalar function such as
-// upper(). For example, consider this query:
+// "shorter" than another.  For example:
 //
-//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
+//    zip([1,2,3], ['a','b']) = [(1,'a'), (2,'b'), (3, null)]
 //
-// It is equivalent to (Zip [(Function generate_series), (Function upper)]).
-// It produces:
+// ProjectSet corresponds to a relational operator project(R, a, b, c, ...)
+// which, for each row in R, produces all the rows produced by zip(a, b, c, ...)
+// with the values of R prefixed. Formally, this performs a lateral cross join
+// of R with zip(a,b,c).
 //
-//     generate_series | upper
-//    -----------------+-------
-//                   0 | ABC
-//                   1 | NULL
-//
-// In the Zip operation, Funcs represents the list of functions, and Cols
-// represents the columns output by the functions. Funcs and Cols might not be
-// the same length since a single function may output multiple columns
-// (e.g., pg_get_keywords() outputs three columns).
-func (_f *Factory) ConstructZip(
-	funcs memo.ScalarListExpr,
-	cols opt.ColList,
+// See the Zip header for more details.
+func (_f *Factory) ConstructProjectSet(
+	input memo.RelExpr,
+	zip memo.ZipExpr,
 ) memo.RelExpr {
-	// [HoistZipSubquery]
+	// [DecorrelateProjectSet]
 	{
-		for i := range funcs {
-			_item := funcs[i]
-			item := _item
-			if _f.funcs.HasHoistableSubquery(item) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistZipSubquery) {
-					_expr := _f.funcs.HoistZipSubquery(funcs, cols).(memo.RelExpr)
+		_values, _ := input.(*memo.ValuesExpr)
+		if _values == nil {
+			if !_f.funcs.IsZipCorrelated(zip, _f.funcs.OutputCols(input)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateProjectSet) {
+					_expr := _f.ConstructInnerJoin(
+						input,
+						_f.ConstructProjectSet(
+							_f.funcs.ConstructNoColsRow(),
+							zip,
+						),
+						memo.EmptyFiltersExpr,
+					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistZipSubquery, nil, _expr)
+						_f.appliedRule(opt.DecorrelateProjectSet, nil, _expr)
 					}
 					return _expr
 				}
@@ -6930,7 +6955,24 @@ func (_f *Factory) ConstructZip(
 		}
 	}
 
-	e := _f.mem.MemoizeZip(funcs, cols)
+	// [HoistProjectSetSubquery]
+	{
+		for i := range zip {
+			_item := &zip[i]
+			item := _item
+			if _f.funcs.HasHoistableSubquery(item) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistProjectSetSubquery) {
+					_expr := _f.funcs.HoistProjectSetSubquery(input, zip).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistProjectSetSubquery, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeProjectSet(input, zip)
 	return _f.onConstructRelational(e)
 }
 
@@ -12648,10 +12690,11 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
-	case *memo.ZipExpr:
-		funcs, funcsChanged := f.reconstructScalarListExpr(t.Funcs, replace)
-		if funcsChanged {
-			return f.ConstructZip(funcs, t.Cols)
+	case *memo.ProjectSetExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		zip, zipChanged := f.reconstructZipExpr(t.Zip, replace)
+		if input != t.Input || zipChanged {
+			return f.ConstructProjectSet(input, zip)
 		}
 		return t
 
@@ -12716,6 +12759,12 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.FiltersExpr:
 		if after, changed := f.reconstructFiltersExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
+	case *memo.ZipExpr:
+		if after, changed := f.reconstructZipExpr(*t, replace); changed {
 			return &after
 		}
 		return t
@@ -13381,6 +13430,28 @@ func (f *Factory) reconstructFiltersExpr(list memo.FiltersExpr, replace Reconstr
 	return newList, true
 }
 
+func (f *Factory) reconstructZipExpr(list memo.ZipExpr, replace ReconstructFunc) (_ memo.ZipExpr, changed bool) {
+	var newList []memo.ZipItem
+	for i := range list {
+		before := list[i].Func
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.ZipItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Func = after
+			newList[i].Cols = list[i].Cols
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
 func (f *Factory) reconstructScalarListExpr(list memo.ScalarListExpr, replace ReconstructFunc) (_ memo.ScalarListExpr, changed bool) {
 	var newList []opt.ScalarExpr
 	for i := range list {
@@ -13631,10 +13702,10 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			&t.RowNumberPrivate,
 		)
 
-	case *memo.ZipExpr:
-		return f.ConstructZip(
-			f.assignScalarListExprPlaceholders(t.Funcs),
-			t.Cols,
+	case *memo.ProjectSetExpr:
+		return f.ConstructProjectSet(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.assignZipExprPlaceholders(t.Zip),
 		)
 
 	case *memo.SubqueryExpr:
@@ -14153,6 +14224,15 @@ func (f *Factory) assignFiltersExprPlaceholders(src memo.FiltersExpr) (dst memo.
 	return dst
 }
 
+func (f *Factory) assignZipExprPlaceholders(src memo.ZipExpr) (dst memo.ZipExpr) {
+	dst = make(memo.ZipExpr, len(src))
+	for i := range src {
+		dst[i].Func = f.assignPlaceholders(src[i].Func).(opt.ScalarExpr)
+		dst[i].Cols = src[i].Cols
+	}
+	return dst
+}
+
 func (f *Factory) assignScalarListExprPlaceholders(src memo.ScalarListExpr) (dst memo.ScalarListExpr) {
 	dst = make(memo.ScalarListExpr, len(src))
 	for i := range src {
@@ -14361,10 +14441,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(memo.RelExpr),
 			args[1].(*memo.RowNumberPrivate),
 		)
-	case opt.ZipOp:
-		return f.ConstructZip(
-			*args[0].(*memo.ScalarListExpr),
-			*args[1].(*opt.ColList),
+	case opt.ProjectSetOp:
+		return f.ConstructProjectSet(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.ZipExpr),
 		)
 	case opt.SubqueryOp:
 		return f.ConstructSubquery(

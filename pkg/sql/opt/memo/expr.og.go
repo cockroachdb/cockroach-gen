@@ -4684,111 +4684,111 @@ type RowNumberPrivate struct {
 	ColID    opt.ColumnID
 }
 
-// ZipExpr represents a functional zip over generators a,b,c, which returns tuples of
+// ProjectSetExpr represents a relational operator which zips through a list of
+// generators for every row of the input.
+//
+// As a reminder, a functional zip over generators a,b,c returns tuples of
 // values from a,b,c picked "simultaneously". NULLs are used when a generator is
-// "shorter" than another. In SQL, these generators can be either a generator
-// function such as generate_series(), or a scalar function such as
-// upper(). For example, consider this query:
+// "shorter" than another.  For example:
 //
-//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
+//    zip([1,2,3], ['a','b']) = [(1,'a'), (2,'b'), (3, null)]
 //
-// It is equivalent to (Zip [(Function generate_series), (Function upper)]).
-// It produces:
+// ProjectSet corresponds to a relational operator project(R, a, b, c, ...)
+// which, for each row in R, produces all the rows produced by zip(a, b, c, ...)
+// with the values of R prefixed. Formally, this performs a lateral cross join
+// of R with zip(a,b,c).
 //
-//     generate_series | upper
-//    -----------------+-------
-//                   0 | ABC
-//                   1 | NULL
-//
-// In the Zip operation, Funcs represents the list of functions, and Cols
-// represents the columns output by the functions. Funcs and Cols might not be
-// the same length since a single function may output multiple columns
-// (e.g., pg_get_keywords() outputs three columns).
-type ZipExpr struct {
-	Funcs ScalarListExpr
-	Cols  opt.ColList
+// See the Zip header for more details.
+type ProjectSetExpr struct {
+	Input RelExpr
+	Zip   ZipExpr
 
 	grp  exprGroup
 	next RelExpr
 }
 
-var _ RelExpr = &ZipExpr{}
+var _ RelExpr = &ProjectSetExpr{}
 
-func (e *ZipExpr) Op() opt.Operator {
-	return opt.ZipOp
+func (e *ProjectSetExpr) Op() opt.Operator {
+	return opt.ProjectSetOp
 }
 
-func (e *ZipExpr) ChildCount() int {
-	return 1
+func (e *ProjectSetExpr) ChildCount() int {
+	return 2
 }
 
-func (e *ZipExpr) Child(nth int) opt.Expr {
+func (e *ProjectSetExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
-		return &e.Funcs
+		return e.Input
+	case 1:
+		return &e.Zip
 	}
 	panic("child index out of range")
 }
 
-func (e *ZipExpr) Private() interface{} {
-	return &e.Cols
+func (e *ProjectSetExpr) Private() interface{} {
+	return nil
 }
 
-func (e *ZipExpr) String() string {
+func (e *ProjectSetExpr) String() string {
 	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
 
-func (e *ZipExpr) SetChild(nth int, child opt.Expr) {
+func (e *ProjectSetExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
-		e.Funcs = *child.(*ScalarListExpr)
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Zip = *child.(*ZipExpr)
 		return
 	}
 	panic("child index out of range")
 }
 
-func (e *ZipExpr) Memo() *Memo {
+func (e *ProjectSetExpr) Memo() *Memo {
 	return e.grp.memo()
 }
 
-func (e *ZipExpr) Relational() *props.Relational {
+func (e *ProjectSetExpr) Relational() *props.Relational {
 	return e.grp.relational()
 }
 
-func (e *ZipExpr) FirstExpr() RelExpr {
+func (e *ProjectSetExpr) FirstExpr() RelExpr {
 	return e.grp.firstExpr()
 }
 
-func (e *ZipExpr) NextExpr() RelExpr {
+func (e *ProjectSetExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ZipExpr) Physical() *props.Physical {
+func (e *ProjectSetExpr) Physical() *props.Physical {
 	return e.grp.bestProps().required
 }
 
-func (e *ZipExpr) Cost() Cost {
+func (e *ProjectSetExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
 
-func (e *ZipExpr) group() exprGroup {
+func (e *ProjectSetExpr) group() exprGroup {
 	return e.grp
 }
 
-func (e *ZipExpr) bestProps() *bestProps {
+func (e *ProjectSetExpr) bestProps() *bestProps {
 	return e.grp.bestProps()
 }
 
-func (e *ZipExpr) setNext(member RelExpr) {
+func (e *ProjectSetExpr) setNext(member RelExpr) {
 	if e.next != nil {
 		panic(fmt.Sprintf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
-func (e *ZipExpr) setGroup(member RelExpr) {
+func (e *ProjectSetExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
 		panic(fmt.Sprintf("expression is already in a group: %s", e))
 	}
@@ -4796,28 +4796,28 @@ func (e *ZipExpr) setGroup(member RelExpr) {
 	LastGroupMember(member).setNext(e)
 }
 
-type zipGroup struct {
+type projectSetGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	first ZipExpr
+	first ProjectSetExpr
 	best  bestProps
 }
 
-var _ exprGroup = &zipGroup{}
+var _ exprGroup = &projectSetGroup{}
 
-func (g *zipGroup) memo() *Memo {
+func (g *projectSetGroup) memo() *Memo {
 	return g.mem
 }
 
-func (g *zipGroup) relational() *props.Relational {
+func (g *projectSetGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *zipGroup) firstExpr() RelExpr {
+func (g *projectSetGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *zipGroup) bestProps() *bestProps {
+func (g *projectSetGroup) bestProps() *bestProps {
 	return &g.best
 }
 
@@ -5631,6 +5631,132 @@ func (e *FiltersItem) ScalarProps(mem *Memo) *props.Scalar {
 		mem.logPropsBuilder.buildFiltersItemProps(e, &e.scalar)
 	}
 	return &e.scalar
+}
+
+// ZipExpr represents a functional zip over generators a,b,c, which returns tuples of
+// values from a,b,c picked "simultaneously". NULLs are used when a generator is
+// "shorter" than another. In SQL, these generators can be either generator
+// functions such as generate_series(), or scalar functions or expressions such
+// as upper() or CAST. For example, consider this query:
+//
+//    SELECT * FROM ROWS FROM (generate_series(0, 1), upper('abc'));
+//
+// It is equivalent to:
+//
+//    (Zip [
+//            (ZipItem (Function generate_series)),
+//            (ZipItem (Function upper))
+//         ]
+//    )
+//
+// It produces:
+//
+//     generate_series | upper
+//    -----------------+-------
+//                   0 | ABC
+//                   1 | NULL
+//
+type ZipExpr []ZipItem
+
+var EmptyZipExpr = ZipExpr{}
+
+var _ opt.ScalarExpr = &ZipExpr{}
+
+func (e *ZipExpr) Op() opt.Operator {
+	return opt.ZipOp
+}
+
+func (e *ZipExpr) ChildCount() int {
+	return len(*e)
+}
+
+func (e *ZipExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
+}
+
+func (e *ZipExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ZipExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ZipExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*ZipItem)
+}
+
+func (e *ZipExpr) DataType() types.T {
+	return types.Any
+}
+
+// ZipItem contains a generator function or scalar expression that is contained
+// in a Zip. See the Zip header for more details.
+type ZipItem struct {
+	Func opt.ScalarExpr
+	ZipItemPrivate
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &ZipItem{}
+
+func (e *ZipItem) Op() opt.Operator {
+	return opt.ZipItemOp
+}
+
+func (e *ZipItem) ChildCount() int {
+	return 1
+}
+
+func (e *ZipItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Func
+	}
+	panic("child index out of range")
+}
+
+func (e *ZipItem) Private() interface{} {
+	return &e.ZipItemPrivate
+}
+
+func (e *ZipItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ZipItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Func = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ZipItem) DataType() types.T {
+	return e.Typ
+}
+
+func (e *ZipItem) ScalarProps(mem *Memo) *props.Scalar {
+	if !e.scalar.Populated {
+		mem.logPropsBuilder.buildZipItemProps(e, &e.scalar)
+	}
+	return &e.scalar
+}
+
+// ZipItemPrivate contains the list of output columns for the generator function
+// or scalar expression in a ZipItem, as well as a set of lazily-populated
+// scalar properties that apply to the ZipItem. Cols is a list since a single
+// function may output multiple columns (e.g., pg_get_keywords() outputs three
+// columns).
+type ZipItemPrivate struct {
+	Cols   opt.ColList
+	scalar props.Scalar
 }
 
 // AndExpr is the boolean conjunction operator that evalutes to true only if both of
@@ -10385,20 +10511,20 @@ func (m *Memo) MemoizeRowNumber(
 	return interned
 }
 
-func (m *Memo) MemoizeZip(
-	funcs ScalarListExpr,
-	cols opt.ColList,
-) *ZipExpr {
-	const size = int64(unsafe.Sizeof(zipGroup{}))
-	grp := &zipGroup{mem: m, first: ZipExpr{
-		Funcs: funcs,
-		Cols:  cols,
+func (m *Memo) MemoizeProjectSet(
+	input RelExpr,
+	zip ZipExpr,
+) *ProjectSetExpr {
+	const size = int64(unsafe.Sizeof(projectSetGroup{}))
+	grp := &projectSetGroup{mem: m, first: ProjectSetExpr{
+		Input: input,
+		Zip:   zip,
 	}}
 	e := &grp.first
 	e.grp = grp
-	interned := m.interner.InternZip(e)
+	interned := m.interner.InternProjectSet(e)
 	if interned == e {
-		m.logPropsBuilder.buildZipProps(e, &grp.rel)
+		m.logPropsBuilder.buildProjectSetProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -12314,9 +12440,9 @@ func (m *Memo) AddRowNumberToGroup(e *RowNumberExpr, grp RelExpr) *RowNumberExpr
 	return interned
 }
 
-func (m *Memo) AddZipToGroup(e *ZipExpr, grp RelExpr) *ZipExpr {
-	const size = int64(unsafe.Sizeof(ZipExpr{}))
-	interned := m.interner.InternZip(e)
+func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetExpr {
+	const size = int64(unsafe.Sizeof(ProjectSetExpr{}))
+	interned := m.interner.InternProjectSet(e)
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
@@ -12399,8 +12525,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternShowTraceForSession(t)
 	case *RowNumberExpr:
 		return in.InternRowNumber(t)
-	case *ZipExpr:
-		return in.InternZip(t)
+	case *ProjectSetExpr:
+		return in.InternProjectSet(t)
 	case *SubqueryExpr:
 		return in.InternSubquery(t)
 	case *AnyExpr:
@@ -12433,6 +12559,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternFilters(t)
 	case *FiltersItem:
 		return in.InternFiltersItem(t)
+	case *ZipExpr:
+		return in.InternZip(t)
+	case *ZipItem:
+		return in.InternZipItem(t)
 	case *AndExpr:
 		return in.InternAnd(t)
 	case *OrExpr:
@@ -13412,17 +13542,17 @@ func (in *interner) InternRowNumber(val *RowNumberExpr) *RowNumberExpr {
 	return val
 }
 
-func (in *interner) InternZip(val *ZipExpr) *ZipExpr {
+func (in *interner) InternProjectSet(val *ProjectSetExpr) *ProjectSetExpr {
 	in.hasher.Init()
-	in.hasher.HashOperator(opt.ZipOp)
-	in.hasher.HashScalarListExpr(val.Funcs)
-	in.hasher.HashColList(val.Cols)
+	in.hasher.HashOperator(opt.ProjectSetOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashZipExpr(val.Zip)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*ZipExpr); ok {
-			if in.hasher.IsScalarListExprEqual(val.Funcs, existing.Funcs) &&
-				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
+		if existing, ok := in.cache.Item().(*ProjectSetExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsZipExprEqual(val.Zip, existing.Zip) {
 				return existing
 			}
 		}
@@ -13725,6 +13855,44 @@ func (in *interner) InternFiltersItem(val *FiltersItem) *FiltersItem {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FiltersItem); ok {
 			if in.hasher.IsScalarExprEqual(val.Condition, existing.Condition) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternZip(val *ZipExpr) *ZipExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ZipOp)
+	in.hasher.HashZipExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ZipExpr); ok {
+			if in.hasher.IsZipExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternZipItem(val *ZipItem) *ZipItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ZipItemOp)
+	in.hasher.HashScalarExpr(val.Func)
+	in.hasher.HashColList(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ZipItem); ok {
+			if in.hasher.IsScalarExprEqual(val.Func, existing.Func) &&
+				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
 				return existing
 			}
 		}
@@ -15337,8 +15505,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildShowTraceForSessionProps(t, rel)
 	case *RowNumberExpr:
 		b.buildRowNumberProps(t, rel)
-	case *ZipExpr:
-		b.buildZipProps(t, rel)
+	case *ProjectSetExpr:
+		b.buildProjectSetProps(t, rel)
 	default:
 		panic(fmt.Sprintf("unhandled type: %s", t.Op()))
 	}
