@@ -410,7 +410,7 @@ const (
 
 	// Limit returns a limited subset of the results in the input relation. The limit
 	// expression is a scalar value; the operator returns at most this many rows. The
-	// Orering field is a props.OrderingChoice which indicates the row ordering
+	// Orering field is a physical.OrderingChoice which indicates the row ordering
 	// required from the input (the first rows with respect to this ordering are
 	// returned).
 	LimitOp

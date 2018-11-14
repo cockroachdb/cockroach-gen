@@ -10,6 +10,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -72,7 +73,7 @@ func (e *SortExpr) NextExpr() RelExpr {
 	return nil
 }
 
-func (e *SortExpr) Physical() *props.Physical {
+func (e *SortExpr) RequiredPhysical() *physical.Required {
 	return e.best.required
 }
 
@@ -155,7 +156,7 @@ func (e *ScanExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ScanExpr) Physical() *props.Physical {
+func (e *ScanExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -282,7 +283,7 @@ func (e *VirtualScanExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *VirtualScanExpr) Physical() *props.Physical {
+func (e *VirtualScanExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -413,7 +414,7 @@ func (e *ValuesExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ValuesExpr) Physical() *props.Physical {
+func (e *ValuesExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -540,7 +541,7 @@ func (e *SelectExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *SelectExpr) Physical() *props.Physical {
+func (e *SelectExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -670,7 +671,7 @@ func (e *ProjectExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ProjectExpr) Physical() *props.Physical {
+func (e *ProjectExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -803,7 +804,7 @@ func (e *InnerJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *InnerJoinExpr) Physical() *props.Physical {
+func (e *InnerJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -931,7 +932,7 @@ func (e *LeftJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *LeftJoinExpr) Physical() *props.Physical {
+func (e *LeftJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1059,7 +1060,7 @@ func (e *RightJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *RightJoinExpr) Physical() *props.Physical {
+func (e *RightJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1187,7 +1188,7 @@ func (e *FullJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *FullJoinExpr) Physical() *props.Physical {
+func (e *FullJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1315,7 +1316,7 @@ func (e *SemiJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *SemiJoinExpr) Physical() *props.Physical {
+func (e *SemiJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1443,7 +1444,7 @@ func (e *AntiJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *AntiJoinExpr) Physical() *props.Physical {
+func (e *AntiJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1567,7 +1568,7 @@ func (e *IndexJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *IndexJoinExpr) Physical() *props.Physical {
+func (e *IndexJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1697,7 +1698,7 @@ func (e *LookupJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *LookupJoinExpr) Physical() *props.Physical {
+func (e *LookupJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1839,7 +1840,7 @@ func (e *MergeJoinExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *MergeJoinExpr) Physical() *props.Physical {
+func (e *MergeJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -1899,8 +1900,8 @@ type MergeJoinPrivate struct {
 	JoinType      opt.Operator
 	LeftEq        opt.Ordering
 	RightEq       opt.Ordering
-	LeftOrdering  props.OrderingChoice
-	RightOrdering props.OrderingChoice
+	LeftOrdering  physical.OrderingChoice
+	RightOrdering physical.OrderingChoice
 }
 
 // InnerJoinApplyExpr has the same join semantics as InnerJoin. However, unlike
@@ -1978,7 +1979,7 @@ func (e *InnerJoinApplyExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *InnerJoinApplyExpr) Physical() *props.Physical {
+func (e *InnerJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2106,7 +2107,7 @@ func (e *LeftJoinApplyExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *LeftJoinApplyExpr) Physical() *props.Physical {
+func (e *LeftJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2234,7 +2235,7 @@ func (e *RightJoinApplyExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *RightJoinApplyExpr) Physical() *props.Physical {
+func (e *RightJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2362,7 +2363,7 @@ func (e *FullJoinApplyExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *FullJoinApplyExpr) Physical() *props.Physical {
+func (e *FullJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2490,7 +2491,7 @@ func (e *SemiJoinApplyExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *SemiJoinApplyExpr) Physical() *props.Physical {
+func (e *SemiJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2618,7 +2619,7 @@ func (e *AntiJoinApplyExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *AntiJoinApplyExpr) Physical() *props.Physical {
+func (e *AntiJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2759,7 +2760,7 @@ func (e *GroupByExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *GroupByExpr) Physical() *props.Physical {
+func (e *GroupByExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -2820,7 +2821,7 @@ func (g *groupByGroup) bestProps() *bestProps {
 // polymorphically.
 type GroupingPrivate struct {
 	GroupingCols opt.ColSet
-	Ordering     props.OrderingChoice
+	Ordering     physical.OrderingChoice
 }
 
 // ScalarGroupByExpr computes aggregate functions over the complete set of input
@@ -2902,7 +2903,7 @@ func (e *ScalarGroupByExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ScalarGroupByExpr) Physical() *props.Physical {
+func (e *ScalarGroupByExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3059,7 +3060,7 @@ func (e *DistinctOnExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *DistinctOnExpr) Physical() *props.Physical {
+func (e *DistinctOnExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3187,7 +3188,7 @@ func (e *UnionExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *UnionExpr) Physical() *props.Physical {
+func (e *UnionExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3342,7 +3343,7 @@ func (e *IntersectExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *IntersectExpr) Physical() *props.Physical {
+func (e *IntersectExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3470,7 +3471,7 @@ func (e *ExceptExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ExceptExpr) Physical() *props.Physical {
+func (e *ExceptExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3610,7 +3611,7 @@ func (e *UnionAllExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *UnionAllExpr) Physical() *props.Physical {
+func (e *UnionAllExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3752,7 +3753,7 @@ func (e *IntersectAllExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *IntersectAllExpr) Physical() *props.Physical {
+func (e *IntersectAllExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3893,7 +3894,7 @@ func (e *ExceptAllExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ExceptAllExpr) Physical() *props.Physical {
+func (e *ExceptAllExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -3951,13 +3952,13 @@ func (g *exceptAllGroup) bestProps() *bestProps {
 
 // LimitExpr returns a limited subset of the results in the input relation. The limit
 // expression is a scalar value; the operator returns at most this many rows. The
-// Orering field is a props.OrderingChoice which indicates the row ordering
+// Orering field is a physical.OrderingChoice which indicates the row ordering
 // required from the input (the first rows with respect to this ordering are
 // returned).
 type LimitExpr struct {
 	Input    RelExpr
 	Limit    opt.ScalarExpr
-	Ordering props.OrderingChoice
+	Ordering physical.OrderingChoice
 
 	grp  exprGroup
 	next RelExpr
@@ -4021,7 +4022,7 @@ func (e *LimitExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *LimitExpr) Physical() *props.Physical {
+func (e *LimitExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -4082,7 +4083,7 @@ func (g *limitGroup) bestProps() *bestProps {
 type OffsetExpr struct {
 	Input    RelExpr
 	Offset   opt.ScalarExpr
-	Ordering props.OrderingChoice
+	Ordering physical.OrderingChoice
 
 	grp  exprGroup
 	next RelExpr
@@ -4146,7 +4147,7 @@ func (e *OffsetExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *OffsetExpr) Physical() *props.Physical {
+func (e *OffsetExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -4265,7 +4266,7 @@ func (e *Max1RowExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *Max1RowExpr) Physical() *props.Physical {
+func (e *Max1RowExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -4384,7 +4385,7 @@ func (e *ExplainExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ExplainExpr) Physical() *props.Physical {
+func (e *ExplainExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -4443,7 +4444,7 @@ func (g *explainGroup) bestProps() *bestProps {
 type ExplainPrivate struct {
 	Options tree.ExplainOptions
 	ColList opt.ColList
-	Props   *props.Physical
+	Props   *physical.Required
 }
 
 // ShowTraceForSessionExpr returns the current session traces.
@@ -4498,7 +4499,7 @@ func (e *ShowTraceForSessionExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ShowTraceForSessionExpr) Physical() *props.Physical {
+func (e *ShowTraceForSessionExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -4623,7 +4624,7 @@ func (e *RowNumberExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *RowNumberExpr) Physical() *props.Physical {
+func (e *RowNumberExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -4680,7 +4681,7 @@ func (g *rowNumberGroup) bestProps() *bestProps {
 }
 
 type RowNumberPrivate struct {
-	Ordering props.OrderingChoice
+	Ordering physical.OrderingChoice
 	ColID    opt.ColumnID
 }
 
@@ -4765,7 +4766,7 @@ func (e *ProjectSetExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *ProjectSetExpr) Physical() *props.Physical {
+func (e *ProjectSetExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
@@ -10394,7 +10395,7 @@ func (m *Memo) MemoizeExceptAll(
 func (m *Memo) MemoizeLimit(
 	input RelExpr,
 	limit opt.ScalarExpr,
-	ordering props.OrderingChoice,
+	ordering physical.OrderingChoice,
 ) *LimitExpr {
 	const size = int64(unsafe.Sizeof(limitGroup{}))
 	grp := &limitGroup{mem: m, first: LimitExpr{
@@ -10416,7 +10417,7 @@ func (m *Memo) MemoizeLimit(
 func (m *Memo) MemoizeOffset(
 	input RelExpr,
 	offset opt.ScalarExpr,
-	ordering props.OrderingChoice,
+	ordering physical.OrderingChoice,
 ) *OffsetExpr {
 	const size = int64(unsafe.Sizeof(offsetGroup{}))
 	grp := &offsetGroup{mem: m, first: OffsetExpr{

@@ -8,7 +8,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
-	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -6679,13 +6679,13 @@ func (_f *Factory) ConstructExceptAll(
 // ConstructLimit constructs an expression for the Limit operator.
 // Limit returns a limited subset of the results in the input relation. The limit
 // expression is a scalar value; the operator returns at most this many rows. The
-// Orering field is a props.OrderingChoice which indicates the row ordering
+// Orering field is a physical.OrderingChoice which indicates the row ordering
 // required from the input (the first rows with respect to this ordering are
 // returned).
 func (_f *Factory) ConstructLimit(
 	input memo.RelExpr,
 	limit opt.ScalarExpr,
-	ordering props.OrderingChoice,
+	ordering physical.OrderingChoice,
 ) memo.RelExpr {
 	// [EliminateLimit]
 	{
@@ -6758,7 +6758,7 @@ func (_f *Factory) ConstructLimit(
 func (_f *Factory) ConstructOffset(
 	input memo.RelExpr,
 	offset opt.ScalarExpr,
-	ordering props.OrderingChoice,
+	ordering physical.OrderingChoice,
 ) memo.RelExpr {
 	// [PushOffsetIntoProject]
 	{
@@ -14415,13 +14415,13 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructLimit(
 			args[0].(memo.RelExpr),
 			args[1].(opt.ScalarExpr),
-			*args[2].(*props.OrderingChoice),
+			*args[2].(*physical.OrderingChoice),
 		)
 	case opt.OffsetOp:
 		return f.ConstructOffset(
 			args[0].(memo.RelExpr),
 			args[1].(opt.ScalarExpr),
-			*args[2].(*props.OrderingChoice),
+			*args[2].(*physical.OrderingChoice),
 		)
 	case opt.Max1RowOp:
 		return f.ConstructMax1Row(
