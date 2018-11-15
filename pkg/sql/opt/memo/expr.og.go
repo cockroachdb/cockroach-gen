@@ -77,6 +77,10 @@ func (e *SortExpr) RequiredPhysical() *physical.Required {
 	return e.best.required
 }
 
+func (e *SortExpr) ProvidedPhysical() *physical.Provided {
+	return &e.best.provided
+}
+
 func (e *SortExpr) Cost() Cost {
 	return e.best.cost
 }
@@ -158,6 +162,10 @@ func (e *ScanExpr) NextExpr() RelExpr {
 
 func (e *ScanExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *ScanExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *ScanExpr) Cost() Cost {
@@ -285,6 +293,10 @@ func (e *VirtualScanExpr) NextExpr() RelExpr {
 
 func (e *VirtualScanExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *VirtualScanExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *VirtualScanExpr) Cost() Cost {
@@ -418,6 +430,10 @@ func (e *ValuesExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *ValuesExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *ValuesExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -543,6 +559,10 @@ func (e *SelectExpr) NextExpr() RelExpr {
 
 func (e *SelectExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *SelectExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *SelectExpr) Cost() Cost {
@@ -673,6 +693,10 @@ func (e *ProjectExpr) NextExpr() RelExpr {
 
 func (e *ProjectExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *ProjectExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *ProjectExpr) Cost() Cost {
@@ -808,6 +832,10 @@ func (e *InnerJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *InnerJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *InnerJoinExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -934,6 +962,10 @@ func (e *LeftJoinExpr) NextExpr() RelExpr {
 
 func (e *LeftJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *LeftJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *LeftJoinExpr) Cost() Cost {
@@ -1064,6 +1096,10 @@ func (e *RightJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *RightJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *RightJoinExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -1190,6 +1226,10 @@ func (e *FullJoinExpr) NextExpr() RelExpr {
 
 func (e *FullJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *FullJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *FullJoinExpr) Cost() Cost {
@@ -1320,6 +1360,10 @@ func (e *SemiJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *SemiJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *SemiJoinExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -1448,6 +1492,10 @@ func (e *AntiJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *AntiJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *AntiJoinExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -1570,6 +1618,10 @@ func (e *IndexJoinExpr) NextExpr() RelExpr {
 
 func (e *IndexJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *IndexJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *IndexJoinExpr) Cost() Cost {
@@ -1700,6 +1752,10 @@ func (e *LookupJoinExpr) NextExpr() RelExpr {
 
 func (e *LookupJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *LookupJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *LookupJoinExpr) Cost() Cost {
@@ -1844,6 +1900,10 @@ func (e *MergeJoinExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *MergeJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *MergeJoinExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -1983,6 +2043,10 @@ func (e *InnerJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *InnerJoinApplyExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *InnerJoinApplyExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -2109,6 +2173,10 @@ func (e *LeftJoinApplyExpr) NextExpr() RelExpr {
 
 func (e *LeftJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *LeftJoinApplyExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *LeftJoinApplyExpr) Cost() Cost {
@@ -2239,6 +2307,10 @@ func (e *RightJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *RightJoinApplyExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *RightJoinApplyExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -2365,6 +2437,10 @@ func (e *FullJoinApplyExpr) NextExpr() RelExpr {
 
 func (e *FullJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *FullJoinApplyExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *FullJoinApplyExpr) Cost() Cost {
@@ -2495,6 +2571,10 @@ func (e *SemiJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *SemiJoinApplyExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *SemiJoinApplyExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -2621,6 +2701,10 @@ func (e *AntiJoinApplyExpr) NextExpr() RelExpr {
 
 func (e *AntiJoinApplyExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *AntiJoinApplyExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *AntiJoinApplyExpr) Cost() Cost {
@@ -2764,6 +2848,10 @@ func (e *GroupByExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *GroupByExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *GroupByExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -2905,6 +2993,10 @@ func (e *ScalarGroupByExpr) NextExpr() RelExpr {
 
 func (e *ScalarGroupByExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *ScalarGroupByExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *ScalarGroupByExpr) Cost() Cost {
@@ -3064,6 +3156,10 @@ func (e *DistinctOnExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *DistinctOnExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *DistinctOnExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -3190,6 +3286,10 @@ func (e *UnionExpr) NextExpr() RelExpr {
 
 func (e *UnionExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *UnionExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *UnionExpr) Cost() Cost {
@@ -3347,6 +3447,10 @@ func (e *IntersectExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *IntersectExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *IntersectExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -3473,6 +3577,10 @@ func (e *ExceptExpr) NextExpr() RelExpr {
 
 func (e *ExceptExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *ExceptExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *ExceptExpr) Cost() Cost {
@@ -3613,6 +3721,10 @@ func (e *UnionAllExpr) NextExpr() RelExpr {
 
 func (e *UnionAllExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *UnionAllExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *UnionAllExpr) Cost() Cost {
@@ -3757,6 +3869,10 @@ func (e *IntersectAllExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *IntersectAllExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *IntersectAllExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -3898,6 +4014,10 @@ func (e *ExceptAllExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *ExceptAllExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *ExceptAllExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -4026,6 +4146,10 @@ func (e *LimitExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *LimitExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *LimitExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -4151,6 +4275,10 @@ func (e *OffsetExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *OffsetExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *OffsetExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -4268,6 +4396,10 @@ func (e *Max1RowExpr) NextExpr() RelExpr {
 
 func (e *Max1RowExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *Max1RowExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *Max1RowExpr) Cost() Cost {
@@ -4389,6 +4521,10 @@ func (e *ExplainExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
+func (e *ExplainExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
 func (e *ExplainExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
@@ -4501,6 +4637,10 @@ func (e *ShowTraceForSessionExpr) NextExpr() RelExpr {
 
 func (e *ShowTraceForSessionExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *ShowTraceForSessionExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *ShowTraceForSessionExpr) Cost() Cost {
@@ -4626,6 +4766,10 @@ func (e *RowNumberExpr) NextExpr() RelExpr {
 
 func (e *RowNumberExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *RowNumberExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *RowNumberExpr) Cost() Cost {
@@ -4768,6 +4912,10 @@ func (e *ProjectSetExpr) NextExpr() RelExpr {
 
 func (e *ProjectSetExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
+}
+
+func (e *ProjectSetExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
 }
 
 func (e *ProjectSetExpr) Cost() Cost {
