@@ -1871,7 +1871,11 @@ type LookupJoinPrivate struct {
 	// index. However, this requires extra Project operators in the lookup join
 	// exploration transforms which currently leads to problems related to lookup
 	// join statistics.
-	Cols        opt.ColSet
+	Cols opt.ColSet
+
+	// lookupProps caches relational properties for the "table" side of the lookup
+	// join, treating it as if it were another relational input. This makes the
+	// lookup join appear more like other join operators.
 	lookupProps props.Relational
 }
 
