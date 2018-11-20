@@ -221,12 +221,33 @@ func (g *scanGroup) bestProps() *bestProps {
 }
 
 type ScanPrivate struct {
-	Table      opt.TableID
-	Index      int
-	Cols       opt.ColSet
+	// Table identifies the table to scan. It is an id that can be passed to
+	// the Metadata.Table method in order to fetch opt.Table metadata.
+	Table opt.TableID
+
+	// Index identifies the index to scan (whether primary or secondary). It
+	// can be passed to the opt.Table.Index(i int) method in order to fetch the
+	// opt.Index metadata.
+	Index int
+
+	// Cols specifies the set of columns that the scan operator projects. This
+	// may be a subset of the columns that the table/index contains.
+	Cols opt.ColSet
+
+	// If set, the scan is a constrained scan; the constraint contains the spans
+	// that need to be scanned.
 	Constraint *constraint.Constraint
-	HardLimit  ScanLimit
-	Flags      ScanFlags
+
+	// HardLimit specifies the maximum number of rows that the scan can return
+	// (after applying any constraint), as well as the required scan direction.
+	// This is a "hard" limit, meaning that the scan operator must never return
+	// more than this number of rows, even if more are available. If its value is
+	// zero, then the limit is unknown, and the scan should return all available
+	// rows.
+	HardLimit ScanLimit
+
+	// Flags modify how the table is scanned, such as which index is used to scan.
+	Flags ScanFlags
 }
 
 // VirtualScanExpr returns a result set containing every row in a virtual table.
@@ -352,8 +373,15 @@ func (g *virtualScanGroup) bestProps() *bestProps {
 }
 
 type VirtualScanPrivate struct {
+	// Table identifies the virtual table to synthesize and scan. It is an id
+	// that can be passed to the Metadata.Table method in order to fetch
+	// opt.Table metadata.
 	Table opt.TableID
-	Cols  opt.ColSet
+
+	// Cols specifies the set of columns that the VirtualScan operator projects.
+	// This is always every column in the virtual table (i.e. never a subset even
+	// if all columns are not needed).
+	Cols opt.ColSet
 }
 
 // ValuesExpr returns a manufactured result set containing a constant number of rows.
@@ -1677,8 +1705,13 @@ func (g *indexJoinGroup) bestProps() *bestProps {
 }
 
 type IndexJoinPrivate struct {
+	// Table identifies the table to do lookups in. The primary index is
+	// currently the only index used.
 	Table opt.TableID
-	Cols  opt.ColSet
+
+	// Cols specifies the set of columns that the index join operator projects.
+	// This may be a subset of the columns that the table contains.
+	Cols opt.ColSet
 }
 
 // LookupJoinExpr represents a join between an input expression and an index. The
@@ -1811,10 +1844,33 @@ func (g *lookupJoinGroup) bestProps() *bestProps {
 }
 
 type LookupJoinPrivate struct {
-	JoinType    opt.Operator
-	Table       opt.TableID
-	Index       int
-	KeyCols     opt.ColList
+	// JoinType is InnerJoin or LeftJoin.
+	// TODO(radu): support SemiJoin, AntiJoin.
+	JoinType opt.Operator
+
+	// Table identifies the table do to lookups in.
+	Table opt.TableID
+
+	// Index identifies the index to do lookups in (whether primary or secondary).
+	// It can be passed to the opt.Table.Index(i int) method in order to fetch the
+	// opt.Index metadata.
+	Index int
+
+	// KeyCols are the columns (produced by the input) used to create lookup keys.
+	// The key columns must be non-empty, and are listed in the same order as the
+	// index columns (or a prefix of them).
+	KeyCols opt.ColList
+
+	// Cols is the set of columns produced by the lookup join. This set can
+	// contain columns from the input and columns from the index. Any columns not
+	// in the input are retrieved from the index. Cols may not contain some or
+	// all of the KeyCols, if they are not output columns for the join.
+	//
+	// TODO(radu): this effectively allows an arbitrary projection; it should be
+	// just a LookupCols set indicating which columns we should add from the
+	// index. However, this requires extra Project operators in the lookup join
+	// exploration transforms which currently leads to problems related to lookup
+	// join statistics.
 	Cols        opt.ColSet
 	lookupProps props.Relational
 }
@@ -1957,9 +2013,25 @@ func (g *mergeJoinGroup) bestProps() *bestProps {
 }
 
 type MergeJoinPrivate struct {
-	JoinType      opt.Operator
-	LeftEq        opt.Ordering
-	RightEq       opt.Ordering
+	// JoinType is one of the basic join operators: InnerJoin, LeftJoin,
+	// RightJoin, FullJoin, SemiJoin, AntiJoin.
+	JoinType opt.Operator
+
+	// LeftEq and RightEq are orderings on equality columns. They have the same
+	// length and LeftEq[i] is a column on the left side which is constrained to
+	// be equal to RightEq[i] on the right side. The directions also have to
+	// match.
+	//
+	// Examples of valid settings for abc JOIN def ON a=d,b=e:
+	//   LeftEq: a+,b+   RightEq: d+,e+
+	//   LeftEq: b-,a+   RightEq: e-,d+
+	LeftEq  opt.Ordering
+	RightEq opt.Ordering
+
+	// LeftOrdering and RightOrdering are "simplified" versions of LeftEq/RightEq,
+	// taking into account the functional dependencies of each side. We need both
+	// versions because we need to configure execution with specific equality
+	// columns and orderings.
 	LeftOrdering  physical.OrderingChoice
 	RightOrdering physical.OrderingChoice
 }
@@ -2908,8 +2980,23 @@ func (g *groupByGroup) bestProps() *bestProps {
 // ScalarGroupBy, and DistinctOn. This allows the operators to be treated
 // polymorphically.
 type GroupingPrivate struct {
+	// GroupingCols partitions the GroupBy input rows into aggregation groups.
+	// All rows sharing the same values for these columns are in the same group.
+	// GroupingCols is always empty in the ScalarGroupBy case.
 	GroupingCols opt.ColSet
-	Ordering     physical.OrderingChoice
+
+	// Ordering specifies the order required of the input. This order can intermix
+	// grouping and non-grouping columns, serving a dual-purpose:
+	//  - if we ignore grouping columns, it specifies an intra-group ordering (sort
+	//    order of values within each group, useful for order-sensitive aggregation
+	//    operators like ArrayAgg;
+	//  - leading grouping columns specify an inter-group ordering, allowing for
+	//    more efficient streaming execution.
+	//
+	// The canonical operation always contains an ordering that has no grouping
+	// columns. Exploration rules can create versions of the operator with
+	// orderings that contain grouping columns.
+	Ordering physical.OrderingChoice
 }
 
 // ScalarGroupByExpr computes aggregate functions over the complete set of input
@@ -4578,9 +4665,14 @@ func (g *explainGroup) bestProps() *bestProps {
 }
 
 type ExplainPrivate struct {
+	// Options contains settings that control the output of the explain statement.
 	Options tree.ExplainOptions
+
+	// ColList stores the column IDs for the explain columns.
 	ColList opt.ColList
-	Props   *physical.Required
+
+	// Props stores the required physical properties for the enclosed expression.
+	Props *physical.Required
 }
 
 // ShowTraceForSessionExpr returns the current session traces.
@@ -4697,8 +4789,13 @@ func (g *showTraceForSessionGroup) bestProps() *bestProps {
 
 type ShowTracePrivate struct {
 	TraceType tree.ShowTraceType
-	Compact   bool
-	ColList   opt.ColList
+
+	// Compact indicates that we output a smaller set of columns; set
+	// when SHOW COMPACT [KV] TRACE is used.
+	Compact bool
+
+	// ColList stores the column IDs for the SHOW TRACE columns.
+	ColList opt.ColList
 }
 
 // RowNumberExpr adds a column to each row in its input containing a unique,
@@ -4825,8 +4922,11 @@ func (g *rowNumberGroup) bestProps() *bestProps {
 }
 
 type RowNumberPrivate struct {
+	// Ordering denotes the required ordering of the input.
 	Ordering physical.OrderingChoice
-	ColID    opt.ColumnID
+
+	// ColID holds the id of the column introduced by this operator.
+	ColID opt.ColumnID
 }
 
 // ProjectSetExpr represents a relational operator which zips through a list of
@@ -5040,7 +5140,9 @@ func (e *SubqueryExpr) DataType() types.T {
 // across all the subquery operators.
 type SubqueryPrivate struct {
 	OriginalExpr *tree.Subquery
-	Cmp          opt.Operator
+
+	// Cmp is only used for AnyOp.
+	Cmp opt.Operator
 }
 
 // AnyExpr is a SQL operator that applies a comparison to every row of an input
@@ -5568,7 +5670,9 @@ func (e *ProjectionsItem) ScalarProps(mem *Memo) *props.Scalar {
 // the column. ColPrivate is shared by ProjectionsItem and AggregationsItem so
 // that they can be treated polymorphically.
 type ColPrivate struct {
-	Col    opt.ColumnID
+	Col opt.ColumnID
+
+	// Lazily populated.
 	scalar props.Scalar
 }
 
@@ -5904,7 +6008,9 @@ func (e *ZipItem) ScalarProps(mem *Memo) *props.Scalar {
 // function may output multiple columns (e.g., pg_get_keywords() outputs three
 // columns).
 type ZipItemPrivate struct {
-	Cols   opt.ColList
+	Cols opt.ColList
+
+	// Lazily populated.
 	scalar props.Scalar
 }
 
