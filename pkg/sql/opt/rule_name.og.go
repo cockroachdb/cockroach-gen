@@ -149,6 +149,7 @@ const (
 	SimplifyCaseWhenConstValue
 	SimplifyEqualsAnyTuple
 	SimplifyAnyScalarArray
+	FoldCollate
 	SimplifySelectFilters
 	DetectSelectContradiction
 	EliminateSelect

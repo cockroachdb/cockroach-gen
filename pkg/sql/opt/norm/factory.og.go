@@ -12065,6 +12065,35 @@ func (_f *Factory) ConstructFunction(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructCollate constructs an expression for the Collate operator.
+// Collate is an expression of the form
+//
+//     x COLLATE y
+//
+// Where x is a "string type" (meaning either a normal string or a collated string),
+// and y is a locale. It evaluates to the string collated to the given locale.
+func (_f *Factory) ConstructCollate(
+	input opt.ScalarExpr,
+	locale string,
+) opt.ScalarExpr {
+	// [FoldCollate]
+	{
+		_const, _ := input.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldCollate) {
+				_expr := _f.funcs.CastToCollatedString(input, locale).(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldCollate, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeCollate(input, locale)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructCoalesce constructs an expression for the Coalesce operator.
 func (_f *Factory) ConstructCoalesce(
 	args memo.ScalarListExpr,
@@ -13188,6 +13217,13 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.CollateExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructCollate(input, t.Locale)
+		}
+		return t
+
 	case *memo.CoalesceExpr:
 		args, argsChanged := f.reconstructScalarListExpr(t.Args, replace)
 		if argsChanged {
@@ -14072,6 +14108,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			&t.FunctionPrivate,
 		)
 
+	case *memo.CollateExpr:
+		return f.ConstructCollate(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			t.Locale,
+		)
+
 	case *memo.CoalesceExpr:
 		return f.ConstructCoalesce(
 			f.assignScalarListExprPlaceholders(t.Args),
@@ -14750,6 +14792,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructFunction(
 			*args[0].(*memo.ScalarListExpr),
 			args[1].(*memo.FunctionPrivate),
+		)
+	case opt.CollateOp:
+		return f.ConstructCollate(
+			args[0].(opt.ScalarExpr),
+			*args[1].(*string),
 		)
 	case opt.CoalesceOp:
 		return f.ConstructCoalesce(

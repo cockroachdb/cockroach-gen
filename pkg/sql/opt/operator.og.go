@@ -133,6 +133,14 @@ const (
 	// that they can be treated polymorphically.
 	ColPrivateOp
 
+	// Collate is an expression of the form
+	//
+	//     x COLLATE y
+	//
+	// Where x is a "string type" (meaning either a normal string or a collated string),
+	// and y is a locale. It evaluates to the string collated to the given locale.
+	CollateOp
+
 	// ColumnAccess is a scalar expression that returns a column from the given
 	// input expression (which is assumed to be of type Tuple). Idx is the ordinal
 	// index of the column in Input.
@@ -790,9 +798,9 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownagg-distinctaggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowsdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeinindex-joinindex-join-privateindirectioninner-joininner-join-applyintersectintersect-allisis-notjson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftleleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultnenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonulloffsetorplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftreg-i-matchreg-matchright-joinright-join-applyrow-numberrow-number-privatescalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applyset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprvaluesvariablevariancevirtual-scanvirtual-scan-privatewhenxor-aggzipzip-itemzip-item-private"
+const opNames = "unknownagg-distinctaggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowsdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeinindex-joinindex-join-privateindirectioninner-joininner-join-applyintersectintersect-allisis-notjson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftleleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultnenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonulloffsetorplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftreg-i-matchreg-matchright-joinright-join-applyrow-numberrow-number-privatescalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applyset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprvaluesvariablevariancevirtual-scanvirtual-scan-privatewhenxor-aggzipzip-itemzip-item-private"
 
-var opIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 121, 127, 132, 138, 146, 153, 157, 161, 169, 180, 193, 199, 209, 214, 223, 241, 249, 254, 264, 275, 278, 280, 286, 296, 302, 309, 324, 329, 339, 354, 363, 377, 384, 396, 405, 414, 423, 438, 446, 462, 464, 472, 488, 490, 496, 498, 508, 526, 537, 547, 563, 572, 585, 587, 593, 601, 616, 627, 643, 652, 659, 661, 670, 685, 689, 694, 705, 724, 726, 729, 737, 747, 765, 768, 773, 776, 780, 782, 785, 795, 801, 809, 824, 837, 851, 855, 861, 863, 874, 878, 881, 888, 899, 910, 926, 933, 944, 953, 963, 979, 989, 1007, 1022, 1033, 1037, 1049, 1055, 1064, 1079, 1090, 1112, 1130, 1140, 1144, 1152, 1159, 1167, 1183, 1186, 1193, 1197, 1202, 1218, 1229, 1234, 1243, 1259, 1265, 1273, 1281, 1293, 1313, 1317, 1324, 1327, 1335, 1351}
+var opIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 121, 127, 132, 138, 146, 153, 157, 161, 169, 180, 187, 200, 206, 216, 221, 230, 248, 256, 261, 271, 282, 285, 287, 293, 303, 309, 316, 331, 336, 346, 361, 370, 384, 391, 403, 412, 421, 430, 445, 453, 469, 471, 479, 495, 497, 503, 505, 515, 533, 544, 554, 570, 579, 592, 594, 600, 608, 623, 634, 650, 659, 666, 668, 677, 692, 696, 701, 712, 731, 733, 736, 744, 754, 772, 775, 780, 783, 787, 789, 792, 802, 808, 816, 831, 844, 858, 862, 868, 870, 881, 885, 888, 895, 906, 917, 933, 940, 951, 960, 970, 986, 996, 1014, 1029, 1040, 1044, 1056, 1062, 1071, 1086, 1097, 1119, 1137, 1147, 1151, 1159, 1166, 1174, 1190, 1193, 1200, 1204, 1209, 1225, 1236, 1241, 1250, 1266, 1272, 1280, 1288, 1300, 1320, 1324, 1331, 1334, 1342, 1358}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -999,6 +1007,7 @@ var ScalarOperators = [...]Operator{
 	CaseOp,
 	CastOp,
 	CoalesceOp,
+	CollateOp,
 	ColumnAccessOp,
 	ConcatOp,
 	ConcatAggOp,
@@ -1085,23 +1094,23 @@ func IsScalarOp(e Expr) bool {
 	case AggDistinctOp, AggregationsOp, AggregationsItemOp, AndOp,
 		AnyOp, AnyNotNullAggOp, AnyScalarOp, ArrayOp, ArrayAggOp,
 		AvgOp, BitandOp, BitorOp, BitxorOp, BoolAndOp,
-		BoolOrOp, CaseOp, CastOp, CoalesceOp, ColumnAccessOp,
-		ConcatOp, ConcatAggOp, ConstOp, ConstAggOp, ConstNotNullAggOp,
-		ContainsOp, CountOp, CountRowsOp, DivOp, EqOp,
-		ExistsOp, FalseOp, FetchTextOp, FetchTextPathOp, FetchValOp,
-		FetchValPathOp, FiltersOp, FiltersItemOp, FirstAggOp, FloorDivOp,
-		FunctionOp, GeOp, GtOp, ILikeOp, InOp,
-		IndirectionOp, IsOp, IsNotOp, JsonAggOp, JsonAllExistsOp,
-		JsonExistsOp, JsonSomeExistsOp, JsonbAggOp, LShiftOp, LeOp,
-		LikeOp, LtOp, MaxOp, MinOp, MinusOp,
-		ModOp, MultOp, NeOp, NotOp, NotILikeOp,
-		NotInOp, NotLikeOp, NotRegIMatchOp, NotRegMatchOp, NotSimilarToOp,
-		NullOp, OrOp, PlaceholderOp, PlusOp, PowOp,
-		ProjectionsOp, ProjectionsItemOp, RShiftOp, RegIMatchOp, RegMatchOp,
-		ScalarListOp, SimilarToOp, SqrDiffOp, StdDevOp, SubqueryOp,
-		SumOp, SumIntOp, TrueOp, TupleOp, UnaryComplementOp,
-		UnaryMinusOp, UnsupportedExprOp, VariableOp, VarianceOp, WhenOp,
-		XorAggOp, ZipOp, ZipItemOp:
+		BoolOrOp, CaseOp, CastOp, CoalesceOp, CollateOp,
+		ColumnAccessOp, ConcatOp, ConcatAggOp, ConstOp, ConstAggOp,
+		ConstNotNullAggOp, ContainsOp, CountOp, CountRowsOp, DivOp,
+		EqOp, ExistsOp, FalseOp, FetchTextOp, FetchTextPathOp,
+		FetchValOp, FetchValPathOp, FiltersOp, FiltersItemOp, FirstAggOp,
+		FloorDivOp, FunctionOp, GeOp, GtOp, ILikeOp,
+		InOp, IndirectionOp, IsOp, IsNotOp, JsonAggOp,
+		JsonAllExistsOp, JsonExistsOp, JsonSomeExistsOp, JsonbAggOp, LShiftOp,
+		LeOp, LikeOp, LtOp, MaxOp, MinOp,
+		MinusOp, ModOp, MultOp, NeOp, NotOp,
+		NotILikeOp, NotInOp, NotLikeOp, NotRegIMatchOp, NotRegMatchOp,
+		NotSimilarToOp, NullOp, OrOp, PlaceholderOp, PlusOp,
+		PowOp, ProjectionsOp, ProjectionsItemOp, RShiftOp, RegIMatchOp,
+		RegMatchOp, ScalarListOp, SimilarToOp, SqrDiffOp, StdDevOp,
+		SubqueryOp, SumOp, SumIntOp, TrueOp, TupleOp,
+		UnaryComplementOp, UnaryMinusOp, UnsupportedExprOp, VariableOp, VarianceOp,
+		WhenOp, XorAggOp, ZipOp, ZipItemOp:
 		return true
 	}
 	return false

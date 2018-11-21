@@ -8795,6 +8795,60 @@ type FunctionPrivate struct {
 	Overload   *tree.Overload
 }
 
+// CollateExpr is an expression of the form
+//
+//     x COLLATE y
+//
+// Where x is a "string type" (meaning either a normal string or a collated string),
+// and y is a locale. It evaluates to the string collated to the given locale.
+type CollateExpr struct {
+	Input  opt.ScalarExpr
+	Locale string
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &CollateExpr{}
+
+func (e *CollateExpr) Op() opt.Operator {
+	return opt.CollateOp
+}
+
+func (e *CollateExpr) ChildCount() int {
+	return 1
+}
+
+func (e *CollateExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *CollateExpr) Private() interface{} {
+	return &e.Locale
+}
+
+func (e *CollateExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CollateExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *CollateExpr) DataType() types.T {
+	return e.Typ
+}
+
 type CoalesceExpr struct {
 	Args ScalarListExpr
 
@@ -11854,6 +11908,24 @@ func (m *Memo) MemoizeFunction(
 	return interned
 }
 
+func (m *Memo) MemoizeCollate(
+	input opt.ScalarExpr,
+	locale string,
+) *CollateExpr {
+	const size = int64(unsafe.Sizeof(CollateExpr{}))
+	e := &CollateExpr{
+		Input:  input,
+		Locale: locale,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCollate(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeCoalesce(
 	args ScalarListExpr,
 ) *CoalesceExpr {
@@ -12928,6 +13000,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternIndirection(t)
 	case *FunctionExpr:
 		return in.InternFunction(t)
+	case *CollateExpr:
+		return in.InternCollate(t)
 	case *CoalesceExpr:
 		return in.InternCoalesce(t)
 	case *ColumnAccessExpr:
@@ -15216,6 +15290,26 @@ func (in *interner) InternFunction(val *FunctionExpr) *FunctionExpr {
 				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) &&
 				in.hasher.IsFuncPropsEqual(val.Properties, existing.Properties) &&
 				in.hasher.IsFuncOverloadEqual(val.Overload, existing.Overload) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCollate(val *CollateExpr) *CollateExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CollateOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashString(val.Locale)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CollateExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsStringEqual(val.Locale, existing.Locale) {
 				return existing
 			}
 		}
