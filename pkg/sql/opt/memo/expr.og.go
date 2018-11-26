@@ -10080,7 +10080,7 @@ func (e *ScalarListExpr) DataType() types.T {
 
 func (m *Memo) MemoizeScan(
 	scanPrivate *ScanPrivate,
-) *ScanExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(scanGroup{}))
 	grp := &scanGroup{mem: m, first: ScanExpr{
 		ScanPrivate: *scanPrivate,
@@ -10093,12 +10093,12 @@ func (m *Memo) MemoizeScan(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeVirtualScan(
 	virtualScanPrivate *VirtualScanPrivate,
-) *VirtualScanExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(virtualScanGroup{}))
 	grp := &virtualScanGroup{mem: m, first: VirtualScanExpr{
 		VirtualScanPrivate: *virtualScanPrivate,
@@ -10111,13 +10111,13 @@ func (m *Memo) MemoizeVirtualScan(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeValues(
 	rows ScalarListExpr,
 	cols opt.ColList,
-) *ValuesExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(valuesGroup{}))
 	grp := &valuesGroup{mem: m, first: ValuesExpr{
 		Rows: rows,
@@ -10131,13 +10131,13 @@ func (m *Memo) MemoizeValues(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeSelect(
 	input RelExpr,
 	filters FiltersExpr,
-) *SelectExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(selectGroup{}))
 	grp := &selectGroup{mem: m, first: SelectExpr{
 		Input:   input,
@@ -10151,14 +10151,14 @@ func (m *Memo) MemoizeSelect(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeProject(
 	input RelExpr,
 	projections ProjectionsExpr,
 	passthrough opt.ColSet,
-) *ProjectExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(projectGroup{}))
 	grp := &projectGroup{mem: m, first: ProjectExpr{
 		Input:       input,
@@ -10173,14 +10173,14 @@ func (m *Memo) MemoizeProject(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeInnerJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *InnerJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(innerJoinGroup{}))
 	grp := &innerJoinGroup{mem: m, first: InnerJoinExpr{
 		Left:  left,
@@ -10195,14 +10195,14 @@ func (m *Memo) MemoizeInnerJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeLeftJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *LeftJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(leftJoinGroup{}))
 	grp := &leftJoinGroup{mem: m, first: LeftJoinExpr{
 		Left:  left,
@@ -10217,14 +10217,14 @@ func (m *Memo) MemoizeLeftJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeRightJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *RightJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(rightJoinGroup{}))
 	grp := &rightJoinGroup{mem: m, first: RightJoinExpr{
 		Left:  left,
@@ -10239,14 +10239,14 @@ func (m *Memo) MemoizeRightJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeFullJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *FullJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(fullJoinGroup{}))
 	grp := &fullJoinGroup{mem: m, first: FullJoinExpr{
 		Left:  left,
@@ -10261,14 +10261,14 @@ func (m *Memo) MemoizeFullJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeSemiJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *SemiJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(semiJoinGroup{}))
 	grp := &semiJoinGroup{mem: m, first: SemiJoinExpr{
 		Left:  left,
@@ -10283,14 +10283,14 @@ func (m *Memo) MemoizeSemiJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeAntiJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *AntiJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(antiJoinGroup{}))
 	grp := &antiJoinGroup{mem: m, first: AntiJoinExpr{
 		Left:  left,
@@ -10305,13 +10305,13 @@ func (m *Memo) MemoizeAntiJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeIndexJoin(
 	input RelExpr,
 	indexJoinPrivate *IndexJoinPrivate,
-) *IndexJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(indexJoinGroup{}))
 	grp := &indexJoinGroup{mem: m, first: IndexJoinExpr{
 		Input:            input,
@@ -10325,14 +10325,14 @@ func (m *Memo) MemoizeIndexJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeLookupJoin(
 	input RelExpr,
 	on FiltersExpr,
 	lookupJoinPrivate *LookupJoinPrivate,
-) *LookupJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(lookupJoinGroup{}))
 	grp := &lookupJoinGroup{mem: m, first: LookupJoinExpr{
 		Input:             input,
@@ -10347,7 +10347,7 @@ func (m *Memo) MemoizeLookupJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeMergeJoin(
@@ -10355,7 +10355,7 @@ func (m *Memo) MemoizeMergeJoin(
 	right RelExpr,
 	on FiltersExpr,
 	mergeJoinPrivate *MergeJoinPrivate,
-) *MergeJoinExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(mergeJoinGroup{}))
 	grp := &mergeJoinGroup{mem: m, first: MergeJoinExpr{
 		Left:             left,
@@ -10371,14 +10371,14 @@ func (m *Memo) MemoizeMergeJoin(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeInnerJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *InnerJoinApplyExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(innerJoinApplyGroup{}))
 	grp := &innerJoinApplyGroup{mem: m, first: InnerJoinApplyExpr{
 		Left:  left,
@@ -10393,14 +10393,14 @@ func (m *Memo) MemoizeInnerJoinApply(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeLeftJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *LeftJoinApplyExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(leftJoinApplyGroup{}))
 	grp := &leftJoinApplyGroup{mem: m, first: LeftJoinApplyExpr{
 		Left:  left,
@@ -10415,14 +10415,14 @@ func (m *Memo) MemoizeLeftJoinApply(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeRightJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *RightJoinApplyExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(rightJoinApplyGroup{}))
 	grp := &rightJoinApplyGroup{mem: m, first: RightJoinApplyExpr{
 		Left:  left,
@@ -10437,14 +10437,14 @@ func (m *Memo) MemoizeRightJoinApply(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeFullJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *FullJoinApplyExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(fullJoinApplyGroup{}))
 	grp := &fullJoinApplyGroup{mem: m, first: FullJoinApplyExpr{
 		Left:  left,
@@ -10459,14 +10459,14 @@ func (m *Memo) MemoizeFullJoinApply(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeSemiJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *SemiJoinApplyExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(semiJoinApplyGroup{}))
 	grp := &semiJoinApplyGroup{mem: m, first: SemiJoinApplyExpr{
 		Left:  left,
@@ -10481,14 +10481,14 @@ func (m *Memo) MemoizeSemiJoinApply(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeAntiJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
-) *AntiJoinApplyExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(antiJoinApplyGroup{}))
 	grp := &antiJoinApplyGroup{mem: m, first: AntiJoinApplyExpr{
 		Left:  left,
@@ -10503,14 +10503,14 @@ func (m *Memo) MemoizeAntiJoinApply(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeGroupBy(
 	input RelExpr,
 	aggregations AggregationsExpr,
 	groupingPrivate *GroupingPrivate,
-) *GroupByExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(groupByGroup{}))
 	grp := &groupByGroup{mem: m, first: GroupByExpr{
 		Input:           input,
@@ -10525,14 +10525,14 @@ func (m *Memo) MemoizeGroupBy(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeScalarGroupBy(
 	input RelExpr,
 	aggregations AggregationsExpr,
 	groupingPrivate *GroupingPrivate,
-) *ScalarGroupByExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(scalarGroupByGroup{}))
 	grp := &scalarGroupByGroup{mem: m, first: ScalarGroupByExpr{
 		Input:           input,
@@ -10547,14 +10547,14 @@ func (m *Memo) MemoizeScalarGroupBy(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeDistinctOn(
 	input RelExpr,
 	aggregations AggregationsExpr,
 	groupingPrivate *GroupingPrivate,
-) *DistinctOnExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(distinctOnGroup{}))
 	grp := &distinctOnGroup{mem: m, first: DistinctOnExpr{
 		Input:           input,
@@ -10569,14 +10569,14 @@ func (m *Memo) MemoizeDistinctOn(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeUnion(
 	left RelExpr,
 	right RelExpr,
 	setPrivate *SetPrivate,
-) *UnionExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(unionGroup{}))
 	grp := &unionGroup{mem: m, first: UnionExpr{
 		Left:       left,
@@ -10591,14 +10591,14 @@ func (m *Memo) MemoizeUnion(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeIntersect(
 	left RelExpr,
 	right RelExpr,
 	setPrivate *SetPrivate,
-) *IntersectExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(intersectGroup{}))
 	grp := &intersectGroup{mem: m, first: IntersectExpr{
 		Left:       left,
@@ -10613,14 +10613,14 @@ func (m *Memo) MemoizeIntersect(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeExcept(
 	left RelExpr,
 	right RelExpr,
 	setPrivate *SetPrivate,
-) *ExceptExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(exceptGroup{}))
 	grp := &exceptGroup{mem: m, first: ExceptExpr{
 		Left:       left,
@@ -10635,14 +10635,14 @@ func (m *Memo) MemoizeExcept(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeUnionAll(
 	left RelExpr,
 	right RelExpr,
 	setPrivate *SetPrivate,
-) *UnionAllExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(unionAllGroup{}))
 	grp := &unionAllGroup{mem: m, first: UnionAllExpr{
 		Left:       left,
@@ -10657,14 +10657,14 @@ func (m *Memo) MemoizeUnionAll(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeIntersectAll(
 	left RelExpr,
 	right RelExpr,
 	setPrivate *SetPrivate,
-) *IntersectAllExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(intersectAllGroup{}))
 	grp := &intersectAllGroup{mem: m, first: IntersectAllExpr{
 		Left:       left,
@@ -10679,14 +10679,14 @@ func (m *Memo) MemoizeIntersectAll(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeExceptAll(
 	left RelExpr,
 	right RelExpr,
 	setPrivate *SetPrivate,
-) *ExceptAllExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(exceptAllGroup{}))
 	grp := &exceptAllGroup{mem: m, first: ExceptAllExpr{
 		Left:       left,
@@ -10701,14 +10701,14 @@ func (m *Memo) MemoizeExceptAll(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeLimit(
 	input RelExpr,
 	limit opt.ScalarExpr,
 	ordering physical.OrderingChoice,
-) *LimitExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(limitGroup{}))
 	grp := &limitGroup{mem: m, first: LimitExpr{
 		Input:    input,
@@ -10723,14 +10723,14 @@ func (m *Memo) MemoizeLimit(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeOffset(
 	input RelExpr,
 	offset opt.ScalarExpr,
 	ordering physical.OrderingChoice,
-) *OffsetExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(offsetGroup{}))
 	grp := &offsetGroup{mem: m, first: OffsetExpr{
 		Input:    input,
@@ -10745,12 +10745,12 @@ func (m *Memo) MemoizeOffset(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeMax1Row(
 	input RelExpr,
-) *Max1RowExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(max1RowGroup{}))
 	grp := &max1RowGroup{mem: m, first: Max1RowExpr{
 		Input: input,
@@ -10763,13 +10763,13 @@ func (m *Memo) MemoizeMax1Row(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeExplain(
 	input RelExpr,
 	explainPrivate *ExplainPrivate,
-) *ExplainExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(explainGroup{}))
 	grp := &explainGroup{mem: m, first: ExplainExpr{
 		Input:          input,
@@ -10783,12 +10783,12 @@ func (m *Memo) MemoizeExplain(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeShowTraceForSession(
 	showTracePrivate *ShowTracePrivate,
-) *ShowTraceForSessionExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(showTraceForSessionGroup{}))
 	grp := &showTraceForSessionGroup{mem: m, first: ShowTraceForSessionExpr{
 		ShowTracePrivate: *showTracePrivate,
@@ -10801,13 +10801,13 @@ func (m *Memo) MemoizeShowTraceForSession(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeRowNumber(
 	input RelExpr,
 	rowNumberPrivate *RowNumberPrivate,
-) *RowNumberExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(rowNumberGroup{}))
 	grp := &rowNumberGroup{mem: m, first: RowNumberExpr{
 		Input:            input,
@@ -10821,13 +10821,13 @@ func (m *Memo) MemoizeRowNumber(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeProjectSet(
 	input RelExpr,
 	zip ZipExpr,
-) *ProjectSetExpr {
+) RelExpr {
 	const size = int64(unsafe.Sizeof(projectSetGroup{}))
 	grp := &projectSetGroup{mem: m, first: ProjectSetExpr{
 		Input: input,
@@ -10841,7 +10841,7 @@ func (m *Memo) MemoizeProjectSet(
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
-	return interned
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeSubquery(
@@ -12324,7 +12324,7 @@ func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12337,7 +12337,7 @@ func (m *Memo) AddVirtualScanToGroup(e *VirtualScanExpr, grp RelExpr) *VirtualSc
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12350,7 +12350,7 @@ func (m *Memo) AddValuesToGroup(e *ValuesExpr, grp RelExpr) *ValuesExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12363,7 +12363,7 @@ func (m *Memo) AddSelectToGroup(e *SelectExpr, grp RelExpr) *SelectExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12376,7 +12376,7 @@ func (m *Memo) AddProjectToGroup(e *ProjectExpr, grp RelExpr) *ProjectExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12389,7 +12389,7 @@ func (m *Memo) AddInnerJoinToGroup(e *InnerJoinExpr, grp RelExpr) *InnerJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12402,7 +12402,7 @@ func (m *Memo) AddLeftJoinToGroup(e *LeftJoinExpr, grp RelExpr) *LeftJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12415,7 +12415,7 @@ func (m *Memo) AddRightJoinToGroup(e *RightJoinExpr, grp RelExpr) *RightJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12428,7 +12428,7 @@ func (m *Memo) AddFullJoinToGroup(e *FullJoinExpr, grp RelExpr) *FullJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12441,7 +12441,7 @@ func (m *Memo) AddSemiJoinToGroup(e *SemiJoinExpr, grp RelExpr) *SemiJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12454,7 +12454,7 @@ func (m *Memo) AddAntiJoinToGroup(e *AntiJoinExpr, grp RelExpr) *AntiJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12467,7 +12467,7 @@ func (m *Memo) AddIndexJoinToGroup(e *IndexJoinExpr, grp RelExpr) *IndexJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12480,7 +12480,7 @@ func (m *Memo) AddLookupJoinToGroup(e *LookupJoinExpr, grp RelExpr) *LookupJoinE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12493,7 +12493,7 @@ func (m *Memo) AddMergeJoinToGroup(e *MergeJoinExpr, grp RelExpr) *MergeJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12506,7 +12506,7 @@ func (m *Memo) AddInnerJoinApplyToGroup(e *InnerJoinApplyExpr, grp RelExpr) *Inn
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12519,7 +12519,7 @@ func (m *Memo) AddLeftJoinApplyToGroup(e *LeftJoinApplyExpr, grp RelExpr) *LeftJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12532,7 +12532,7 @@ func (m *Memo) AddRightJoinApplyToGroup(e *RightJoinApplyExpr, grp RelExpr) *Rig
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12545,7 +12545,7 @@ func (m *Memo) AddFullJoinApplyToGroup(e *FullJoinApplyExpr, grp RelExpr) *FullJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12558,7 +12558,7 @@ func (m *Memo) AddSemiJoinApplyToGroup(e *SemiJoinApplyExpr, grp RelExpr) *SemiJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12571,7 +12571,7 @@ func (m *Memo) AddAntiJoinApplyToGroup(e *AntiJoinApplyExpr, grp RelExpr) *AntiJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12584,7 +12584,7 @@ func (m *Memo) AddGroupByToGroup(e *GroupByExpr, grp RelExpr) *GroupByExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12597,7 +12597,7 @@ func (m *Memo) AddScalarGroupByToGroup(e *ScalarGroupByExpr, grp RelExpr) *Scala
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12610,7 +12610,7 @@ func (m *Memo) AddDistinctOnToGroup(e *DistinctOnExpr, grp RelExpr) *DistinctOnE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12623,7 +12623,7 @@ func (m *Memo) AddUnionToGroup(e *UnionExpr, grp RelExpr) *UnionExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12636,7 +12636,7 @@ func (m *Memo) AddIntersectToGroup(e *IntersectExpr, grp RelExpr) *IntersectExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12649,7 +12649,7 @@ func (m *Memo) AddExceptToGroup(e *ExceptExpr, grp RelExpr) *ExceptExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12662,7 +12662,7 @@ func (m *Memo) AddUnionAllToGroup(e *UnionAllExpr, grp RelExpr) *UnionAllExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12675,7 +12675,7 @@ func (m *Memo) AddIntersectAllToGroup(e *IntersectAllExpr, grp RelExpr) *Interse
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12688,7 +12688,7 @@ func (m *Memo) AddExceptAllToGroup(e *ExceptAllExpr, grp RelExpr) *ExceptAllExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12701,7 +12701,7 @@ func (m *Memo) AddLimitToGroup(e *LimitExpr, grp RelExpr) *LimitExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12714,7 +12714,7 @@ func (m *Memo) AddOffsetToGroup(e *OffsetExpr, grp RelExpr) *OffsetExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12727,7 +12727,7 @@ func (m *Memo) AddMax1RowToGroup(e *Max1RowExpr, grp RelExpr) *Max1RowExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12740,7 +12740,7 @@ func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12753,7 +12753,7 @@ func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp Rel
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12766,7 +12766,7 @@ func (m *Memo) AddRowNumberToGroup(e *RowNumberExpr, grp RelExpr) *RowNumberExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
@@ -12779,7 +12779,7 @@ func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), e))
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
 	}
 	return interned
 }
