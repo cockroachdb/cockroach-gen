@@ -343,7 +343,7 @@ var Keywords = map[string]struct {
 	"then":                      {THEN, "R"},
 	"time":                      {TIME, "C"},
 	"timestamp":                 {TIMESTAMP, "C"},
-	"timestamptz":               {TIMESTAMPTZ, "U"},
+	"timestamptz":               {TIMESTAMPTZ, "C"},
 	"timetz":                    {TIMETZ, "C"},
 	"to":                        {TO, "R"},
 	"trace":                     {TRACE, "U"},
