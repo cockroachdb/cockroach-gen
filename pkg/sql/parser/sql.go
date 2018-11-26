@@ -16994,7 +16994,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 		//line sql-gen.y:5318
 		{
-			return unimplementedWithIssue(sqllex, 8318)
+			return unimplementedWithIssue(sqllex, 27792)
 		}
 	case 898:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
@@ -17099,7 +17099,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 		//line sql-gen.y:5410
 		{
-			return unimplementedWithIssue(sqllex, 8318)
+			return unimplementedWithIssue(sqllex, 27792)
 		}
 	case 916:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
