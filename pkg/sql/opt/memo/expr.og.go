@@ -10078,6 +10078,168 @@ func (e *ScalarListExpr) DataType() types.T {
 	return types.Any
 }
 
+// InsertExpr evaluates a relational input expression, and inserts values from it
+// into a target table. The input may be an arbitrarily complex expression:
+//
+//   INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
+//
+// It can also be a simple VALUES clause:
+//
+//   INSERT INTO ab VALUES (1, 2)
+//
+// It may also return rows, which can be further composed:
+//
+//   SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
+//
+// The Insert operator is capable of inserting values into computed columns and
+// mutation columns, which are not writable (or even visible in the case of
+// mutation columns) by SQL users.
+type InsertExpr struct {
+	Input RelExpr
+	InsertPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &InsertExpr{}
+
+func (e *InsertExpr) Op() opt.Operator {
+	return opt.InsertOp
+}
+
+func (e *InsertExpr) ChildCount() int {
+	return 1
+}
+
+func (e *InsertExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *InsertExpr) Private() interface{} {
+	return &e.InsertPrivate
+}
+
+func (e *InsertExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *InsertExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *InsertExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *InsertExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *InsertExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *InsertExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *InsertExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *InsertExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *InsertExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *InsertExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *InsertExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *InsertExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *InsertExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type insertGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first InsertExpr
+	best  bestProps
+}
+
+var _ exprGroup = &insertGroup{}
+
+func (g *insertGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *insertGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *insertGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *insertGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type InsertPrivate struct {
+	// Table identifies the table into which to insert. It is an id that can be
+	// passed to the Metadata.Table method in order to fetch opt.Table metadata.
+	Table opt.TableID
+
+	// InputCols are columns from the Input expression that will be inserted into
+	// the target table. They must be a subset of the Input expression's output
+	// columns, but otherwise can be in any order. The count and order of columns
+	// corresponds to the count and order of the target table's columns; column
+	// values are read from the specified input columns and are then inserted into
+	// the corresponding table columns.
+	InputCols opt.ColList
+
+	// Ordering is the ordering required of the input expression. Rows will be
+	// inserted into the target table in this order.
+	Ordering physical.OrderingChoice
+
+	// NeedResults is true if the Insert operator returns output rows. One output
+	// row will be returned for each input row. The output row contains all
+	// columns in the table, including hidden columns, but not including any
+	// columns that are undergoing mutation (being added or dropped as part of
+	// online schema change).
+	NeedResults bool
+}
+
 func (m *Memo) MemoizeScan(
 	scanPrivate *ScanPrivate,
 ) RelExpr {
@@ -12316,6 +12478,26 @@ func (m *Memo) MemoizeAggDistinct(
 	return interned
 }
 
+func (m *Memo) MemoizeInsert(
+	input RelExpr,
+	insertPrivate *InsertPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(insertGroup{}))
+	grp := &insertGroup{mem: m, first: InsertExpr{
+		Input:         input,
+		InsertPrivate: *insertPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternInsert(e)
+	if interned == e {
+		m.logPropsBuilder.buildInsertProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 	const size = int64(unsafe.Sizeof(ScanExpr{}))
 	interned := m.interner.InternScan(e)
@@ -12784,6 +12966,19 @@ func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetE
 	return interned
 }
 
+func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
+	const size = int64(unsafe.Sizeof(InsertExpr{}))
+	interned := m.interner.InternInsert(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *ScanExpr:
@@ -13054,6 +13249,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAggDistinct(t)
 	case *ScalarListExpr:
 		return in.InternScalarList(t)
+	case *InsertExpr:
+		return in.InternInsert(t)
 	default:
 		panic(fmt.Sprintf("unhandled op: %s", e.Op()))
 	}
@@ -15786,6 +15983,32 @@ func (in *interner) InternScalarList(val *ScalarListExpr) *ScalarListExpr {
 	return val
 }
 
+func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.InsertOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InputCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NeedResults)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*InsertExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InputCols, existing.InputCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *ScanExpr:
@@ -15860,6 +16083,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildRowNumberProps(t, rel)
 	case *ProjectSetExpr:
 		b.buildProjectSetProps(t, rel)
+	case *InsertExpr:
+		b.buildInsertProps(t, rel)
 	default:
 		panic(fmt.Sprintf("unhandled type: %s", t.Op()))
 	}

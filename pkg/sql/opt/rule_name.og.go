@@ -109,8 +109,10 @@ const (
 	SimplifyGroupByOrdering
 	SimplifyRowNumberOrdering
 	SimplifyExplainOrdering
+	SimplifyInsertOrdering
 	EliminateProject
 	MergeProjects
+	MergeProjectWithValues
 	PruneProjectCols
 	PruneScanCols
 	PruneSelectCols
