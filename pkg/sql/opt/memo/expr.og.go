@@ -2040,6 +2040,176 @@ type MergeJoinPrivate struct {
 	RightOrdering physical.OrderingChoice
 }
 
+// ZigzagJoinExpr represents a join that is executed using the zigzag joiner.
+// All fields except for the ON expression are stored in the private;
+// since the zigzag joiner operates directly on indexes and doesn't
+// support arbitrary inputs.
+//
+// TODO(itsbilal): Add support for representing multi-way zigzag joins.
+type ZigzagJoinExpr struct {
+	On FiltersExpr
+	ZigzagJoinPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ZigzagJoinExpr{}
+
+func (e *ZigzagJoinExpr) Op() opt.Operator {
+	return opt.ZigzagJoinOp
+}
+
+func (e *ZigzagJoinExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ZigzagJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.On
+	}
+	panic("child index out of range")
+}
+
+func (e *ZigzagJoinExpr) Private() interface{} {
+	return &e.ZigzagJoinPrivate
+}
+
+func (e *ZigzagJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ZigzagJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ZigzagJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ZigzagJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ZigzagJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ZigzagJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ZigzagJoinExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ZigzagJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *ZigzagJoinExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ZigzagJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ZigzagJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ZigzagJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ZigzagJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type zigzagJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ZigzagJoinExpr
+	best  bestProps
+}
+
+var _ exprGroup = &zigzagJoinGroup{}
+
+func (g *zigzagJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *zigzagJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *zigzagJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *zigzagJoinGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ZigzagJoinPrivate struct {
+	// LeftTable and RightTable identifies the left and right tables for this
+	// join.
+	LeftTable  opt.TableID
+	RightTable opt.TableID
+
+	// LeftIndex and RightIndex identifies the index to do lookups in (whether
+	// primary or secondary). It can be passed to the opt.Table.Index(i int)
+	// method in order to fetch the opt.Index metadata.
+	LeftIndex  int
+	RightIndex int
+
+	// LeftEqCols and RightEqCols contains lists of columns on the left and
+	// right sides that are being equated. Both lists must be of equal length.
+	LeftEqCols  opt.ColList
+	RightEqCols opt.ColList
+
+	// FixedVals, LeftFixedCols and RightFixedCols reference fixed values.
+	// Fixed values are constants that constrain each index' prefix columns
+	// (the ones denoted in {Left,Right}FixedCols). These fixed columns must
+	// lie at the start of the index and must immediately precede EqCols.
+	//
+	// FixedVals is a list of 2 tuples, each representing one side's fixed
+	// values.
+	//
+	// Read the comment in pkg/sql/distsqlrun/zigzagjoiner.go for more on
+	// fixed and equality columns.
+	FixedVals      ScalarListExpr
+	LeftFixedCols  opt.ColList
+	RightFixedCols opt.ColList
+
+	// Cols is the set of columns produced by the zigzag join. This set can
+	// contain columns from either side's index.
+	Cols opt.ColSet
+
+	// leftProps and rightProps cache relational properties corresponding to an
+	// unconstrained scan on the respective indexes. By putting this in the
+	// expr, zigzag joins can reuse a lot of the logical property building code
+	// for joins.
+	leftProps  props.Relational
+	rightProps props.Relational
+}
+
 // InnerJoinApplyExpr has the same join semantics as InnerJoin. However, unlike
 // InnerJoin, it allows the right input to refer to columns projected by the
 // left input.
@@ -10536,6 +10706,26 @@ func (m *Memo) MemoizeMergeJoin(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeZigzagJoin(
+	on FiltersExpr,
+	zigzagJoinPrivate *ZigzagJoinPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(zigzagJoinGroup{}))
+	grp := &zigzagJoinGroup{mem: m, first: ZigzagJoinExpr{
+		On:                on,
+		ZigzagJoinPrivate: *zigzagJoinPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternZigzagJoin(e)
+	if interned == e {
+		m.logPropsBuilder.buildZigzagJoinProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeInnerJoinApply(
 	left RelExpr,
 	right RelExpr,
@@ -12680,6 +12870,19 @@ func (m *Memo) AddMergeJoinToGroup(e *MergeJoinExpr, grp RelExpr) *MergeJoinExpr
 	return interned
 }
 
+func (m *Memo) AddZigzagJoinToGroup(e *ZigzagJoinExpr, grp RelExpr) *ZigzagJoinExpr {
+	const size = int64(unsafe.Sizeof(ZigzagJoinExpr{}))
+	interned := m.interner.InternZigzagJoin(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (m *Memo) AddInnerJoinApplyToGroup(e *InnerJoinApplyExpr, grp RelExpr) *InnerJoinApplyExpr {
 	const size = int64(unsafe.Sizeof(InnerJoinApplyExpr{}))
 	interned := m.interner.InternInnerJoinApply(e)
@@ -13009,6 +13212,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternLookupJoin(t)
 	case *MergeJoinExpr:
 		return in.InternMergeJoin(t)
+	case *ZigzagJoinExpr:
+		return in.InternZigzagJoin(t)
 	case *InnerJoinApplyExpr:
 		return in.InternInnerJoinApply(t)
 	case *LeftJoinApplyExpr:
@@ -13573,6 +13778,44 @@ func (in *interner) InternMergeJoin(val *MergeJoinExpr) *MergeJoinExpr {
 				in.hasher.IsOrderingEqual(val.RightEq, existing.RightEq) &&
 				in.hasher.IsOrderingChoiceEqual(val.LeftOrdering, existing.LeftOrdering) &&
 				in.hasher.IsOrderingChoiceEqual(val.RightOrdering, existing.RightOrdering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternZigzagJoin(val *ZigzagJoinExpr) *ZigzagJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ZigzagJoinOp)
+	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashTableID(val.LeftTable)
+	in.hasher.HashTableID(val.RightTable)
+	in.hasher.HashInt(val.LeftIndex)
+	in.hasher.HashInt(val.RightIndex)
+	in.hasher.HashColList(val.LeftEqCols)
+	in.hasher.HashColList(val.RightEqCols)
+	in.hasher.HashScalarListExpr(val.FixedVals)
+	in.hasher.HashColList(val.LeftFixedCols)
+	in.hasher.HashColList(val.RightFixedCols)
+	in.hasher.HashColSet(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ZigzagJoinExpr); ok {
+			if in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsTableIDEqual(val.LeftTable, existing.LeftTable) &&
+				in.hasher.IsTableIDEqual(val.RightTable, existing.RightTable) &&
+				in.hasher.IsIntEqual(val.LeftIndex, existing.LeftIndex) &&
+				in.hasher.IsIntEqual(val.RightIndex, existing.RightIndex) &&
+				in.hasher.IsColListEqual(val.LeftEqCols, existing.LeftEqCols) &&
+				in.hasher.IsColListEqual(val.RightEqCols, existing.RightEqCols) &&
+				in.hasher.IsScalarListExprEqual(val.FixedVals, existing.FixedVals) &&
+				in.hasher.IsColListEqual(val.LeftFixedCols, existing.LeftFixedCols) &&
+				in.hasher.IsColListEqual(val.RightFixedCols, existing.RightFixedCols) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
 				return existing
 			}
 		}
@@ -16039,6 +16282,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildLookupJoinProps(t, rel)
 	case *MergeJoinExpr:
 		b.buildMergeJoinProps(t, rel)
+	case *ZigzagJoinExpr:
+		b.buildZigzagJoinProps(t, rel)
 	case *InnerJoinApplyExpr:
 		b.buildInnerJoinApplyProps(t, rel)
 	case *LeftJoinApplyExpr:

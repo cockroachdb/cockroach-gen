@@ -3656,6 +3656,21 @@ func (_f *Factory) ConstructMergeJoin(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructZigzagJoin constructs an expression for the ZigzagJoin operator.
+// ZigzagJoin represents a join that is executed using the zigzag joiner.
+// All fields except for the ON expression are stored in the private;
+// since the zigzag joiner operates directly on indexes and doesn't
+// support arbitrary inputs.
+//
+// TODO(itsbilal): Add support for representing multi-way zigzag joins.
+func (_f *Factory) ConstructZigzagJoin(
+	on memo.FiltersExpr,
+	zigzagJoinPrivate *memo.ZigzagJoinPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeZigzagJoin(on, zigzagJoinPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructInnerJoinApply constructs an expression for the InnerJoinApply operator.
 // InnerJoinApply has the same join semantics as InnerJoin. However, unlike
 // InnerJoin, it allows the right input to refer to columns projected by the
@@ -12498,6 +12513,13 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ZigzagJoinExpr:
+		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		if onChanged {
+			return f.ConstructZigzagJoin(on, &t.ZigzagJoinPrivate)
+		}
+		return t
+
 	case *memo.InnerJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
@@ -13551,6 +13573,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			&t.MergeJoinPrivate,
 		)
 
+	case *memo.ZigzagJoinExpr:
+		return f.ConstructZigzagJoin(
+			f.assignFiltersExprPlaceholders(t.On),
+			&t.ZigzagJoinPrivate,
+		)
+
 	case *memo.InnerJoinApplyExpr:
 		return f.ConstructInnerJoinApply(
 			f.assignPlaceholders(t.Left).(memo.RelExpr),
@@ -14320,6 +14348,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[1].(memo.RelExpr),
 			*args[2].(*memo.FiltersExpr),
 			args[3].(*memo.MergeJoinPrivate),
+		)
+	case opt.ZigzagJoinOp:
+		return f.ConstructZigzagJoin(
+			*args[0].(*memo.FiltersExpr),
+			args[1].(*memo.ZigzagJoinPrivate),
 		)
 	case opt.InnerJoinApplyOp:
 		return f.ConstructInnerJoinApply(

@@ -182,6 +182,7 @@ const (
 	CommuteRightJoin
 	GenerateMergeJoins
 	GenerateLookupJoins
+	GenerateZigzagJoins
 	GenerateLookupJoinsWithFilter
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan
