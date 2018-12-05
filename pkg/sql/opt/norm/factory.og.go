@@ -11974,6 +11974,57 @@ func (_f *Factory) ConstructIndirection(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructArrayFlatten constructs an expression for the ArrayFlatten operator.
+// ArrayFlatten is an ARRAY(<subquery>) expression. ArrayFlatten takes as input
+// a subquery which returns a single column and constructs a scalar array as the
+// output. Any NULLs are included in the results, and if the subquery has an
+// ORDER BY clause that ordering will be respected by the resulting array.
+func (_f *Factory) ConstructArrayFlatten(
+	input memo.RelExpr,
+	subqueryPrivate *memo.SubqueryPrivate,
+) opt.ScalarExpr {
+	// [NormalizeArrayFlattenToAgg]
+	{
+		if _f.funcs.HasOuterCols(input) {
+			subquery := subqueryPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeArrayFlattenToAgg) {
+				_expr := _f.ConstructCoalesce(
+					memo.ScalarListExpr{
+						_f.ConstructSubquery(
+							_f.ConstructScalarGroupBy(
+								input,
+								memo.AggregationsExpr{
+									{
+										Agg: _f.ConstructArrayAgg(
+											_f.ConstructVariable(
+												_f.funcs.FirstCol(input),
+											),
+										),
+										ColPrivate: *_f.funcs.MakeArrayAggCol(_f.funcs.ArrayType(input)),
+									},
+								},
+								_f.funcs.MakeOrderedGrouping(_f.funcs.MakeEmptyColSet(), _f.funcs.SubqueryOrdering(subquery)),
+							),
+							_f.funcs.MakeUnorderedSubquery(),
+						),
+						_f.ConstructArray(
+							memo.EmptyScalarListExpr,
+							_f.funcs.ArrayType(input),
+						),
+					},
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.NormalizeArrayFlattenToAgg, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeArrayFlatten(input, subqueryPrivate)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructFunction constructs an expression for the Function operator.
 // Function invokes a builtin SQL function like CONCAT or NOW, passing the given
 // arguments. The FunctionPrivate field contains the name of the function as well
@@ -13177,6 +13228,13 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ArrayFlattenExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructArrayFlatten(input, &t.SubqueryPrivate)
+		}
+		return t
+
 	case *memo.FunctionExpr:
 		args, argsChanged := f.reconstructScalarListExpr(t.Args, replace)
 		if argsChanged {
@@ -14082,6 +14140,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
 		)
 
+	case *memo.ArrayFlattenExpr:
+		return f.ConstructArrayFlatten(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.SubqueryPrivate,
+		)
+
 	case *memo.FunctionExpr:
 		return f.ConstructFunction(
 			f.assignScalarListExprPlaceholders(t.Args),
@@ -14778,6 +14842,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructIndirection(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
+		)
+	case opt.ArrayFlattenOp:
+		return f.ConstructArrayFlatten(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.SubqueryPrivate),
 		)
 	case opt.FunctionOp:
 		return f.ConstructFunction(

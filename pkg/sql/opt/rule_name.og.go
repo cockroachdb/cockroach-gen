@@ -152,6 +152,7 @@ const (
 	SimplifyEqualsAnyTuple
 	SimplifyAnyScalarArray
 	FoldCollate
+	NormalizeArrayFlattenToAgg
 	SimplifySelectFilters
 	DetectSelectContradiction
 	EliminateSelect

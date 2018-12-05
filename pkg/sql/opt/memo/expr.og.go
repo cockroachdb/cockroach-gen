@@ -5314,6 +5314,12 @@ func (e *SubqueryExpr) DataType() types.T {
 // across all the subquery operators.
 type SubqueryPrivate struct {
 	OriginalExpr *tree.Subquery
+	Ordering     opt.Ordering
+
+	// RequestedCol is set if there could possibly be other columns in the input
+	// (say, if there was an ordering that must be respected) besides the one that
+	// will eventually be output.
+	RequestedCol opt.ColumnID
 
 	// Cmp is only used for AnyOp.
 	Cmp opt.Operator
@@ -8909,6 +8915,58 @@ func (e *IndirectionExpr) DataType() types.T {
 	return e.Typ
 }
 
+// ArrayFlattenExpr is an ARRAY(<subquery>) expression. ArrayFlatten takes as input
+// a subquery which returns a single column and constructs a scalar array as the
+// output. Any NULLs are included in the results, and if the subquery has an
+// ORDER BY clause that ordering will be respected by the resulting array.
+type ArrayFlattenExpr struct {
+	Input RelExpr
+	SubqueryPrivate
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &ArrayFlattenExpr{}
+
+func (e *ArrayFlattenExpr) Op() opt.Operator {
+	return opt.ArrayFlattenOp
+}
+
+func (e *ArrayFlattenExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ArrayFlattenExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *ArrayFlattenExpr) Private() interface{} {
+	return &e.SubqueryPrivate
+}
+
+func (e *ArrayFlattenExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ArrayFlattenExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *ArrayFlattenExpr) DataType() types.T {
+	return e.Typ
+}
+
 // FunctionExpr invokes a builtin SQL function like CONCAT or NOW, passing the given
 // arguments. The FunctionPrivate field contains the name of the function as well
 // as pointers to its type and properties.
@@ -12243,6 +12301,24 @@ func (m *Memo) MemoizeIndirection(
 	return interned
 }
 
+func (m *Memo) MemoizeArrayFlatten(
+	input RelExpr,
+	subqueryPrivate *SubqueryPrivate,
+) *ArrayFlattenExpr {
+	const size = int64(unsafe.Sizeof(ArrayFlattenExpr{}))
+	e := &ArrayFlattenExpr{
+		Input:           input,
+		SubqueryPrivate: *subqueryPrivate,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternArrayFlatten(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeFunction(
 	args ScalarListExpr,
 	functionPrivate *FunctionPrivate,
@@ -13398,6 +13474,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternArray(t)
 	case *IndirectionExpr:
 		return in.InternIndirection(t)
+	case *ArrayFlattenExpr:
+		return in.InternArrayFlatten(t)
 	case *FunctionExpr:
 		return in.InternFunction(t)
 	case *CollateExpr:
@@ -14340,6 +14418,8 @@ func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
 	in.hasher.HashOperator(opt.SubqueryOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOrdering(val.Ordering)
+	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
 
 	in.cache.Start(in.hasher.hash)
@@ -14347,6 +14427,8 @@ func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
 		if existing, ok := in.cache.Item().(*SubqueryExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
 				return existing
 			}
@@ -14363,6 +14445,8 @@ func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashScalarExpr(val.Scalar)
 	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOrdering(val.Ordering)
+	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
 
 	in.cache.Start(in.hasher.hash)
@@ -14371,6 +14455,8 @@ func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Scalar, existing.Scalar) &&
 				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
 				return existing
 			}
@@ -14386,6 +14472,8 @@ func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
 	in.hasher.HashOperator(opt.ExistsOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOrdering(val.Ordering)
+	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
 
 	in.cache.Start(in.hasher.hash)
@@ -14393,6 +14481,8 @@ func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
 		if existing, ok := in.cache.Item().(*ExistsExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
 				return existing
 			}
@@ -15704,6 +15794,32 @@ func (in *interner) InternIndirection(val *IndirectionExpr) *IndirectionExpr {
 		if existing, ok := in.cache.Item().(*IndirectionExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Index, existing.Index) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternArrayFlatten(val *ArrayFlattenExpr) *ArrayFlattenExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ArrayFlattenOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashOrdering(val.Ordering)
+	in.hasher.HashColumnID(val.RequestedCol)
+	in.hasher.HashOperator(val.Cmp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ArrayFlattenExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
 				return existing
 			}
 		}
