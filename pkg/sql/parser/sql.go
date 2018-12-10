@@ -18171,7 +18171,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:6512
 		{
-			sqlVAL.union.val = coltypes.Serial
+			sqlVAL.union.val = coltypes.Serial8
 		}
 	case 1104:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -18280,13 +18280,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:6602
 		{
-			sqlVAL.union.val = coltypes.Int
+			sqlVAL.union.val = coltypes.Int8
 		}
 	case 1119:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:6606
 		{
-			sqlVAL.union.val = coltypes.Int
+			sqlVAL.union.val = coltypes.Int8
 		}
 	case 1120:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
