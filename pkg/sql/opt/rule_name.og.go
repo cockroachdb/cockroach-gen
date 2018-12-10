@@ -109,7 +109,7 @@ const (
 	SimplifyGroupByOrdering
 	SimplifyRowNumberOrdering
 	SimplifyExplainOrdering
-	SimplifyInsertOrdering
+	SimplifyMutationOrdering
 	EliminateProject
 	MergeProjects
 	MergeProjectWithValues

@@ -12413,25 +12413,45 @@ func (_f *Factory) ConstructAggDistinct(
 // mutation columns) by SQL users.
 func (_f *Factory) ConstructInsert(
 	input memo.RelExpr,
-	insertPrivate *memo.InsertPrivate,
+	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
-	// [SimplifyInsertOrdering]
+	// [SimplifyMutationOrdering]
 	{
-		if _f.funcs.CanSimplifyInsertOrdering(input, insertPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyInsertOrdering) {
+		if _f.funcs.CanSimplifyMutationOrdering(input, mutationPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyMutationOrdering) {
 				_expr := _f.ConstructInsert(
 					input,
-					_f.funcs.SimplifyInsertOrdering(input, insertPrivate),
+					_f.funcs.SimplifyMutationOrdering(input, mutationPrivate),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyInsertOrdering, nil, _expr)
+					_f.appliedRule(opt.SimplifyMutationOrdering, nil, _expr)
 				}
 				return _expr
 			}
 		}
 	}
 
-	e := _f.mem.MemoizeInsert(input, insertPrivate)
+	e := _f.mem.MemoizeInsert(input, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructUpdate constructs an expression for the Update operator.
+// Update evaluates a relational input expression that fetches existing rows from
+// a target table and computes new values for one or more columns. The Update
+// operator uses the existing and new values from the input to update indexes,
+// evaluate check constraints and foreign keys, and update computed columns.
+// Arbitrary subsets of rows can be selected from the target table and processed
+// in order, as with this example:
+//
+//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
+//
+// The Update operator will also update any computed columns, including mutation
+// columns that are computed.
+func (_f *Factory) ConstructUpdate(
+	input memo.RelExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeUpdate(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -13425,7 +13445,14 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.InsertExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
-			return f.ConstructInsert(input, &t.InsertPrivate)
+			return f.ConstructInsert(input, &t.MutationPrivate)
+		}
+		return t
+
+	case *memo.UpdateExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructUpdate(input, &t.MutationPrivate)
 		}
 		return t
 
@@ -14283,7 +14310,13 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 	case *memo.InsertExpr:
 		return f.ConstructInsert(
 			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			&t.InsertPrivate,
+			&t.MutationPrivate,
+		)
+
+	case *memo.UpdateExpr:
+		return f.ConstructUpdate(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.MutationPrivate,
 		)
 
 	}
@@ -14960,7 +14993,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.InsertOp:
 		return f.ConstructInsert(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.InsertPrivate),
+			args[1].(*memo.MutationPrivate),
+		)
+	case opt.UpdateOp:
+		return f.ConstructUpdate(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.MutationPrivate),
 		)
 	}
 	panic(fmt.Sprintf("cannot dynamically construct operator %s", op))

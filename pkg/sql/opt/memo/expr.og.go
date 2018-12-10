@@ -10324,7 +10324,7 @@ func (e *ScalarListExpr) DataType() types.T {
 // mutation columns) by SQL users.
 type InsertExpr struct {
 	Input RelExpr
-	InsertPrivate
+	MutationPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -10349,7 +10349,7 @@ func (e *InsertExpr) Child(nth int) opt.Expr {
 }
 
 func (e *InsertExpr) Private() interface{} {
-	return &e.InsertPrivate
+	return &e.MutationPrivate
 }
 
 func (e *InsertExpr) String() string {
@@ -10443,18 +10443,66 @@ func (g *insertGroup) bestProps() *bestProps {
 	return &g.best
 }
 
-type InsertPrivate struct {
-	// Table identifies the table into which to insert. It is an id that can be
+type MutationPrivate struct {
+	// Table identifies the table which is being mutated. It is an id that can be
 	// passed to the Metadata.Table method in order to fetch opt.Table metadata.
 	Table opt.TableID
 
-	// InputCols are columns from the Input expression that will be inserted into
+	// InsertCols are columns from the Input expression that will be inserted into
 	// the target table. They must be a subset of the Input expression's output
-	// columns, but otherwise can be in any order. The count and order of columns
-	// corresponds to the count and order of the target table's columns; column
-	// values are read from the specified input columns and are then inserted into
-	// the corresponding table columns.
-	InputCols opt.ColList
+	// columns. The count and order of columns corresponds to the count and order
+	// of the target table's columns, including in-progress schema mutation
+	// columns. If any column ID is zero, then that column will not be part of
+	// the insert operation (e.g. delete-only mutation column). Column values are
+	// read from the input columns and are then inserted into the corresponding
+	// table columns. For example:
+	//
+	//   INSERT INTO ab VALUES (1, 2)
+	//
+	// If there is a delete-only mutation column "c", then InsertCols would contain
+	// [id-a, id-b, 0].
+	InsertCols opt.ColList
+
+	// FetchCols are columns from the Input expression that will be fetched from
+	// the target table. They must be a subset of the Input expression's output
+	// columns. The count and order of columns corresponds to the count and order
+	// of the target table's columns, including in-progress schema mutation
+	// columns. If any column ID is zero, then that column will not take part in
+	// the update operation (e.g. columns in unreferenced column family).
+	//
+	// Fetch columns are referenced by update, computed, and constraint
+	// expressions. They're also needed to formulate the final key/value pairs;
+	// updating even one column in a family requires the entire value to be
+	// reformulated. For example:
+	//
+	//   CREATE TABLE abcd (
+	//     a INT PRIMARY KEY, b INT, c INT, d INT, e INT,
+	//     FAMILY (a, b), FAMILY (c, d), FAMILY (e))
+	//   UPDATE ab SET c=c+1
+	//
+	// The (a, c, d) columns need to be fetched from the store in order to satisfy
+	// the UPDATE query. The "a" column is needed because it's in the primary key.
+	// The "c" column is needed because its value is used as part of computing an
+	// updated value, and the "d" column is needed because it's in the same family
+	// as "c". Taking all this into account, FetchCols would contain this list:
+	// [id-a, 0, id-c, id-d, 0].
+	FetchCols opt.ColList
+
+	// UpdateCols are columns from the Input expression that contain updated values
+	// for columns of the target table. They must be a subset of the Input
+	// expression's output columns. The count and order of columns corresponds to
+	// the count and order of the target table's columns, including in-progress
+	// schema mutation columns. If any column ID is zero, then that column will not
+	// take part in the update operation (e.g. columns that are not updated).
+	// Updated column values are read from the input columns and are then inserted
+	// into the corresponding table columns. For example:
+	//
+	//   CREATE TABLE abc (a INT PRIMARY KEY, b INT, c INT AS (b+1) AS STORED)
+	//   UPDATE abc SET b=1
+	//
+	// Since column "b" is updated, and "c" is a computed column dependent on "b",
+	// then UpdateCols would contain [0, id-b, id-c].
+	UpdateCols opt.ColList
 
 	// Ordering is the ordering required of the input expression. Rows will be
 	// inserted into the target table in this order.
@@ -10466,6 +10514,138 @@ type InsertPrivate struct {
 	// columns that are undergoing mutation (being added or dropped as part of
 	// online schema change).
 	NeedResults bool
+}
+
+// UpdateExpr evaluates a relational input expression that fetches existing rows from
+// a target table and computes new values for one or more columns. The Update
+// operator uses the existing and new values from the input to update indexes,
+// evaluate check constraints and foreign keys, and update computed columns.
+// Arbitrary subsets of rows can be selected from the target table and processed
+// in order, as with this example:
+//
+//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
+//
+// The Update operator will also update any computed columns, including mutation
+// columns that are computed.
+type UpdateExpr struct {
+	Input RelExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &UpdateExpr{}
+
+func (e *UpdateExpr) Op() opt.Operator {
+	return opt.UpdateOp
+}
+
+func (e *UpdateExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UpdateExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *UpdateExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *UpdateExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UpdateExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *UpdateExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UpdateExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UpdateExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UpdateExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UpdateExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *UpdateExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *UpdateExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *UpdateExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UpdateExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *UpdateExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UpdateExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type updateGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first UpdateExpr
+	best  bestProps
+}
+
+var _ exprGroup = &updateGroup{}
+
+func (g *updateGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *updateGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *updateGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *updateGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 func (m *Memo) MemoizeScan(
@@ -12746,18 +12926,38 @@ func (m *Memo) MemoizeAggDistinct(
 
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
-	insertPrivate *InsertPrivate,
+	mutationPrivate *MutationPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(insertGroup{}))
 	grp := &insertGroup{mem: m, first: InsertExpr{
-		Input:         input,
-		InsertPrivate: *insertPrivate,
+		Input:           input,
+		MutationPrivate: *mutationPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
 	interned := m.interner.InternInsert(e)
 	if interned == e {
 		m.logPropsBuilder.buildInsertProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeUpdate(
+	input RelExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(updateGroup{}))
+	grp := &updateGroup{mem: m, first: UpdateExpr{
+		Input:           input,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUpdate(e)
+	if interned == e {
+		m.logPropsBuilder.buildUpdateProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -13258,6 +13458,19 @@ func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	return interned
 }
 
+func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
+	const size = int64(unsafe.Sizeof(UpdateExpr{}))
+	interned := m.interner.InternUpdate(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *ScanExpr:
@@ -13534,6 +13747,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternScalarList(t)
 	case *InsertExpr:
 		return in.InternInsert(t)
+	case *UpdateExpr:
+		return in.InternUpdate(t)
 	default:
 		panic(fmt.Sprintf("unhandled op: %s", e.Op()))
 	}
@@ -16347,7 +16562,9 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashOperator(opt.InsertOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InputCols)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
 	in.hasher.HashBool(val.NeedResults)
 
@@ -16356,7 +16573,39 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 		if existing, ok := in.cache.Item().(*InsertExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InputCols, existing.InputCols) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UpdateOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NeedResults)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UpdateExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
@@ -16446,6 +16695,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildProjectSetProps(t, rel)
 	case *InsertExpr:
 		b.buildInsertProps(t, rel)
+	case *UpdateExpr:
+		b.buildUpdateProps(t, rel)
 	default:
 		panic(fmt.Sprintf("unhandled type: %s", t.Op()))
 	}
