@@ -146,7 +146,7 @@ func (m *memColumn) AppendWithSel(
 	}
 }
 
-func (m *memColumn) Copy(src ColVec, srcStartIdx, srcEndIdx int, typ types.T) {
+func (m *memColumn) Copy(src ColVec, srcStartIdx, srcEndIdx uint64, typ types.T) {
 	switch typ {
 
 	case types.Bool:
