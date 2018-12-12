@@ -18308,7 +18308,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:6535
 		{
-			sqlVAL.union.val = coltypes.Serial8
+			sqlVAL.union.val = sqllex.(*scanner).nakedSerialType
 		}
 	case 1108:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -18417,13 +18417,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:6625
 		{
-			sqlVAL.union.val = coltypes.Int8
+			sqlVAL.union.val = sqllex.(*scanner).nakedIntType
 		}
 	case 1123:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:6629
 		{
-			sqlVAL.union.val = coltypes.Int8
+			sqlVAL.union.val = sqllex.(*scanner).nakedIntType
 		}
 	case 1124:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
