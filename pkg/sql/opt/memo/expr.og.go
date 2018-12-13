@@ -10504,10 +10504,6 @@ type MutationPrivate struct {
 	// then UpdateCols would contain [0, id-b, id-c].
 	UpdateCols opt.ColList
 
-	// Ordering is the ordering required of the input expression. Rows will be
-	// inserted into the target table in this order.
-	Ordering physical.OrderingChoice
-
 	// NeedResults is true if the Insert operator returns output rows. One output
 	// row will be returned for each input row. The output row contains all
 	// columns in the table, including hidden columns, but not including any
@@ -16565,7 +16561,6 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashOrderingChoice(val.Ordering)
 	in.hasher.HashBool(val.NeedResults)
 
 	in.cache.Start(in.hasher.hash)
@@ -16576,7 +16571,6 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
 			}
@@ -16595,7 +16589,6 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashOrderingChoice(val.Ordering)
 	in.hasher.HashBool(val.NeedResults)
 
 	in.cache.Start(in.hasher.hash)
@@ -16606,7 +16599,6 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
 			}

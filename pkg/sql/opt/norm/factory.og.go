@@ -12415,22 +12415,6 @@ func (_f *Factory) ConstructInsert(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
-	// [SimplifyMutationOrdering]
-	{
-		if _f.funcs.CanSimplifyMutationOrdering(input, mutationPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyMutationOrdering) {
-				_expr := _f.ConstructInsert(
-					input,
-					_f.funcs.SimplifyMutationOrdering(input, mutationPrivate),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyMutationOrdering, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeInsert(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
@@ -12451,22 +12435,6 @@ func (_f *Factory) ConstructUpdate(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
-	// [SimplifyMutationOrdering]
-	{
-		if _f.funcs.CanSimplifyMutationOrdering(input, mutationPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyMutationOrdering) {
-				_expr := _f.ConstructUpdate(
-					input,
-					_f.funcs.SimplifyMutationOrdering(input, mutationPrivate),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyMutationOrdering, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeUpdate(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
