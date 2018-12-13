@@ -8678,6 +8678,82 @@ func (e *CastExpr) DataType() types.T {
 	return e.Typ
 }
 
+// IfErrExpr is roughly a runtime try-catch operator. It has different semantics
+// depending on which of its fields are set.
+//
+// If ErrCode is set, only errors which match the given error code will be
+// caught. If ErrCode is not set, all errors will be caught.
+//
+// If OrElse is not set, IfErr evaluates to true or false indicating whether an
+// error was caught.  If OrElse is set, IfErr evaluates to Cond if no error was
+// caught and to OrElse if an error was caught.
+//
+// TODO(justin): The implementation here is a hack: ErrCode and OrElse are
+// optional, so we repurpose lists as an optional field (since it's not
+// valid to use nil). If this comes up again, we might want to consider
+// adding an explicit Option type.
+type IfErrExpr struct {
+	Cond opt.ScalarExpr
+
+	// OrElse and ErrCode will be lists with a single element if their respective
+	// values are set, and empty lists otherwise.
+	OrElse  ScalarListExpr
+	ErrCode ScalarListExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &IfErrExpr{}
+
+func (e *IfErrExpr) Op() opt.Operator {
+	return opt.IfErrOp
+}
+
+func (e *IfErrExpr) ChildCount() int {
+	return 3
+}
+
+func (e *IfErrExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Cond
+	case 1:
+		return &e.OrElse
+	case 2:
+		return &e.ErrCode
+	}
+	panic("child index out of range")
+}
+
+func (e *IfErrExpr) Private() interface{} {
+	return nil
+}
+
+func (e *IfErrExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IfErrExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Cond = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.OrElse = *child.(*ScalarListExpr)
+		return
+	case 2:
+		e.ErrCode = *child.(*ScalarListExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *IfErrExpr) DataType() types.T {
+	return e.Typ
+}
+
 // CaseExpr is a CASE statement of the form:
 //
 //   CASE [ <Input> ]
@@ -12404,6 +12480,26 @@ func (m *Memo) MemoizeCast(
 	return interned
 }
 
+func (m *Memo) MemoizeIfErr(
+	cond opt.ScalarExpr,
+	orElse ScalarListExpr,
+	errCode ScalarListExpr,
+) *IfErrExpr {
+	const size = int64(unsafe.Sizeof(IfErrExpr{}))
+	e := &IfErrExpr{
+		Cond:    cond,
+		OrElse:  orElse,
+		ErrCode: errCode,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternIfErr(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeCase(
 	input opt.ScalarExpr,
 	whens ScalarListExpr,
@@ -13675,6 +13771,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternUnaryComplement(t)
 	case *CastExpr:
 		return in.InternCast(t)
+	case *IfErrExpr:
+		return in.InternIfErr(t)
 	case *CaseExpr:
 		return in.InternCase(t)
 	case *WhenExpr:
@@ -15923,6 +16021,28 @@ func (in *interner) InternCast(val *CastExpr) *CastExpr {
 		if existing, ok := in.cache.Item().(*CastExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsColTypeEqual(val.TargetTyp, existing.TargetTyp) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIfErr(val *IfErrExpr) *IfErrExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IfErrOp)
+	in.hasher.HashScalarExpr(val.Cond)
+	in.hasher.HashScalarListExpr(val.OrElse)
+	in.hasher.HashScalarListExpr(val.ErrCode)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IfErrExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Cond, existing.Cond) &&
+				in.hasher.IsScalarListExprEqual(val.OrElse, existing.OrElse) &&
+				in.hasher.IsScalarListExprEqual(val.ErrCode, existing.ErrCode) {
 				return existing
 			}
 		}

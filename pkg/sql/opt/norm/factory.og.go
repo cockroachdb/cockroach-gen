@@ -11876,6 +11876,30 @@ func (_f *Factory) ConstructCast(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructIfErr constructs an expression for the IfErr operator.
+// IfErr is roughly a runtime try-catch operator. It has different semantics
+// depending on which of its fields are set.
+//
+// If ErrCode is set, only errors which match the given error code will be
+// caught. If ErrCode is not set, all errors will be caught.
+//
+// If OrElse is not set, IfErr evaluates to true or false indicating whether an
+// error was caught.  If OrElse is set, IfErr evaluates to Cond if no error was
+// caught and to OrElse if an error was caught.
+//
+// TODO(justin): The implementation here is a hack: ErrCode and OrElse are
+// optional, so we repurpose lists as an optional field (since it's not
+// valid to use nil). If this comes up again, we might want to consider
+// adding an explicit Option type.
+func (_f *Factory) ConstructIfErr(
+	cond opt.ScalarExpr,
+	orElse memo.ScalarListExpr,
+	errCode memo.ScalarListExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeIfErr(cond, orElse, errCode)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructCase constructs an expression for the Case operator.
 // Case is a CASE statement of the form:
 //
@@ -13200,6 +13224,15 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.IfErrExpr:
+		cond := replace(t.Cond).(opt.ScalarExpr)
+		orElse, orElseChanged := f.reconstructScalarListExpr(t.OrElse, replace)
+		errCode, errCodeChanged := f.reconstructScalarListExpr(t.ErrCode, replace)
+		if cond != t.Cond || orElseChanged || errCodeChanged {
+			return f.ConstructIfErr(cond, orElse, errCode)
+		}
+		return t
+
 	case *memo.CaseExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		whens, whensChanged := f.reconstructScalarListExpr(t.Whens, replace)
@@ -14126,6 +14159,13 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			t.TargetTyp,
 		)
 
+	case *memo.IfErrExpr:
+		return f.ConstructIfErr(
+			f.assignPlaceholders(t.Cond).(opt.ScalarExpr),
+			f.assignScalarListExprPlaceholders(t.OrElse),
+			f.assignScalarListExprPlaceholders(t.ErrCode),
+		)
+
 	case *memo.CaseExpr:
 		return f.ConstructCase(
 			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
@@ -14838,6 +14878,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructCast(
 			args[0].(opt.ScalarExpr),
 			args[1].(coltypes.T),
+		)
+	case opt.IfErrOp:
+		return f.ConstructIfErr(
+			args[0].(opt.ScalarExpr),
+			*args[1].(*memo.ScalarListExpr),
+			*args[2].(*memo.ScalarListExpr),
 		)
 	case opt.CaseOp:
 		return f.ConstructCase(
