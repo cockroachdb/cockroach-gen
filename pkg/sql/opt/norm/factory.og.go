@@ -12352,6 +12352,15 @@ func (_f *Factory) ConstructJsonbAgg(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructStringAgg constructs an expression for the StringAgg operator.
+func (_f *Factory) ConstructStringAgg(
+	input opt.ScalarExpr,
+	sep opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeStringAgg(input, sep)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructConstAgg constructs an expression for the ConstAgg operator.
 // ConstAgg is used in the special case when the value of a column is known to be
 // constant within a grouping set; it returns that value. If there are no rows
@@ -13418,6 +13427,14 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.StringAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		sep := replace(t.Sep).(opt.ScalarExpr)
+		if input != t.Input || sep != t.Sep {
+			return f.ConstructStringAgg(input, sep)
+		}
+		return t
+
 	case *memo.ConstAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -14306,6 +14323,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
 		)
 
+	case *memo.StringAggExpr:
+		return f.ConstructStringAgg(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Sep).(opt.ScalarExpr),
+		)
+
 	case *memo.ConstAggExpr:
 		return f.ConstructConstAgg(
 			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
@@ -14999,6 +15022,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.JsonbAggOp:
 		return f.ConstructJsonbAgg(
 			args[0].(opt.ScalarExpr),
+		)
+	case opt.StringAggOp:
+		return f.ConstructStringAgg(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
 		)
 	case opt.ConstAggOp:
 		return f.ConstructConstAgg(

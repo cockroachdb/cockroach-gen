@@ -222,12 +222,12 @@ func (g *scanGroup) bestProps() *bestProps {
 
 type ScanPrivate struct {
 	// Table identifies the table to scan. It is an id that can be passed to
-	// the Metadata.Table method in order to fetch opt.Table metadata.
+	// the Metadata.Table method in order to fetch cat.Table metadata.
 	Table opt.TableID
 
 	// Index identifies the index to scan (whether primary or secondary). It
-	// can be passed to the opt.Table.Index(i int) method in order to fetch the
-	// opt.Index metadata.
+	// can be passed to the cat.Table.Index(i int) method in order to fetch the
+	// cat.Index metadata.
 	Index int
 
 	// Cols specifies the set of columns that the scan operator projects. This
@@ -375,7 +375,7 @@ func (g *virtualScanGroup) bestProps() *bestProps {
 type VirtualScanPrivate struct {
 	// Table identifies the virtual table to synthesize and scan. It is an id
 	// that can be passed to the Metadata.Table method in order to fetch
-	// opt.Table metadata.
+	// cat.Table metadata.
 	Table opt.TableID
 
 	// Cols specifies the set of columns that the VirtualScan operator projects.
@@ -1852,8 +1852,8 @@ type LookupJoinPrivate struct {
 	Table opt.TableID
 
 	// Index identifies the index to do lookups in (whether primary or secondary).
-	// It can be passed to the opt.Table.Index(i int) method in order to fetch the
-	// opt.Index metadata.
+	// It can be passed to the cat.Table.Index(i int) method in order to fetch the
+	// cat.Index metadata.
 	Index int
 
 	// KeyCols are the columns (produced by the input) used to create lookup keys.
@@ -2174,8 +2174,8 @@ type ZigzagJoinPrivate struct {
 	RightTable opt.TableID
 
 	// LeftIndex and RightIndex identifies the index to do lookups in (whether
-	// primary or secondary). It can be passed to the opt.Table.Index(i int)
-	// method in order to fetch the opt.Index metadata.
+	// primary or secondary). It can be passed to the cat.Table.Index(i int)
+	// method in order to fetch the cat.Index metadata.
 	LeftIndex  int
 	RightIndex int
 
@@ -10078,6 +10078,62 @@ func (e *JsonbAggExpr) DataType() types.T {
 	return e.Typ
 }
 
+type StringAggExpr struct {
+	Input opt.ScalarExpr
+
+	// Sep is the constant expression which separates the input strings.
+	// Note that it must always be a constant expression.
+	Sep opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &StringAggExpr{}
+
+func (e *StringAggExpr) Op() opt.Operator {
+	return opt.StringAggOp
+}
+
+func (e *StringAggExpr) ChildCount() int {
+	return 2
+}
+
+func (e *StringAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Sep
+	}
+	panic("child index out of range")
+}
+
+func (e *StringAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *StringAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *StringAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Sep = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *StringAggExpr) DataType() types.T {
+	return e.Typ
+}
+
 // ConstAggExpr is used in the special case when the value of a column is known to be
 // constant within a grouping set; it returns that value. If there are no rows
 // in the grouping set, then ConstAgg returns NULL.
@@ -10521,7 +10577,7 @@ func (g *insertGroup) bestProps() *bestProps {
 
 type MutationPrivate struct {
 	// Table identifies the table which is being mutated. It is an id that can be
-	// passed to the Metadata.Table method in order to fetch opt.Table metadata.
+	// passed to the Metadata.Table method in order to fetch cat.Table metadata.
 	Table opt.TableID
 
 	// InsertCols are columns from the Input expression that will be inserted into
@@ -12936,6 +12992,24 @@ func (m *Memo) MemoizeJsonbAgg(
 	return interned
 }
 
+func (m *Memo) MemoizeStringAgg(
+	input opt.ScalarExpr,
+	sep opt.ScalarExpr,
+) *StringAggExpr {
+	const size = int64(unsafe.Sizeof(StringAggExpr{}))
+	e := &StringAggExpr{
+		Input: input,
+		Sep:   sep,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternStringAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeConstAgg(
 	input opt.ScalarExpr,
 ) *ConstAggExpr {
@@ -13827,6 +13901,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternJsonAgg(t)
 	case *JsonbAggExpr:
 		return in.InternJsonbAgg(t)
+	case *StringAggExpr:
+		return in.InternStringAgg(t)
 	case *ConstAggExpr:
 		return in.InternConstAgg(t)
 	case *ConstNotNullAggExpr:
@@ -16556,6 +16632,26 @@ func (in *interner) InternJsonbAgg(val *JsonbAggExpr) *JsonbAggExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*JsonbAggExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternStringAgg(val *StringAggExpr) *StringAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.StringAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Sep)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*StringAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Sep, existing.Sep) {
 				return existing
 			}
 		}
