@@ -299,3 +299,31 @@ func (m *memColumn) CopyWithSelInt16(vec ColVec, sel []uint16, nSel uint16, colT
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
 }
+
+func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
+	if m.NullAt(colIdx) {
+		return "NULL"
+	}
+	switch colType {
+	case types.Bool:
+		return fmt.Sprintf("%v", m.Bool()[colIdx])
+	case types.Bytes:
+		return fmt.Sprintf("%v", m.Bytes()[colIdx])
+	case types.Decimal:
+		return fmt.Sprintf("%v", m.Decimal()[colIdx])
+	case types.Int8:
+		return fmt.Sprintf("%v", m.Int8()[colIdx])
+	case types.Int16:
+		return fmt.Sprintf("%v", m.Int16()[colIdx])
+	case types.Int32:
+		return fmt.Sprintf("%v", m.Int32()[colIdx])
+	case types.Int64:
+		return fmt.Sprintf("%v", m.Int64()[colIdx])
+	case types.Float32:
+		return fmt.Sprintf("%v", m.Float32()[colIdx])
+	case types.Float64:
+		return fmt.Sprintf("%v", m.Float64()[colIdx])
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+}
