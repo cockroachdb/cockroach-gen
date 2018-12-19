@@ -42,6 +42,18 @@ func (m *memColumn) Append(vec ColVec, colType types.T, toLength uint64, fromLen
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
+
+	if fromLength > 0 {
+		m.nulls = append(m.nulls, make([]int64, (fromLength-1)>>6+1)...)
+
+		if vec.HasNulls() {
+			for i := uint16(0); i < fromLength; i++ {
+				if vec.NullAt(i) {
+					m.SetNull64(toLength + uint64(i))
+				}
+			}
+		}
+	}
 }
 
 func (m *memColumn) AppendWithSel(
@@ -132,6 +144,15 @@ func (m *memColumn) AppendWithSel(
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
+
+	if batchSize > 0 {
+		m.nulls = append(m.nulls, make([]int64, (batchSize-1)>>6+1)...)
+		for i := uint16(0); i < batchSize; i++ {
+			if vec.NullAt(sel[i]) {
+				m.SetNull64(toLength + uint64(i))
+			}
+		}
+	}
 }
 
 func (m *memColumn) Copy(src ColVec, srcStartIdx, srcEndIdx uint64, typ types.T) {
@@ -160,70 +181,162 @@ func (m *memColumn) Copy(src ColVec, srcStartIdx, srcEndIdx uint64, typ types.T)
 }
 
 func (m *memColumn) CopyWithSelInt64(vec ColVec, sel []uint64, nSel uint16, colType types.T) {
+	m.UnsetNulls()
+
 	// todo (changangela): handle the case when nSel > ColBatchSize
 	switch colType {
 	case types.Bool:
 		toCol := m.Bool()
 		fromCol := vec.Bool()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Bytes:
 		toCol := m.Bytes()
 		fromCol := vec.Bytes()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Decimal:
 		toCol := m.Decimal()
 		fromCol := vec.Decimal()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int8:
 		toCol := m.Int8()
 		fromCol := vec.Int8()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int16:
 		toCol := m.Int16()
 		fromCol := vec.Int16()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int32:
 		toCol := m.Int32()
 		fromCol := vec.Int32()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int64:
 		toCol := m.Int64()
 		fromCol := vec.Int64()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Float32:
 		toCol := m.Float32()
 		fromCol := vec.Float32()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Float64:
 		toCol := m.Float64()
 		fromCol := vec.Float64()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt64(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
@@ -231,69 +344,161 @@ func (m *memColumn) CopyWithSelInt64(vec ColVec, sel []uint64, nSel uint16, colT
 }
 
 func (m *memColumn) CopyWithSelInt16(vec ColVec, sel []uint16, nSel uint16, colType types.T) {
+	m.UnsetNulls()
+
 	switch colType {
 	case types.Bool:
 		toCol := m.Bool()
 		fromCol := vec.Bool()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Bytes:
 		toCol := m.Bytes()
 		fromCol := vec.Bytes()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Decimal:
 		toCol := m.Decimal()
 		fromCol := vec.Decimal()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int8:
 		toCol := m.Int8()
 		fromCol := vec.Int8()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int16:
 		toCol := m.Int16()
 		fromCol := vec.Int16()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int32:
 		toCol := m.Int32()
 		fromCol := vec.Int32()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Int64:
 		toCol := m.Int64()
 		fromCol := vec.Int64()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Float32:
 		toCol := m.Float32()
 		fromCol := vec.Float32()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	case types.Float64:
 		toCol := m.Float64()
 		fromCol := vec.Float64()
 
-		for i := uint16(0); i < nSel; i++ {
-			toCol[i] = fromCol[sel[i]]
+		if vec.HasNulls() {
+			for i := uint16(0); i < nSel; i++ {
+				if vec.NullAt(sel[i]) {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				toCol[i] = fromCol[sel[i]]
+			}
 		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))

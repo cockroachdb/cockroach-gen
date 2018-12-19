@@ -187,15 +187,19 @@ func (ht *hashTable) rehash(
 	}
 }
 
-// checkCol determines if the current key column in the groupID buckets
-// matches the specified equality column key. If there is a match, then the key
-// is added to differs. If the bucket has reached the end, the key is rejected.
+// checkCol determines if the current key column in the groupID buckets matches
+// the specified equality column key. If there is a match, then the key is added
+// to differs. If the bucket has reached the end, the key is rejected. If any
+// element in the key is null, then there is no match.
 func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []uint16) {
 	switch t {
 
 	case types.Bool:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Bool()
-		probeKeys := prober.keys[keyColIdx].Bool()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Bool()
+		probeKeys := probeVec.Bool()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -205,10 +209,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -219,17 +230,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Bytes:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Bytes()
-		probeKeys := prober.keys[keyColIdx].Bytes()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Bytes()
+		probeKeys := probeVec.Bytes()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -239,10 +260,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if !bytes.Equal(buildKeys[keyID-1], probeKeys[sel[prober.toCheck[i]]]) {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if !bytes.Equal(buildKeys[keyID-1], probeKeys[sel[prober.toCheck[i]]]) {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -253,17 +281,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if !bytes.Equal(buildKeys[keyID-1], probeKeys[prober.toCheck[i]]) {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if !bytes.Equal(buildKeys[keyID-1], probeKeys[prober.toCheck[i]]) {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Decimal:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Decimal()
-		probeKeys := prober.keys[keyColIdx].Decimal()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Decimal()
+		probeKeys := probeVec.Decimal()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -273,10 +311,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1].Cmp(&probeKeys[sel[prober.toCheck[i]]]) != 0 {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1].Cmp(&probeKeys[sel[prober.toCheck[i]]]) != 0 {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -287,17 +332,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1].Cmp(&probeKeys[prober.toCheck[i]]) != 0 {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1].Cmp(&probeKeys[prober.toCheck[i]]) != 0 {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Int8:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Int8()
-		probeKeys := prober.keys[keyColIdx].Int8()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Int8()
+		probeKeys := probeVec.Int8()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -307,10 +362,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -321,17 +383,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Int16:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Int16()
-		probeKeys := prober.keys[keyColIdx].Int16()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Int16()
+		probeKeys := probeVec.Int16()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -341,10 +413,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -355,17 +434,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Int32:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Int32()
-		probeKeys := prober.keys[keyColIdx].Int32()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Int32()
+		probeKeys := probeVec.Int32()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -375,10 +464,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -389,17 +485,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Int64:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Int64()
-		probeKeys := prober.keys[keyColIdx].Int64()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Int64()
+		probeKeys := probeVec.Int64()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -409,10 +515,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -423,17 +536,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Float32:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Float32()
-		probeKeys := prober.keys[keyColIdx].Float32()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Float32()
+		probeKeys := probeVec.Float32()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -443,10 +566,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -457,17 +587,27 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
 
 	case types.Float64:
-		buildKeys := prober.ht.vals[prober.ht.keyCols[keyColIdx]].Float64()
-		probeKeys := prober.keys[keyColIdx].Float64()
+		buildVec := prober.ht.vals[prober.ht.keyCols[keyColIdx]]
+		probeVec := prober.keys[keyColIdx]
+
+		buildKeys := buildVec.Float64()
+		probeKeys := probeVec.Float64()
 
 		if sel != nil {
 			for i := uint16(0); i < nToCheck; i++ {
@@ -477,10 +617,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+					if probeVec.NullAt(sel[prober.toCheck[i]]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[sel[prober.toCheck[i]]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		} else {
@@ -491,10 +638,17 @@ func (prober *hashJoinProber) checkCol(t types.T, keyColIdx int, nToCheck uint16
 					// compared to the corresponding probe table to determine if a match is
 					// found.
 
-					if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+					if probeVec.NullAt(prober.toCheck[i]) {
+						prober.groupID[prober.toCheck[i]] = 0
+					} else if buildVec.NullAt64(keyID - 1) {
 						prober.differs[prober.toCheck[i]] = true
-					}
+					} else {
 
+						if buildKeys[keyID-1] != probeKeys[prober.toCheck[i]] {
+							prober.differs[prober.toCheck[i]] = true
+						}
+
+					}
 				}
 			}
 		}
