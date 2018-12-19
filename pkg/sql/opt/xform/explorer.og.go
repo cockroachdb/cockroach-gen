@@ -116,6 +116,44 @@ func (_e *explorer) exploreSelect(
 		}
 	}
 
+	// [GenerateInvertedIndexZigzagJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scan := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scan) {
+						if _e.funcs.HasInvertedIndexes(scan) {
+							filters := _root.Filters
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedIndexZigzagJoins) {
+								var _last memo.RelExpr
+								if _e.o.appliedRule != nil {
+									_last = memo.LastGroupMember(_root)
+								}
+								_e.funcs.GenerateInvertedIndexZigzagJoins(_root, scan, filters)
+								if _e.o.appliedRule != nil {
+									_e.o.appliedRule(opt.GenerateInvertedIndexZigzagJoins, _root, _last.NextExpr())
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateConstrainedScans]
 	{
 		_partlyExplored := _rootOrd < _rootState.start

@@ -183,6 +183,7 @@ const (
 	GenerateMergeJoins
 	GenerateLookupJoins
 	GenerateZigzagJoins
+	GenerateInvertedIndexZigzagJoins
 	GenerateLookupJoinsWithFilter
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan
