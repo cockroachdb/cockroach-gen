@@ -505,6 +505,251 @@ func (m *memColumn) CopyWithSelInt16(vec ColVec, sel []uint16, nSel uint16, colT
 	}
 }
 
+func (m *memColumn) CopyWithSelAndNilsInt64(
+	vec ColVec, sel []uint64, nSel uint16, nils []bool, colType types.T,
+) {
+	m.UnsetNulls()
+
+	switch colType {
+	case types.Bool:
+		toCol := m.Bool()
+		fromCol := vec.Bool()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Bytes:
+		toCol := m.Bytes()
+		fromCol := vec.Bytes()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Decimal:
+		toCol := m.Decimal()
+		fromCol := vec.Decimal()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Int8:
+		toCol := m.Int8()
+		fromCol := vec.Int8()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Int16:
+		toCol := m.Int16()
+		fromCol := vec.Int16()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Int32:
+		toCol := m.Int32()
+		fromCol := vec.Int32()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Int64:
+		toCol := m.Int64()
+		fromCol := vec.Int64()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Float32:
+		toCol := m.Float32()
+		fromCol := vec.Float32()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	case types.Float64:
+		toCol := m.Float64()
+		fromCol := vec.Float64()
+
+		if vec.HasNulls() {
+			// TODO(jordan): copy the null arrays in batch.
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					if vec.NullAt64(sel[i]) {
+						m.SetNull(i)
+					} else {
+						toCol[i] = fromCol[sel[i]]
+					}
+				}
+			}
+		} else {
+			for i := uint16(0); i < nSel; i++ {
+				if nils[i] {
+					m.SetNull(i)
+				} else {
+					toCol[i] = fromCol[sel[i]]
+				}
+			}
+		}
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+}
+
 func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 	if m.NullAt(colIdx) {
 		return "NULL"
