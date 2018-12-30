@@ -48,7 +48,7 @@ func (n *commentOnTableNode) startExec(params runParams) error {
 	if n.n.Comment != nil {
 		_, err := params.p.extendedEvalCtx.ExecCfg.InternalExecutor.Exec(
 			params.ctx,
-			"upsert-comment",
+			"set-table-comment",
 			params.p.Txn(),
 			"UPSERT INTO system.comments VALUES ($1, $2, 0, $3)",
 			keys.TableCommentType,
@@ -60,7 +60,7 @@ func (n *commentOnTableNode) startExec(params runParams) error {
 	} else {
 		_, err := params.p.extendedEvalCtx.ExecCfg.InternalExecutor.Exec(
 			params.ctx,
-			"delete-comment",
+			"delete-table-comment",
 			params.p.Txn(),
 			"DELETE FROM system.comments WHERE type=$1 AND object_id=$2 AND sub_id=0",
 			keys.TableCommentType,
