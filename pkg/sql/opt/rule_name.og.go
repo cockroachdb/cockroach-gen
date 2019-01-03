@@ -72,6 +72,10 @@ const (
 	EliminateGroupByProject
 	ReduceGroupingCols
 	EliminateAggDistinctForKeys
+	InlineProjectConstants
+	InlineSelectConstants
+	InlineJoinConstantsLeft
+	InlineJoinConstantsRight
 	PushSelectIntoInlinableProject
 	InlineProjectInProject
 	SimplifyJoinFilters

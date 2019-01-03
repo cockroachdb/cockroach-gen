@@ -229,6 +229,28 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [InlineSelectConstants]
+	{
+		constCols := _f.funcs.FindInlinableConstants(input)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range filters {
+				item := &filters[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineSelectConstants) {
+						_expr := _f.ConstructSelect(
+							input,
+							_f.funcs.InlineFilterConstants(filters, input, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineSelectConstants, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectSelectContradiction]
 	{
 		for i := range filters {
@@ -715,6 +737,29 @@ func (_f *Factory) ConstructProject(
 	projections memo.ProjectionsExpr,
 	passthrough opt.ColSet,
 ) memo.RelExpr {
+	// [InlineProjectConstants]
+	{
+		constCols := _f.funcs.FindInlinableConstants(input)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range projections {
+				item := &projections[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineProjectConstants) {
+						_expr := _f.ConstructProject(
+							input,
+							_f.funcs.InlineProjectionConstants(projections, input, constCols),
+							passthrough,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineProjectConstants, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [EliminateProject]
 	{
 		if len(projections) == 0 {
@@ -1075,7 +1120,8 @@ func (_f *Factory) ConstructProject(
 	{
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
-			if !_f.funcs.HasDuplicateRefs(projections, passthrough) {
+			innerProjections := _project.Projections
+			if !_f.funcs.HasDuplicateRefs(projections, passthrough, _f.funcs.ProjectionCols(innerProjections)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.InlineProjectInProject) {
 					_expr := _f.funcs.InlineProjectProject(input, projections, passthrough).(memo.RelExpr)
 					if _f.appliedRule != nil {
@@ -1404,6 +1450,52 @@ func (_f *Factory) ConstructInnerJoin(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructInnerJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructInnerJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -1956,6 +2048,52 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructLeftJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructLeftJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectJoinContradiction]
 	{
 		for i := range on {
@@ -2293,6 +2431,52 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructRightJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructRightJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectJoinContradiction]
 	{
 		for i := range on {
@@ -2596,6 +2780,52 @@ func (_f *Factory) ConstructFullJoin(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructFullJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructFullJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -2950,6 +3180,52 @@ func (_f *Factory) ConstructSemiJoin(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructSemiJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructSemiJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -3415,6 +3691,52 @@ func (_f *Factory) ConstructAntiJoin(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructAntiJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructAntiJoin(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -4029,6 +4351,52 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructInnerJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructInnerJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectJoinContradiction]
 	{
 		for i := range on {
@@ -4579,6 +4947,52 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructLeftJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructLeftJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectJoinContradiction]
 	{
 		for i := range on {
@@ -4900,6 +5314,52 @@ func (_f *Factory) ConstructRightJoinApply(
 		}
 	}
 
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructRightJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructRightJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectJoinContradiction]
 	{
 		for i := range on {
@@ -5187,6 +5647,52 @@ func (_f *Factory) ConstructFullJoinApply(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructFullJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructFullJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -5525,6 +6031,52 @@ func (_f *Factory) ConstructSemiJoinApply(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructSemiJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructSemiJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -5920,6 +6472,52 @@ func (_f *Factory) ConstructAntiJoinApply(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.NormalizeJoinNotAnyFilter, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsLeft]
+	{
+		constCols := _f.funcs.FindInlinableConstants(left)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+						_expr := _f.ConstructAntiJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, left, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [InlineJoinConstantsRight]
+	{
+		constCols := _f.funcs.FindInlinableConstants(right)
+		if !_f.funcs.ColsAreEmpty(constCols) {
+			for i := range on {
+				item := &on[i]
+				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+						_expr := _f.ConstructAntiJoinApply(
+							left,
+							right,
+							_f.funcs.InlineFilterConstants(on, right, constCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
 						}
 						return _expr
 					}
