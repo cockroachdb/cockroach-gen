@@ -184,6 +184,11 @@ const (
 
 	CountRowsOp
 
+	// CreateTable represents a CREATE TABLE statement.
+	CreateTableOp
+
+	CreateTablePrivateOp
+
 	// DistinctOn filters out rows that are identical on the set of grouping columns;
 	// only the first row (according to an ordering) is kept for each set of possible
 	// values. It is roughly equivalent with a GroupBy on the same grouping columns
@@ -865,13 +870,13 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownagg-distinctaggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggarray-flattenavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowsdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeif-errinindex-joinindex-join-privateindirectioninner-joininner-join-applyinsertintersectintersect-allisis-notjson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftleleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultmutation-privatenenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonulloffsetorplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftreg-i-matchreg-matchright-joinright-join-applyrow-numberrow-number-privatescalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applyset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devstring-aggsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprupdatevaluesvariablevariancevirtual-scanvirtual-scan-privatewhenxor-aggzigzag-joinzigzag-join-privatezipzip-itemzip-item-private"
+const opNames = "unknownagg-distinctaggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggarray-flattenavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowscreate-tablecreate-table-privatedistinct-ondiveqexceptexcept-allexistsexplainexplain-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeif-errinindex-joinindex-join-privateindirectioninner-joininner-join-applyinsertintersectintersect-allisis-notjson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftleleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultmutation-privatenenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonulloffsetorplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftreg-i-matchreg-matchright-joinright-join-applyrow-numberrow-number-privatescalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applyset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devstring-aggsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprupdatevaluesvariablevariancevirtual-scanvirtual-scan-privatewhenxor-aggzigzag-joinzigzag-join-privatezipzip-itemzip-item-private"
 
-var opNameIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 131, 134, 140, 145, 151, 159, 166, 170, 174, 182, 193, 200, 213, 219, 229, 234, 243, 261, 269, 274, 284, 295, 298, 300, 306, 316, 322, 329, 344, 349, 359, 374, 383, 397, 404, 416, 425, 434, 443, 458, 466, 482, 484, 492, 508, 510, 516, 522, 524, 534, 552, 563, 573, 589, 595, 604, 617, 619, 625, 633, 648, 659, 675, 684, 691, 693, 702, 717, 721, 726, 737, 756, 758, 761, 769, 779, 797, 800, 805, 808, 812, 828, 830, 833, 843, 849, 857, 872, 885, 899, 903, 909, 911, 922, 926, 929, 936, 947, 958, 974, 981, 992, 1001, 1011, 1027, 1037, 1055, 1070, 1081, 1085, 1097, 1103, 1112, 1127, 1138, 1160, 1178, 1188, 1192, 1200, 1207, 1217, 1225, 1241, 1244, 1251, 1255, 1260, 1276, 1287, 1292, 1301, 1317, 1323, 1329, 1337, 1345, 1357, 1377, 1381, 1388, 1399, 1418, 1421, 1429, 1445}
+var opNameIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 131, 134, 140, 145, 151, 159, 166, 170, 174, 182, 193, 200, 213, 219, 229, 234, 243, 261, 269, 274, 284, 296, 316, 327, 330, 332, 338, 348, 354, 361, 376, 381, 391, 406, 415, 429, 436, 448, 457, 466, 475, 490, 498, 514, 516, 524, 540, 542, 548, 554, 556, 566, 584, 595, 605, 621, 627, 636, 649, 651, 657, 665, 680, 691, 707, 716, 723, 725, 734, 749, 753, 758, 769, 788, 790, 793, 801, 811, 829, 832, 837, 840, 844, 860, 862, 865, 875, 881, 889, 904, 917, 931, 935, 941, 943, 954, 958, 961, 968, 979, 990, 1006, 1013, 1024, 1033, 1043, 1059, 1069, 1087, 1102, 1113, 1117, 1129, 1135, 1144, 1159, 1170, 1192, 1210, 1220, 1224, 1232, 1239, 1249, 1257, 1273, 1276, 1283, 1287, 1292, 1308, 1319, 1324, 1333, 1349, 1355, 1361, 1369, 1377, 1389, 1409, 1413, 1420, 1431, 1450, 1453, 1461, 1477}
 
-const opSyntaxTags = "UNKNOWNAGG DISTINCTAGGREGATIONSAGGREGATIONS ITEMANDANTI JOINANTI JOIN APPLYANYANY NOT NULL AGGANY SCALARARRAYARRAY AGGARRAY FLATTENAVGBITANDBITORBITXORBOOL ANDBOOL ORCASECASTCOALESCECOL PRIVATECOLLATECOLUMN ACCESSCONCATCONCAT AGGCONSTCONST AGGCONST NOT NULL AGGCONTAINSCOUNTCOUNT ROWSDISTINCT ONDIVEQEXCEPTEXCEPT ALLEXISTSEXPLAINEXPLAIN PRIVATEFALSEFETCH TEXTFETCH TEXT PATHFETCH VALFETCH VAL PATHFILTERSFILTERS ITEMFIRST AGGFLOOR DIVFULL JOINFULL JOIN APPLYFUNCTIONFUNCTION PRIVATEGEGROUP BYGROUPING PRIVATEGTI LIKEIF ERRININDEX JOININDEX JOIN PRIVATEINDIRECTIONINNER JOININNER JOIN APPLYINSERTINTERSECTINTERSECT ALLISIS NOTJSON AGGJSON ALL EXISTSJSON EXISTSJSON SOME EXISTSJSONB AGGL SHIFTLELEFT JOINLEFT JOIN APPLYLIKELIMITLOOKUP JOINLOOKUP JOIN PRIVATELTMAXMAX1 ROWMERGE JOINMERGE JOIN PRIVATEMINMINUSMODMULTMUTATION PRIVATENENOTNOT I LIKENOT INNOT LIKENOT REG I MATCHNOT REG MATCHNOT SIMILAR TONULLOFFSETORPLACEHOLDERPLUSPOWPROJECTPROJECT SETPROJECTIONSPROJECTIONS ITEMR SHIFTREG I MATCHREG MATCHRIGHT JOINRIGHT JOIN APPLYROW NUMBERROW NUMBER PRIVATESCALAR GROUP BYSCALAR LISTSCANSCAN PRIVATESELECTSEMI JOINSEMI JOIN APPLYSET PRIVATESHOW TRACE FOR SESSIONSHOW TRACE PRIVATESIMILAR TOSORTSQR DIFFSTD DEVSTRING AGGSUBQUERYSUBQUERY PRIVATESUMSUM INTTRUETUPLEUNARY COMPLEMENTUNARY MINUSUNIONUNION ALLUNSUPPORTED EXPRUPDATEVALUESVARIABLEVARIANCEVIRTUAL SCANVIRTUAL SCAN PRIVATEWHENXOR AGGZIGZAG JOINZIGZAG JOIN PRIVATEZIPZIP ITEMZIP ITEM PRIVATE"
+const opSyntaxTags = "UNKNOWNAGG DISTINCTAGGREGATIONSAGGREGATIONS ITEMANDANTI JOINANTI JOIN APPLYANYANY NOT NULL AGGANY SCALARARRAYARRAY AGGARRAY FLATTENAVGBITANDBITORBITXORBOOL ANDBOOL ORCASECASTCOALESCECOL PRIVATECOLLATECOLUMN ACCESSCONCATCONCAT AGGCONSTCONST AGGCONST NOT NULL AGGCONTAINSCOUNTCOUNT ROWSCREATE TABLECREATE TABLE PRIVATEDISTINCT ONDIVEQEXCEPTEXCEPT ALLEXISTSEXPLAINEXPLAIN PRIVATEFALSEFETCH TEXTFETCH TEXT PATHFETCH VALFETCH VAL PATHFILTERSFILTERS ITEMFIRST AGGFLOOR DIVFULL JOINFULL JOIN APPLYFUNCTIONFUNCTION PRIVATEGEGROUP BYGROUPING PRIVATEGTI LIKEIF ERRININDEX JOININDEX JOIN PRIVATEINDIRECTIONINNER JOININNER JOIN APPLYINSERTINTERSECTINTERSECT ALLISIS NOTJSON AGGJSON ALL EXISTSJSON EXISTSJSON SOME EXISTSJSONB AGGL SHIFTLELEFT JOINLEFT JOIN APPLYLIKELIMITLOOKUP JOINLOOKUP JOIN PRIVATELTMAXMAX1 ROWMERGE JOINMERGE JOIN PRIVATEMINMINUSMODMULTMUTATION PRIVATENENOTNOT I LIKENOT INNOT LIKENOT REG I MATCHNOT REG MATCHNOT SIMILAR TONULLOFFSETORPLACEHOLDERPLUSPOWPROJECTPROJECT SETPROJECTIONSPROJECTIONS ITEMR SHIFTREG I MATCHREG MATCHRIGHT JOINRIGHT JOIN APPLYROW NUMBERROW NUMBER PRIVATESCALAR GROUP BYSCALAR LISTSCANSCAN PRIVATESELECTSEMI JOINSEMI JOIN APPLYSET PRIVATESHOW TRACE FOR SESSIONSHOW TRACE PRIVATESIMILAR TOSORTSQR DIFFSTD DEVSTRING AGGSUBQUERYSUBQUERY PRIVATESUMSUM INTTRUETUPLEUNARY COMPLEMENTUNARY MINUSUNIONUNION ALLUNSUPPORTED EXPRUPDATEVALUESVARIABLEVARIANCEVIRTUAL SCANVIRTUAL SCAN PRIVATEWHENXOR AGGZIGZAG JOINZIGZAG JOIN PRIVATEZIPZIP ITEMZIP ITEM PRIVATE"
 
-var opSyntaxTagIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 131, 134, 140, 145, 151, 159, 166, 170, 174, 182, 193, 200, 213, 219, 229, 234, 243, 261, 269, 274, 284, 295, 298, 300, 306, 316, 322, 329, 344, 349, 359, 374, 383, 397, 404, 416, 425, 434, 443, 458, 466, 482, 484, 492, 508, 510, 516, 522, 524, 534, 552, 563, 573, 589, 595, 604, 617, 619, 625, 633, 648, 659, 675, 684, 691, 693, 702, 717, 721, 726, 737, 756, 758, 761, 769, 779, 797, 800, 805, 808, 812, 828, 830, 833, 843, 849, 857, 872, 885, 899, 903, 909, 911, 922, 926, 929, 936, 947, 958, 974, 981, 992, 1001, 1011, 1027, 1037, 1055, 1070, 1081, 1085, 1097, 1103, 1112, 1127, 1138, 1160, 1178, 1188, 1192, 1200, 1207, 1217, 1225, 1241, 1244, 1251, 1255, 1260, 1276, 1287, 1292, 1301, 1317, 1323, 1329, 1337, 1345, 1357, 1377, 1381, 1388, 1399, 1418, 1421, 1429, 1445}
+var opSyntaxTagIndexes = [...]uint32{0, 7, 19, 31, 48, 51, 60, 75, 78, 94, 104, 109, 118, 131, 134, 140, 145, 151, 159, 166, 170, 174, 182, 193, 200, 213, 219, 229, 234, 243, 261, 269, 274, 284, 296, 316, 327, 330, 332, 338, 348, 354, 361, 376, 381, 391, 406, 415, 429, 436, 448, 457, 466, 475, 490, 498, 514, 516, 524, 540, 542, 548, 554, 556, 566, 584, 595, 605, 621, 627, 636, 649, 651, 657, 665, 680, 691, 707, 716, 723, 725, 734, 749, 753, 758, 769, 788, 790, 793, 801, 811, 829, 832, 837, 840, 844, 860, 862, 865, 875, 881, 889, 904, 917, 931, 935, 941, 943, 954, 958, 961, 968, 979, 990, 1006, 1013, 1024, 1033, 1043, 1059, 1069, 1087, 1102, 1113, 1117, 1129, 1135, 1144, 1159, 1170, 1192, 1210, 1220, 1224, 1232, 1239, 1249, 1257, 1273, 1276, 1283, 1287, 1292, 1308, 1319, 1324, 1333, 1349, 1355, 1361, 1369, 1377, 1389, 1409, 1413, 1420, 1431, 1450, 1453, 1461, 1477}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -888,6 +893,7 @@ func IsEnforcerOp(e Expr) bool {
 var RelationalOperators = [...]Operator{
 	AntiJoinOp,
 	AntiJoinApplyOp,
+	CreateTableOp,
 	DistinctOnOp,
 	ExceptOp,
 	ExceptAllOp,
@@ -929,14 +935,15 @@ var RelationalOperators = [...]Operator{
 
 func IsRelationalOp(e Expr) bool {
 	switch e.Op() {
-	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, ExceptOp,
-		ExceptAllOp, ExplainOp, FullJoinOp, FullJoinApplyOp, GroupByOp,
-		IndexJoinOp, InnerJoinOp, InnerJoinApplyOp, InsertOp, IntersectOp,
-		IntersectAllOp, LeftJoinOp, LeftJoinApplyOp, LimitOp, LookupJoinOp,
-		Max1RowOp, MergeJoinOp, OffsetOp, ProjectOp, ProjectSetOp,
-		RightJoinOp, RightJoinApplyOp, RowNumberOp, ScalarGroupByOp, ScanOp,
-		SelectOp, SemiJoinOp, SemiJoinApplyOp, ShowTraceForSessionOp, UnionOp,
-		UnionAllOp, UpdateOp, ValuesOp, VirtualScanOp, ZigzagJoinOp:
+	case AntiJoinOp, AntiJoinApplyOp, CreateTableOp, DistinctOnOp,
+		ExceptOp, ExceptAllOp, ExplainOp, FullJoinOp, FullJoinApplyOp,
+		GroupByOp, IndexJoinOp, InnerJoinOp, InnerJoinApplyOp, InsertOp,
+		IntersectOp, IntersectAllOp, LeftJoinOp, LeftJoinApplyOp, LimitOp,
+		LookupJoinOp, Max1RowOp, MergeJoinOp, OffsetOp, ProjectOp,
+		ProjectSetOp, RightJoinOp, RightJoinApplyOp, RowNumberOp, ScalarGroupByOp,
+		ScanOp, SelectOp, SemiJoinOp, SemiJoinApplyOp, ShowTraceForSessionOp,
+		UnionOp, UnionAllOp, UpdateOp, ValuesOp, VirtualScanOp,
+		ZigzagJoinOp:
 		return true
 	}
 	return false
@@ -944,6 +951,7 @@ func IsRelationalOp(e Expr) bool {
 
 var PrivateOperators = [...]Operator{
 	ColPrivateOp,
+	CreateTablePrivateOp,
 	ExplainPrivateOp,
 	FunctionPrivateOp,
 	GroupingPrivateOp,
@@ -963,10 +971,10 @@ var PrivateOperators = [...]Operator{
 
 func IsPrivateOp(e Expr) bool {
 	switch e.Op() {
-	case ColPrivateOp, ExplainPrivateOp, FunctionPrivateOp, GroupingPrivateOp,
-		IndexJoinPrivateOp, LookupJoinPrivateOp, MergeJoinPrivateOp, MutationPrivateOp, RowNumberPrivateOp,
-		ScanPrivateOp, SetPrivateOp, ShowTracePrivateOp, SubqueryPrivateOp, VirtualScanPrivateOp,
-		ZigzagJoinPrivateOp, ZipItemPrivateOp:
+	case ColPrivateOp, CreateTablePrivateOp, ExplainPrivateOp, FunctionPrivateOp,
+		GroupingPrivateOp, IndexJoinPrivateOp, LookupJoinPrivateOp, MergeJoinPrivateOp, MutationPrivateOp,
+		RowNumberPrivateOp, ScanPrivateOp, SetPrivateOp, ShowTracePrivateOp, SubqueryPrivateOp,
+		VirtualScanPrivateOp, ZigzagJoinPrivateOp, ZipItemPrivateOp:
 		return true
 	}
 	return false
@@ -1391,6 +1399,18 @@ var MutationOperators = [...]Operator{
 func IsMutationOp(e Expr) bool {
 	switch e.Op() {
 	case InsertOp, UpdateOp:
+		return true
+	}
+	return false
+}
+
+var DDLOperators = [...]Operator{
+	CreateTableOp,
+}
+
+func IsDDLOp(e Expr) bool {
+	switch e.Op() {
+	case CreateTableOp:
 		return true
 	}
 	return false

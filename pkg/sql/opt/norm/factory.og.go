@@ -13070,6 +13070,16 @@ func (_f *Factory) ConstructUpdate(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructCreateTable constructs an expression for the CreateTable operator.
+// CreateTable represents a CREATE TABLE statement.
+func (_f *Factory) ConstructCreateTable(
+	input memo.RelExpr,
+	createTablePrivate *memo.CreateTablePrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeCreateTable(input, createTablePrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Reconstruct enables an expression subtree to be rewritten under the control
 // of the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -14088,6 +14098,13 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.CreateTableExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructCreateTable(input, &t.CreateTablePrivate)
+		}
+		return t
+
 	}
 	panic(fmt.Sprintf("unhandled op %s", e.Op()))
 }
@@ -14964,6 +14981,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			&t.MutationPrivate,
 		)
 
+	case *memo.CreateTableExpr:
+		return f.ConstructCreateTable(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.CreateTablePrivate,
+		)
+
 	}
 	panic(fmt.Sprintf("unhandled op %s", src.Op()))
 }
@@ -15655,6 +15678,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructUpdate(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.MutationPrivate),
+		)
+	case opt.CreateTableOp:
+		return f.ConstructCreateTable(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.CreateTablePrivate),
 		)
 	}
 	panic(fmt.Sprintf("cannot dynamically construct operator %s", op))

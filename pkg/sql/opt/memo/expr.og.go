@@ -10776,6 +10776,143 @@ func (g *updateGroup) bestProps() *bestProps {
 	return &g.best
 }
 
+// CreateTableExpr represents a CREATE TABLE statement.
+type CreateTableExpr struct {
+	// Input is only used if the AS clause was used in the CREATE TABLE
+	// statement. If it was not used, then the Input is a dummy zero row, zero
+	// column Values expression (and nil inputs are not allowed).
+	Input RelExpr
+	CreateTablePrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &CreateTableExpr{}
+
+func (e *CreateTableExpr) Op() opt.Operator {
+	return opt.CreateTableOp
+}
+
+func (e *CreateTableExpr) ChildCount() int {
+	return 1
+}
+
+func (e *CreateTableExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *CreateTableExpr) Private() interface{} {
+	return &e.CreateTablePrivate
+}
+
+func (e *CreateTableExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CreateTableExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *CreateTableExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *CreateTableExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *CreateTableExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *CreateTableExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *CreateTableExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *CreateTableExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *CreateTableExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *CreateTableExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *CreateTableExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *CreateTableExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *CreateTableExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type createTableGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first CreateTableExpr
+	best  bestProps
+}
+
+var _ exprGroup = &createTableGroup{}
+
+func (g *createTableGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *createTableGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *createTableGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *createTableGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type CreateTablePrivate struct {
+	// Schema is the ID of the catalog schema into which the new table goes.
+	Schema opt.SchemaID
+
+	// InputCols gives the ordering of input columns. It is only defined when the
+	// AS clause was used in the CREATE TABLE statement.
+	InputCols opt.ColList
+
+	// Syntax is the CREATE TABLE AST node.
+	Syntax *tree.CreateTable
+}
+
 func (m *Memo) MemoizeScan(
 	scanPrivate *ScanPrivate,
 ) RelExpr {
@@ -13130,6 +13267,26 @@ func (m *Memo) MemoizeUpdate(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeCreateTable(
+	input RelExpr,
+	createTablePrivate *CreateTablePrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(createTableGroup{}))
+	grp := &createTableGroup{mem: m, first: CreateTableExpr{
+		Input:              input,
+		CreateTablePrivate: *createTablePrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternCreateTable(e)
+	if interned == e {
+		m.logPropsBuilder.buildCreateTableProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 	const size = int64(unsafe.Sizeof(ScanExpr{}))
 	interned := m.interner.InternScan(e)
@@ -13637,6 +13794,19 @@ func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
 	return interned
 }
 
+func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTableExpr {
+	const size = int64(unsafe.Sizeof(CreateTableExpr{}))
+	interned := m.interner.InternCreateTable(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *ScanExpr:
@@ -13919,6 +14089,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternInsert(t)
 	case *UpdateExpr:
 		return in.InternUpdate(t)
+	case *CreateTableExpr:
+		return in.InternCreateTable(t)
 	default:
 		panic(fmt.Sprintf("unhandled op: %s", e.Op()))
 	}
@@ -13930,7 +14102,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashInt(val.Index)
 	in.hasher.HashColSet(val.Cols)
-	in.hasher.HashConstraint(val.Constraint)
+	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
 
@@ -13940,7 +14112,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIntEqual(val.Index, existing.Index) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
-				in.hasher.IsConstraintEqual(val.Constraint, existing.Constraint) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) {
 				return existing
@@ -14802,7 +14974,7 @@ func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.SubqueryOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashPointer(unsafe.Pointer(val.OriginalExpr))
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
@@ -14811,7 +14983,7 @@ func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*SubqueryExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
@@ -14829,7 +15001,7 @@ func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
 	in.hasher.HashOperator(opt.AnyOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashScalarExpr(val.Scalar)
-	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashPointer(unsafe.Pointer(val.OriginalExpr))
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
@@ -14839,7 +15011,7 @@ func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
 		if existing, ok := in.cache.Item().(*AnyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Scalar, existing.Scalar) &&
-				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
@@ -14856,7 +15028,7 @@ func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ExistsOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashPointer(unsafe.Pointer(val.OriginalExpr))
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
@@ -14865,7 +15037,7 @@ func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ExistsExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
@@ -16214,7 +16386,7 @@ func (in *interner) InternArrayFlatten(val *ArrayFlattenExpr) *ArrayFlattenExpr 
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ArrayFlattenOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashSubquery(val.OriginalExpr)
+	in.hasher.HashPointer(unsafe.Pointer(val.OriginalExpr))
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
@@ -16223,7 +16395,7 @@ func (in *interner) InternArrayFlatten(val *ArrayFlattenExpr) *ArrayFlattenExpr 
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ArrayFlattenExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsSubqueryEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
 				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
@@ -16242,8 +16414,8 @@ func (in *interner) InternFunction(val *FunctionExpr) *FunctionExpr {
 	in.hasher.HashScalarListExpr(val.Args)
 	in.hasher.HashString(val.Name)
 	in.hasher.HashDatumType(val.Typ)
-	in.hasher.HashFuncProps(val.Properties)
-	in.hasher.HashFuncOverload(val.Overload)
+	in.hasher.HashPointer(unsafe.Pointer(val.Properties))
+	in.hasher.HashPointer(unsafe.Pointer(val.Overload))
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -16251,8 +16423,8 @@ func (in *interner) InternFunction(val *FunctionExpr) *FunctionExpr {
 			if in.hasher.IsScalarListExprEqual(val.Args, existing.Args) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) &&
-				in.hasher.IsFuncPropsEqual(val.Properties, existing.Properties) &&
-				in.hasher.IsFuncOverloadEqual(val.Overload, existing.Overload) {
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.Properties), unsafe.Pointer(existing.Properties)) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.Overload), unsafe.Pointer(existing.Overload)) {
 				return existing
 			}
 		}
@@ -16825,6 +16997,30 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	return val
 }
 
+func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CreateTableOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashSchemaID(val.Schema)
+	in.hasher.HashColList(val.InputCols)
+	in.hasher.HashPointer(unsafe.Pointer(val.Syntax))
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CreateTableExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
+				in.hasher.IsColListEqual(val.InputCols, existing.InputCols) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.Syntax), unsafe.Pointer(existing.Syntax)) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *ScanExpr:
@@ -16905,6 +17101,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildInsertProps(t, rel)
 	case *UpdateExpr:
 		b.buildUpdateProps(t, rel)
+	case *CreateTableExpr:
+		b.buildCreateTableProps(t, rel)
 	default:
 		panic(fmt.Sprintf("unhandled type: %s", t.Op()))
 	}
