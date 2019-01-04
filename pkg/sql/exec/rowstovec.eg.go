@@ -32,10 +32,10 @@ func EncDatumRowsToColVec(
 ) error {
 
 	switch columnType.SemanticType {
-	case sqlbase.ColumnType_OID:
+	case sqlbase.ColumnType_NAME:
 
 		nRows := uint16(len(rows))
-		col := vec.Int64()
+		col := vec.Bytes()
 		datumToPhysicalFn := types.GetDatumToPhysicalFn(*columnType)
 		for i := uint16(0); i < nRows; i++ {
 			if rows[i][columnIdx].Datum == nil {
@@ -51,7 +51,7 @@ func EncDatumRowsToColVec(
 				if err != nil {
 					return err
 				}
-				col[i] = v.(int64)
+				col[i] = v.([]byte)
 			}
 		}
 	case sqlbase.ColumnType_INT:
@@ -191,10 +191,10 @@ func EncDatumRowsToColVec(
 				col[i] = v.(apd.Decimal)
 			}
 		}
-	case sqlbase.ColumnType_BYTES:
+	case sqlbase.ColumnType_DATE:
 
 		nRows := uint16(len(rows))
-		col := vec.Bytes()
+		col := vec.Int64()
 		datumToPhysicalFn := types.GetDatumToPhysicalFn(*columnType)
 		for i := uint16(0); i < nRows; i++ {
 			if rows[i][columnIdx].Datum == nil {
@@ -210,7 +210,7 @@ func EncDatumRowsToColVec(
 				if err != nil {
 					return err
 				}
-				col[i] = v.([]byte)
+				col[i] = v.(int64)
 			}
 		}
 	case sqlbase.ColumnType_STRING:
@@ -235,7 +235,7 @@ func EncDatumRowsToColVec(
 				col[i] = v.([]byte)
 			}
 		}
-	case sqlbase.ColumnType_NAME:
+	case sqlbase.ColumnType_BYTES:
 
 		nRows := uint16(len(rows))
 		col := vec.Bytes()
@@ -301,7 +301,7 @@ func EncDatumRowsToColVec(
 				col[i] = v.(float64)
 			}
 		}
-	case sqlbase.ColumnType_DATE:
+	case sqlbase.ColumnType_OID:
 
 		nRows := uint16(len(rows))
 		col := vec.Int64()
