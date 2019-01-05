@@ -10636,6 +10636,12 @@ type MutationPrivate struct {
 	// then UpdateCols would contain [0, id-b, id-c].
 	UpdateCols opt.ColList
 
+	// CanaryCol is used only with the Upsert operator. It identifies the column
+	// that the execution engine uses to decide whether to insert or to update.
+	// If the canary column value is null for a particular input row, then a new
+	// row is inserted into the table. Otherwise, the existing row is updated.
+	CanaryCol opt.ColumnID
+
 	// NeedResults is true if the Insert operator returns output rows. One output
 	// row will be returned for each input row. The output row contains all
 	// columns in the table, including hidden columns, but not including any
@@ -10645,11 +10651,9 @@ type MutationPrivate struct {
 }
 
 // UpdateExpr evaluates a relational input expression that fetches existing rows from
-// a target table and computes new values for one or more columns. The Update
-// operator uses the existing and new values from the input to update indexes,
-// evaluate check constraints and foreign keys, and update computed columns.
-// Arbitrary subsets of rows can be selected from the target table and processed
-// in order, as with this example:
+// a target table and computes new values for one or more columns. Arbitrary
+// subsets of rows can be selected from the target table and processed in order,
+// as with this example:
 //
 //   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
 //
@@ -10773,6 +10777,143 @@ func (g *updateGroup) firstExpr() RelExpr {
 }
 
 func (g *updateGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// UpsertExpr evaluates a relational input expression that tries to insert a new row
+// into a target table. If a conflicting row already exists, then Upsert will
+// instead update the existing row. The Upsert operator is used for all of these
+// syntactic variants:
+//
+//   INSERT..ON CONFLICT DO UPDATE
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
+//
+//   INSERT..ON CONFLICT DO NOTHING
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
+//
+//   UPSERT
+//     UPSERT INTO abc VALUES (1, 2, 3)
+//
+// The Update operator will also insert/update any computed columns, including
+// mutation columns that are computed.
+type UpsertExpr struct {
+	Input RelExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &UpsertExpr{}
+
+func (e *UpsertExpr) Op() opt.Operator {
+	return opt.UpsertOp
+}
+
+func (e *UpsertExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UpsertExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *UpsertExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *UpsertExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UpsertExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *UpsertExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UpsertExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UpsertExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UpsertExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UpsertExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *UpsertExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *UpsertExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *UpsertExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UpsertExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *UpsertExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UpsertExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type upsertGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first UpsertExpr
+	best  bestProps
+}
+
+var _ exprGroup = &upsertGroup{}
+
+func (g *upsertGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *upsertGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *upsertGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *upsertGroup) bestProps() *bestProps {
 	return &g.best
 }
 
@@ -13267,6 +13408,26 @@ func (m *Memo) MemoizeUpdate(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeUpsert(
+	input RelExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(upsertGroup{}))
+	grp := &upsertGroup{mem: m, first: UpsertExpr{
+		Input:           input,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUpsert(e)
+	if interned == e {
+		m.logPropsBuilder.buildUpsertProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeCreateTable(
 	input RelExpr,
 	createTablePrivate *CreateTablePrivate,
@@ -13794,6 +13955,19 @@ func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
 	return interned
 }
 
+func (m *Memo) AddUpsertToGroup(e *UpsertExpr, grp RelExpr) *UpsertExpr {
+	const size = int64(unsafe.Sizeof(UpsertExpr{}))
+	interned := m.interner.InternUpsert(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTableExpr {
 	const size = int64(unsafe.Sizeof(CreateTableExpr{}))
 	interned := m.interner.InternCreateTable(e)
@@ -14089,6 +14263,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternInsert(t)
 	case *UpdateExpr:
 		return in.InternUpdate(t)
+	case *UpsertExpr:
+		return in.InternUpsert(t)
 	case *CreateTableExpr:
 		return in.InternCreateTable(t)
 	default:
@@ -16949,6 +17125,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashBool(val.NeedResults)
 
 	in.cache.Start(in.hasher.hash)
@@ -16959,6 +17136,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
 			}
@@ -16977,6 +17155,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashBool(val.NeedResults)
 
 	in.cache.Start(in.hasher.hash)
@@ -16987,6 +17166,37 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UpsertOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashBool(val.NeedResults)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UpsertExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
 			}
@@ -17101,6 +17311,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildInsertProps(t, rel)
 	case *UpdateExpr:
 		b.buildUpdateProps(t, rel)
+	case *UpsertExpr:
+		b.buildUpsertProps(t, rel)
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
 	default:

@@ -13052,11 +13052,9 @@ func (_f *Factory) ConstructInsert(
 
 // ConstructUpdate constructs an expression for the Update operator.
 // Update evaluates a relational input expression that fetches existing rows from
-// a target table and computes new values for one or more columns. The Update
-// operator uses the existing and new values from the input to update indexes,
-// evaluate check constraints and foreign keys, and update computed columns.
-// Arbitrary subsets of rows can be selected from the target table and processed
-// in order, as with this example:
+// a target table and computes new values for one or more columns. Arbitrary
+// subsets of rows can be selected from the target table and processed in order,
+// as with this example:
 //
 //   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
 //
@@ -13067,6 +13065,31 @@ func (_f *Factory) ConstructUpdate(
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	e := _f.mem.MemoizeUpdate(input, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructUpsert constructs an expression for the Upsert operator.
+// Upsert evaluates a relational input expression that tries to insert a new row
+// into a target table. If a conflicting row already exists, then Upsert will
+// instead update the existing row. The Upsert operator is used for all of these
+// syntactic variants:
+//
+//   INSERT..ON CONFLICT DO UPDATE
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
+//
+//   INSERT..ON CONFLICT DO NOTHING
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
+//
+//   UPSERT
+//     UPSERT INTO abc VALUES (1, 2, 3)
+//
+// The Update operator will also insert/update any computed columns, including
+// mutation columns that are computed.
+func (_f *Factory) ConstructUpsert(
+	input memo.RelExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeUpsert(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14098,6 +14121,13 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.UpsertExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructUpsert(input, &t.MutationPrivate)
+		}
+		return t
+
 	case *memo.CreateTableExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -14981,6 +15011,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			&t.MutationPrivate,
 		)
 
+	case *memo.UpsertExpr:
+		return f.ConstructUpsert(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.MutationPrivate,
+		)
+
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
 			f.assignPlaceholders(t.Input).(memo.RelExpr),
@@ -15676,6 +15712,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.UpdateOp:
 		return f.ConstructUpdate(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.MutationPrivate),
+		)
+	case opt.UpsertOp:
+		return f.ConstructUpsert(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.MutationPrivate),
 		)
