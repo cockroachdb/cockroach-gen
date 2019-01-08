@@ -13093,6 +13093,20 @@ func (_f *Factory) ConstructUpsert(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructDelete constructs an expression for the Delete operator.
+// Delete is an operator used to delete all rows that are selected by a
+// relational input expression:
+//
+//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
+//
+func (_f *Factory) ConstructDelete(
+	input memo.RelExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeDelete(input, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructCreateTable constructs an expression for the CreateTable operator.
 // CreateTable represents a CREATE TABLE statement.
 func (_f *Factory) ConstructCreateTable(
@@ -14128,6 +14142,13 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.DeleteExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructDelete(input, &t.MutationPrivate)
+		}
+		return t
+
 	case *memo.CreateTableExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -15017,6 +15038,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			&t.MutationPrivate,
 		)
 
+	case *memo.DeleteExpr:
+		return f.ConstructDelete(
+			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			&t.MutationPrivate,
+		)
+
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
 			f.assignPlaceholders(t.Input).(memo.RelExpr),
@@ -15717,6 +15744,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.UpsertOp:
 		return f.ConstructUpsert(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.MutationPrivate),
+		)
+	case opt.DeleteOp:
+		return f.ConstructDelete(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.MutationPrivate),
 		)

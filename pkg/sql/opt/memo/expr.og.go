@@ -10917,6 +10917,132 @@ func (g *upsertGroup) bestProps() *bestProps {
 	return &g.best
 }
 
+// DeleteExpr is an operator used to delete all rows that are selected by a
+// relational input expression:
+//
+//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
+//
+type DeleteExpr struct {
+	Input RelExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &DeleteExpr{}
+
+func (e *DeleteExpr) Op() opt.Operator {
+	return opt.DeleteOp
+}
+
+func (e *DeleteExpr) ChildCount() int {
+	return 1
+}
+
+func (e *DeleteExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic("child index out of range")
+}
+
+func (e *DeleteExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *DeleteExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *DeleteExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *DeleteExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *DeleteExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *DeleteExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *DeleteExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *DeleteExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *DeleteExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *DeleteExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *DeleteExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *DeleteExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *DeleteExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *DeleteExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type deleteGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first DeleteExpr
+	best  bestProps
+}
+
+var _ exprGroup = &deleteGroup{}
+
+func (g *deleteGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *deleteGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *deleteGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *deleteGroup) bestProps() *bestProps {
+	return &g.best
+}
+
 // CreateTableExpr represents a CREATE TABLE statement.
 type CreateTableExpr struct {
 	// Input is only used if the AS clause was used in the CREATE TABLE
@@ -13428,6 +13554,26 @@ func (m *Memo) MemoizeUpsert(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeDelete(
+	input RelExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(deleteGroup{}))
+	grp := &deleteGroup{mem: m, first: DeleteExpr{
+		Input:           input,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternDelete(e)
+	if interned == e {
+		m.logPropsBuilder.buildDeleteProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeCreateTable(
 	input RelExpr,
 	createTablePrivate *CreateTablePrivate,
@@ -13968,6 +14114,19 @@ func (m *Memo) AddUpsertToGroup(e *UpsertExpr, grp RelExpr) *UpsertExpr {
 	return interned
 }
 
+func (m *Memo) AddDeleteToGroup(e *DeleteExpr, grp RelExpr) *DeleteExpr {
+	const size = int64(unsafe.Sizeof(DeleteExpr{}))
+	interned := m.interner.InternDelete(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTableExpr {
 	const size = int64(unsafe.Sizeof(CreateTableExpr{}))
 	interned := m.interner.InternCreateTable(e)
@@ -14265,6 +14424,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternUpdate(t)
 	case *UpsertExpr:
 		return in.InternUpsert(t)
+	case *DeleteExpr:
+		return in.InternDelete(t)
 	case *CreateTableExpr:
 		return in.InternCreateTable(t)
 	default:
@@ -17207,6 +17368,36 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	return val
 }
 
+func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.DeleteOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashBool(val.NeedResults)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*DeleteExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CreateTableOp)
@@ -17313,6 +17504,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildUpdateProps(t, rel)
 	case *UpsertExpr:
 		b.buildUpsertProps(t, rel)
+	case *DeleteExpr:
+		b.buildDeleteProps(t, rel)
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
 	default:
