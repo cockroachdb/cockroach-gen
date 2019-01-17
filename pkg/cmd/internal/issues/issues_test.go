@@ -17,6 +17,7 @@ package issues
 import (
 	"context"
 	"fmt"
+	"github.com/google/go-github/github"
 	"log"
 	"net/http"
 	"net/url"
@@ -25,8 +26,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/google/go-github/github"
 )
 
 func TestPost(t *testing.T) {
