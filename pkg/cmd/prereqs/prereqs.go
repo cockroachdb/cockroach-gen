@@ -169,6 +169,7 @@ var filenameEscaper = strings.NewReplacer(
 	`~`, `\~`,
 	`$`, `$$`,
 	`#`, `\#`,
+        `%`, `\%`,
 )
 
 func run(w io.Writer, path string, includeTest bool, binName string) error {
