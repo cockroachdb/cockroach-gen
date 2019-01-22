@@ -10649,7 +10649,7 @@ type MutationPrivate struct {
 	//   INSERT INTO ab VALUES (1, 2)
 	//
 	// If there is a delete-only mutation column "c", then InsertCols would contain
-	// [id-a, id-b, 0].
+	// [a_colid, b_colid, 0].
 	InsertCols opt.ColList
 
 	// FetchCols are columns from the Input expression that will be fetched from
@@ -10674,7 +10674,7 @@ type MutationPrivate struct {
 	// The "c" column is needed because its value is used as part of computing an
 	// updated value, and the "d" column is needed because it's in the same family
 	// as "c". Taking all this into account, FetchCols would contain this list:
-	// [id-a, 0, id-c, id-d, 0].
+	// [a_colid, 0, c_colid, d_colid, 0].
 	FetchCols opt.ColList
 
 	// UpdateCols are columns from the Input expression that contain updated values
@@ -10690,8 +10690,25 @@ type MutationPrivate struct {
 	//   UPDATE abc SET b=1
 	//
 	// Since column "b" is updated, and "c" is a computed column dependent on "b",
-	// then UpdateCols would contain [0, id-b, id-c].
+	// then UpdateCols would contain [0, b_colid, c_colid].
 	UpdateCols opt.ColList
+
+	// CheckCols are columns from the Input expression containing the results of
+	// evaluating the check constraints from the target table. Evaluating a check
+	// check constraint expression produces a boolean value which is projected as
+	// a column and then checked by the mutation operator. Check columns must be
+	// a subset of the Input expression's output columns. The count and order of
+	// columns corresponds to the count and order of the target table's Check
+	// collection (see the opt.Table.CheckCount and opt.Table.Check methods). If
+	// any column ID is zero, then that check will not be performed (i.e. because
+	// it's been statically proved to be true). For example:
+	//
+	//   CREATE TABLE abc (a INT CHECK (a > 0), b INT, c INT CHECK (c <> 0))
+	//   UPDATE abc SET a=1, b=b+1
+	//
+	// Since the check constraint for column "a" can be statically proven to be
+	// true, CheckCols would contain [0, b_colid].
+	CheckCols opt.ColList
 
 	// CanaryCol is used only with the Upsert operator. It identifies the column
 	// that the execution engine uses to decide whether to insert or to update.
@@ -17383,6 +17400,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashBool(val.NeedResults)
 
@@ -17394,6 +17412,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
@@ -17413,6 +17432,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashBool(val.NeedResults)
 
@@ -17424,6 +17444,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
@@ -17443,6 +17464,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashBool(val.NeedResults)
 
@@ -17454,6 +17476,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
@@ -17473,6 +17496,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
 	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashBool(val.NeedResults)
 
@@ -17484,6 +17508,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
 				return existing
