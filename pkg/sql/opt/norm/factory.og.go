@@ -13025,6 +13025,19 @@ func (_f *Factory) ConstructAggDistinct(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructAggFilter constructs an expression for the AggFilter operator.
+// AggFilter is used as a modifier that wraps the input of an aggregate
+// function. It causes only rows for which the filter expression is true
+// to be processed. AggFilter should always occur on top of AggDistinct
+// if they are both present.
+func (_f *Factory) ConstructAggFilter(
+	input opt.ScalarExpr,
+	filter opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeAggFilter(input, filter)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructInsert constructs an expression for the Insert operator.
 // Insert evaluates a relational input expression, and inserts values from it
 // into a target table. The input may be an arbitrarily complex expression:
@@ -14115,6 +14128,14 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.AggFilterExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		filter := replace(t.Filter).(opt.ScalarExpr)
+		if input != t.Input || filter != t.Filter {
+			return f.ConstructAggFilter(input, filter)
+		}
+		return t
+
 	case *memo.ScalarListExpr:
 		if after, changed := f.reconstructScalarListExpr(*t, replace); changed {
 			return &after
@@ -15020,6 +15041,12 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
 		)
 
+	case *memo.AggFilterExpr:
+		return f.ConstructAggFilter(
+			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.assignPlaceholders(t.Filter).(opt.ScalarExpr),
+		)
+
 	case *memo.InsertExpr:
 		return f.ConstructInsert(
 			f.assignPlaceholders(t.Input).(memo.RelExpr),
@@ -15731,6 +15758,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.AggDistinctOp:
 		return f.ConstructAggDistinct(
 			args[0].(opt.ScalarExpr),
+		)
+	case opt.AggFilterOp:
+		return f.ConstructAggFilter(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
 		)
 	case opt.InsertOp:
 		return f.ConstructInsert(

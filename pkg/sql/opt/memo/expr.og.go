@@ -10395,6 +10395,63 @@ func (e *AggDistinctExpr) DataType() types.T {
 	return e.Typ
 }
 
+// AggFilterExpr is used as a modifier that wraps the input of an aggregate
+// function. It causes only rows for which the filter expression is true
+// to be processed. AggFilter should always occur on top of AggDistinct
+// if they are both present.
+type AggFilterExpr struct {
+	Input  opt.ScalarExpr
+	Filter opt.ScalarExpr
+
+	Typ types.T
+}
+
+var _ opt.ScalarExpr = &AggFilterExpr{}
+
+func (e *AggFilterExpr) Op() opt.Operator {
+	return opt.AggFilterOp
+}
+
+func (e *AggFilterExpr) ChildCount() int {
+	return 2
+}
+
+func (e *AggFilterExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Filter
+	}
+	panic("child index out of range")
+}
+
+func (e *AggFilterExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AggFilterExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AggFilterExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Filter = child.(opt.ScalarExpr)
+		return
+	}
+	panic("child index out of range")
+}
+
+func (e *AggFilterExpr) DataType() types.T {
+	return e.Typ
+}
+
 // ScalarListExpr is a list expression that has scalar expression items of type
 // opt.ScalarExpr. opt.ScalarExpr is an external type that is defined outside of
 // Optgen. It is hard-coded in the code generator to be the item type for
@@ -13494,6 +13551,24 @@ func (m *Memo) MemoizeAggDistinct(
 	return interned
 }
 
+func (m *Memo) MemoizeAggFilter(
+	input opt.ScalarExpr,
+	filter opt.ScalarExpr,
+) *AggFilterExpr {
+	const size = int64(unsafe.Sizeof(AggFilterExpr{}))
+	e := &AggFilterExpr{
+		Input:  input,
+		Filter: filter,
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternAggFilter(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	mutationPrivate *MutationPrivate,
@@ -14416,6 +14491,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternFirstAgg(t)
 	case *AggDistinctExpr:
 		return in.InternAggDistinct(t)
+	case *AggFilterExpr:
+		return in.InternAggFilter(t)
 	case *ScalarListExpr:
 		return in.InternScalarList(t)
 	case *InsertExpr:
@@ -17251,6 +17328,26 @@ func (in *interner) InternAggDistinct(val *AggDistinctExpr) *AggDistinctExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AggDistinctExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAggFilter(val *AggFilterExpr) *AggFilterExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AggFilterOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Filter)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AggFilterExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Filter, existing.Filter) {
 				return existing
 			}
 		}
