@@ -6990,6 +6990,25 @@ func (_f *Factory) ConstructDistinctOn(
 		}
 	}
 
+	// [EliminateDistinctOnNoColumns]
+	{
+		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnNoColumns) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
+					input,
+					_f.ConstructConst(
+						tree.NewDInt(1),
+					),
+					_f.funcs.GroupingInputOrdering(groupingPrivate),
+				), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctOnNoColumns, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [SimplifyGroupByOrdering]
 	{
 		if _f.funcs.CanSimplifyGroupingOrdering(input, groupingPrivate) {
