@@ -48,6 +48,18 @@ func (_f *Factory) ConstructVirtualScan(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructSequenceSelect constructs an expression for the SequenceSelect operator.
+// SequenceSelect represents a read from a sequence as a data source. It always returns
+// three columns, last_value, log_cnt, and is_called, with a single row. last_value is
+// the most recent value returned from the sequence and log_cnt and is_called are
+// always 0 and true, respectively.
+func (_f *Factory) ConstructSequenceSelect(
+	sequenceSelectPrivate *memo.SequenceSelectPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeSequenceSelect(sequenceSelectPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructValues constructs an expression for the Values operator.
 // Values returns a manufactured result set containing a constant number of rows.
 // specified by the Rows list field. Each row must contain the same set of
@@ -13177,6 +13189,9 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.VirtualScanExpr:
 		return t
 
+	case *memo.SequenceSelectExpr:
+		return t
+
 	case *memo.ValuesExpr:
 		rows, rowsChanged := f.reconstructScalarListExpr(t.Rows, replace)
 		if rowsChanged {
@@ -14316,6 +14331,9 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 	case *memo.VirtualScanExpr:
 		return f.mem.MemoizeVirtualScan(&t.VirtualScanPrivate)
 
+	case *memo.SequenceSelectExpr:
+		return f.mem.MemoizeSequenceSelect(&t.SequenceSelectPrivate)
+
 	case *memo.ValuesExpr:
 		return f.ConstructValues(
 			f.assignScalarListExprPlaceholders(t.Rows),
@@ -15152,6 +15170,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.VirtualScanOp:
 		return f.ConstructVirtualScan(
 			args[0].(*memo.VirtualScanPrivate),
+		)
+	case opt.SequenceSelectOp:
+		return f.ConstructSequenceSelect(
+			args[0].(*memo.SequenceSelectPrivate),
 		)
 	case opt.ValuesOp:
 		return f.ConstructValues(

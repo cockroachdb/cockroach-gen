@@ -384,6 +384,129 @@ type VirtualScanPrivate struct {
 	Cols opt.ColSet
 }
 
+// SequenceSelectExpr represents a read from a sequence as a data source. It always returns
+// three columns, last_value, log_cnt, and is_called, with a single row. last_value is
+// the most recent value returned from the sequence and log_cnt and is_called are
+// always 0 and true, respectively.
+type SequenceSelectExpr struct {
+	SequenceSelectPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &SequenceSelectExpr{}
+
+func (e *SequenceSelectExpr) Op() opt.Operator {
+	return opt.SequenceSelectOp
+}
+
+func (e *SequenceSelectExpr) ChildCount() int {
+	return 0
+}
+
+func (e *SequenceSelectExpr) Child(nth int) opt.Expr {
+	panic("child index out of range")
+}
+
+func (e *SequenceSelectExpr) Private() interface{} {
+	return &e.SequenceSelectPrivate
+}
+
+func (e *SequenceSelectExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *SequenceSelectExpr) SetChild(nth int, child opt.Expr) {
+	panic("child index out of range")
+}
+
+func (e *SequenceSelectExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *SequenceSelectExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *SequenceSelectExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *SequenceSelectExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *SequenceSelectExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *SequenceSelectExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *SequenceSelectExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *SequenceSelectExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *SequenceSelectExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *SequenceSelectExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *SequenceSelectExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(fmt.Sprintf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type sequenceSelectGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first SequenceSelectExpr
+	best  bestProps
+}
+
+var _ exprGroup = &sequenceSelectGroup{}
+
+func (g *sequenceSelectGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *sequenceSelectGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *sequenceSelectGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *sequenceSelectGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type SequenceSelectPrivate struct {
+	// Sequence identifies the sequence to read from.
+	Sequence opt.SequenceID
+
+	// Cols is the 3 element list of column IDs returned by the operator.
+	Cols opt.ColList
+}
+
 // ValuesExpr returns a manufactured result set containing a constant number of rows.
 // specified by the Rows list field. Each row must contain the same set of
 // columns in the same order.
@@ -11290,6 +11413,24 @@ func (m *Memo) MemoizeVirtualScan(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeSequenceSelect(
+	sequenceSelectPrivate *SequenceSelectPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(sequenceSelectGroup{}))
+	grp := &sequenceSelectGroup{mem: m, first: SequenceSelectExpr{
+		SequenceSelectPrivate: *sequenceSelectPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternSequenceSelect(e)
+	if interned == e {
+		m.logPropsBuilder.buildSequenceSelectProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeValues(
 	rows ScalarListExpr,
 	cols opt.ColList,
@@ -13712,6 +13853,19 @@ func (m *Memo) AddVirtualScanToGroup(e *VirtualScanExpr, grp RelExpr) *VirtualSc
 	return interned
 }
 
+func (m *Memo) AddSequenceSelectToGroup(e *SequenceSelectExpr, grp RelExpr) *SequenceSelectExpr {
+	const size = int64(unsafe.Sizeof(SequenceSelectExpr{}))
+	interned := m.interner.InternSequenceSelect(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+	}
+	return interned
+}
+
 func (m *Memo) AddValuesToGroup(e *ValuesExpr, grp RelExpr) *ValuesExpr {
 	const size = int64(unsafe.Sizeof(ValuesExpr{}))
 	interned := m.interner.InternValues(e)
@@ -14238,6 +14392,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternScan(t)
 	case *VirtualScanExpr:
 		return in.InternVirtualScan(t)
+	case *SequenceSelectExpr:
+		return in.InternSequenceSelect(t)
 	case *ValuesExpr:
 		return in.InternValues(t)
 	case *SelectExpr:
@@ -14566,6 +14722,26 @@ func (in *interner) InternVirtualScan(val *VirtualScanExpr) *VirtualScanExpr {
 		if existing, ok := in.cache.Item().(*VirtualScanExpr); ok {
 			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSequenceSelect(val *SequenceSelectExpr) *SequenceSelectExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.SequenceSelectOp)
+	in.hasher.HashSequenceID(val.Sequence)
+	in.hasher.HashColList(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*SequenceSelectExpr); ok {
+			if in.hasher.IsSequenceIDEqual(val.Sequence, existing.Sequence) &&
+				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
 				return existing
 			}
 		}
@@ -17550,6 +17726,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildScanProps(t, rel)
 	case *VirtualScanExpr:
 		b.buildVirtualScanProps(t, rel)
+	case *SequenceSelectExpr:
+		b.buildSequenceSelectProps(t, rel)
 	case *ValuesExpr:
 		b.buildValuesProps(t, rel)
 	case *SelectExpr:
