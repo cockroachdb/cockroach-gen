@@ -1853,6 +1853,23 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [SortFiltersInJoin]
+	{
+		if !_f.funcs.AreFiltersSorted(on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SortFiltersInJoin) {
+				_expr := _f.ConstructInnerJoin(
+					left,
+					right,
+					_f.funcs.SortFilters(on),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SortFiltersInJoin, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		for i := range on {

@@ -5389,9 +5389,14 @@ type SubqueryExpr struct {
 	SubqueryPrivate
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &SubqueryExpr{}
+
+func (e *SubqueryExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *SubqueryExpr) Op() opt.Operator {
 	return opt.SubqueryOp
@@ -5472,9 +5477,15 @@ type AnyExpr struct {
 	Input  RelExpr
 	Scalar opt.ScalarExpr
 	SubqueryPrivate
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AnyExpr{}
+
+func (e *AnyExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AnyExpr) Op() opt.Operator {
 	return opt.AnyOp
@@ -5525,9 +5536,15 @@ func (e *AnyExpr) DataType() types.T {
 type ExistsExpr struct {
 	Input RelExpr
 	SubqueryPrivate
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ExistsExpr{}
+
+func (e *ExistsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ExistsExpr) Op() opt.Operator {
 	return opt.ExistsOp
@@ -5574,9 +5591,14 @@ type VariableExpr struct {
 	Col opt.ColumnID
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &VariableExpr{}
+
+func (e *VariableExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *VariableExpr) Op() opt.Operator {
 	return opt.VariableOp
@@ -5614,9 +5636,14 @@ type ConstExpr struct {
 	Value tree.Datum
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ConstExpr{}
+
+func (e *ConstExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ConstExpr) Op() opt.Operator {
 	return opt.ConstOp
@@ -5666,9 +5693,15 @@ func (e *ConstExpr) DataType() types.T {
 // expressions.
 type NullExpr struct {
 	Typ types.T
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NullExpr{}
+
+func (e *NullExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NullExpr) Op() opt.Operator {
 	return opt.NullOp
@@ -5704,9 +5737,14 @@ func (e *NullExpr) DataType() types.T {
 // value. It is a separate operator to make matching and replacement simpler and
 // more efficient, as patterns can contain (True) expressions.
 type TrueExpr struct {
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &TrueExpr{}
+
+func (e *TrueExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *TrueExpr) Op() opt.Operator {
 	return opt.TrueOp
@@ -5742,9 +5780,14 @@ func (e *TrueExpr) DataType() types.T {
 // datum value. It is a separate operator to make matching and replacement
 // simpler and more efficient, as patterns can contain (False) expressions.
 type FalseExpr struct {
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FalseExpr{}
+
+func (e *FalseExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FalseExpr) Op() opt.Operator {
 	return opt.FalseOp
@@ -5780,9 +5823,14 @@ type PlaceholderExpr struct {
 	Value tree.TypedExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &PlaceholderExpr{}
+
+func (e *PlaceholderExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *PlaceholderExpr) Op() opt.Operator {
 	return opt.PlaceholderOp
@@ -5817,9 +5865,15 @@ func (e *PlaceholderExpr) DataType() types.T {
 type TupleExpr struct {
 	Elems ScalarListExpr
 	Typ   types.T
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &TupleExpr{}
+
+func (e *TupleExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *TupleExpr) Op() opt.Operator {
 	return opt.TupleOp
@@ -5870,6 +5924,10 @@ var EmptyProjectionsExpr = ProjectionsExpr{}
 
 var _ opt.ScalarExpr = &ProjectionsExpr{}
 
+func (e *ProjectionsExpr) ID() opt.ScalarID {
+	panic("lists have no id")
+}
+
 func (e *ProjectionsExpr) Op() opt.Operator {
 	return opt.ProjectionsOp
 }
@@ -5918,9 +5976,14 @@ type ProjectionsItem struct {
 	ColPrivate
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ProjectionsItem{}
+
+func (e *ProjectionsItem) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ProjectionsItem) Op() opt.Operator {
 	return opt.ProjectionsItemOp
@@ -5990,6 +6053,10 @@ var EmptyAggregationsExpr = AggregationsExpr{}
 
 var _ opt.ScalarExpr = &AggregationsExpr{}
 
+func (e *AggregationsExpr) ID() opt.ScalarID {
+	panic("lists have no id")
+}
+
 func (e *AggregationsExpr) Op() opt.Operator {
 	return opt.AggregationsOp
 }
@@ -6040,9 +6107,14 @@ type AggregationsItem struct {
 	ColPrivate
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AggregationsItem{}
+
+func (e *AggregationsItem) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AggregationsItem) Op() opt.Operator {
 	return opt.AggregationsItemOp
@@ -6101,6 +6173,10 @@ var EmptyFiltersExpr = FiltersExpr{}
 
 var _ opt.ScalarExpr = &FiltersExpr{}
 
+func (e *FiltersExpr) ID() opt.ScalarID {
+	panic("lists have no id")
+}
+
 func (e *FiltersExpr) Op() opt.Operator {
 	return opt.FiltersOp
 }
@@ -6139,9 +6215,15 @@ func (e *FiltersExpr) DataType() types.T {
 type FiltersItem struct {
 	Condition opt.ScalarExpr
 	scalar    props.Scalar
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FiltersItem{}
+
+func (e *FiltersItem) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FiltersItem) Op() opt.Operator {
 	return opt.FiltersItemOp
@@ -6218,6 +6300,10 @@ var EmptyZipExpr = ZipExpr{}
 
 var _ opt.ScalarExpr = &ZipExpr{}
 
+func (e *ZipExpr) ID() opt.ScalarID {
+	panic("lists have no id")
+}
+
 func (e *ZipExpr) Op() opt.Operator {
 	return opt.ZipOp
 }
@@ -6255,9 +6341,14 @@ type ZipItem struct {
 	ZipItemPrivate
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ZipItem{}
+
+func (e *ZipItem) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ZipItem) Op() opt.Operator {
 	return opt.ZipItemOp
@@ -6322,9 +6413,15 @@ type ZipItemPrivate struct {
 type AndExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AndExpr{}
+
+func (e *AndExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AndExpr) Op() opt.Operator {
 	return opt.AndOp
@@ -6375,9 +6472,15 @@ func (e *AndExpr) DataType() types.T {
 type OrExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &OrExpr{}
+
+func (e *OrExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *OrExpr) Op() opt.Operator {
 	return opt.OrOp
@@ -6427,9 +6530,15 @@ func (e *OrExpr) DataType() types.T {
 // evaluates to false.
 type NotExpr struct {
 	Input opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotExpr{}
+
+func (e *NotExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotExpr) Op() opt.Operator {
 	return opt.NotOp
@@ -6473,9 +6582,15 @@ func (e *NotExpr) DataType() types.T {
 type EqExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &EqExpr{}
+
+func (e *EqExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *EqExpr) Op() opt.Operator {
 	return opt.EqOp
@@ -6524,9 +6639,15 @@ func (e *EqExpr) DataType() types.T {
 type LtExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &LtExpr{}
+
+func (e *LtExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *LtExpr) Op() opt.Operator {
 	return opt.LtOp
@@ -6575,9 +6696,15 @@ func (e *LtExpr) DataType() types.T {
 type GtExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &GtExpr{}
+
+func (e *GtExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *GtExpr) Op() opt.Operator {
 	return opt.GtOp
@@ -6626,9 +6753,15 @@ func (e *GtExpr) DataType() types.T {
 type LeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &LeExpr{}
+
+func (e *LeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *LeExpr) Op() opt.Operator {
 	return opt.LeOp
@@ -6677,9 +6810,15 @@ func (e *LeExpr) DataType() types.T {
 type GeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &GeExpr{}
+
+func (e *GeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *GeExpr) Op() opt.Operator {
 	return opt.GeOp
@@ -6728,9 +6867,15 @@ func (e *GeExpr) DataType() types.T {
 type NeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NeExpr{}
+
+func (e *NeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NeExpr) Op() opt.Operator {
 	return opt.NeOp
@@ -6779,9 +6924,15 @@ func (e *NeExpr) DataType() types.T {
 type InExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &InExpr{}
+
+func (e *InExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *InExpr) Op() opt.Operator {
 	return opt.InOp
@@ -6830,9 +6981,15 @@ func (e *InExpr) DataType() types.T {
 type NotInExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotInExpr{}
+
+func (e *NotInExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotInExpr) Op() opt.Operator {
 	return opt.NotInOp
@@ -6881,9 +7038,15 @@ func (e *NotInExpr) DataType() types.T {
 type LikeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &LikeExpr{}
+
+func (e *LikeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *LikeExpr) Op() opt.Operator {
 	return opt.LikeOp
@@ -6932,9 +7095,15 @@ func (e *LikeExpr) DataType() types.T {
 type NotLikeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotLikeExpr{}
+
+func (e *NotLikeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotLikeExpr) Op() opt.Operator {
 	return opt.NotLikeOp
@@ -6983,9 +7152,15 @@ func (e *NotLikeExpr) DataType() types.T {
 type ILikeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ILikeExpr{}
+
+func (e *ILikeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ILikeExpr) Op() opt.Operator {
 	return opt.ILikeOp
@@ -7034,9 +7209,15 @@ func (e *ILikeExpr) DataType() types.T {
 type NotILikeExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotILikeExpr{}
+
+func (e *NotILikeExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotILikeExpr) Op() opt.Operator {
 	return opt.NotILikeOp
@@ -7085,9 +7266,15 @@ func (e *NotILikeExpr) DataType() types.T {
 type SimilarToExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &SimilarToExpr{}
+
+func (e *SimilarToExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *SimilarToExpr) Op() opt.Operator {
 	return opt.SimilarToOp
@@ -7136,9 +7323,15 @@ func (e *SimilarToExpr) DataType() types.T {
 type NotSimilarToExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotSimilarToExpr{}
+
+func (e *NotSimilarToExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotSimilarToExpr) Op() opt.Operator {
 	return opt.NotSimilarToOp
@@ -7187,9 +7380,15 @@ func (e *NotSimilarToExpr) DataType() types.T {
 type RegMatchExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &RegMatchExpr{}
+
+func (e *RegMatchExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *RegMatchExpr) Op() opt.Operator {
 	return opt.RegMatchOp
@@ -7238,9 +7437,15 @@ func (e *RegMatchExpr) DataType() types.T {
 type NotRegMatchExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotRegMatchExpr{}
+
+func (e *NotRegMatchExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotRegMatchExpr) Op() opt.Operator {
 	return opt.NotRegMatchOp
@@ -7289,9 +7494,15 @@ func (e *NotRegMatchExpr) DataType() types.T {
 type RegIMatchExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &RegIMatchExpr{}
+
+func (e *RegIMatchExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *RegIMatchExpr) Op() opt.Operator {
 	return opt.RegIMatchOp
@@ -7340,9 +7551,15 @@ func (e *RegIMatchExpr) DataType() types.T {
 type NotRegIMatchExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NotRegIMatchExpr{}
+
+func (e *NotRegIMatchExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *NotRegIMatchExpr) Op() opt.Operator {
 	return opt.NotRegIMatchOp
@@ -7391,9 +7608,15 @@ func (e *NotRegIMatchExpr) DataType() types.T {
 type IsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &IsExpr{}
+
+func (e *IsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *IsExpr) Op() opt.Operator {
 	return opt.IsOp
@@ -7442,9 +7665,15 @@ func (e *IsExpr) DataType() types.T {
 type IsNotExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &IsNotExpr{}
+
+func (e *IsNotExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *IsNotExpr) Op() opt.Operator {
 	return opt.IsNotOp
@@ -7493,9 +7722,15 @@ func (e *IsNotExpr) DataType() types.T {
 type ContainsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ContainsExpr{}
+
+func (e *ContainsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ContainsExpr) Op() opt.Operator {
 	return opt.ContainsOp
@@ -7544,9 +7779,15 @@ func (e *ContainsExpr) DataType() types.T {
 type JsonExistsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &JsonExistsExpr{}
+
+func (e *JsonExistsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *JsonExistsExpr) Op() opt.Operator {
 	return opt.JsonExistsOp
@@ -7595,9 +7836,15 @@ func (e *JsonExistsExpr) DataType() types.T {
 type JsonAllExistsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &JsonAllExistsExpr{}
+
+func (e *JsonAllExistsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *JsonAllExistsExpr) Op() opt.Operator {
 	return opt.JsonAllExistsOp
@@ -7646,9 +7893,15 @@ func (e *JsonAllExistsExpr) DataType() types.T {
 type JsonSomeExistsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &JsonSomeExistsExpr{}
+
+func (e *JsonSomeExistsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *JsonSomeExistsExpr) Op() opt.Operator {
 	return opt.JsonSomeExistsOp
@@ -7700,9 +7953,15 @@ type AnyScalarExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 	Cmp   opt.Operator
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AnyScalarExpr{}
+
+func (e *AnyScalarExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AnyScalarExpr) Op() opt.Operator {
 	return opt.AnyScalarOp
@@ -7753,9 +8012,14 @@ type BitandExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &BitandExpr{}
+
+func (e *BitandExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *BitandExpr) Op() opt.Operator {
 	return opt.BitandOp
@@ -7806,9 +8070,14 @@ type BitorExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &BitorExpr{}
+
+func (e *BitorExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *BitorExpr) Op() opt.Operator {
 	return opt.BitorOp
@@ -7859,9 +8128,14 @@ type BitxorExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &BitxorExpr{}
+
+func (e *BitxorExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *BitxorExpr) Op() opt.Operator {
 	return opt.BitxorOp
@@ -7912,9 +8186,14 @@ type PlusExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &PlusExpr{}
+
+func (e *PlusExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *PlusExpr) Op() opt.Operator {
 	return opt.PlusOp
@@ -7965,9 +8244,14 @@ type MinusExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &MinusExpr{}
+
+func (e *MinusExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *MinusExpr) Op() opt.Operator {
 	return opt.MinusOp
@@ -8018,9 +8302,14 @@ type MultExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &MultExpr{}
+
+func (e *MultExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *MultExpr) Op() opt.Operator {
 	return opt.MultOp
@@ -8071,9 +8360,14 @@ type DivExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &DivExpr{}
+
+func (e *DivExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *DivExpr) Op() opt.Operator {
 	return opt.DivOp
@@ -8124,9 +8418,14 @@ type FloorDivExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FloorDivExpr{}
+
+func (e *FloorDivExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FloorDivExpr) Op() opt.Operator {
 	return opt.FloorDivOp
@@ -8177,9 +8476,14 @@ type ModExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ModExpr{}
+
+func (e *ModExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ModExpr) Op() opt.Operator {
 	return opt.ModOp
@@ -8230,9 +8534,14 @@ type PowExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &PowExpr{}
+
+func (e *PowExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *PowExpr) Op() opt.Operator {
 	return opt.PowOp
@@ -8283,9 +8592,14 @@ type ConcatExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ConcatExpr{}
+
+func (e *ConcatExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ConcatExpr) Op() opt.Operator {
 	return opt.ConcatOp
@@ -8336,9 +8650,14 @@ type LShiftExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &LShiftExpr{}
+
+func (e *LShiftExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *LShiftExpr) Op() opt.Operator {
 	return opt.LShiftOp
@@ -8389,9 +8708,14 @@ type RShiftExpr struct {
 	Right opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &RShiftExpr{}
+
+func (e *RShiftExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *RShiftExpr) Op() opt.Operator {
 	return opt.RShiftOp
@@ -8442,9 +8766,14 @@ type FetchValExpr struct {
 	Index opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FetchValExpr{}
+
+func (e *FetchValExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FetchValExpr) Op() opt.Operator {
 	return opt.FetchValOp
@@ -8495,9 +8824,14 @@ type FetchTextExpr struct {
 	Index opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FetchTextExpr{}
+
+func (e *FetchTextExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FetchTextExpr) Op() opt.Operator {
 	return opt.FetchTextOp
@@ -8548,9 +8882,14 @@ type FetchValPathExpr struct {
 	Path opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FetchValPathExpr{}
+
+func (e *FetchValPathExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FetchValPathExpr) Op() opt.Operator {
 	return opt.FetchValPathOp
@@ -8601,9 +8940,14 @@ type FetchTextPathExpr struct {
 	Path opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FetchTextPathExpr{}
+
+func (e *FetchTextPathExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FetchTextPathExpr) Op() opt.Operator {
 	return opt.FetchTextPathOp
@@ -8653,9 +8997,14 @@ type UnaryMinusExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &UnaryMinusExpr{}
+
+func (e *UnaryMinusExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *UnaryMinusExpr) Op() opt.Operator {
 	return opt.UnaryMinusOp
@@ -8700,9 +9049,14 @@ type UnaryComplementExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &UnaryComplementExpr{}
+
+func (e *UnaryComplementExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *UnaryComplementExpr) Op() opt.Operator {
 	return opt.UnaryComplementOp
@@ -8758,9 +9112,14 @@ type CastExpr struct {
 	TargetTyp coltypes.T
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CastExpr{}
+
+func (e *CastExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *CastExpr) Op() opt.Operator {
 	return opt.CastOp
@@ -8824,9 +9183,14 @@ type IfErrExpr struct {
 	ErrCode ScalarListExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &IfErrExpr{}
+
+func (e *IfErrExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *IfErrExpr) Op() opt.Operator {
 	return opt.IfErrOp
@@ -8902,9 +9266,14 @@ type CaseExpr struct {
 	OrElse opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CaseExpr{}
+
+func (e *CaseExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *CaseExpr) Op() opt.Operator {
 	return opt.CaseOp
@@ -8963,9 +9332,14 @@ type WhenExpr struct {
 	Value     opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &WhenExpr{}
+
+func (e *WhenExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *WhenExpr) Op() opt.Operator {
 	return opt.WhenOp
@@ -9015,9 +9389,15 @@ func (e *WhenExpr) DataType() types.T {
 type ArrayExpr struct {
 	Elems ScalarListExpr
 	Typ   types.T
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ArrayExpr{}
+
+func (e *ArrayExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ArrayExpr) Op() opt.Operator {
 	return opt.ArrayOp
@@ -9066,9 +9446,14 @@ type IndirectionExpr struct {
 	Index opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &IndirectionExpr{}
+
+func (e *IndirectionExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *IndirectionExpr) Op() opt.Operator {
 	return opt.IndirectionOp
@@ -9123,9 +9508,14 @@ type ArrayFlattenExpr struct {
 	SubqueryPrivate
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ArrayFlattenExpr{}
+
+func (e *ArrayFlattenExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ArrayFlattenExpr) Op() opt.Operator {
 	return opt.ArrayFlattenOp
@@ -9172,9 +9562,15 @@ func (e *ArrayFlattenExpr) DataType() types.T {
 type FunctionExpr struct {
 	Args ScalarListExpr
 	FunctionPrivate
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FunctionExpr{}
+
+func (e *FunctionExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FunctionExpr) Op() opt.Operator {
 	return opt.FunctionOp
@@ -9233,9 +9629,14 @@ type CollateExpr struct {
 	Locale string
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CollateExpr{}
+
+func (e *CollateExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *CollateExpr) Op() opt.Operator {
 	return opt.CollateOp
@@ -9280,9 +9681,14 @@ type CoalesceExpr struct {
 	Args ScalarListExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CoalesceExpr{}
+
+func (e *CoalesceExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *CoalesceExpr) Op() opt.Operator {
 	return opt.CoalesceOp
@@ -9331,9 +9737,14 @@ type ColumnAccessExpr struct {
 	Idx   TupleOrdinal
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ColumnAccessExpr{}
+
+func (e *ColumnAccessExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ColumnAccessExpr) Op() opt.Operator {
 	return opt.ColumnAccessOp
@@ -9380,9 +9791,14 @@ type UnsupportedExprExpr struct {
 	Value tree.TypedExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &UnsupportedExprExpr{}
+
+func (e *UnsupportedExprExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *UnsupportedExprExpr) Op() opt.Operator {
 	return opt.UnsupportedExprOp
@@ -9418,9 +9834,14 @@ type ArrayAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ArrayAggExpr{}
+
+func (e *ArrayAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ArrayAggExpr) Op() opt.Operator {
 	return opt.ArrayAggOp
@@ -9465,9 +9886,14 @@ type AvgExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AvgExpr{}
+
+func (e *AvgExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AvgExpr) Op() opt.Operator {
 	return opt.AvgOp
@@ -9512,9 +9938,14 @@ type BoolAndExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &BoolAndExpr{}
+
+func (e *BoolAndExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *BoolAndExpr) Op() opt.Operator {
 	return opt.BoolAndOp
@@ -9559,9 +9990,14 @@ type BoolOrExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &BoolOrExpr{}
+
+func (e *BoolOrExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *BoolOrExpr) Op() opt.Operator {
 	return opt.BoolOrOp
@@ -9606,9 +10042,14 @@ type ConcatAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ConcatAggExpr{}
+
+func (e *ConcatAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ConcatAggExpr) Op() opt.Operator {
 	return opt.ConcatAggOp
@@ -9653,9 +10094,14 @@ type CountExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CountExpr{}
+
+func (e *CountExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *CountExpr) Op() opt.Operator {
 	return opt.CountOp
@@ -9697,9 +10143,14 @@ func (e *CountExpr) DataType() types.T {
 }
 
 type CountRowsExpr struct {
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CountRowsExpr{}
+
+func (e *CountRowsExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *CountRowsExpr) Op() opt.Operator {
 	return opt.CountRowsOp
@@ -9735,9 +10186,14 @@ type MaxExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &MaxExpr{}
+
+func (e *MaxExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *MaxExpr) Op() opt.Operator {
 	return opt.MaxOp
@@ -9782,9 +10238,14 @@ type MinExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &MinExpr{}
+
+func (e *MinExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *MinExpr) Op() opt.Operator {
 	return opt.MinOp
@@ -9829,9 +10290,14 @@ type SumIntExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &SumIntExpr{}
+
+func (e *SumIntExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *SumIntExpr) Op() opt.Operator {
 	return opt.SumIntOp
@@ -9876,9 +10342,14 @@ type SumExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &SumExpr{}
+
+func (e *SumExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *SumExpr) Op() opt.Operator {
 	return opt.SumOp
@@ -9923,9 +10394,14 @@ type SqrDiffExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &SqrDiffExpr{}
+
+func (e *SqrDiffExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *SqrDiffExpr) Op() opt.Operator {
 	return opt.SqrDiffOp
@@ -9970,9 +10446,14 @@ type VarianceExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &VarianceExpr{}
+
+func (e *VarianceExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *VarianceExpr) Op() opt.Operator {
 	return opt.VarianceOp
@@ -10017,9 +10498,14 @@ type StdDevExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &StdDevExpr{}
+
+func (e *StdDevExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *StdDevExpr) Op() opt.Operator {
 	return opt.StdDevOp
@@ -10064,9 +10550,14 @@ type XorAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &XorAggExpr{}
+
+func (e *XorAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *XorAggExpr) Op() opt.Operator {
 	return opt.XorAggOp
@@ -10111,9 +10602,14 @@ type JsonAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &JsonAggExpr{}
+
+func (e *JsonAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *JsonAggExpr) Op() opt.Operator {
 	return opt.JsonAggOp
@@ -10158,9 +10654,14 @@ type JsonbAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &JsonbAggExpr{}
+
+func (e *JsonbAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *JsonbAggExpr) Op() opt.Operator {
 	return opt.JsonbAggOp
@@ -10209,9 +10710,14 @@ type StringAggExpr struct {
 	Sep opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &StringAggExpr{}
+
+func (e *StringAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *StringAggExpr) Op() opt.Operator {
 	return opt.StringAggOp
@@ -10267,9 +10773,14 @@ type ConstAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ConstAggExpr{}
+
+func (e *ConstAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ConstAggExpr) Op() opt.Operator {
 	return opt.ConstAggOp
@@ -10322,9 +10833,14 @@ type ConstNotNullAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ConstNotNullAggExpr{}
+
+func (e *ConstNotNullAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *ConstNotNullAggExpr) Op() opt.Operator {
 	return opt.ConstNotNullAggOp
@@ -10374,9 +10890,14 @@ type AnyNotNullAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AnyNotNullAggExpr{}
+
+func (e *AnyNotNullAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AnyNotNullAggExpr) Op() opt.Operator {
 	return opt.AnyNotNullAggOp
@@ -10425,9 +10946,14 @@ type FirstAggExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FirstAggExpr{}
+
+func (e *FirstAggExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *FirstAggExpr) Op() opt.Operator {
 	return opt.FirstAggOp
@@ -10475,9 +11001,14 @@ type AggDistinctExpr struct {
 	Input opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AggDistinctExpr{}
+
+func (e *AggDistinctExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AggDistinctExpr) Op() opt.Operator {
 	return opt.AggDistinctOp
@@ -10527,9 +11058,14 @@ type AggFilterExpr struct {
 	Filter opt.ScalarExpr
 
 	Typ types.T
+	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &AggFilterExpr{}
+
+func (e *AggFilterExpr) ID() opt.ScalarID {
+	return e.id
+}
 
 func (e *AggFilterExpr) Op() opt.Operator {
 	return opt.AggFilterOp
@@ -10587,6 +11123,10 @@ type ScalarListExpr []opt.ScalarExpr
 var EmptyScalarListExpr = ScalarListExpr{}
 
 var _ opt.ScalarExpr = &ScalarListExpr{}
+
+func (e *ScalarListExpr) ID() opt.ScalarID {
+	panic("lists have no id")
+}
 
 func (e *ScalarListExpr) Op() opt.Operator {
 	return opt.ScalarListOp
@@ -12189,6 +12729,7 @@ func (m *Memo) MemoizeSubquery(
 	e := &SubqueryExpr{
 		Input:           input,
 		SubqueryPrivate: *subqueryPrivate,
+		id:              m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSubquery(e)
@@ -12209,6 +12750,7 @@ func (m *Memo) MemoizeAny(
 		Input:           input,
 		Scalar:          scalar,
 		SubqueryPrivate: *subqueryPrivate,
+		id:              m.NextID(),
 	}
 	interned := m.interner.InternAny(e)
 	if interned == e {
@@ -12226,6 +12768,7 @@ func (m *Memo) MemoizeExists(
 	e := &ExistsExpr{
 		Input:           input,
 		SubqueryPrivate: *subqueryPrivate,
+		id:              m.NextID(),
 	}
 	interned := m.interner.InternExists(e)
 	if interned == e {
@@ -12241,6 +12784,7 @@ func (m *Memo) MemoizeVariable(
 	const size = int64(unsafe.Sizeof(VariableExpr{}))
 	e := &VariableExpr{
 		Col: col,
+		id:  m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternVariable(e)
@@ -12257,6 +12801,7 @@ func (m *Memo) MemoizeConst(
 	const size = int64(unsafe.Sizeof(ConstExpr{}))
 	e := &ConstExpr{
 		Value: value,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConst(e)
@@ -12273,6 +12818,7 @@ func (m *Memo) MemoizeNull(
 	const size = int64(unsafe.Sizeof(NullExpr{}))
 	e := &NullExpr{
 		Typ: typ,
+		id:  m.NextID(),
 	}
 	interned := m.interner.InternNull(e)
 	if interned == e {
@@ -12296,6 +12842,7 @@ func (m *Memo) MemoizePlaceholder(
 	const size = int64(unsafe.Sizeof(PlaceholderExpr{}))
 	e := &PlaceholderExpr{
 		Value: value,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternPlaceholder(e)
@@ -12314,6 +12861,7 @@ func (m *Memo) MemoizeTuple(
 	e := &TupleExpr{
 		Elems: elems,
 		Typ:   typ,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternTuple(e)
 	if interned == e {
@@ -12331,6 +12879,7 @@ func (m *Memo) MemoizeAnd(
 	e := &AndExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternAnd(e)
 	if interned == e {
@@ -12348,6 +12897,7 @@ func (m *Memo) MemoizeOr(
 	e := &OrExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternOr(e)
 	if interned == e {
@@ -12363,6 +12913,7 @@ func (m *Memo) MemoizeNot(
 	const size = int64(unsafe.Sizeof(NotExpr{}))
 	e := &NotExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNot(e)
 	if interned == e {
@@ -12380,6 +12931,7 @@ func (m *Memo) MemoizeEq(
 	e := &EqExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternEq(e)
 	if interned == e {
@@ -12397,6 +12949,7 @@ func (m *Memo) MemoizeLt(
 	e := &LtExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternLt(e)
 	if interned == e {
@@ -12414,6 +12967,7 @@ func (m *Memo) MemoizeGt(
 	e := &GtExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternGt(e)
 	if interned == e {
@@ -12431,6 +12985,7 @@ func (m *Memo) MemoizeLe(
 	e := &LeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternLe(e)
 	if interned == e {
@@ -12448,6 +13003,7 @@ func (m *Memo) MemoizeGe(
 	e := &GeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternGe(e)
 	if interned == e {
@@ -12465,6 +13021,7 @@ func (m *Memo) MemoizeNe(
 	e := &NeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNe(e)
 	if interned == e {
@@ -12482,6 +13039,7 @@ func (m *Memo) MemoizeIn(
 	e := &InExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternIn(e)
 	if interned == e {
@@ -12499,6 +13057,7 @@ func (m *Memo) MemoizeNotIn(
 	e := &NotInExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNotIn(e)
 	if interned == e {
@@ -12516,6 +13075,7 @@ func (m *Memo) MemoizeLike(
 	e := &LikeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternLike(e)
 	if interned == e {
@@ -12533,6 +13093,7 @@ func (m *Memo) MemoizeNotLike(
 	e := &NotLikeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNotLike(e)
 	if interned == e {
@@ -12550,6 +13111,7 @@ func (m *Memo) MemoizeILike(
 	e := &ILikeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternILike(e)
 	if interned == e {
@@ -12567,6 +13129,7 @@ func (m *Memo) MemoizeNotILike(
 	e := &NotILikeExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNotILike(e)
 	if interned == e {
@@ -12584,6 +13147,7 @@ func (m *Memo) MemoizeSimilarTo(
 	e := &SimilarToExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternSimilarTo(e)
 	if interned == e {
@@ -12601,6 +13165,7 @@ func (m *Memo) MemoizeNotSimilarTo(
 	e := &NotSimilarToExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNotSimilarTo(e)
 	if interned == e {
@@ -12618,6 +13183,7 @@ func (m *Memo) MemoizeRegMatch(
 	e := &RegMatchExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternRegMatch(e)
 	if interned == e {
@@ -12635,6 +13201,7 @@ func (m *Memo) MemoizeNotRegMatch(
 	e := &NotRegMatchExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNotRegMatch(e)
 	if interned == e {
@@ -12652,6 +13219,7 @@ func (m *Memo) MemoizeRegIMatch(
 	e := &RegIMatchExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternRegIMatch(e)
 	if interned == e {
@@ -12669,6 +13237,7 @@ func (m *Memo) MemoizeNotRegIMatch(
 	e := &NotRegIMatchExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternNotRegIMatch(e)
 	if interned == e {
@@ -12686,6 +13255,7 @@ func (m *Memo) MemoizeIs(
 	e := &IsExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternIs(e)
 	if interned == e {
@@ -12703,6 +13273,7 @@ func (m *Memo) MemoizeIsNot(
 	e := &IsNotExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternIsNot(e)
 	if interned == e {
@@ -12720,6 +13291,7 @@ func (m *Memo) MemoizeContains(
 	e := &ContainsExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternContains(e)
 	if interned == e {
@@ -12737,6 +13309,7 @@ func (m *Memo) MemoizeJsonExists(
 	e := &JsonExistsExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternJsonExists(e)
 	if interned == e {
@@ -12754,6 +13327,7 @@ func (m *Memo) MemoizeJsonAllExists(
 	e := &JsonAllExistsExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternJsonAllExists(e)
 	if interned == e {
@@ -12771,6 +13345,7 @@ func (m *Memo) MemoizeJsonSomeExists(
 	e := &JsonSomeExistsExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternJsonSomeExists(e)
 	if interned == e {
@@ -12790,6 +13365,7 @@ func (m *Memo) MemoizeAnyScalar(
 		Left:  left,
 		Right: right,
 		Cmp:   cmp,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternAnyScalar(e)
 	if interned == e {
@@ -12807,6 +13383,7 @@ func (m *Memo) MemoizeBitand(
 	e := &BitandExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitand(e)
@@ -12825,6 +13402,7 @@ func (m *Memo) MemoizeBitor(
 	e := &BitorExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitor(e)
@@ -12843,6 +13421,7 @@ func (m *Memo) MemoizeBitxor(
 	e := &BitxorExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitxor(e)
@@ -12861,6 +13440,7 @@ func (m *Memo) MemoizePlus(
 	e := &PlusExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternPlus(e)
@@ -12879,6 +13459,7 @@ func (m *Memo) MemoizeMinus(
 	e := &MinusExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMinus(e)
@@ -12897,6 +13478,7 @@ func (m *Memo) MemoizeMult(
 	e := &MultExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMult(e)
@@ -12915,6 +13497,7 @@ func (m *Memo) MemoizeDiv(
 	e := &DivExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternDiv(e)
@@ -12933,6 +13516,7 @@ func (m *Memo) MemoizeFloorDiv(
 	e := &FloorDivExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFloorDiv(e)
@@ -12951,6 +13535,7 @@ func (m *Memo) MemoizeMod(
 	e := &ModExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMod(e)
@@ -12969,6 +13554,7 @@ func (m *Memo) MemoizePow(
 	e := &PowExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternPow(e)
@@ -12987,6 +13573,7 @@ func (m *Memo) MemoizeConcat(
 	e := &ConcatExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConcat(e)
@@ -13005,6 +13592,7 @@ func (m *Memo) MemoizeLShift(
 	e := &LShiftExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternLShift(e)
@@ -13023,6 +13611,7 @@ func (m *Memo) MemoizeRShift(
 	e := &RShiftExpr{
 		Left:  left,
 		Right: right,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternRShift(e)
@@ -13041,6 +13630,7 @@ func (m *Memo) MemoizeFetchVal(
 	e := &FetchValExpr{
 		Json:  json,
 		Index: index,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchVal(e)
@@ -13059,6 +13649,7 @@ func (m *Memo) MemoizeFetchText(
 	e := &FetchTextExpr{
 		Json:  json,
 		Index: index,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchText(e)
@@ -13077,6 +13668,7 @@ func (m *Memo) MemoizeFetchValPath(
 	e := &FetchValPathExpr{
 		Json: json,
 		Path: path,
+		id:   m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchValPath(e)
@@ -13095,6 +13687,7 @@ func (m *Memo) MemoizeFetchTextPath(
 	e := &FetchTextPathExpr{
 		Json: json,
 		Path: path,
+		id:   m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchTextPath(e)
@@ -13111,6 +13704,7 @@ func (m *Memo) MemoizeUnaryMinus(
 	const size = int64(unsafe.Sizeof(UnaryMinusExpr{}))
 	e := &UnaryMinusExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternUnaryMinus(e)
@@ -13127,6 +13721,7 @@ func (m *Memo) MemoizeUnaryComplement(
 	const size = int64(unsafe.Sizeof(UnaryComplementExpr{}))
 	e := &UnaryComplementExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternUnaryComplement(e)
@@ -13145,6 +13740,7 @@ func (m *Memo) MemoizeCast(
 	e := &CastExpr{
 		Input:     input,
 		TargetTyp: targetTyp,
+		id:        m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCast(e)
@@ -13165,6 +13761,7 @@ func (m *Memo) MemoizeIfErr(
 		Cond:    cond,
 		OrElse:  orElse,
 		ErrCode: errCode,
+		id:      m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternIfErr(e)
@@ -13185,6 +13782,7 @@ func (m *Memo) MemoizeCase(
 		Input:  input,
 		Whens:  whens,
 		OrElse: orElse,
+		id:     m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCase(e)
@@ -13203,6 +13801,7 @@ func (m *Memo) MemoizeWhen(
 	e := &WhenExpr{
 		Condition: condition,
 		Value:     value,
+		id:        m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternWhen(e)
@@ -13221,6 +13820,7 @@ func (m *Memo) MemoizeArray(
 	e := &ArrayExpr{
 		Elems: elems,
 		Typ:   typ,
+		id:    m.NextID(),
 	}
 	interned := m.interner.InternArray(e)
 	if interned == e {
@@ -13238,6 +13838,7 @@ func (m *Memo) MemoizeIndirection(
 	e := &IndirectionExpr{
 		Input: input,
 		Index: index,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternIndirection(e)
@@ -13256,6 +13857,7 @@ func (m *Memo) MemoizeArrayFlatten(
 	e := &ArrayFlattenExpr{
 		Input:           input,
 		SubqueryPrivate: *subqueryPrivate,
+		id:              m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternArrayFlatten(e)
@@ -13274,6 +13876,7 @@ func (m *Memo) MemoizeFunction(
 	e := &FunctionExpr{
 		Args:            args,
 		FunctionPrivate: *functionPrivate,
+		id:              m.NextID(),
 	}
 	interned := m.interner.InternFunction(e)
 	if interned == e {
@@ -13291,6 +13894,7 @@ func (m *Memo) MemoizeCollate(
 	e := &CollateExpr{
 		Input:  input,
 		Locale: locale,
+		id:     m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCollate(e)
@@ -13307,6 +13911,7 @@ func (m *Memo) MemoizeCoalesce(
 	const size = int64(unsafe.Sizeof(CoalesceExpr{}))
 	e := &CoalesceExpr{
 		Args: args,
+		id:   m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCoalesce(e)
@@ -13325,6 +13930,7 @@ func (m *Memo) MemoizeColumnAccess(
 	e := &ColumnAccessExpr{
 		Input: input,
 		Idx:   idx,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternColumnAccess(e)
@@ -13341,6 +13947,7 @@ func (m *Memo) MemoizeUnsupportedExpr(
 	const size = int64(unsafe.Sizeof(UnsupportedExprExpr{}))
 	e := &UnsupportedExprExpr{
 		Value: value,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternUnsupportedExpr(e)
@@ -13357,6 +13964,7 @@ func (m *Memo) MemoizeArrayAgg(
 	const size = int64(unsafe.Sizeof(ArrayAggExpr{}))
 	e := &ArrayAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternArrayAgg(e)
@@ -13373,6 +13981,7 @@ func (m *Memo) MemoizeAvg(
 	const size = int64(unsafe.Sizeof(AvgExpr{}))
 	e := &AvgExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAvg(e)
@@ -13389,6 +13998,7 @@ func (m *Memo) MemoizeBoolAnd(
 	const size = int64(unsafe.Sizeof(BoolAndExpr{}))
 	e := &BoolAndExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBoolAnd(e)
@@ -13405,6 +14015,7 @@ func (m *Memo) MemoizeBoolOr(
 	const size = int64(unsafe.Sizeof(BoolOrExpr{}))
 	e := &BoolOrExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBoolOr(e)
@@ -13421,6 +14032,7 @@ func (m *Memo) MemoizeConcatAgg(
 	const size = int64(unsafe.Sizeof(ConcatAggExpr{}))
 	e := &ConcatAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConcatAgg(e)
@@ -13437,6 +14049,7 @@ func (m *Memo) MemoizeCount(
 	const size = int64(unsafe.Sizeof(CountExpr{}))
 	e := &CountExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCount(e)
@@ -13457,6 +14070,7 @@ func (m *Memo) MemoizeMax(
 	const size = int64(unsafe.Sizeof(MaxExpr{}))
 	e := &MaxExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMax(e)
@@ -13473,6 +14087,7 @@ func (m *Memo) MemoizeMin(
 	const size = int64(unsafe.Sizeof(MinExpr{}))
 	e := &MinExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMin(e)
@@ -13489,6 +14104,7 @@ func (m *Memo) MemoizeSumInt(
 	const size = int64(unsafe.Sizeof(SumIntExpr{}))
 	e := &SumIntExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSumInt(e)
@@ -13505,6 +14121,7 @@ func (m *Memo) MemoizeSum(
 	const size = int64(unsafe.Sizeof(SumExpr{}))
 	e := &SumExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSum(e)
@@ -13521,6 +14138,7 @@ func (m *Memo) MemoizeSqrDiff(
 	const size = int64(unsafe.Sizeof(SqrDiffExpr{}))
 	e := &SqrDiffExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSqrDiff(e)
@@ -13537,6 +14155,7 @@ func (m *Memo) MemoizeVariance(
 	const size = int64(unsafe.Sizeof(VarianceExpr{}))
 	e := &VarianceExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternVariance(e)
@@ -13553,6 +14172,7 @@ func (m *Memo) MemoizeStdDev(
 	const size = int64(unsafe.Sizeof(StdDevExpr{}))
 	e := &StdDevExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternStdDev(e)
@@ -13569,6 +14189,7 @@ func (m *Memo) MemoizeXorAgg(
 	const size = int64(unsafe.Sizeof(XorAggExpr{}))
 	e := &XorAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternXorAgg(e)
@@ -13585,6 +14206,7 @@ func (m *Memo) MemoizeJsonAgg(
 	const size = int64(unsafe.Sizeof(JsonAggExpr{}))
 	e := &JsonAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternJsonAgg(e)
@@ -13601,6 +14223,7 @@ func (m *Memo) MemoizeJsonbAgg(
 	const size = int64(unsafe.Sizeof(JsonbAggExpr{}))
 	e := &JsonbAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternJsonbAgg(e)
@@ -13619,6 +14242,7 @@ func (m *Memo) MemoizeStringAgg(
 	e := &StringAggExpr{
 		Input: input,
 		Sep:   sep,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternStringAgg(e)
@@ -13635,6 +14259,7 @@ func (m *Memo) MemoizeConstAgg(
 	const size = int64(unsafe.Sizeof(ConstAggExpr{}))
 	e := &ConstAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConstAgg(e)
@@ -13651,6 +14276,7 @@ func (m *Memo) MemoizeConstNotNullAgg(
 	const size = int64(unsafe.Sizeof(ConstNotNullAggExpr{}))
 	e := &ConstNotNullAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConstNotNullAgg(e)
@@ -13667,6 +14293,7 @@ func (m *Memo) MemoizeAnyNotNullAgg(
 	const size = int64(unsafe.Sizeof(AnyNotNullAggExpr{}))
 	e := &AnyNotNullAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAnyNotNullAgg(e)
@@ -13683,6 +14310,7 @@ func (m *Memo) MemoizeFirstAgg(
 	const size = int64(unsafe.Sizeof(FirstAggExpr{}))
 	e := &FirstAggExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFirstAgg(e)
@@ -13699,6 +14327,7 @@ func (m *Memo) MemoizeAggDistinct(
 	const size = int64(unsafe.Sizeof(AggDistinctExpr{}))
 	e := &AggDistinctExpr{
 		Input: input,
+		id:    m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAggDistinct(e)
@@ -13717,6 +14346,7 @@ func (m *Memo) MemoizeAggFilter(
 	e := &AggFilterExpr{
 		Input:  input,
 		Filter: filter,
+		id:     m.NextID(),
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAggFilter(e)

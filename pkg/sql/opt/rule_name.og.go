@@ -97,6 +97,7 @@ const (
 	HoistJoinProject
 	SimplifyJoinNotNullEquality
 	ExtractJoinEqualities
+	SortFiltersInJoin
 	EliminateLimit
 	PushLimitIntoProject
 	PushOffsetIntoProject
@@ -190,6 +191,7 @@ const (
 	GenerateZigzagJoins
 	GenerateInvertedIndexZigzagJoins
 	GenerateLookupJoinsWithFilter
+	AssociateJoin
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan
 	PushLimitIntoIndexJoin

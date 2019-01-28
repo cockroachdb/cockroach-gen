@@ -372,6 +372,54 @@ func (_e *explorer) exploreInnerJoin(
 		}
 	}
 
+	// [AssociateJoin]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Left)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Left.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_innerJoin, _ := _member.(*memo.InnerJoinExpr)
+				if _innerJoin != nil {
+					innerLeft := _innerJoin.Left
+					if _e.funcs.ShouldReorderJoins() {
+						innerRight := _innerJoin.Right
+						innerOn := _innerJoin.On
+						right := _root.Right
+						on := _root.On
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.AssociateJoin) {
+							_expr := &memo.InnerJoinExpr{
+								Left: innerLeft,
+								Right: _e.f.ConstructInnerJoin(
+									innerRight,
+									right,
+									_e.funcs.ExtractBoundConditions(on, _e.funcs.OutputCols2(innerRight, right)),
+								),
+								On: _e.funcs.SortFilters(_e.funcs.ConcatFilters(_e.funcs.ExtractUnboundConditions(on, _e.funcs.OutputCols2(innerRight, right)), innerOn)),
+							}
+							_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
+							if _e.o.appliedRule != nil {
+								if _interned != _expr {
+									_e.o.appliedRule(opt.AssociateJoin, _root, nil)
+								} else {
+									_e.o.appliedRule(opt.AssociateJoin, _root, _interned)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
