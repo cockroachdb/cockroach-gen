@@ -13164,6 +13164,23 @@ func (_f *Factory) ConstructDelete(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
+	// [PruneMutationCols]
+	{
+		needed := _f.funcs.NeededColsMutation(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationCols) {
+				_expr := _f.ConstructDelete(
+					_f.funcs.PruneCols(input, needed),
+					_f.funcs.PruneMutationCols(mutationPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeDelete(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
