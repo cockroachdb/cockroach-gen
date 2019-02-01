@@ -208,6 +208,7 @@ func (p *sortedDistinctBoolOp) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -221,6 +222,7 @@ func (p *sortedDistinctBoolOp) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -318,6 +320,7 @@ func (p *sortedDistinctBytesOp) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -331,6 +334,7 @@ func (p *sortedDistinctBytesOp) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -428,6 +432,7 @@ func (p *sortedDistinctDecimalOp) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -441,6 +446,7 @@ func (p *sortedDistinctDecimalOp) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -538,6 +544,7 @@ func (p *sortedDistinctInt8Op) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -551,6 +558,7 @@ func (p *sortedDistinctInt8Op) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -648,6 +656,7 @@ func (p *sortedDistinctInt16Op) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -661,6 +670,7 @@ func (p *sortedDistinctInt16Op) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -758,6 +768,7 @@ func (p *sortedDistinctInt32Op) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -771,6 +782,7 @@ func (p *sortedDistinctInt32Op) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -868,6 +880,7 @@ func (p *sortedDistinctInt64Op) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -881,6 +894,7 @@ func (p *sortedDistinctInt64Op) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -978,6 +992,7 @@ func (p *sortedDistinctFloat32Op) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -991,6 +1006,7 @@ func (p *sortedDistinctFloat32Op) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -1088,6 +1104,7 @@ func (p *sortedDistinctFloat64Op) Next() ColBatch {
 		// Bounds check elimination.
 		sel = sel[startIdx:n]
 		for _, i := range sel {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
@@ -1101,6 +1118,7 @@ func (p *sortedDistinctFloat64Op) Next() ColBatch {
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
 		for i := range col {
+
 			v := col[i]
 			// Note that not inlining this unique var actually makes a non-trivial
 			// performance difference.
