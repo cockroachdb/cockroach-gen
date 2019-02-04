@@ -375,14 +375,15 @@ func (_e *explorer) exploreInnerJoin(
 	// [AssociateJoin]
 	{
 		_partlyExplored := _rootOrd < _rootState.start
-		_state := _e.lookupExploreState(_root.Left)
+		left := _root.Left
+		_state := _e.lookupExploreState(left)
 		if !_state.fullyExplored {
 			_fullyExplored = false
 		}
 		var _member memo.RelExpr
 		for _ord := 0; _ord < _state.end; _ord++ {
 			if _member == nil {
-				_member = _root.Left.FirstExpr()
+				_member = left.FirstExpr()
 			} else {
 				_member = _member.NextExpr()
 			}
@@ -390,10 +391,10 @@ func (_e *explorer) exploreInnerJoin(
 				_innerJoin, _ := _member.(*memo.InnerJoinExpr)
 				if _innerJoin != nil {
 					innerLeft := _innerJoin.Left
-					if _e.funcs.ShouldReorderJoins() {
-						innerRight := _innerJoin.Right
-						innerOn := _innerJoin.On
-						right := _root.Right
+					innerRight := _innerJoin.Right
+					innerOn := _innerJoin.On
+					right := _root.Right
+					if _e.funcs.ShouldReorderJoins(left, right) {
 						on := _root.On
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.AssociateJoin) {
 							_expr := &memo.InnerJoinExpr{
