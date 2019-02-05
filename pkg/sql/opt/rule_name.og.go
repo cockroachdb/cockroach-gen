@@ -131,7 +131,8 @@ const (
 	PruneRowNumberCols
 	PruneExplainCols
 	PruneProjectSetCols
-	PruneMutationCols
+	PruneMutationFetchCols
+	PruneMutationInputCols
 	RejectNullsLeftJoin
 	RejectNullsRightJoin
 	RejectNullsGroupBy

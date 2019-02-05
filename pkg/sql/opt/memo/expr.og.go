@@ -11377,14 +11377,18 @@ type MutationPrivate struct {
 	// that the execution engine uses to decide whether to insert or to update.
 	// If the canary column value is null for a particular input row, then a new
 	// row is inserted into the table. Otherwise, the existing row is updated.
+	// While CanaryCol is 0 for all non-Upsert operators, it is also 0 for the
+	// "blind" Upsert case in which a "Put" KV operator inserts a new row or
+	// overwrites an existing row.
 	CanaryCol opt.ColumnID
 
-	// NeedResults is true if the Insert operator returns output rows. One output
-	// row will be returned for each input row. The output row contains all
-	// columns in the table, including hidden columns, but not including any
-	// columns that are undergoing mutation (being added or dropped as part of
-	// online schema change).
-	NeedResults bool
+	// ReturnCols are the set of columns returned by the mutation operator when
+	// the RETURNING clause has been specified. By default, the return columns
+	// include all columns in the table, including hidden columns, but not
+	// including any columns that are undergoing mutation (being added or dropped
+	// as part of online schema change). If no RETURNING clause was specified,
+	// then ReturnCols is nil.
+	ReturnCols opt.ColList
 }
 
 // UpdateExpr evaluates a relational input expression that fetches existing rows from
@@ -18208,7 +18212,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.UpdateCols)
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashBool(val.NeedResults)
+	in.hasher.HashColList(val.ReturnCols)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -18220,7 +18224,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
 				return existing
 			}
 		}
@@ -18240,7 +18244,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.UpdateCols)
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashBool(val.NeedResults)
+	in.hasher.HashColList(val.ReturnCols)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -18252,7 +18256,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
 				return existing
 			}
 		}
@@ -18272,7 +18276,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.HashColList(val.UpdateCols)
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashBool(val.NeedResults)
+	in.hasher.HashColList(val.ReturnCols)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -18284,7 +18288,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
 				return existing
 			}
 		}
@@ -18304,7 +18308,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.HashColList(val.UpdateCols)
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashBool(val.NeedResults)
+	in.hasher.HashColList(val.ReturnCols)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -18316,7 +18320,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsBoolEqual(val.NeedResults, existing.NeedResults) {
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
 				return existing
 			}
 		}

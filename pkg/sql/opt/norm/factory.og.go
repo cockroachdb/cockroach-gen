@@ -1066,7 +1066,7 @@ func (_f *Factory) ConstructProject(
 		if _rowNumber != nil {
 			input := _rowNumber.Input
 			rowNumberPrivate := &_rowNumber.RowNumberPrivate
-			needed := _f.funcs.UnionCols3(_f.funcs.NeededColsRowNumber(rowNumberPrivate), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			needed := _f.funcs.UnionCols3(_f.funcs.NeededRowNumberCols(rowNumberPrivate), _f.funcs.ProjectionOuterCols(projections), passthrough)
 			if _f.funcs.CanPruneCols(input, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneRowNumberCols) {
 					_expr := _f.ConstructProject(
@@ -6831,7 +6831,7 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [PruneGroupByCols]
 	{
-		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededColsGrouping(groupingPrivate))
+		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededGroupingCols(groupingPrivate))
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
 				_expr := _f.ConstructGroupBy(
@@ -7057,7 +7057,7 @@ func (_f *Factory) ConstructDistinctOn(
 
 	// [PruneGroupByCols]
 	{
-		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededColsGrouping(groupingPrivate))
+		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededGroupingCols(groupingPrivate))
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
 				_expr := _f.ConstructDistinctOn(
@@ -7425,7 +7425,7 @@ func (_f *Factory) ConstructExplain(
 
 	// [PruneExplainCols]
 	{
-		needed := _f.funcs.NeededColsExplain(explainPrivate)
+		needed := _f.funcs.NeededExplainCols(explainPrivate)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneExplainCols) {
 				_expr := _f.ConstructExplain(
@@ -13107,6 +13107,23 @@ func (_f *Factory) ConstructInsert(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructInsert(
+					_f.funcs.PruneCols(input, needed),
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeInsert(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
@@ -13125,6 +13142,40 @@ func (_f *Factory) ConstructUpdate(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
+	// [PruneMutationFetchCols]
+	{
+		needed := _f.funcs.NeededMutationFetchCols(opt.UpdateOp, mutationPrivate)
+		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
+				_expr := _f.ConstructUpdate(
+					input,
+					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructUpdate(
+					_f.funcs.PruneCols(input, needed),
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeUpdate(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
@@ -13150,6 +13201,40 @@ func (_f *Factory) ConstructUpsert(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
+	// [PruneMutationFetchCols]
+	{
+		needed := _f.funcs.NeededMutationFetchCols(opt.UpsertOp, mutationPrivate)
+		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
+				_expr := _f.ConstructUpsert(
+					input,
+					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructUpsert(
+					_f.funcs.PruneCols(input, needed),
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeUpsert(input, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
@@ -13164,17 +13249,34 @@ func (_f *Factory) ConstructDelete(
 	input memo.RelExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
-	// [PruneMutationCols]
+	// [PruneMutationFetchCols]
 	{
-		needed := _f.funcs.NeededColsMutation(mutationPrivate)
-		if _f.funcs.CanPruneCols(input, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationCols) {
+		needed := _f.funcs.NeededMutationFetchCols(opt.DeleteOp, mutationPrivate)
+		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructDelete(
-					_f.funcs.PruneCols(input, needed),
-					_f.funcs.PruneMutationCols(mutationPrivate, needed),
+					input,
+					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationCols, nil, _expr)
+					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructDelete(
+					_f.funcs.PruneCols(input, needed),
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
 				}
 				return _expr
 			}
