@@ -242,20 +242,24 @@ func (_e *explorer) exploreInnerJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
-				_expr := &memo.InnerJoinExpr{
-					Left:  right,
-					Right: left,
-					On:    on,
-				}
-				_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteJoin, _root, _interned)
+			if !_e.funcs.HasNoCols(left) {
+				right := _root.Right
+				if !_e.funcs.HasNoCols(right) {
+					on := _root.On
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
+						_expr := &memo.InnerJoinExpr{
+							Left:  right,
+							Right: left,
+							On:    on,
+						}
+						_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.CommuteJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.CommuteJoin, _root, _interned)
+							}
+						}
 					}
 				}
 			}
@@ -391,27 +395,33 @@ func (_e *explorer) exploreInnerJoin(
 				_innerJoin, _ := _member.(*memo.InnerJoinExpr)
 				if _innerJoin != nil {
 					innerLeft := _innerJoin.Left
-					innerRight := _innerJoin.Right
-					innerOn := _innerJoin.On
-					right := _root.Right
-					if _e.funcs.ShouldReorderJoins(left, right) {
-						on := _root.On
-						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.AssociateJoin) {
-							_expr := &memo.InnerJoinExpr{
-								Left: innerLeft,
-								Right: _e.f.ConstructInnerJoin(
-									innerRight,
-									right,
-									_e.funcs.ExtractBoundConditions(on, _e.funcs.OutputCols2(innerRight, right)),
-								),
-								On: _e.funcs.SortFilters(_e.funcs.ConcatFilters(_e.funcs.ExtractUnboundConditions(on, _e.funcs.OutputCols2(innerRight, right)), innerOn)),
-							}
-							_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
-							if _e.o.appliedRule != nil {
-								if _interned != _expr {
-									_e.o.appliedRule(opt.AssociateJoin, _root, nil)
-								} else {
-									_e.o.appliedRule(opt.AssociateJoin, _root, _interned)
+					if !_e.funcs.HasNoCols(innerLeft) {
+						innerRight := _innerJoin.Right
+						if !_e.funcs.HasNoCols(innerRight) {
+							innerOn := _innerJoin.On
+							right := _root.Right
+							if _e.funcs.ShouldReorderJoins(left, right) {
+								if !_e.funcs.HasNoCols(right) {
+									on := _root.On
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.AssociateJoin) {
+										_expr := &memo.InnerJoinExpr{
+											Left: innerLeft,
+											Right: _e.f.ConstructInnerJoin(
+												innerRight,
+												right,
+												_e.funcs.ExtractBoundConditions(on, _e.funcs.OutputCols2(innerRight, right)),
+											),
+											On: _e.funcs.SortFilters(_e.funcs.ConcatFilters(_e.funcs.ExtractUnboundConditions(on, _e.funcs.OutputCols2(innerRight, right)), innerOn)),
+										}
+										_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
+										if _e.o.appliedRule != nil {
+											if _interned != _expr {
+												_e.o.appliedRule(opt.AssociateJoin, _root, nil)
+											} else {
+												_e.o.appliedRule(opt.AssociateJoin, _root, _interned)
+											}
+										}
+									}
 								}
 							}
 						}
@@ -435,20 +445,24 @@ func (_e *explorer) exploreLeftJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteLeftJoin) {
-				_expr := &memo.RightJoinExpr{
-					Left:  right,
-					Right: left,
-					On:    on,
-				}
-				_interned := _e.mem.AddRightJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteLeftJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteLeftJoin, _root, _interned)
+			if !_e.funcs.HasNoCols(left) {
+				right := _root.Right
+				if !_e.funcs.HasNoCols(left) {
+					on := _root.On
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteLeftJoin) {
+						_expr := &memo.RightJoinExpr{
+							Left:  right,
+							Right: left,
+							On:    on,
+						}
+						_interned := _e.mem.AddRightJoinToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.CommuteLeftJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.CommuteLeftJoin, _root, _interned)
+							}
+						}
 					}
 				}
 			}
@@ -579,20 +593,24 @@ func (_e *explorer) exploreRightJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteRightJoin) {
-				_expr := &memo.LeftJoinExpr{
-					Left:  right,
-					Right: left,
-					On:    on,
-				}
-				_interned := _e.mem.AddLeftJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteRightJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteRightJoin, _root, _interned)
+			if !_e.funcs.HasNoCols(left) {
+				right := _root.Right
+				if !_e.funcs.HasNoCols(left) {
+					on := _root.On
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteRightJoin) {
+						_expr := &memo.LeftJoinExpr{
+							Left:  right,
+							Right: left,
+							On:    on,
+						}
+						_interned := _e.mem.AddLeftJoinToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.CommuteRightJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.CommuteRightJoin, _root, _interned)
+							}
+						}
 					}
 				}
 			}
@@ -632,20 +650,24 @@ func (_e *explorer) exploreFullJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
-				_expr := &memo.FullJoinExpr{
-					Left:  right,
-					Right: left,
-					On:    on,
-				}
-				_interned := _e.mem.AddFullJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteJoin, _root, _interned)
+			if !_e.funcs.HasNoCols(left) {
+				right := _root.Right
+				if !_e.funcs.HasNoCols(right) {
+					on := _root.On
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
+						_expr := &memo.FullJoinExpr{
+							Left:  right,
+							Right: left,
+							On:    on,
+						}
+						_interned := _e.mem.AddFullJoinToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.CommuteJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.CommuteJoin, _root, _interned)
+							}
+						}
 					}
 				}
 			}
