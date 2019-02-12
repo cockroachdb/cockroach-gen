@@ -14742,7 +14742,7 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 		if err != nil {
 			panic(placeholderError{err})
 		}
-		return f.ConstructConstVal(d)
+		return f.ConstructConstVal(d, t.DataType())
 
 	case *memo.TupleExpr:
 		return f.ConstructTuple(
