@@ -5451,6 +5451,11 @@ type SubqueryPrivate struct {
 
 	// Cmp is only used for AnyOp.
 	Cmp opt.Operator
+
+	// WasLimited indicates a limit was applied "under" the subquery to
+	// restrict how many rows are fetched to determine the result.  See
+	// e.g. the rule IntroduceExistsLimit.
+	WasLimited bool
 }
 
 // AnyExpr is a SQL operator that applies a comparison to every row of an input
@@ -16219,6 +16224,7 @@ func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
+	in.hasher.HashBool(val.WasLimited)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -16227,7 +16233,8 @@ func (in *interner) InternSubquery(val *SubqueryExpr) *SubqueryExpr {
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
-				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) &&
+				in.hasher.IsBoolEqual(val.WasLimited, existing.WasLimited) {
 				return existing
 			}
 		}
@@ -16246,6 +16253,7 @@ func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
+	in.hasher.HashBool(val.WasLimited)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -16255,7 +16263,8 @@ func (in *interner) InternAny(val *AnyExpr) *AnyExpr {
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
-				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) &&
+				in.hasher.IsBoolEqual(val.WasLimited, existing.WasLimited) {
 				return existing
 			}
 		}
@@ -16273,6 +16282,7 @@ func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
+	in.hasher.HashBool(val.WasLimited)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -16281,7 +16291,8 @@ func (in *interner) InternExists(val *ExistsExpr) *ExistsExpr {
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
-				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) &&
+				in.hasher.IsBoolEqual(val.WasLimited, existing.WasLimited) {
 				return existing
 			}
 		}
@@ -17631,6 +17642,7 @@ func (in *interner) InternArrayFlatten(val *ArrayFlattenExpr) *ArrayFlattenExpr 
 	in.hasher.HashOrdering(val.Ordering)
 	in.hasher.HashColumnID(val.RequestedCol)
 	in.hasher.HashOperator(val.Cmp)
+	in.hasher.HashBool(val.WasLimited)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -17639,7 +17651,8 @@ func (in *interner) InternArrayFlatten(val *ArrayFlattenExpr) *ArrayFlattenExpr 
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
 				in.hasher.IsOrderingEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.RequestedCol, existing.RequestedCol) &&
-				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) {
+				in.hasher.IsOperatorEqual(val.Cmp, existing.Cmp) &&
+				in.hasher.IsBoolEqual(val.WasLimited, existing.WasLimited) {
 				return existing
 			}
 		}

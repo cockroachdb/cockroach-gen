@@ -153,6 +153,7 @@ const (
 	UnifyComparisonTypes
 	EliminateExistsProject
 	EliminateExistsGroupBy
+	IntroduceExistsLimit
 	NormalizeJSONFieldAccess
 	NormalizeJSONContains
 	SimplifyCaseWhenConstValue
