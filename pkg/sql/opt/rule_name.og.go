@@ -94,7 +94,8 @@ const (
 	EliminateAntiJoin
 	EliminateJoinNoColsLeft
 	EliminateJoinNoColsRight
-	HoistJoinProject
+	HoistJoinProjectRight
+	HoistJoinProjectLeft
 	SimplifyJoinNotNullEquality
 	ExtractJoinEqualities
 	SortFiltersInJoin

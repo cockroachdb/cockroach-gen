@@ -1758,14 +1758,14 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
-	// [HoistJoinProject]
+	// [HoistJoinProjectRight]
 	{
 		_project, _ := right.(*memo.ProjectExpr)
 		if _project != nil {
 			input := _project.Input
 			projections := _project.Projections
 			if len(projections) == 0 {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectRight) {
 					_expr := _f.ConstructProject(
 						_f.ConstructInnerJoin(
 							left,
@@ -1776,7 +1776,33 @@ func (_f *Factory) ConstructInnerJoin(
 						_f.funcs.OutputCols2(left, right),
 					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
+						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [HoistJoinProjectLeft]
+	{
+		_project, _ := left.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectLeft) {
+					_expr := _f.ConstructProject(
+						_f.ConstructInnerJoin(
+							input,
+							right,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
 					}
 					return _expr
 				}
@@ -2241,14 +2267,14 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
-	// [HoistJoinProject]
+	// [HoistJoinProjectRight]
 	{
 		_project, _ := right.(*memo.ProjectExpr)
 		if _project != nil {
 			input := _project.Input
 			projections := _project.Projections
 			if len(projections) == 0 {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectRight) {
 					_expr := _f.ConstructProject(
 						_f.ConstructLeftJoin(
 							left,
@@ -2259,7 +2285,33 @@ func (_f *Factory) ConstructLeftJoin(
 						_f.funcs.OutputCols2(left, right),
 					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
+						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [HoistJoinProjectLeft]
+	{
+		_project, _ := left.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectLeft) {
+					_expr := _f.ConstructProject(
+						_f.ConstructLeftJoin(
+							input,
+							right,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
 					}
 					return _expr
 				}
@@ -4614,14 +4666,14 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
-	// [HoistJoinProject]
+	// [HoistJoinProjectRight]
 	{
 		_project, _ := right.(*memo.ProjectExpr)
 		if _project != nil {
 			input := _project.Input
 			projections := _project.Projections
 			if len(projections) == 0 {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectRight) {
 					_expr := _f.ConstructProject(
 						_f.ConstructInnerJoinApply(
 							left,
@@ -4632,7 +4684,33 @@ func (_f *Factory) ConstructInnerJoinApply(
 						_f.funcs.OutputCols2(left, right),
 					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
+						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [HoistJoinProjectLeft]
+	{
+		_project, _ := left.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectLeft) {
+					_expr := _f.ConstructProject(
+						_f.ConstructInnerJoinApply(
+							input,
+							right,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
 					}
 					return _expr
 				}
@@ -5140,14 +5218,14 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
-	// [HoistJoinProject]
+	// [HoistJoinProjectRight]
 	{
 		_project, _ := right.(*memo.ProjectExpr)
 		if _project != nil {
 			input := _project.Input
 			projections := _project.Projections
 			if len(projections) == 0 {
-				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProject) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectRight) {
 					_expr := _f.ConstructProject(
 						_f.ConstructLeftJoinApply(
 							left,
@@ -5158,7 +5236,33 @@ func (_f *Factory) ConstructLeftJoinApply(
 						_f.funcs.OutputCols2(left, right),
 					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.HoistJoinProject, nil, _expr)
+						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [HoistJoinProjectLeft]
+	{
+		_project, _ := left.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			if len(projections) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.HoistJoinProjectLeft) {
+					_expr := _f.ConstructProject(
+						_f.ConstructLeftJoinApply(
+							input,
+							right,
+							on,
+						),
+						projections,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
 					}
 					return _expr
 				}
