@@ -13429,27 +13429,28 @@ func (_f *Factory) ConstructCreateTable(
 	return _f.onConstructRelational(e)
 }
 
-// Reconstruct enables an expression subtree to be rewritten under the control
-// of the caller. It passes each child of the given expression to the replace
+// Replace enables an expression subtree to be rewritten under the control of
+// the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
-// callback by recursively calling Reconstruct. It can also return a replacement
-// expression; if it does, then Reconstruct will rebuild the operator via a call
-// to the corresponding factory Construct method. Here is example usage:
+// callback by recursively calling Replace. It can also return a replacement
+// expression; if it does, then Replace will rebuild the operator and its
+// ancestors via a calls to the corresponding factory Construct methods. Here
+// is example usage:
 //
-//   var replace func(e opt.Expr, replace ReconstructFunc) opt.Expr
-//   replace = func(e opt.Expr, replace ReconstructFunc) opt.Expr {
+//   var replace func(e opt.Expr, replace ReplaceFunc) opt.Expr
+//   replace = func(e opt.Expr, replace ReplaceFunc) opt.Expr {
 //     if e.Op() == opt.VariableOp {
-//       return ReplaceVar(e)
+//       return getReplaceVar(e)
 //     }
-//     return e.Reconstruct(e, replace)
+//     return e.Replace(e, replace)
 //   }
 //   replace(root, replace)
 //
 // Here, all variables in the tree are being replaced by some other expression
 // in a pre-order traversal of the tree. Post-order traversal is trivially
-// achieved by moving the e.Reconstruct call to the top of the replace function
+// achieved by moving the e.Replace call to the top of the replace function
 // rather than bottom.
-func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
+func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	switch t := e.(type) {
 	case *memo.ScanExpr:
 		return t
@@ -13461,7 +13462,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		return t
 
 	case *memo.ValuesExpr:
-		rows, rowsChanged := f.reconstructScalarListExpr(t.Rows, replace)
+		rows, rowsChanged := f.replaceScalarListExpr(t.Rows, replace)
 		if rowsChanged {
 			return f.ConstructValues(rows, t.Cols)
 		}
@@ -13469,7 +13470,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.SelectExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		filters, filtersChanged := f.reconstructFiltersExpr(t.Filters, replace)
+		filters, filtersChanged := f.replaceFiltersExpr(t.Filters, replace)
 		if input != t.Input || filtersChanged {
 			return f.ConstructSelect(input, filters)
 		}
@@ -13477,7 +13478,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.ProjectExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		projections, projectionsChanged := f.reconstructProjectionsExpr(t.Projections, replace)
+		projections, projectionsChanged := f.replaceProjectionsExpr(t.Projections, replace)
 		if input != t.Input || projectionsChanged {
 			return f.ConstructProject(input, projections, t.Passthrough)
 		}
@@ -13486,7 +13487,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.InnerJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructInnerJoin(left, right, on)
 		}
@@ -13495,7 +13496,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.LeftJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructLeftJoin(left, right, on)
 		}
@@ -13504,7 +13505,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.RightJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructRightJoin(left, right, on)
 		}
@@ -13513,7 +13514,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.FullJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructFullJoin(left, right, on)
 		}
@@ -13522,7 +13523,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.SemiJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructSemiJoin(left, right, on)
 		}
@@ -13531,7 +13532,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.AntiJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructAntiJoin(left, right, on)
 		}
@@ -13546,7 +13547,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.LookupJoinExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if input != t.Input || onChanged {
 			return f.ConstructLookupJoin(input, on, &t.LookupJoinPrivate)
 		}
@@ -13555,14 +13556,14 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.MergeJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructMergeJoin(left, right, on, &t.MergeJoinPrivate)
 		}
 		return t
 
 	case *memo.ZigzagJoinExpr:
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if onChanged {
 			return f.ConstructZigzagJoin(on, &t.ZigzagJoinPrivate)
 		}
@@ -13571,7 +13572,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.InnerJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructInnerJoinApply(left, right, on)
 		}
@@ -13580,7 +13581,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.LeftJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructLeftJoinApply(left, right, on)
 		}
@@ -13589,7 +13590,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.RightJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructRightJoinApply(left, right, on)
 		}
@@ -13598,7 +13599,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.FullJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructFullJoinApply(left, right, on)
 		}
@@ -13607,7 +13608,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.SemiJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructSemiJoinApply(left, right, on)
 		}
@@ -13616,7 +13617,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	case *memo.AntiJoinApplyExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
-		on, onChanged := f.reconstructFiltersExpr(t.On, replace)
+		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if left != t.Left || right != t.Right || onChanged {
 			return f.ConstructAntiJoinApply(left, right, on)
 		}
@@ -13624,7 +13625,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.GroupByExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		aggregations, aggregationsChanged := f.reconstructAggregationsExpr(t.Aggregations, replace)
+		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
 		if input != t.Input || aggregationsChanged {
 			return f.ConstructGroupBy(input, aggregations, &t.GroupingPrivate)
 		}
@@ -13632,7 +13633,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.ScalarGroupByExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		aggregations, aggregationsChanged := f.reconstructAggregationsExpr(t.Aggregations, replace)
+		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
 		if input != t.Input || aggregationsChanged {
 			return f.ConstructScalarGroupBy(input, aggregations, &t.GroupingPrivate)
 		}
@@ -13640,7 +13641,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.DistinctOnExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		aggregations, aggregationsChanged := f.reconstructAggregationsExpr(t.Aggregations, replace)
+		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
 		if input != t.Input || aggregationsChanged {
 			return f.ConstructDistinctOn(input, aggregations, &t.GroupingPrivate)
 		}
@@ -13736,7 +13737,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.ProjectSetExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		zip, zipChanged := f.reconstructZipExpr(t.Zip, replace)
+		zip, zipChanged := f.replaceZipExpr(t.Zip, replace)
 		if input != t.Input || zipChanged {
 			return f.ConstructProjectSet(input, zip)
 		}
@@ -13783,32 +13784,32 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		return t
 
 	case *memo.TupleExpr:
-		elems, elemsChanged := f.reconstructScalarListExpr(t.Elems, replace)
+		elems, elemsChanged := f.replaceScalarListExpr(t.Elems, replace)
 		if elemsChanged {
 			return f.ConstructTuple(elems, t.Typ)
 		}
 		return t
 
 	case *memo.ProjectionsExpr:
-		if after, changed := f.reconstructProjectionsExpr(*t, replace); changed {
+		if after, changed := f.replaceProjectionsExpr(*t, replace); changed {
 			return &after
 		}
 		return t
 
 	case *memo.AggregationsExpr:
-		if after, changed := f.reconstructAggregationsExpr(*t, replace); changed {
+		if after, changed := f.replaceAggregationsExpr(*t, replace); changed {
 			return &after
 		}
 		return t
 
 	case *memo.FiltersExpr:
-		if after, changed := f.reconstructFiltersExpr(*t, replace); changed {
+		if after, changed := f.replaceFiltersExpr(*t, replace); changed {
 			return &after
 		}
 		return t
 
 	case *memo.ZipExpr:
-		if after, changed := f.reconstructZipExpr(*t, replace); changed {
+		if after, changed := f.replaceZipExpr(*t, replace); changed {
 			return &after
 		}
 		return t
@@ -14195,8 +14196,8 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.IfErrExpr:
 		cond := replace(t.Cond).(opt.ScalarExpr)
-		orElse, orElseChanged := f.reconstructScalarListExpr(t.OrElse, replace)
-		errCode, errCodeChanged := f.reconstructScalarListExpr(t.ErrCode, replace)
+		orElse, orElseChanged := f.replaceScalarListExpr(t.OrElse, replace)
+		errCode, errCodeChanged := f.replaceScalarListExpr(t.ErrCode, replace)
 		if cond != t.Cond || orElseChanged || errCodeChanged {
 			return f.ConstructIfErr(cond, orElse, errCode)
 		}
@@ -14204,7 +14205,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 
 	case *memo.CaseExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
-		whens, whensChanged := f.reconstructScalarListExpr(t.Whens, replace)
+		whens, whensChanged := f.replaceScalarListExpr(t.Whens, replace)
 		orElse := replace(t.OrElse).(opt.ScalarExpr)
 		if input != t.Input || whensChanged || orElse != t.OrElse {
 			return f.ConstructCase(input, whens, orElse)
@@ -14220,7 +14221,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		return t
 
 	case *memo.ArrayExpr:
-		elems, elemsChanged := f.reconstructScalarListExpr(t.Elems, replace)
+		elems, elemsChanged := f.replaceScalarListExpr(t.Elems, replace)
 		if elemsChanged {
 			return f.ConstructArray(elems, t.Typ)
 		}
@@ -14242,7 +14243,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		return t
 
 	case *memo.FunctionExpr:
-		args, argsChanged := f.reconstructScalarListExpr(t.Args, replace)
+		args, argsChanged := f.replaceScalarListExpr(t.Args, replace)
 		if argsChanged {
 			return f.ConstructFunction(args, &t.FunctionPrivate)
 		}
@@ -14256,7 +14257,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		return t
 
 	case *memo.CoalesceExpr:
-		args, argsChanged := f.reconstructScalarListExpr(t.Args, replace)
+		args, argsChanged := f.replaceScalarListExpr(t.Args, replace)
 		if argsChanged {
 			return f.ConstructCoalesce(args)
 		}
@@ -14439,7 +14440,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 		return t
 
 	case *memo.ScalarListExpr:
-		if after, changed := f.reconstructScalarListExpr(*t, replace); changed {
+		if after, changed := f.replaceScalarListExpr(*t, replace); changed {
 			return &after
 		}
 		return t
@@ -14483,7 +14484,7 @@ func (f *Factory) Reconstruct(e opt.Expr, replace ReconstructFunc) opt.Expr {
 	panic(fmt.Sprintf("unhandled op %s", e.Op()))
 }
 
-func (f *Factory) reconstructProjectionsExpr(list memo.ProjectionsExpr, replace ReconstructFunc) (_ memo.ProjectionsExpr, changed bool) {
+func (f *Factory) replaceProjectionsExpr(list memo.ProjectionsExpr, replace ReplaceFunc) (_ memo.ProjectionsExpr, changed bool) {
 	var newList []memo.ProjectionsItem
 	for i := range list {
 		before := list[i].Element
@@ -14505,7 +14506,7 @@ func (f *Factory) reconstructProjectionsExpr(list memo.ProjectionsExpr, replace 
 	return newList, true
 }
 
-func (f *Factory) reconstructAggregationsExpr(list memo.AggregationsExpr, replace ReconstructFunc) (_ memo.AggregationsExpr, changed bool) {
+func (f *Factory) replaceAggregationsExpr(list memo.AggregationsExpr, replace ReplaceFunc) (_ memo.AggregationsExpr, changed bool) {
 	var newList []memo.AggregationsItem
 	for i := range list {
 		before := list[i].Agg
@@ -14527,7 +14528,7 @@ func (f *Factory) reconstructAggregationsExpr(list memo.AggregationsExpr, replac
 	return newList, true
 }
 
-func (f *Factory) reconstructFiltersExpr(list memo.FiltersExpr, replace ReconstructFunc) (_ memo.FiltersExpr, changed bool) {
+func (f *Factory) replaceFiltersExpr(list memo.FiltersExpr, replace ReplaceFunc) (_ memo.FiltersExpr, changed bool) {
 	var newList []memo.FiltersItem
 	for i := range list {
 		before := list[i].Condition
@@ -14548,7 +14549,7 @@ func (f *Factory) reconstructFiltersExpr(list memo.FiltersExpr, replace Reconstr
 	return newList, true
 }
 
-func (f *Factory) reconstructZipExpr(list memo.ZipExpr, replace ReconstructFunc) (_ memo.ZipExpr, changed bool) {
+func (f *Factory) replaceZipExpr(list memo.ZipExpr, replace ReplaceFunc) (_ memo.ZipExpr, changed bool) {
 	var newList []memo.ZipItem
 	for i := range list {
 		before := list[i].Func
@@ -14570,7 +14571,7 @@ func (f *Factory) reconstructZipExpr(list memo.ZipExpr, replace ReconstructFunc)
 	return newList, true
 }
 
-func (f *Factory) reconstructScalarListExpr(list memo.ScalarListExpr, replace ReconstructFunc) (_ memo.ScalarListExpr, changed bool) {
+func (f *Factory) replaceScalarListExpr(list memo.ScalarListExpr, replace ReplaceFunc) (_ memo.ScalarListExpr, changed bool) {
 	var newList []opt.ScalarExpr
 	for i := range list {
 		before := list[i]
@@ -14591,7 +14592,11 @@ func (f *Factory) reconstructScalarListExpr(list memo.ScalarListExpr, replace Re
 	return newList, true
 }
 
-func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
+// copyAndReplaceDefault performs the default traversal and cloning behavior
+// for the CopyAndReplace method. It constructs a copy of the given source
+// operator using children copied (and potentially remapped) by the given replace
+// function. See comments for CopyAndReplace for more details.
+func (f *Factory) copyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
 	switch t := src.(type) {
 	case *memo.ScanExpr:
 		return f.mem.MemoizeScan(&t.ScanPrivate)
@@ -14604,219 +14609,219 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 
 	case *memo.ValuesExpr:
 		return f.ConstructValues(
-			f.assignScalarListExprPlaceholders(t.Rows),
+			f.copyAndReplaceDefaultScalarListExpr(t.Rows, replace),
 			t.Cols,
 		)
 
 	case *memo.SelectExpr:
 		return f.ConstructSelect(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.Filters),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.Filters, replace),
 		)
 
 	case *memo.ProjectExpr:
 		return f.ConstructProject(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignProjectionsExprPlaceholders(t.Projections),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultProjectionsExpr(t.Projections, replace),
 			t.Passthrough,
 		)
 
 	case *memo.InnerJoinExpr:
 		return f.ConstructInnerJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.LeftJoinExpr:
 		return f.ConstructLeftJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.RightJoinExpr:
 		return f.ConstructRightJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.FullJoinExpr:
 		return f.ConstructFullJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.SemiJoinExpr:
 		return f.ConstructSemiJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.AntiJoinExpr:
 		return f.ConstructAntiJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.IndexJoinExpr:
 		return f.ConstructIndexJoin(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.IndexJoinPrivate,
 		)
 
 	case *memo.LookupJoinExpr:
 		return f.ConstructLookupJoin(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 			&t.LookupJoinPrivate,
 		)
 
 	case *memo.MergeJoinExpr:
 		return f.ConstructMergeJoin(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 			&t.MergeJoinPrivate,
 		)
 
 	case *memo.ZigzagJoinExpr:
 		return f.ConstructZigzagJoin(
-			f.assignFiltersExprPlaceholders(t.On),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 			&t.ZigzagJoinPrivate,
 		)
 
 	case *memo.InnerJoinApplyExpr:
 		return f.ConstructInnerJoinApply(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.LeftJoinApplyExpr:
 		return f.ConstructLeftJoinApply(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.RightJoinApplyExpr:
 		return f.ConstructRightJoinApply(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.FullJoinApplyExpr:
 		return f.ConstructFullJoinApply(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.SemiJoinApplyExpr:
 		return f.ConstructSemiJoinApply(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.AntiJoinApplyExpr:
 		return f.ConstructAntiJoinApply(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
-			f.assignFiltersExprPlaceholders(t.On),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
 		)
 
 	case *memo.GroupByExpr:
 		return f.ConstructGroupBy(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignAggregationsExprPlaceholders(t.Aggregations),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultAggregationsExpr(t.Aggregations, replace),
 			&t.GroupingPrivate,
 		)
 
 	case *memo.ScalarGroupByExpr:
 		return f.ConstructScalarGroupBy(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignAggregationsExprPlaceholders(t.Aggregations),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultAggregationsExpr(t.Aggregations, replace),
 			&t.GroupingPrivate,
 		)
 
 	case *memo.DistinctOnExpr:
 		return f.ConstructDistinctOn(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignAggregationsExprPlaceholders(t.Aggregations),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultAggregationsExpr(t.Aggregations, replace),
 			&t.GroupingPrivate,
 		)
 
 	case *memo.UnionExpr:
 		return f.ConstructUnion(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
 			&t.SetPrivate,
 		)
 
 	case *memo.IntersectExpr:
 		return f.ConstructIntersect(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
 			&t.SetPrivate,
 		)
 
 	case *memo.ExceptExpr:
 		return f.ConstructExcept(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
 			&t.SetPrivate,
 		)
 
 	case *memo.UnionAllExpr:
 		return f.ConstructUnionAll(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
 			&t.SetPrivate,
 		)
 
 	case *memo.IntersectAllExpr:
 		return f.ConstructIntersectAll(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
 			&t.SetPrivate,
 		)
 
 	case *memo.ExceptAllExpr:
 		return f.ConstructExceptAll(
-			f.assignPlaceholders(t.Left).(memo.RelExpr),
-			f.assignPlaceholders(t.Right).(memo.RelExpr),
+			f.invokeReplace(t.Left, replace).(memo.RelExpr),
+			f.invokeReplace(t.Right, replace).(memo.RelExpr),
 			&t.SetPrivate,
 		)
 
 	case *memo.LimitExpr:
 		return f.ConstructLimit(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignPlaceholders(t.Limit).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Limit, replace).(opt.ScalarExpr),
 			t.Ordering,
 		)
 
 	case *memo.OffsetExpr:
 		return f.ConstructOffset(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignPlaceholders(t.Offset).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Offset, replace).(opt.ScalarExpr),
 			t.Ordering,
 		)
 
 	case *memo.Max1RowExpr:
 		return f.ConstructMax1Row(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 		)
 
 	case *memo.ExplainExpr:
 		return f.ConstructExplain(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.ExplainPrivate,
 		)
 
@@ -14825,32 +14830,32 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 
 	case *memo.RowNumberExpr:
 		return f.ConstructRowNumber(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.RowNumberPrivate,
 		)
 
 	case *memo.ProjectSetExpr:
 		return f.ConstructProjectSet(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignZipExprPlaceholders(t.Zip),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultZipExpr(t.Zip, replace),
 		)
 
 	case *memo.SubqueryExpr:
 		return f.ConstructSubquery(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.SubqueryPrivate,
 		)
 
 	case *memo.AnyExpr:
 		return f.ConstructAny(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
-			f.assignPlaceholders(t.Scalar).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Scalar, replace).(opt.ScalarExpr),
 			&t.SubqueryPrivate,
 		)
 
 	case *memo.ExistsExpr:
 		return f.ConstructExists(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.SubqueryPrivate,
 		)
 
@@ -14870,362 +14875,358 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 		return t
 
 	case *memo.PlaceholderExpr:
-		d, err := t.Value.Eval(f.evalCtx)
-		if err != nil {
-			panic(placeholderError{err})
-		}
-		return f.ConstructConstVal(d, t.DataType())
+		return t
 
 	case *memo.TupleExpr:
 		return f.ConstructTuple(
-			f.assignScalarListExprPlaceholders(t.Elems),
+			f.copyAndReplaceDefaultScalarListExpr(t.Elems, replace),
 			t.Typ,
 		)
 
 	case *memo.AndExpr:
 		return f.ConstructAnd(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.OrExpr:
 		return f.ConstructOr(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotExpr:
 		return f.ConstructNot(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.EqExpr:
 		return f.ConstructEq(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.LtExpr:
 		return f.ConstructLt(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.GtExpr:
 		return f.ConstructGt(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.LeExpr:
 		return f.ConstructLe(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.GeExpr:
 		return f.ConstructGe(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NeExpr:
 		return f.ConstructNe(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.InExpr:
 		return f.ConstructIn(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotInExpr:
 		return f.ConstructNotIn(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.LikeExpr:
 		return f.ConstructLike(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotLikeExpr:
 		return f.ConstructNotLike(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ILikeExpr:
 		return f.ConstructILike(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotILikeExpr:
 		return f.ConstructNotILike(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.SimilarToExpr:
 		return f.ConstructSimilarTo(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotSimilarToExpr:
 		return f.ConstructNotSimilarTo(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.RegMatchExpr:
 		return f.ConstructRegMatch(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotRegMatchExpr:
 		return f.ConstructNotRegMatch(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.RegIMatchExpr:
 		return f.ConstructRegIMatch(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.NotRegIMatchExpr:
 		return f.ConstructNotRegIMatch(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.IsExpr:
 		return f.ConstructIs(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.IsNotExpr:
 		return f.ConstructIsNot(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ContainsExpr:
 		return f.ConstructContains(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.JsonExistsExpr:
 		return f.ConstructJsonExists(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.JsonAllExistsExpr:
 		return f.ConstructJsonAllExists(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.JsonSomeExistsExpr:
 		return f.ConstructJsonSomeExists(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.AnyScalarExpr:
 		return f.ConstructAnyScalar(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 			t.Cmp,
 		)
 
 	case *memo.BitandExpr:
 		return f.ConstructBitand(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.BitorExpr:
 		return f.ConstructBitor(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.BitxorExpr:
 		return f.ConstructBitxor(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.PlusExpr:
 		return f.ConstructPlus(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.MinusExpr:
 		return f.ConstructMinus(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.MultExpr:
 		return f.ConstructMult(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.DivExpr:
 		return f.ConstructDiv(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.FloorDivExpr:
 		return f.ConstructFloorDiv(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ModExpr:
 		return f.ConstructMod(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.PowExpr:
 		return f.ConstructPow(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ConcatExpr:
 		return f.ConstructConcat(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.LShiftExpr:
 		return f.ConstructLShift(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.RShiftExpr:
 		return f.ConstructRShift(
-			f.assignPlaceholders(t.Left).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Right).(opt.ScalarExpr),
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.FetchValExpr:
 		return f.ConstructFetchVal(
-			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
+			f.invokeReplace(t.Json, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Index, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.FetchTextExpr:
 		return f.ConstructFetchText(
-			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
+			f.invokeReplace(t.Json, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Index, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.FetchValPathExpr:
 		return f.ConstructFetchValPath(
-			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Path).(opt.ScalarExpr),
+			f.invokeReplace(t.Json, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Path, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.FetchTextPathExpr:
 		return f.ConstructFetchTextPath(
-			f.assignPlaceholders(t.Json).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Path).(opt.ScalarExpr),
+			f.invokeReplace(t.Json, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Path, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.UnaryMinusExpr:
 		return f.ConstructUnaryMinus(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.UnaryComplementExpr:
 		return f.ConstructUnaryComplement(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.CastExpr:
 		return f.ConstructCast(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 			t.TargetTyp,
 		)
 
 	case *memo.IfErrExpr:
 		return f.ConstructIfErr(
-			f.assignPlaceholders(t.Cond).(opt.ScalarExpr),
-			f.assignScalarListExprPlaceholders(t.OrElse),
-			f.assignScalarListExprPlaceholders(t.ErrCode),
+			f.invokeReplace(t.Cond, replace).(opt.ScalarExpr),
+			f.copyAndReplaceDefaultScalarListExpr(t.OrElse, replace),
+			f.copyAndReplaceDefaultScalarListExpr(t.ErrCode, replace),
 		)
 
 	case *memo.CaseExpr:
 		return f.ConstructCase(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
-			f.assignScalarListExprPlaceholders(t.Whens),
-			f.assignPlaceholders(t.OrElse).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.copyAndReplaceDefaultScalarListExpr(t.Whens, replace),
+			f.invokeReplace(t.OrElse, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.WhenExpr:
 		return f.ConstructWhen(
-			f.assignPlaceholders(t.Condition).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Value).(opt.ScalarExpr),
+			f.invokeReplace(t.Condition, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ArrayExpr:
 		return f.ConstructArray(
-			f.assignScalarListExprPlaceholders(t.Elems),
+			f.copyAndReplaceDefaultScalarListExpr(t.Elems, replace),
 			t.Typ,
 		)
 
 	case *memo.IndirectionExpr:
 		return f.ConstructIndirection(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Index).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Index, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ArrayFlattenExpr:
 		return f.ConstructArrayFlatten(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.SubqueryPrivate,
 		)
 
 	case *memo.FunctionExpr:
 		return f.ConstructFunction(
-			f.assignScalarListExprPlaceholders(t.Args),
+			f.copyAndReplaceDefaultScalarListExpr(t.Args, replace),
 			&t.FunctionPrivate,
 		)
 
 	case *memo.CollateExpr:
 		return f.ConstructCollate(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 			t.Locale,
 		)
 
 	case *memo.CoalesceExpr:
 		return f.ConstructCoalesce(
-			f.assignScalarListExprPlaceholders(t.Args),
+			f.copyAndReplaceDefaultScalarListExpr(t.Args, replace),
 		)
 
 	case *memo.ColumnAccessExpr:
 		return f.ConstructColumnAccess(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 			t.Idx,
 		)
 
@@ -15234,32 +15235,32 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 
 	case *memo.ArrayAggExpr:
 		return f.ConstructArrayAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.AvgExpr:
 		return f.ConstructAvg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.BoolAndExpr:
 		return f.ConstructBoolAnd(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.BoolOrExpr:
 		return f.ConstructBoolOr(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ConcatAggExpr:
 		return f.ConstructConcatAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.CountExpr:
 		return f.ConstructCount(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.CountRowsExpr:
@@ -15267,118 +15268,118 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 
 	case *memo.MaxExpr:
 		return f.ConstructMax(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.MinExpr:
 		return f.ConstructMin(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.SumIntExpr:
 		return f.ConstructSumInt(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.SumExpr:
 		return f.ConstructSum(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.SqrDiffExpr:
 		return f.ConstructSqrDiff(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.VarianceExpr:
 		return f.ConstructVariance(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.StdDevExpr:
 		return f.ConstructStdDev(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.XorAggExpr:
 		return f.ConstructXorAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.JsonAggExpr:
 		return f.ConstructJsonAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.JsonbAggExpr:
 		return f.ConstructJsonbAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.StringAggExpr:
 		return f.ConstructStringAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Sep).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Sep, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ConstAggExpr:
 		return f.ConstructConstAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.ConstNotNullAggExpr:
 		return f.ConstructConstNotNullAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.AnyNotNullAggExpr:
 		return f.ConstructAnyNotNullAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.FirstAggExpr:
 		return f.ConstructFirstAgg(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.AggDistinctExpr:
 		return f.ConstructAggDistinct(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.AggFilterExpr:
 		return f.ConstructAggFilter(
-			f.assignPlaceholders(t.Input).(opt.ScalarExpr),
-			f.assignPlaceholders(t.Filter).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Filter, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.InsertExpr:
 		return f.ConstructInsert(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.MutationPrivate,
 		)
 
 	case *memo.UpdateExpr:
 		return f.ConstructUpdate(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.MutationPrivate,
 		)
 
 	case *memo.UpsertExpr:
 		return f.ConstructUpsert(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.MutationPrivate,
 		)
 
 	case *memo.DeleteExpr:
 		return f.ConstructDelete(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.MutationPrivate,
 		)
 
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
-			f.assignPlaceholders(t.Input).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.CreateTablePrivate,
 		)
 
@@ -15386,45 +15387,57 @@ func (f *Factory) assignPlaceholders(src opt.Expr) (dst opt.Expr) {
 	panic(fmt.Sprintf("unhandled op %s", src.Op()))
 }
 
-func (f *Factory) assignProjectionsExprPlaceholders(src memo.ProjectionsExpr) (dst memo.ProjectionsExpr) {
+func (f *Factory) copyAndReplaceDefaultProjectionsExpr(src memo.ProjectionsExpr, replace ReplaceFunc) (dst memo.ProjectionsExpr) {
 	dst = make(memo.ProjectionsExpr, len(src))
 	for i := range src {
-		dst[i].Element = f.assignPlaceholders(src[i].Element).(opt.ScalarExpr)
+		dst[i].Element = f.invokeReplace(src[i].Element, replace).(opt.ScalarExpr)
 		dst[i].Col = src[i].Col
 	}
 	return dst
 }
 
-func (f *Factory) assignAggregationsExprPlaceholders(src memo.AggregationsExpr) (dst memo.AggregationsExpr) {
+func (f *Factory) copyAndReplaceDefaultAggregationsExpr(src memo.AggregationsExpr, replace ReplaceFunc) (dst memo.AggregationsExpr) {
 	dst = make(memo.AggregationsExpr, len(src))
 	for i := range src {
-		dst[i].Agg = f.assignPlaceholders(src[i].Agg).(opt.ScalarExpr)
+		dst[i].Agg = f.invokeReplace(src[i].Agg, replace).(opt.ScalarExpr)
 		dst[i].Col = src[i].Col
 	}
 	return dst
 }
 
-func (f *Factory) assignFiltersExprPlaceholders(src memo.FiltersExpr) (dst memo.FiltersExpr) {
+func (f *Factory) copyAndReplaceDefaultFiltersExpr(src memo.FiltersExpr, replace ReplaceFunc) (dst memo.FiltersExpr) {
 	dst = make(memo.FiltersExpr, len(src))
 	for i := range src {
-		dst[i].Condition = f.assignPlaceholders(src[i].Condition).(opt.ScalarExpr)
+		dst[i].Condition = f.invokeReplace(src[i].Condition, replace).(opt.ScalarExpr)
 	}
 	return dst
 }
 
-func (f *Factory) assignZipExprPlaceholders(src memo.ZipExpr) (dst memo.ZipExpr) {
+func (f *Factory) copyAndReplaceDefaultZipExpr(src memo.ZipExpr, replace ReplaceFunc) (dst memo.ZipExpr) {
 	dst = make(memo.ZipExpr, len(src))
 	for i := range src {
-		dst[i].Func = f.assignPlaceholders(src[i].Func).(opt.ScalarExpr)
+		dst[i].Func = f.invokeReplace(src[i].Func, replace).(opt.ScalarExpr)
 		dst[i].Cols = src[i].Cols
 	}
 	return dst
 }
 
-func (f *Factory) assignScalarListExprPlaceholders(src memo.ScalarListExpr) (dst memo.ScalarListExpr) {
+func (f *Factory) copyAndReplaceDefaultScalarListExpr(src memo.ScalarListExpr, replace ReplaceFunc) (dst memo.ScalarListExpr) {
 	dst = make(memo.ScalarListExpr, len(src))
 	for i := range src {
-		dst[i] = f.assignPlaceholders(src[i]).(opt.ScalarExpr)
+		dst[i] = f.invokeReplace(src[i], replace).(opt.ScalarExpr)
+	}
+	return dst
+}
+
+// invokeReplace wraps the user-provided replace function. If replace returns
+// its input unchanged, then invokeReplace automatically calls
+// copyAndReplaceDefault to get default replace behavior. See comments for
+// CopyAndReplace for more details.
+func (f *Factory) invokeReplace(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
+	dst = replace(src)
+	if src == dst {
+		return f.copyAndReplaceDefault(src, replace)
 	}
 	return dst
 }
