@@ -911,6 +911,7 @@ type InnerJoinExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -939,7 +940,7 @@ func (e *InnerJoinExpr) Child(nth int) opt.Expr {
 }
 
 func (e *InnerJoinExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *InnerJoinExpr) String() string {
@@ -1043,6 +1044,7 @@ type LeftJoinExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -1071,7 +1073,7 @@ func (e *LeftJoinExpr) Child(nth int) opt.Expr {
 }
 
 func (e *LeftJoinExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *LeftJoinExpr) String() string {
@@ -1175,6 +1177,7 @@ type RightJoinExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -1203,7 +1206,7 @@ func (e *RightJoinExpr) Child(nth int) opt.Expr {
 }
 
 func (e *RightJoinExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *RightJoinExpr) String() string {
@@ -1307,6 +1310,7 @@ type FullJoinExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -1335,7 +1339,7 @@ func (e *FullJoinExpr) Child(nth int) opt.Expr {
 }
 
 func (e *FullJoinExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *FullJoinExpr) String() string {
@@ -1439,6 +1443,7 @@ type SemiJoinExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -1467,7 +1472,7 @@ func (e *SemiJoinExpr) Child(nth int) opt.Expr {
 }
 
 func (e *SemiJoinExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *SemiJoinExpr) String() string {
@@ -1571,6 +1576,7 @@ type AntiJoinExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -1599,7 +1605,7 @@ func (e *AntiJoinExpr) Child(nth int) opt.Expr {
 }
 
 func (e *AntiJoinExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *AntiJoinExpr) String() string {
@@ -1697,6 +1703,11 @@ func (g *antiJoinGroup) firstExpr() RelExpr {
 
 func (g *antiJoinGroup) bestProps() *bestProps {
 	return &g.best
+}
+
+// JoinPrivate is shared between the various join operators including apply
+// variants, but excluding IndexJoin, LookupJoin, MergeJoin.
+type JoinPrivate struct {
 }
 
 // IndexJoinExpr represents an inner join between an input expression and a primary
@@ -2340,6 +2351,7 @@ type InnerJoinApplyExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -2368,7 +2380,7 @@ func (e *InnerJoinApplyExpr) Child(nth int) opt.Expr {
 }
 
 func (e *InnerJoinApplyExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *InnerJoinApplyExpr) String() string {
@@ -2472,6 +2484,7 @@ type LeftJoinApplyExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -2500,7 +2513,7 @@ func (e *LeftJoinApplyExpr) Child(nth int) opt.Expr {
 }
 
 func (e *LeftJoinApplyExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *LeftJoinApplyExpr) String() string {
@@ -2604,6 +2617,7 @@ type RightJoinApplyExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -2632,7 +2646,7 @@ func (e *RightJoinApplyExpr) Child(nth int) opt.Expr {
 }
 
 func (e *RightJoinApplyExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *RightJoinApplyExpr) String() string {
@@ -2736,6 +2750,7 @@ type FullJoinApplyExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -2764,7 +2779,7 @@ func (e *FullJoinApplyExpr) Child(nth int) opt.Expr {
 }
 
 func (e *FullJoinApplyExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *FullJoinApplyExpr) String() string {
@@ -2868,6 +2883,7 @@ type SemiJoinApplyExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -2896,7 +2912,7 @@ func (e *SemiJoinApplyExpr) Child(nth int) opt.Expr {
 }
 
 func (e *SemiJoinApplyExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *SemiJoinApplyExpr) String() string {
@@ -3000,6 +3016,7 @@ type AntiJoinApplyExpr struct {
 	Left  RelExpr
 	Right RelExpr
 	On    FiltersExpr
+	JoinPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -3028,7 +3045,7 @@ func (e *AntiJoinApplyExpr) Child(nth int) opt.Expr {
 }
 
 func (e *AntiJoinApplyExpr) Private() interface{} {
-	return nil
+	return &e.JoinPrivate
 }
 
 func (e *AntiJoinApplyExpr) String() string {
@@ -12049,12 +12066,14 @@ func (m *Memo) MemoizeInnerJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(innerJoinGroup{}))
 	grp := &innerJoinGroup{mem: m, first: InnerJoinExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12071,12 +12090,14 @@ func (m *Memo) MemoizeLeftJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(leftJoinGroup{}))
 	grp := &leftJoinGroup{mem: m, first: LeftJoinExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12093,12 +12114,14 @@ func (m *Memo) MemoizeRightJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(rightJoinGroup{}))
 	grp := &rightJoinGroup{mem: m, first: RightJoinExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12115,12 +12138,14 @@ func (m *Memo) MemoizeFullJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(fullJoinGroup{}))
 	grp := &fullJoinGroup{mem: m, first: FullJoinExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12137,12 +12162,14 @@ func (m *Memo) MemoizeSemiJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(semiJoinGroup{}))
 	grp := &semiJoinGroup{mem: m, first: SemiJoinExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12159,12 +12186,14 @@ func (m *Memo) MemoizeAntiJoin(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(antiJoinGroup{}))
 	grp := &antiJoinGroup{mem: m, first: AntiJoinExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12267,12 +12296,14 @@ func (m *Memo) MemoizeInnerJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(innerJoinApplyGroup{}))
 	grp := &innerJoinApplyGroup{mem: m, first: InnerJoinApplyExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12289,12 +12320,14 @@ func (m *Memo) MemoizeLeftJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(leftJoinApplyGroup{}))
 	grp := &leftJoinApplyGroup{mem: m, first: LeftJoinApplyExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12311,12 +12344,14 @@ func (m *Memo) MemoizeRightJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(rightJoinApplyGroup{}))
 	grp := &rightJoinApplyGroup{mem: m, first: RightJoinApplyExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12333,12 +12368,14 @@ func (m *Memo) MemoizeFullJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(fullJoinApplyGroup{}))
 	grp := &fullJoinApplyGroup{mem: m, first: FullJoinApplyExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12355,12 +12392,14 @@ func (m *Memo) MemoizeSemiJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(semiJoinApplyGroup{}))
 	grp := &semiJoinApplyGroup{mem: m, first: SemiJoinApplyExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -12377,12 +12416,14 @@ func (m *Memo) MemoizeAntiJoinApply(
 	left RelExpr,
 	right RelExpr,
 	on FiltersExpr,
+	joinPrivate *JoinPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(antiJoinApplyGroup{}))
 	grp := &antiJoinApplyGroup{mem: m, first: AntiJoinApplyExpr{
-		Left:  left,
-		Right: right,
-		On:    on,
+		Left:        left,
+		Right:       right,
+		On:          on,
+		JoinPrivate: *joinPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp

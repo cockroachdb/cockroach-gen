@@ -246,11 +246,13 @@ func (_e *explorer) exploreInnerJoin(
 				right := _root.Right
 				if !_e.funcs.HasNoCols(right) {
 					on := _root.On
+					private := &_root.JoinPrivate
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
 						_expr := &memo.InnerJoinExpr{
-							Left:  right,
-							Right: left,
-							On:    on,
+							Left:        right,
+							Right:       left,
+							On:          on,
+							JoinPrivate: *private,
 						}
 						_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
 						if _e.o.appliedRule != nil {
@@ -272,12 +274,13 @@ func (_e *explorer) exploreInnerJoin(
 			left := _root.Left
 			right := _root.Right
 			on := _root.On
+			private := &_root.JoinPrivate
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
 				var _last memo.RelExpr
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.InnerJoinOp, left, right, on)
+				_e.funcs.GenerateMergeJoins(_root, opt.InnerJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -306,12 +309,13 @@ func (_e *explorer) exploreInnerJoin(
 					scanPrivate := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						on := _root.On
+						private := &_root.JoinPrivate
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoins) {
 							var _last memo.RelExpr
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, on)
+							_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
 							}
@@ -358,12 +362,13 @@ func (_e *explorer) exploreInnerJoin(
 							if _e.funcs.IsCanonicalScan(scanPrivate) {
 								filters := _select.Filters
 								on := _root.On
+								private := &_root.JoinPrivate
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithFilter) {
 									var _last memo.RelExpr
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters))
+									_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
 									}
@@ -410,8 +415,10 @@ func (_e *explorer) exploreInnerJoin(
 												innerRight,
 												right,
 												_e.funcs.ExtractBoundConditions(on, _e.funcs.OutputCols2(innerRight, right)),
+												_e.funcs.EmptyJoinPrivate(),
 											),
-											On: _e.funcs.SortFilters(_e.funcs.ConcatFilters(_e.funcs.ExtractUnboundConditions(on, _e.funcs.OutputCols2(innerRight, right)), innerOn)),
+											On:          _e.funcs.SortFilters(_e.funcs.ConcatFilters(_e.funcs.ExtractUnboundConditions(on, _e.funcs.OutputCols2(innerRight, right)), innerOn)),
+											JoinPrivate: *_e.funcs.EmptyJoinPrivate(),
 										}
 										_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
 										if _e.o.appliedRule != nil {
@@ -449,11 +456,13 @@ func (_e *explorer) exploreLeftJoin(
 				right := _root.Right
 				if !_e.funcs.HasNoCols(left) {
 					on := _root.On
+					private := &_root.JoinPrivate
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteLeftJoin) {
 						_expr := &memo.RightJoinExpr{
-							Left:  right,
-							Right: left,
-							On:    on,
+							Left:        right,
+							Right:       left,
+							On:          on,
+							JoinPrivate: *private,
 						}
 						_interned := _e.mem.AddRightJoinToGroup(_expr, _root)
 						if _e.o.appliedRule != nil {
@@ -475,12 +484,13 @@ func (_e *explorer) exploreLeftJoin(
 			left := _root.Left
 			right := _root.Right
 			on := _root.On
+			private := &_root.JoinPrivate
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
 				var _last memo.RelExpr
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.LeftJoinOp, left, right, on)
+				_e.funcs.GenerateMergeJoins(_root, opt.LeftJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -509,12 +519,13 @@ func (_e *explorer) exploreLeftJoin(
 					scanPrivate := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						on := _root.On
+						private := &_root.JoinPrivate
 						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoins) {
 							var _last memo.RelExpr
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, on)
+							_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
 							}
@@ -561,12 +572,13 @@ func (_e *explorer) exploreLeftJoin(
 							if _e.funcs.IsCanonicalScan(scanPrivate) {
 								filters := _select.Filters
 								on := _root.On
+								private := &_root.JoinPrivate
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithFilter) {
 									var _last memo.RelExpr
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters))
+									_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
 									}
@@ -597,11 +609,13 @@ func (_e *explorer) exploreRightJoin(
 				right := _root.Right
 				if !_e.funcs.HasNoCols(left) {
 					on := _root.On
+					private := &_root.JoinPrivate
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteRightJoin) {
 						_expr := &memo.LeftJoinExpr{
-							Left:  right,
-							Right: left,
-							On:    on,
+							Left:        right,
+							Right:       left,
+							On:          on,
+							JoinPrivate: *private,
 						}
 						_interned := _e.mem.AddLeftJoinToGroup(_expr, _root)
 						if _e.o.appliedRule != nil {
@@ -623,12 +637,13 @@ func (_e *explorer) exploreRightJoin(
 			left := _root.Left
 			right := _root.Right
 			on := _root.On
+			private := &_root.JoinPrivate
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
 				var _last memo.RelExpr
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.RightJoinOp, left, right, on)
+				_e.funcs.GenerateMergeJoins(_root, opt.RightJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -654,11 +669,13 @@ func (_e *explorer) exploreFullJoin(
 				right := _root.Right
 				if !_e.funcs.HasNoCols(right) {
 					on := _root.On
+					private := &_root.JoinPrivate
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
 						_expr := &memo.FullJoinExpr{
-							Left:  right,
-							Right: left,
-							On:    on,
+							Left:        right,
+							Right:       left,
+							On:          on,
+							JoinPrivate: *private,
 						}
 						_interned := _e.mem.AddFullJoinToGroup(_expr, _root)
 						if _e.o.appliedRule != nil {
@@ -680,12 +697,13 @@ func (_e *explorer) exploreFullJoin(
 			left := _root.Left
 			right := _root.Right
 			on := _root.On
+			private := &_root.JoinPrivate
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
 				var _last memo.RelExpr
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.FullJoinOp, left, right, on)
+				_e.funcs.GenerateMergeJoins(_root, opt.FullJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -709,12 +727,13 @@ func (_e *explorer) exploreSemiJoin(
 			left := _root.Left
 			right := _root.Right
 			on := _root.On
+			private := &_root.JoinPrivate
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
 				var _last memo.RelExpr
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.SemiJoinOp, left, right, on)
+				_e.funcs.GenerateMergeJoins(_root, opt.SemiJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -738,12 +757,13 @@ func (_e *explorer) exploreAntiJoin(
 			left := _root.Left
 			right := _root.Right
 			on := _root.On
+			private := &_root.JoinPrivate
 			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateMergeJoins) {
 				var _last memo.RelExpr
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.AntiJoinOp, left, right, on)
+				_e.funcs.GenerateMergeJoins(_root, opt.AntiJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
