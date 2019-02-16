@@ -15852,7 +15852,12 @@ func (f *Factory) copyAndReplaceDefaultScalarListExpr(src memo.ScalarListExpr, r
 // copyAndReplaceDefault to get default replace behavior. See comments for
 // CopyAndReplace for more details.
 func (f *Factory) invokeReplace(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
-	dst = replace(src)
+	if rel, ok := src.(memo.RelExpr); ok {
+		src = rel.FirstExpr()
+		dst = replace(src)
+	} else {
+		dst = replace(src)
+	}
 	if src == dst {
 		return f.copyAndReplaceDefault(src, replace)
 	}
