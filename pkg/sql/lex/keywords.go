@@ -225,6 +225,7 @@ var KeywordsCategories = map[string]string{
 	"on":                        "R",
 	"only":                      "R",
 	"operator":                  "U",
+	"opt":                       "U",
 	"option":                    "U",
 	"options":                   "U",
 	"or":                        "R",
@@ -243,6 +244,7 @@ var KeywordsCategories = map[string]string{
 	"pause":                     "U",
 	"physical":                  "U",
 	"placing":                   "R",
+	"plan":                      "U",
 	"plans":                     "U",
 	"position":                  "C",
 	"preceding":                 "U",
@@ -612,6 +614,7 @@ var KeywordNames = []string{
 	"on",
 	"only",
 	"operator",
+	"opt",
 	"option",
 	"options",
 	"or",
@@ -630,6 +633,7 @@ var KeywordNames = []string{
 	"pause",
 	"physical",
 	"placing",
+	"plan",
 	"plans",
 	"position",
 	"preceding",
@@ -1226,6 +1230,8 @@ func GetKeywordID(k string) int32 {
 		return ONLY
 	case "operator":
 		return OPERATOR
+	case "opt":
+		return OPT
 	case "option":
 		return OPTION
 	case "options":
@@ -1262,6 +1268,8 @@ func GetKeywordID(k string) int32 {
 		return PHYSICAL
 	case "placing":
 		return PLACING
+	case "plan":
+		return PLAN
 	case "plans":
 		return PLANS
 	case "position":
