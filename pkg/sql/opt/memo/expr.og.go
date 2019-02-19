@@ -518,7 +518,7 @@ type SequenceSelectPrivate struct {
 // as an opt.ColList. It is legal for Cols to be empty.
 type ValuesExpr struct {
 	Rows ScalarListExpr
-	Cols opt.ColList
+	ValuesPrivate
 
 	grp  exprGroup
 	next RelExpr
@@ -543,7 +543,7 @@ func (e *ValuesExpr) Child(nth int) opt.Expr {
 }
 
 func (e *ValuesExpr) Private() interface{} {
-	return &e.Cols
+	return &e.ValuesPrivate
 }
 
 func (e *ValuesExpr) String() string {
@@ -635,6 +635,16 @@ func (g *valuesGroup) firstExpr() RelExpr {
 
 func (g *valuesGroup) bestProps() *bestProps {
 	return &g.best
+}
+
+type ValuesPrivate struct {
+	Cols opt.ColList
+
+	// ID is a memo-unique identifier which distinguishes between identical
+	// Values expressions which appear in different places in the query. In most
+	// cases the column set is sufficient to do this, but various rules make it
+	// possible to construct Values expressions with no columns.
+	ID opt.ValuesID
 }
 
 // SelectExpr filters rows from its input result set, based on the boolean filter
@@ -12002,12 +12012,12 @@ func (m *Memo) MemoizeSequenceSelect(
 
 func (m *Memo) MemoizeValues(
 	rows ScalarListExpr,
-	cols opt.ColList,
+	valuesPrivate *ValuesPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(valuesGroup{}))
 	grp := &valuesGroup{mem: m, first: ValuesExpr{
-		Rows: rows,
-		Cols: cols,
+		Rows:          rows,
+		ValuesPrivate: *valuesPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -15439,12 +15449,14 @@ func (in *interner) InternValues(val *ValuesExpr) *ValuesExpr {
 	in.hasher.HashOperator(opt.ValuesOp)
 	in.hasher.HashScalarListExpr(val.Rows)
 	in.hasher.HashColList(val.Cols)
+	in.hasher.HashValuesID(val.ID)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ValuesExpr); ok {
 			if in.hasher.IsScalarListExprEqual(val.Rows, existing.Rows) &&
-				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
+				in.hasher.IsColListEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsValuesIDEqual(val.ID, existing.ID) {
 				return existing
 			}
 		}

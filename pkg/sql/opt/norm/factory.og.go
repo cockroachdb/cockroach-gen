@@ -72,15 +72,16 @@ func (_f *Factory) ConstructSequenceSelect(
 // as an opt.ColList. It is legal for Cols to be empty.
 func (_f *Factory) ConstructValues(
 	rows memo.ScalarListExpr,
-	cols opt.ColList,
+	valuesPrivate *memo.ValuesPrivate,
 ) memo.RelExpr {
 	// [HoistValuesSubquery]
 	{
 		for i := range rows {
 			item := rows[i]
 			if _f.funcs.HasHoistableSubquery(item) {
+				private := valuesPrivate
 				if _f.matchedRule == nil || _f.matchedRule(opt.HoistValuesSubquery) {
-					_expr := _f.funcs.HoistValuesSubquery(rows, cols).(memo.RelExpr)
+					_expr := _f.funcs.HoistValuesSubquery(rows, private).(memo.RelExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistValuesSubquery, nil, _expr)
 					}
@@ -90,7 +91,7 @@ func (_f *Factory) ConstructValues(
 		}
 	}
 
-	e := _f.mem.MemoizeValues(rows, cols)
+	e := _f.mem.MemoizeValues(rows, valuesPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -13869,7 +13870,7 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.ValuesExpr:
 		rows, rowsChanged := f.replaceScalarListExpr(t.Rows, replace)
 		if rowsChanged {
-			return f.ConstructValues(rows, t.Cols)
+			return f.ConstructValues(rows, &t.ValuesPrivate)
 		}
 		return t
 
@@ -15015,7 +15016,7 @@ func (f *Factory) copyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.ValuesExpr:
 		return f.ConstructValues(
 			f.copyAndReplaceDefaultScalarListExpr(t.Rows, replace),
-			t.Cols,
+			&t.ValuesPrivate,
 		)
 
 	case *memo.SelectExpr:
@@ -15881,7 +15882,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ValuesOp:
 		return f.ConstructValues(
 			*args[0].(*memo.ScalarListExpr),
-			*args[1].(*opt.ColList),
+			args[1].(*memo.ValuesPrivate),
 		)
 	case opt.SelectOp:
 		return f.ConstructSelect(
