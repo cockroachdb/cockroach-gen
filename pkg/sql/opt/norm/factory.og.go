@@ -14998,11 +14998,11 @@ func (f *Factory) replaceScalarListExpr(list memo.ScalarListExpr, replace Replac
 	return newList, true
 }
 
-// copyAndReplaceDefault performs the default traversal and cloning behavior
+// CopyAndReplaceDefault performs the default traversal and cloning behavior
 // for the CopyAndReplace method. It constructs a copy of the given source
 // operator using children copied (and potentially remapped) by the given replace
 // function. See comments for CopyAndReplace for more details.
-func (f *Factory) copyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
+func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
 	switch t := src.(type) {
 	case *memo.ScanExpr:
 		return f.mem.MemoizeScan(&t.ScanPrivate)
@@ -15848,21 +15848,13 @@ func (f *Factory) copyAndReplaceDefaultScalarListExpr(src memo.ScalarListExpr, r
 	return dst
 }
 
-// invokeReplace wraps the user-provided replace function. If replace returns
-// its input unchanged, then invokeReplace automatically calls
-// copyAndReplaceDefault to get default replace behavior. See comments for
+// invokeReplace wraps the user-provided replace function. See comments for
 // CopyAndReplace for more details.
 func (f *Factory) invokeReplace(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
 	if rel, ok := src.(memo.RelExpr); ok {
 		src = rel.FirstExpr()
-		dst = replace(src)
-	} else {
-		dst = replace(src)
 	}
-	if src == dst {
-		return f.copyAndReplaceDefault(src, replace)
-	}
-	return dst
+	return replace(src)
 }
 
 func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Expr {
