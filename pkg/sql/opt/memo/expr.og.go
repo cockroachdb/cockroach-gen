@@ -1718,6 +1718,8 @@ func (g *antiJoinGroup) bestProps() *bestProps {
 // JoinPrivate is shared between the various join operators including apply
 // variants, but excluding IndexJoin, LookupJoin, MergeJoin.
 type JoinPrivate struct {
+	// Flags modify what type of join we choose.
+	Flags JoinFlags
 }
 
 // IndexJoinExpr represents an inner join between an input expression and a primary
@@ -15514,13 +15516,15 @@ func (in *interner) InternInnerJoin(val *InnerJoinExpr) *InnerJoinExpr {
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*InnerJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15536,13 +15540,15 @@ func (in *interner) InternLeftJoin(val *LeftJoinExpr) *LeftJoinExpr {
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*LeftJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15558,13 +15564,15 @@ func (in *interner) InternRightJoin(val *RightJoinExpr) *RightJoinExpr {
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*RightJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15580,13 +15588,15 @@ func (in *interner) InternFullJoin(val *FullJoinExpr) *FullJoinExpr {
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FullJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15602,13 +15612,15 @@ func (in *interner) InternSemiJoin(val *SemiJoinExpr) *SemiJoinExpr {
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*SemiJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15624,13 +15636,15 @@ func (in *interner) InternAntiJoin(val *AntiJoinExpr) *AntiJoinExpr {
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AntiJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15768,13 +15782,15 @@ func (in *interner) InternInnerJoinApply(val *InnerJoinApplyExpr) *InnerJoinAppl
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*InnerJoinApplyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15790,13 +15806,15 @@ func (in *interner) InternLeftJoinApply(val *LeftJoinApplyExpr) *LeftJoinApplyEx
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*LeftJoinApplyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15812,13 +15830,15 @@ func (in *interner) InternRightJoinApply(val *RightJoinApplyExpr) *RightJoinAppl
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*RightJoinApplyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15834,13 +15854,15 @@ func (in *interner) InternFullJoinApply(val *FullJoinApplyExpr) *FullJoinApplyEx
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FullJoinApplyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15856,13 +15878,15 @@ func (in *interner) InternSemiJoinApply(val *SemiJoinApplyExpr) *SemiJoinApplyEx
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*SemiJoinApplyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15878,13 +15902,15 @@ func (in *interner) InternAntiJoinApply(val *AntiJoinApplyExpr) *AntiJoinApplyEx
 	in.hasher.HashRelExpr(val.Left)
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AntiJoinApplyExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
-				in.hasher.IsFiltersExprEqual(val.On, existing.On) {
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}

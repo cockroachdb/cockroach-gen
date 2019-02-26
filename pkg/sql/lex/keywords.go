@@ -135,6 +135,7 @@ var KeywordsCategories = map[string]string{
 	"group":                     "R",
 	"grouping":                  "C",
 	"groups":                    "U",
+	"hash":                      "U",
 	"having":                    "R",
 	"high":                      "U",
 	"histogram":                 "U",
@@ -195,10 +196,12 @@ var KeywordsCategories = map[string]string{
 	"local":                     "U",
 	"localtime":                 "R",
 	"localtimestamp":            "R",
+	"lookup":                    "U",
 	"low":                       "U",
 	"match":                     "U",
 	"materialized":              "U",
 	"maxvalue":                  "U",
+	"merge":                     "U",
 	"minute":                    "U",
 	"minvalue":                  "U",
 	"month":                     "U",
@@ -524,6 +527,7 @@ var KeywordNames = []string{
 	"group",
 	"grouping",
 	"groups",
+	"hash",
 	"having",
 	"high",
 	"histogram",
@@ -584,10 +588,12 @@ var KeywordNames = []string{
 	"local",
 	"localtime",
 	"localtimestamp",
+	"lookup",
 	"low",
 	"match",
 	"materialized",
 	"maxvalue",
+	"merge",
 	"minute",
 	"minvalue",
 	"month",
@@ -1050,6 +1056,8 @@ func GetKeywordID(k string) int32 {
 		return GROUPING
 	case "groups":
 		return GROUPS
+	case "hash":
+		return HASH
 	case "having":
 		return HAVING
 	case "high":
@@ -1170,6 +1178,8 @@ func GetKeywordID(k string) int32 {
 		return LOCALTIME
 	case "localtimestamp":
 		return LOCALTIMESTAMP
+	case "lookup":
+		return LOOKUP
 	case "low":
 		return LOW
 	case "match":
@@ -1178,6 +1188,8 @@ func GetKeywordID(k string) int32 {
 		return MATERIALIZED
 	case "maxvalue":
 		return MAXVALUE
+	case "merge":
+		return MERGE
 	case "minute":
 		return MINUTE
 	case "minvalue":
