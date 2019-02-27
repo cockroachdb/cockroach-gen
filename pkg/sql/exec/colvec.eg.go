@@ -56,6 +56,74 @@ func (m *memColumn) Append(vec ColVec, colType types.T, toLength uint64, fromLen
 	}
 }
 
+func (m *memColumn) AppendSlice(
+	vec ColVec, colType types.T, destStartIdx uint64, srcStartIdx uint16, srcEndIdx uint16,
+) {
+	batchSize := srcEndIdx - srcStartIdx
+	outputLen := destStartIdx + uint64(batchSize)
+
+	switch colType {
+	case types.Bool:
+		if outputLen > uint64(len(m.Bool())) {
+			m.col = append(m.Bool()[:destStartIdx], vec.Bool()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Bool()[destStartIdx:], vec.Bool()[srcStartIdx:srcEndIdx])
+		}
+	case types.Bytes:
+		if outputLen > uint64(len(m.Bytes())) {
+			m.col = append(m.Bytes()[:destStartIdx], vec.Bytes()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Bytes()[destStartIdx:], vec.Bytes()[srcStartIdx:srcEndIdx])
+		}
+	case types.Decimal:
+		if outputLen > uint64(len(m.Decimal())) {
+			m.col = append(m.Decimal()[:destStartIdx], vec.Decimal()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Decimal()[destStartIdx:], vec.Decimal()[srcStartIdx:srcEndIdx])
+		}
+	case types.Int8:
+		if outputLen > uint64(len(m.Int8())) {
+			m.col = append(m.Int8()[:destStartIdx], vec.Int8()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Int8()[destStartIdx:], vec.Int8()[srcStartIdx:srcEndIdx])
+		}
+	case types.Int16:
+		if outputLen > uint64(len(m.Int16())) {
+			m.col = append(m.Int16()[:destStartIdx], vec.Int16()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Int16()[destStartIdx:], vec.Int16()[srcStartIdx:srcEndIdx])
+		}
+	case types.Int32:
+		if outputLen > uint64(len(m.Int32())) {
+			m.col = append(m.Int32()[:destStartIdx], vec.Int32()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Int32()[destStartIdx:], vec.Int32()[srcStartIdx:srcEndIdx])
+		}
+	case types.Int64:
+		if outputLen > uint64(len(m.Int64())) {
+			m.col = append(m.Int64()[:destStartIdx], vec.Int64()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Int64()[destStartIdx:], vec.Int64()[srcStartIdx:srcEndIdx])
+		}
+	case types.Float32:
+		if outputLen > uint64(len(m.Float32())) {
+			m.col = append(m.Float32()[:destStartIdx], vec.Float32()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Float32()[destStartIdx:], vec.Float32()[srcStartIdx:srcEndIdx])
+		}
+	case types.Float64:
+		if outputLen > uint64(len(m.Float64())) {
+			m.col = append(m.Float64()[:destStartIdx], vec.Float64()[srcStartIdx:srcEndIdx]...)
+		} else {
+			copy(m.Float64()[destStartIdx:], vec.Float64()[srcStartIdx:srcEndIdx])
+		}
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+
+	m.ExtendNulls(vec, destStartIdx, srcStartIdx, batchSize)
+}
+
 func (m *memColumn) AppendWithSel(
 	vec ColVec, sel []uint16, batchSize uint16, colType types.T, toLength uint64,
 ) {
@@ -155,26 +223,128 @@ func (m *memColumn) AppendWithSel(
 	}
 }
 
+func (m *memColumn) AppendSliceWithSel(
+	vec ColVec,
+	colType types.T,
+	destStartIdx uint64,
+	srcStartIdx uint16,
+	srcEndIdx uint16,
+	sel []uint16,
+) {
+	batchSize := srcEndIdx - srcStartIdx
+	switch colType {
+	case types.Bool:
+		toCol := append(m.Bool()[:destStartIdx], make([]bool, batchSize)...)
+		fromCol := vec.Bool()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Bytes:
+		toCol := append(m.Bytes()[:destStartIdx], make([][]byte, batchSize)...)
+		fromCol := vec.Bytes()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Decimal:
+		toCol := append(m.Decimal()[:destStartIdx], make([]apd.Decimal, batchSize)...)
+		fromCol := vec.Decimal()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Int8:
+		toCol := append(m.Int8()[:destStartIdx], make([]int8, batchSize)...)
+		fromCol := vec.Int8()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Int16:
+		toCol := append(m.Int16()[:destStartIdx], make([]int16, batchSize)...)
+		fromCol := vec.Int16()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Int32:
+		toCol := append(m.Int32()[:destStartIdx], make([]int32, batchSize)...)
+		fromCol := vec.Int32()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Int64:
+		toCol := append(m.Int64()[:destStartIdx], make([]int64, batchSize)...)
+		fromCol := vec.Int64()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Float32:
+		toCol := append(m.Float32()[:destStartIdx], make([]float32, batchSize)...)
+		fromCol := vec.Float32()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	case types.Float64:
+		toCol := append(m.Float64()[:destStartIdx], make([]float64, batchSize)...)
+		fromCol := vec.Float64()
+
+		for i := 0; i < int(batchSize); i++ {
+			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
+		}
+
+		m.col = toCol
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+
+	m.ExtendNullsWithSel(vec, destStartIdx, srcStartIdx, batchSize, sel)
+}
+
 func (m *memColumn) Copy(src ColVec, srcStartIdx, srcEndIdx uint64, typ types.T) {
+	m.CopyAt(src, 0, srcStartIdx, srcEndIdx, typ)
+}
+
+func (m *memColumn) CopyAt(src ColVec, destStartIdx, srcStartIdx, srcEndIdx uint64, typ types.T) {
 	switch typ {
 	case types.Bool:
-		copy(m.Bool(), src.Bool()[srcStartIdx:srcEndIdx])
+		copy(m.Bool()[destStartIdx:], src.Bool()[srcStartIdx:srcEndIdx])
 	case types.Bytes:
-		copy(m.Bytes(), src.Bytes()[srcStartIdx:srcEndIdx])
+		copy(m.Bytes()[destStartIdx:], src.Bytes()[srcStartIdx:srcEndIdx])
 	case types.Decimal:
-		copy(m.Decimal(), src.Decimal()[srcStartIdx:srcEndIdx])
+		copy(m.Decimal()[destStartIdx:], src.Decimal()[srcStartIdx:srcEndIdx])
 	case types.Int8:
-		copy(m.Int8(), src.Int8()[srcStartIdx:srcEndIdx])
+		copy(m.Int8()[destStartIdx:], src.Int8()[srcStartIdx:srcEndIdx])
 	case types.Int16:
-		copy(m.Int16(), src.Int16()[srcStartIdx:srcEndIdx])
+		copy(m.Int16()[destStartIdx:], src.Int16()[srcStartIdx:srcEndIdx])
 	case types.Int32:
-		copy(m.Int32(), src.Int32()[srcStartIdx:srcEndIdx])
+		copy(m.Int32()[destStartIdx:], src.Int32()[srcStartIdx:srcEndIdx])
 	case types.Int64:
-		copy(m.Int64(), src.Int64()[srcStartIdx:srcEndIdx])
+		copy(m.Int64()[destStartIdx:], src.Int64()[srcStartIdx:srcEndIdx])
 	case types.Float32:
-		copy(m.Float32(), src.Float32()[srcStartIdx:srcEndIdx])
+		copy(m.Float32()[destStartIdx:], src.Float32()[srcStartIdx:srcEndIdx])
 	case types.Float64:
-		copy(m.Float64(), src.Float64()[srcStartIdx:srcEndIdx])
+		copy(m.Float64()[destStartIdx:], src.Float64()[srcStartIdx:srcEndIdx])
 	default:
 		panic(fmt.Sprintf("unhandled type %d", typ))
 	}
@@ -750,6 +920,58 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 	}
 }
 
+func (m *memColumn) Slice(colType types.T, start uint64, end uint64) ColVec {
+	switch colType {
+	case types.Bool:
+		col := m.Bool()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Bytes:
+		col := m.Bytes()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Decimal:
+		col := m.Decimal()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Int8:
+		col := m.Int8()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Int16:
+		col := m.Int16()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Int32:
+		col := m.Int32()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Int64:
+		col := m.Int64()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Float32:
+		col := m.Float32()
+		return &memColumn{
+			col: col[start:end],
+		}
+	case types.Float64:
+		col := m.Float64()
+		return &memColumn{
+			col: col[start:end],
+		}
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+}
+
 func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 	if m.NullAt(colIdx) {
 		return "NULL"
@@ -775,5 +997,39 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 		return fmt.Sprintf("%v", m.Float64()[colIdx])
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+}
+
+func (m *memColumn) ExtendNulls(
+	vec ColVec, destStartIdx uint64, srcStartIdx uint16, toAppend uint16,
+) {
+	outputLen := destStartIdx + uint64(toAppend)
+	if uint64(cap(m.nulls)) < outputLen/64 {
+		// (batchSize-1)>>6+1 is the number of Int64s needed to encode the additional elements/nulls in the ColVec.
+		// This is equivalent to ceil(batchSize/64).
+		m.nulls = append(m.nulls, make([]int64, (toAppend-1)>>6+1)...)
+	}
+	if vec.HasNulls() {
+		for i := uint16(0); i < toAppend; i++ {
+			if vec.NullAt(srcStartIdx + i) {
+				m.SetNull64(destStartIdx + uint64(i))
+			}
+		}
+	}
+}
+
+func (m *memColumn) ExtendNullsWithSel(
+	vec ColVec, destStartIdx uint64, srcStartIdx uint16, toAppend uint16, sel []uint16,
+) {
+	outputLen := destStartIdx + uint64(toAppend)
+	if uint64(cap(m.nulls)) < outputLen/64 {
+		// (batchSize-1)>>6+1 is the number of Int64s needed to encode the additional elements/nulls in the ColVec.
+		// This is equivalent to ceil(batchSize/64).
+		m.nulls = append(m.nulls, make([]int64, (toAppend-1)>>6+1)...)
+	}
+	for i := uint16(0); i < toAppend; i++ {
+		if vec.NullAt(sel[srcStartIdx+i]) {
+			m.SetNull64(destStartIdx + uint64(i))
+		}
 	}
 }
