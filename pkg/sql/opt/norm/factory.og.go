@@ -11873,7 +11873,10 @@ func (_f *Factory) ConstructPlus(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldPlusZero) {
-					_expr := left
+					_expr := _f.ConstructCast(
+						left,
+						_f.funcs.BinaryColType(opt.PlusOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldPlusZero, nil, _expr)
 					}
@@ -11889,7 +11892,10 @@ func (_f *Factory) ConstructPlus(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldZeroPlus) {
-					_expr := right
+					_expr := _f.ConstructCast(
+						right,
+						_f.funcs.BinaryColType(opt.PlusOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldZeroPlus, nil, _expr)
 					}
@@ -12002,7 +12008,10 @@ func (_f *Factory) ConstructMinus(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 0) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
-					_expr := left
+					_expr := _f.ConstructCast(
+						left,
+						_f.funcs.BinaryColType(opt.MinusOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldMinusZero, nil, _expr)
 					}
@@ -12077,7 +12086,10 @@ func (_f *Factory) ConstructMult(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMultOne) {
-					_expr := left
+					_expr := _f.ConstructCast(
+						left,
+						_f.funcs.BinaryColType(opt.MultOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldMultOne, nil, _expr)
 					}
@@ -12093,7 +12105,10 @@ func (_f *Factory) ConstructMult(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldOneMult) {
-					_expr := right
+					_expr := _f.ConstructCast(
+						right,
+						_f.funcs.BinaryColType(opt.MultOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldOneMult, nil, _expr)
 					}
@@ -12206,7 +12221,10 @@ func (_f *Factory) ConstructDiv(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
-					_expr := left
+					_expr := _f.ConstructCast(
+						left,
+						_f.funcs.BinaryColType(opt.DivOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
 					}
@@ -12281,7 +12299,10 @@ func (_f *Factory) ConstructFloorDiv(
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 1) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
-					_expr := left
+					_expr := _f.ConstructCast(
+						left,
+						_f.funcs.BinaryColType(opt.FloorDivOp, left, right),
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
 					}
@@ -13052,6 +13073,23 @@ func (_f *Factory) ConstructCast(
 					_f.appliedRule(opt.FoldNullCast, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [FoldCast]
+	{
+		typ := targetTyp
+		if _f.funcs.IsConstValueOrTuple(input) {
+			result := _f.funcs.FoldCast(input, typ)
+			if _f.funcs.Succeeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCast) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCast, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
