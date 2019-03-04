@@ -2023,6 +2023,7 @@ type LookupJoinPrivate struct {
 	// join, treating it as if it were another relational input. This makes the
 	// lookup join appear more like other join operators.
 	lookupProps props.Relational
+	JoinPrivate
 }
 
 // MergeJoinExpr represents a join that is executed using merge-join.
@@ -2184,6 +2185,7 @@ type MergeJoinPrivate struct {
 	// columns and orderings.
 	LeftOrdering  physical.OrderingChoice
 	RightOrdering physical.OrderingChoice
+	JoinPrivate
 }
 
 // ZigzagJoinExpr represents a join that is executed using the zigzag joiner.
@@ -15686,6 +15688,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashInt(val.Index)
 	in.hasher.HashColList(val.KeyCols)
 	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -15696,7 +15699,8 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIntEqual(val.Index, existing.Index) &&
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
-				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
@@ -15717,6 +15721,7 @@ func (in *interner) InternMergeJoin(val *MergeJoinExpr) *MergeJoinExpr {
 	in.hasher.HashOrdering(val.RightEq)
 	in.hasher.HashOrderingChoice(val.LeftOrdering)
 	in.hasher.HashOrderingChoice(val.RightOrdering)
+	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -15728,7 +15733,8 @@ func (in *interner) InternMergeJoin(val *MergeJoinExpr) *MergeJoinExpr {
 				in.hasher.IsOrderingEqual(val.LeftEq, existing.LeftEq) &&
 				in.hasher.IsOrderingEqual(val.RightEq, existing.RightEq) &&
 				in.hasher.IsOrderingChoiceEqual(val.LeftOrdering, existing.LeftOrdering) &&
-				in.hasher.IsOrderingChoiceEqual(val.RightOrdering, existing.RightOrdering) {
+				in.hasher.IsOrderingChoiceEqual(val.RightOrdering, existing.RightOrdering) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
 		}
