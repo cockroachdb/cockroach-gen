@@ -15,7 +15,8 @@ package exec
 import (
 	"bytes"
 	"fmt"
-	"math"
+	"reflect"
+	"unsafe"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -34,29 +35,29 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
+				p := uintptr(buckets[i])
 
-				x := uint64(0)
+				x := 0
 				if v {
 					x = 1
 				}
-				hash = x
+				p = p*31 + uintptr(x)
 
-				buckets[i] = buckets[i]*31 + hash
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
+				p := uintptr(buckets[i])
 
-				x := uint64(0)
+				x := 0
 				if v {
 					x = 1
 				}
-				hash = x
+				p = p*31 + uintptr(x)
 
-				buckets[i] = buckets[i]*31 + hash
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -66,29 +67,23 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
+				p := uintptr(buckets[i])
 
-				_temp := 1
-				for b := range v {
-					_temp = _temp*31 + b
-				}
-				hash = uint64(hash)
+				sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+				p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
 
-				buckets[i] = buckets[i]*31 + hash
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
+				p := uintptr(buckets[i])
 
-				_temp := 1
-				for b := range v {
-					_temp = _temp*31 + b
-				}
-				hash = uint64(hash)
+				sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+				p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
 
-				buckets[i] = buckets[i]*31 + hash
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -98,29 +93,31 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
+				p := uintptr(buckets[i])
 
 				d, err := v.Float64()
 				if err != nil {
 					panic(fmt.Sprintf("%v", err))
 				}
-				hash = math.Float64bits(d)
 
-				buckets[i] = buckets[i]*31 + hash
+				p = f64hash(noescape(unsafe.Pointer(&d)), p)
+
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
+				p := uintptr(buckets[i])
 
 				d, err := v.Float64()
 				if err != nil {
 					panic(fmt.Sprintf("%v", err))
 				}
-				hash = math.Float64bits(d)
 
-				buckets[i] = buckets[i]*31 + hash
+				p = f64hash(noescape(unsafe.Pointer(&d)), p)
+
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -130,17 +127,17 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash8(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash8(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -150,17 +147,17 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash16(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash16(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -170,17 +167,17 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash32(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash32(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -190,17 +187,17 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash64(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
-				hash = uint64(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = memhash64(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -210,17 +207,17 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
-				hash = uint64(math.Float32bits(v))
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = f32hash(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
-				hash = uint64(math.Float32bits(v))
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = f32hash(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		}
 
@@ -230,17 +227,17 @@ func (ht *hashTable) rehash(
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[sel[i]]
-				var hash uint64
-				hash = math.Float64bits(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = f64hash(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
 				v := keys[i]
-				var hash uint64
-				hash = math.Float64bits(v)
-				buckets[i] = buckets[i]*31 + hash
+				p := uintptr(buckets[i])
+				p = f64hash(noescape(unsafe.Pointer(&v)), p)
+				buckets[i] = uint64(p)
 			}
 		}
 
