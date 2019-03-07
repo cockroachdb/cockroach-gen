@@ -14532,7 +14532,8 @@ func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14545,7 +14546,8 @@ func (m *Memo) AddVirtualScanToGroup(e *VirtualScanExpr, grp RelExpr) *VirtualSc
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14558,7 +14560,8 @@ func (m *Memo) AddSequenceSelectToGroup(e *SequenceSelectExpr, grp RelExpr) *Seq
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14571,7 +14574,8 @@ func (m *Memo) AddValuesToGroup(e *ValuesExpr, grp RelExpr) *ValuesExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14584,7 +14588,8 @@ func (m *Memo) AddSelectToGroup(e *SelectExpr, grp RelExpr) *SelectExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14597,7 +14602,8 @@ func (m *Memo) AddProjectToGroup(e *ProjectExpr, grp RelExpr) *ProjectExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14610,7 +14616,8 @@ func (m *Memo) AddInnerJoinToGroup(e *InnerJoinExpr, grp RelExpr) *InnerJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14623,7 +14630,8 @@ func (m *Memo) AddLeftJoinToGroup(e *LeftJoinExpr, grp RelExpr) *LeftJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14636,7 +14644,8 @@ func (m *Memo) AddRightJoinToGroup(e *RightJoinExpr, grp RelExpr) *RightJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14649,7 +14658,8 @@ func (m *Memo) AddFullJoinToGroup(e *FullJoinExpr, grp RelExpr) *FullJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14662,7 +14672,8 @@ func (m *Memo) AddSemiJoinToGroup(e *SemiJoinExpr, grp RelExpr) *SemiJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14675,7 +14686,8 @@ func (m *Memo) AddAntiJoinToGroup(e *AntiJoinExpr, grp RelExpr) *AntiJoinExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14688,7 +14700,8 @@ func (m *Memo) AddIndexJoinToGroup(e *IndexJoinExpr, grp RelExpr) *IndexJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14701,7 +14714,8 @@ func (m *Memo) AddLookupJoinToGroup(e *LookupJoinExpr, grp RelExpr) *LookupJoinE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14714,7 +14728,8 @@ func (m *Memo) AddMergeJoinToGroup(e *MergeJoinExpr, grp RelExpr) *MergeJoinExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14727,7 +14742,8 @@ func (m *Memo) AddZigzagJoinToGroup(e *ZigzagJoinExpr, grp RelExpr) *ZigzagJoinE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14740,7 +14756,8 @@ func (m *Memo) AddInnerJoinApplyToGroup(e *InnerJoinApplyExpr, grp RelExpr) *Inn
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14753,7 +14770,8 @@ func (m *Memo) AddLeftJoinApplyToGroup(e *LeftJoinApplyExpr, grp RelExpr) *LeftJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14766,7 +14784,8 @@ func (m *Memo) AddRightJoinApplyToGroup(e *RightJoinApplyExpr, grp RelExpr) *Rig
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14779,7 +14798,8 @@ func (m *Memo) AddFullJoinApplyToGroup(e *FullJoinApplyExpr, grp RelExpr) *FullJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14792,7 +14812,8 @@ func (m *Memo) AddSemiJoinApplyToGroup(e *SemiJoinApplyExpr, grp RelExpr) *SemiJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14805,7 +14826,8 @@ func (m *Memo) AddAntiJoinApplyToGroup(e *AntiJoinApplyExpr, grp RelExpr) *AntiJ
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14818,7 +14840,8 @@ func (m *Memo) AddGroupByToGroup(e *GroupByExpr, grp RelExpr) *GroupByExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14831,7 +14854,8 @@ func (m *Memo) AddScalarGroupByToGroup(e *ScalarGroupByExpr, grp RelExpr) *Scala
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14844,7 +14868,8 @@ func (m *Memo) AddDistinctOnToGroup(e *DistinctOnExpr, grp RelExpr) *DistinctOnE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14857,7 +14882,8 @@ func (m *Memo) AddUnionToGroup(e *UnionExpr, grp RelExpr) *UnionExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14870,7 +14896,8 @@ func (m *Memo) AddIntersectToGroup(e *IntersectExpr, grp RelExpr) *IntersectExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14883,7 +14910,8 @@ func (m *Memo) AddExceptToGroup(e *ExceptExpr, grp RelExpr) *ExceptExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14896,7 +14924,8 @@ func (m *Memo) AddUnionAllToGroup(e *UnionAllExpr, grp RelExpr) *UnionAllExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14909,7 +14938,8 @@ func (m *Memo) AddIntersectAllToGroup(e *IntersectAllExpr, grp RelExpr) *Interse
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14922,7 +14952,8 @@ func (m *Memo) AddExceptAllToGroup(e *ExceptAllExpr, grp RelExpr) *ExceptAllExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14935,7 +14966,8 @@ func (m *Memo) AddLimitToGroup(e *LimitExpr, grp RelExpr) *LimitExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14948,7 +14980,8 @@ func (m *Memo) AddOffsetToGroup(e *OffsetExpr, grp RelExpr) *OffsetExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14961,7 +14994,8 @@ func (m *Memo) AddMax1RowToGroup(e *Max1RowExpr, grp RelExpr) *Max1RowExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14974,7 +15008,8 @@ func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -14987,7 +15022,8 @@ func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp Rel
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15000,7 +15036,8 @@ func (m *Memo) AddRowNumberToGroup(e *RowNumberExpr, grp RelExpr) *RowNumberExpr
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15013,7 +15050,8 @@ func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetE
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15026,7 +15064,8 @@ func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15039,7 +15078,8 @@ func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15052,7 +15092,8 @@ func (m *Memo) AddUpsertToGroup(e *UpsertExpr, grp RelExpr) *UpsertExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15065,7 +15106,8 @@ func (m *Memo) AddDeleteToGroup(e *DeleteExpr, grp RelExpr) *DeleteExpr {
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
@@ -15078,7 +15120,8 @@ func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTab
 		m.memEstimate += size
 		m.checkExpr(e)
 	} else if interned.group() != grp.group() {
-		panic(fmt.Sprintf("%s expression cannot be added to multiple groups: %s", e.Op(), interned))
+		// This is a group collision, do nothing.
+		return nil
 	}
 	return interned
 }
