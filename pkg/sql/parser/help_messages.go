@@ -921,7 +921,7 @@ SHOW [COMPACT] [KV] TRACE FOR SESSION
 		//line sql.y: 3343
 		Category: hDDL,
 		//line sql.y: 3344
-		Text: `SHOW TABLES [FROM <databasename> [ . <schemaname> ] ]
+		Text: `SHOW TABLES [FROM <databasename> [ . <schemaname> ] ] [WITH COMMENT]
 `,
 		//line sql.y: 3345
 		SeeAlso: `WEBDOCS/show-tables.html
