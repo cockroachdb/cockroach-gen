@@ -12004,18 +12004,20 @@ func (_f *Factory) ConstructMinus(
 ) opt.ScalarExpr {
 	// [FoldMinusZero]
 	{
-		_const, _ := right.(*memo.ConstExpr)
-		if _const != nil {
-			if _f.funcs.EqualsNumber(_const.Value, 0) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
-					_expr := _f.ConstructCast(
-						left,
-						_f.funcs.BinaryColType(opt.MinusOp, left, right),
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldMinusZero, nil, _expr)
+		if _f.funcs.IsAdditive(left) {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
+				if _f.funcs.EqualsNumber(_const.Value, 0) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
+						_expr := _f.ConstructCast(
+							left,
+							_f.funcs.BinaryColType(opt.MinusOp, left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldMinusZero, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
