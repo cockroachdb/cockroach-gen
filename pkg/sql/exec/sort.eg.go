@@ -18,6 +18,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/distsqlpb"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
@@ -117,7 +118,7 @@ type sortBoolAscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortBoolAscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortBoolAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Bool()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -195,7 +196,7 @@ type sortBoolDescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortBoolDescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortBoolDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Bool()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -273,7 +274,7 @@ type sortBytesAscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortBytesAscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Bytes()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -351,7 +352,7 @@ type sortBytesDescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortBytesDescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Bytes()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -429,7 +430,7 @@ type sortDecimalAscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortDecimalAscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortDecimalAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Decimal()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -507,7 +508,7 @@ type sortDecimalDescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortDecimalDescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortDecimalDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Decimal()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -585,7 +586,7 @@ type sortInt8AscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt8AscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt8AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int8()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -663,7 +664,7 @@ type sortInt8DescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt8DescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt8DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int8()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -741,7 +742,7 @@ type sortInt16AscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt16AscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt16AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int16()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -819,7 +820,7 @@ type sortInt16DescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt16DescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt16DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int16()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -897,7 +898,7 @@ type sortInt32AscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt32AscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt32AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int32()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -975,7 +976,7 @@ type sortInt32DescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt32DescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt32DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int32()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -1053,7 +1054,7 @@ type sortInt64AscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt64AscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt64AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int64()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -1131,7 +1132,7 @@ type sortInt64DescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortInt64DescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortInt64DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Int64()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -1209,7 +1210,7 @@ type sortFloat32AscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortFloat32AscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat32AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Float32()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -1287,7 +1288,7 @@ type sortFloat32DescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortFloat32DescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat32DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Float32()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -1365,7 +1366,7 @@ type sortFloat64AscOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortFloat64AscOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat64AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Float64()
 	s.order = order
 	s.workingSpace = workingSpace
@@ -1443,7 +1444,7 @@ type sortFloat64DescOp struct {
 	workingSpace []uint64
 }
 
-func (s *sortFloat64DescOp) init(col ColVec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat64DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
 	s.sortCol = col.Float64()
 	s.order = order
 	s.workingSpace = workingSpace

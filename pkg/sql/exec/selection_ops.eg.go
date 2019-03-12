@@ -6,7 +6,9 @@ import (
 	"bytes"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/types/conv"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
 	"github.com/pkg/errors"
@@ -19,21 +21,21 @@ type selEQBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selEQBoolBoolConstOp) Next() ColBatch {
+func (p *selEQBoolBoolConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -44,7 +46,7 @@ func (p *selEQBoolBoolConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -69,15 +71,15 @@ type selEQBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selEQBoolBoolOp) Next() ColBatch {
+func (p *selEQBoolBoolOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bool()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bool()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -121,21 +123,21 @@ type selNEBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selNEBoolBoolConstOp) Next() ColBatch {
+func (p *selNEBoolBoolConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -146,7 +148,7 @@ func (p *selNEBoolBoolConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -171,15 +173,15 @@ type selNEBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selNEBoolBoolOp) Next() ColBatch {
+func (p *selNEBoolBoolOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bool()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bool()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -223,21 +225,21 @@ type selLTBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selLTBoolBoolConstOp) Next() ColBatch {
+func (p *selLTBoolBoolConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) < 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) < 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -248,7 +250,7 @@ func (p *selLTBoolBoolConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) < 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) < 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -273,15 +275,15 @@ type selLTBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selLTBoolBoolOp) Next() ColBatch {
+func (p *selLTBoolBoolOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bool()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bool()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -325,21 +327,21 @@ type selLEBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selLEBoolBoolConstOp) Next() ColBatch {
+func (p *selLEBoolBoolConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) <= 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) <= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -350,7 +352,7 @@ func (p *selLEBoolBoolConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) <= 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) <= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -375,15 +377,15 @@ type selLEBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selLEBoolBoolOp) Next() ColBatch {
+func (p *selLEBoolBoolOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bool()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bool()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -427,21 +429,21 @@ type selGTBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selGTBoolBoolConstOp) Next() ColBatch {
+func (p *selGTBoolBoolConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) > 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) > 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -452,7 +454,7 @@ func (p *selGTBoolBoolConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) > 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) > 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -477,15 +479,15 @@ type selGTBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selGTBoolBoolOp) Next() ColBatch {
+func (p *selGTBoolBoolOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bool()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bool()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -529,21 +531,21 @@ type selGEBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selGEBoolBoolConstOp) Next() ColBatch {
+func (p *selGEBoolBoolConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bool()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) >= 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) >= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -554,7 +556,7 @@ func (p *selGEBoolBoolConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareBools(col[i], p.constArg) >= 0
+				cmp = tree.CompareBools(coldata[i], p.constArg) >= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -579,15 +581,15 @@ type selGEBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selGEBoolBoolOp) Next() ColBatch {
+func (p *selGEBoolBoolOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bool()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bool()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bool()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bool()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -631,21 +633,21 @@ type selEQBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selEQBytesBytesConstOp) Next() ColBatch {
+func (p *selEQBytesBytesConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = bytes.Equal(col[i], p.constArg)
+				cmp = bytes.Equal(coldata[i], p.constArg)
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -656,7 +658,7 @@ func (p *selEQBytesBytesConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = bytes.Equal(col[i], p.constArg)
+				cmp = bytes.Equal(coldata[i], p.constArg)
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -681,15 +683,15 @@ type selEQBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selEQBytesBytesOp) Next() ColBatch {
+func (p *selEQBytesBytesOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bytes()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bytes()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -733,21 +735,21 @@ type selNEBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selNEBytesBytesConstOp) Next() ColBatch {
+func (p *selNEBytesBytesConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = !bytes.Equal(col[i], p.constArg)
+				cmp = !bytes.Equal(coldata[i], p.constArg)
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -758,7 +760,7 @@ func (p *selNEBytesBytesConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = !bytes.Equal(col[i], p.constArg)
+				cmp = !bytes.Equal(coldata[i], p.constArg)
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -783,15 +785,15 @@ type selNEBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selNEBytesBytesOp) Next() ColBatch {
+func (p *selNEBytesBytesOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bytes()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bytes()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -835,21 +837,21 @@ type selLTBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selLTBytesBytesConstOp) Next() ColBatch {
+func (p *selLTBytesBytesConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) < 0
+				cmp = bytes.Compare(coldata[i], p.constArg) < 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -860,7 +862,7 @@ func (p *selLTBytesBytesConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) < 0
+				cmp = bytes.Compare(coldata[i], p.constArg) < 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -885,15 +887,15 @@ type selLTBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selLTBytesBytesOp) Next() ColBatch {
+func (p *selLTBytesBytesOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bytes()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bytes()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -937,21 +939,21 @@ type selLEBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selLEBytesBytesConstOp) Next() ColBatch {
+func (p *selLEBytesBytesConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) <= 0
+				cmp = bytes.Compare(coldata[i], p.constArg) <= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -962,7 +964,7 @@ func (p *selLEBytesBytesConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) <= 0
+				cmp = bytes.Compare(coldata[i], p.constArg) <= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -987,15 +989,15 @@ type selLEBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selLEBytesBytesOp) Next() ColBatch {
+func (p *selLEBytesBytesOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bytes()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bytes()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1039,21 +1041,21 @@ type selGTBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selGTBytesBytesConstOp) Next() ColBatch {
+func (p *selGTBytesBytesConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) > 0
+				cmp = bytes.Compare(coldata[i], p.constArg) > 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1064,7 +1066,7 @@ func (p *selGTBytesBytesConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) > 0
+				cmp = bytes.Compare(coldata[i], p.constArg) > 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1089,15 +1091,15 @@ type selGTBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selGTBytesBytesOp) Next() ColBatch {
+func (p *selGTBytesBytesOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bytes()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bytes()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1141,21 +1143,21 @@ type selGEBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selGEBytesBytesConstOp) Next() ColBatch {
+func (p *selGEBytesBytesConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Bytes()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) >= 0
+				cmp = bytes.Compare(coldata[i], p.constArg) >= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1166,7 +1168,7 @@ func (p *selGEBytesBytesConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = bytes.Compare(col[i], p.constArg) >= 0
+				cmp = bytes.Compare(coldata[i], p.constArg) >= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1191,15 +1193,15 @@ type selGEBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selGEBytesBytesOp) Next() ColBatch {
+func (p *selGEBytesBytesOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Bytes()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Bytes()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Bytes()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Bytes()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1243,21 +1245,21 @@ type selEQDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selEQDecimalDecimalConstOp) Next() ColBatch {
+func (p *selEQDecimalDecimalConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) == 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) == 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1268,7 +1270,7 @@ func (p *selEQDecimalDecimalConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) == 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) == 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1293,15 +1295,15 @@ type selEQDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selEQDecimalDecimalOp) Next() ColBatch {
+func (p *selEQDecimalDecimalOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Decimal()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Decimal()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1345,21 +1347,21 @@ type selNEDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selNEDecimalDecimalConstOp) Next() ColBatch {
+func (p *selNEDecimalDecimalConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) != 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) != 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1370,7 +1372,7 @@ func (p *selNEDecimalDecimalConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) != 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) != 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1395,15 +1397,15 @@ type selNEDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selNEDecimalDecimalOp) Next() ColBatch {
+func (p *selNEDecimalDecimalOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Decimal()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Decimal()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1447,21 +1449,21 @@ type selLTDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selLTDecimalDecimalConstOp) Next() ColBatch {
+func (p *selLTDecimalDecimalConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) < 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) < 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1472,7 +1474,7 @@ func (p *selLTDecimalDecimalConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) < 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) < 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1497,15 +1499,15 @@ type selLTDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selLTDecimalDecimalOp) Next() ColBatch {
+func (p *selLTDecimalDecimalOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Decimal()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Decimal()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1549,21 +1551,21 @@ type selLEDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selLEDecimalDecimalConstOp) Next() ColBatch {
+func (p *selLEDecimalDecimalConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) <= 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) <= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1574,7 +1576,7 @@ func (p *selLEDecimalDecimalConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) <= 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) <= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1599,15 +1601,15 @@ type selLEDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selLEDecimalDecimalOp) Next() ColBatch {
+func (p *selLEDecimalDecimalOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Decimal()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Decimal()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1651,21 +1653,21 @@ type selGTDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selGTDecimalDecimalConstOp) Next() ColBatch {
+func (p *selGTDecimalDecimalConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) > 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) > 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1676,7 +1678,7 @@ func (p *selGTDecimalDecimalConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) > 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) > 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1701,15 +1703,15 @@ type selGTDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selGTDecimalDecimalOp) Next() ColBatch {
+func (p *selGTDecimalDecimalOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Decimal()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Decimal()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1753,21 +1755,21 @@ type selGEDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selGEDecimalDecimalConstOp) Next() ColBatch {
+func (p *selGEDecimalDecimalConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Decimal()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) >= 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) >= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1778,7 +1780,7 @@ func (p *selGEDecimalDecimalConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = tree.CompareDecimals(&col[i], &p.constArg) >= 0
+				cmp = tree.CompareDecimals(&coldata[i], &p.constArg) >= 0
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1803,15 +1805,15 @@ type selGEDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selGEDecimalDecimalOp) Next() ColBatch {
+func (p *selGEDecimalDecimalOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Decimal()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Decimal()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Decimal()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Decimal()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1855,21 +1857,21 @@ type selEQInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selEQInt8Int8ConstOp) Next() ColBatch {
+func (p *selEQInt8Int8ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int8()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1880,7 +1882,7 @@ func (p *selEQInt8Int8ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1905,15 +1907,15 @@ type selEQInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt8Int8Op) Next() ColBatch {
+func (p *selEQInt8Int8Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int8()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int8()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int8()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int8()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -1957,21 +1959,21 @@ type selNEInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selNEInt8Int8ConstOp) Next() ColBatch {
+func (p *selNEInt8Int8ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int8()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -1982,7 +1984,7 @@ func (p *selNEInt8Int8ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2007,15 +2009,15 @@ type selNEInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt8Int8Op) Next() ColBatch {
+func (p *selNEInt8Int8Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int8()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int8()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int8()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int8()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2059,21 +2061,21 @@ type selLTInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selLTInt8Int8ConstOp) Next() ColBatch {
+func (p *selLTInt8Int8ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int8()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2084,7 +2086,7 @@ func (p *selLTInt8Int8ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2109,15 +2111,15 @@ type selLTInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt8Int8Op) Next() ColBatch {
+func (p *selLTInt8Int8Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int8()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int8()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int8()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int8()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2161,21 +2163,21 @@ type selLEInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selLEInt8Int8ConstOp) Next() ColBatch {
+func (p *selLEInt8Int8ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int8()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2186,7 +2188,7 @@ func (p *selLEInt8Int8ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2211,15 +2213,15 @@ type selLEInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt8Int8Op) Next() ColBatch {
+func (p *selLEInt8Int8Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int8()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int8()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int8()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int8()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2263,21 +2265,21 @@ type selGTInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selGTInt8Int8ConstOp) Next() ColBatch {
+func (p *selGTInt8Int8ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int8()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2288,7 +2290,7 @@ func (p *selGTInt8Int8ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2313,15 +2315,15 @@ type selGTInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt8Int8Op) Next() ColBatch {
+func (p *selGTInt8Int8Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int8()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int8()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int8()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int8()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2365,21 +2367,21 @@ type selGEInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selGEInt8Int8ConstOp) Next() ColBatch {
+func (p *selGEInt8Int8ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int8()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2390,7 +2392,7 @@ func (p *selGEInt8Int8ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2415,15 +2417,15 @@ type selGEInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt8Int8Op) Next() ColBatch {
+func (p *selGEInt8Int8Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int8()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int8()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int8()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int8()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2467,21 +2469,21 @@ type selEQInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selEQInt16Int16ConstOp) Next() ColBatch {
+func (p *selEQInt16Int16ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int16()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2492,7 +2494,7 @@ func (p *selEQInt16Int16ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2517,15 +2519,15 @@ type selEQInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt16Int16Op) Next() ColBatch {
+func (p *selEQInt16Int16Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int16()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int16()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int16()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int16()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2569,21 +2571,21 @@ type selNEInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selNEInt16Int16ConstOp) Next() ColBatch {
+func (p *selNEInt16Int16ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int16()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2594,7 +2596,7 @@ func (p *selNEInt16Int16ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2619,15 +2621,15 @@ type selNEInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt16Int16Op) Next() ColBatch {
+func (p *selNEInt16Int16Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int16()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int16()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int16()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int16()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2671,21 +2673,21 @@ type selLTInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selLTInt16Int16ConstOp) Next() ColBatch {
+func (p *selLTInt16Int16ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int16()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2696,7 +2698,7 @@ func (p *selLTInt16Int16ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2721,15 +2723,15 @@ type selLTInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt16Int16Op) Next() ColBatch {
+func (p *selLTInt16Int16Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int16()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int16()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int16()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int16()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2773,21 +2775,21 @@ type selLEInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selLEInt16Int16ConstOp) Next() ColBatch {
+func (p *selLEInt16Int16ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int16()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2798,7 +2800,7 @@ func (p *selLEInt16Int16ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2823,15 +2825,15 @@ type selLEInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt16Int16Op) Next() ColBatch {
+func (p *selLEInt16Int16Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int16()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int16()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int16()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int16()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2875,21 +2877,21 @@ type selGTInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selGTInt16Int16ConstOp) Next() ColBatch {
+func (p *selGTInt16Int16ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int16()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2900,7 +2902,7 @@ func (p *selGTInt16Int16ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -2925,15 +2927,15 @@ type selGTInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt16Int16Op) Next() ColBatch {
+func (p *selGTInt16Int16Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int16()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int16()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int16()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int16()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -2977,21 +2979,21 @@ type selGEInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selGEInt16Int16ConstOp) Next() ColBatch {
+func (p *selGEInt16Int16ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int16()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3002,7 +3004,7 @@ func (p *selGEInt16Int16ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3027,15 +3029,15 @@ type selGEInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt16Int16Op) Next() ColBatch {
+func (p *selGEInt16Int16Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int16()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int16()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int16()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int16()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3079,21 +3081,21 @@ type selEQInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selEQInt32Int32ConstOp) Next() ColBatch {
+func (p *selEQInt32Int32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3104,7 +3106,7 @@ func (p *selEQInt32Int32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3129,15 +3131,15 @@ type selEQInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt32Int32Op) Next() ColBatch {
+func (p *selEQInt32Int32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3181,21 +3183,21 @@ type selNEInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selNEInt32Int32ConstOp) Next() ColBatch {
+func (p *selNEInt32Int32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3206,7 +3208,7 @@ func (p *selNEInt32Int32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3231,15 +3233,15 @@ type selNEInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt32Int32Op) Next() ColBatch {
+func (p *selNEInt32Int32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3283,21 +3285,21 @@ type selLTInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selLTInt32Int32ConstOp) Next() ColBatch {
+func (p *selLTInt32Int32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3308,7 +3310,7 @@ func (p *selLTInt32Int32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3333,15 +3335,15 @@ type selLTInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt32Int32Op) Next() ColBatch {
+func (p *selLTInt32Int32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3385,21 +3387,21 @@ type selLEInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selLEInt32Int32ConstOp) Next() ColBatch {
+func (p *selLEInt32Int32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3410,7 +3412,7 @@ func (p *selLEInt32Int32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3435,15 +3437,15 @@ type selLEInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt32Int32Op) Next() ColBatch {
+func (p *selLEInt32Int32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3487,21 +3489,21 @@ type selGTInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selGTInt32Int32ConstOp) Next() ColBatch {
+func (p *selGTInt32Int32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3512,7 +3514,7 @@ func (p *selGTInt32Int32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3537,15 +3539,15 @@ type selGTInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt32Int32Op) Next() ColBatch {
+func (p *selGTInt32Int32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3589,21 +3591,21 @@ type selGEInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selGEInt32Int32ConstOp) Next() ColBatch {
+func (p *selGEInt32Int32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3614,7 +3616,7 @@ func (p *selGEInt32Int32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3639,15 +3641,15 @@ type selGEInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt32Int32Op) Next() ColBatch {
+func (p *selGEInt32Int32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3691,21 +3693,21 @@ type selEQInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selEQInt64Int64ConstOp) Next() ColBatch {
+func (p *selEQInt64Int64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3716,7 +3718,7 @@ func (p *selEQInt64Int64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3741,15 +3743,15 @@ type selEQInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt64Int64Op) Next() ColBatch {
+func (p *selEQInt64Int64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3793,21 +3795,21 @@ type selNEInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selNEInt64Int64ConstOp) Next() ColBatch {
+func (p *selNEInt64Int64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3818,7 +3820,7 @@ func (p *selNEInt64Int64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3843,15 +3845,15 @@ type selNEInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt64Int64Op) Next() ColBatch {
+func (p *selNEInt64Int64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3895,21 +3897,21 @@ type selLTInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selLTInt64Int64ConstOp) Next() ColBatch {
+func (p *selLTInt64Int64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3920,7 +3922,7 @@ func (p *selLTInt64Int64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -3945,15 +3947,15 @@ type selLTInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt64Int64Op) Next() ColBatch {
+func (p *selLTInt64Int64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -3997,21 +3999,21 @@ type selLEInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selLEInt64Int64ConstOp) Next() ColBatch {
+func (p *selLEInt64Int64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4022,7 +4024,7 @@ func (p *selLEInt64Int64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4047,15 +4049,15 @@ type selLEInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt64Int64Op) Next() ColBatch {
+func (p *selLEInt64Int64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4099,21 +4101,21 @@ type selGTInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selGTInt64Int64ConstOp) Next() ColBatch {
+func (p *selGTInt64Int64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4124,7 +4126,7 @@ func (p *selGTInt64Int64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4149,15 +4151,15 @@ type selGTInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt64Int64Op) Next() ColBatch {
+func (p *selGTInt64Int64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4201,21 +4203,21 @@ type selGEInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selGEInt64Int64ConstOp) Next() ColBatch {
+func (p *selGEInt64Int64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Int64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4226,7 +4228,7 @@ func (p *selGEInt64Int64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4251,15 +4253,15 @@ type selGEInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt64Int64Op) Next() ColBatch {
+func (p *selGEInt64Int64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Int64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Int64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Int64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Int64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4303,21 +4305,21 @@ type selEQFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selEQFloat32Float32ConstOp) Next() ColBatch {
+func (p *selEQFloat32Float32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4328,7 +4330,7 @@ func (p *selEQFloat32Float32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4353,15 +4355,15 @@ type selEQFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selEQFloat32Float32Op) Next() ColBatch {
+func (p *selEQFloat32Float32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4405,21 +4407,21 @@ type selNEFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selNEFloat32Float32ConstOp) Next() ColBatch {
+func (p *selNEFloat32Float32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4430,7 +4432,7 @@ func (p *selNEFloat32Float32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4455,15 +4457,15 @@ type selNEFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selNEFloat32Float32Op) Next() ColBatch {
+func (p *selNEFloat32Float32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4507,21 +4509,21 @@ type selLTFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selLTFloat32Float32ConstOp) Next() ColBatch {
+func (p *selLTFloat32Float32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4532,7 +4534,7 @@ func (p *selLTFloat32Float32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4557,15 +4559,15 @@ type selLTFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selLTFloat32Float32Op) Next() ColBatch {
+func (p *selLTFloat32Float32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4609,21 +4611,21 @@ type selLEFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selLEFloat32Float32ConstOp) Next() ColBatch {
+func (p *selLEFloat32Float32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4634,7 +4636,7 @@ func (p *selLEFloat32Float32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4659,15 +4661,15 @@ type selLEFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selLEFloat32Float32Op) Next() ColBatch {
+func (p *selLEFloat32Float32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4711,21 +4713,21 @@ type selGTFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selGTFloat32Float32ConstOp) Next() ColBatch {
+func (p *selGTFloat32Float32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4736,7 +4738,7 @@ func (p *selGTFloat32Float32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4761,15 +4763,15 @@ type selGTFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selGTFloat32Float32Op) Next() ColBatch {
+func (p *selGTFloat32Float32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4813,21 +4815,21 @@ type selGEFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selGEFloat32Float32ConstOp) Next() ColBatch {
+func (p *selGEFloat32Float32ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float32()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4838,7 +4840,7 @@ func (p *selGEFloat32Float32ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4863,15 +4865,15 @@ type selGEFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selGEFloat32Float32Op) Next() ColBatch {
+func (p *selGEFloat32Float32Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float32()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float32()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float32()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float32()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -4915,21 +4917,21 @@ type selEQFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selEQFloat64Float64ConstOp) Next() ColBatch {
+func (p *selEQFloat64Float64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4940,7 +4942,7 @@ func (p *selEQFloat64Float64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] == p.constArg
+				cmp = coldata[i] == p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -4965,15 +4967,15 @@ type selEQFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selEQFloat64Float64Op) Next() ColBatch {
+func (p *selEQFloat64Float64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -5017,21 +5019,21 @@ type selNEFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selNEFloat64Float64ConstOp) Next() ColBatch {
+func (p *selNEFloat64Float64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5042,7 +5044,7 @@ func (p *selNEFloat64Float64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] != p.constArg
+				cmp = coldata[i] != p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5067,15 +5069,15 @@ type selNEFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selNEFloat64Float64Op) Next() ColBatch {
+func (p *selNEFloat64Float64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -5119,21 +5121,21 @@ type selLTFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selLTFloat64Float64ConstOp) Next() ColBatch {
+func (p *selLTFloat64Float64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5144,7 +5146,7 @@ func (p *selLTFloat64Float64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] < p.constArg
+				cmp = coldata[i] < p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5169,15 +5171,15 @@ type selLTFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selLTFloat64Float64Op) Next() ColBatch {
+func (p *selLTFloat64Float64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -5221,21 +5223,21 @@ type selLEFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selLEFloat64Float64ConstOp) Next() ColBatch {
+func (p *selLEFloat64Float64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5246,7 +5248,7 @@ func (p *selLEFloat64Float64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] <= p.constArg
+				cmp = coldata[i] <= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5271,15 +5273,15 @@ type selLEFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selLEFloat64Float64Op) Next() ColBatch {
+func (p *selLEFloat64Float64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -5323,21 +5325,21 @@ type selGTFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selGTFloat64Float64ConstOp) Next() ColBatch {
+func (p *selGTFloat64Float64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5348,7 +5350,7 @@ func (p *selGTFloat64Float64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] > p.constArg
+				cmp = coldata[i] > p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5373,15 +5375,15 @@ type selGTFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selGTFloat64Float64Op) Next() ColBatch {
+func (p *selGTFloat64Float64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -5425,21 +5427,21 @@ type selGEFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selGEFloat64Float64ConstOp) Next() ColBatch {
+func (p *selGEFloat64Float64ConstOp) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col := batch.ColVec(p.colIdx).Float64()[:ColBatchSize]
+		coldata := batch.ColVec(p.colIdx).Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
 		if sel := batch.Selection(); sel != nil {
 			sel := sel[:n]
 			for _, i := range sel {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5450,7 +5452,7 @@ func (p *selGEFloat64Float64ConstOp) Next() ColBatch {
 			sel := batch.Selection()
 			for i := uint16(0); i < n; i++ {
 				var cmp bool
-				cmp = col[i] >= p.constArg
+				cmp = coldata[i] >= p.constArg
 				if cmp {
 					sel[idx] = i
 					idx++
@@ -5475,15 +5477,15 @@ type selGEFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selGEFloat64Float64Op) Next() ColBatch {
+func (p *selGEFloat64Float64Op) Next() coldata.Batch {
 	for {
 		batch := p.input.Next()
 		if batch.Length() == 0 {
 			return batch
 		}
 
-		col1 := batch.ColVec(p.col1Idx).Float64()[:ColBatchSize]
-		col2 := batch.ColVec(p.col2Idx).Float64()[:ColBatchSize]
+		col1 := batch.ColVec(p.col1Idx).Float64()[:coldata.BatchSize]
+		col2 := batch.ColVec(p.col2Idx).Float64()[:coldata.BatchSize]
 		n := batch.Length()
 
 		var idx uint16
@@ -5529,11 +5531,11 @@ func GetSelectionConstOperator(
 	colIdx int,
 	constArg tree.Datum,
 ) (Operator, error) {
-	c, err := types.GetDatumToPhysicalFn(ct)(constArg)
+	c, err := conv.GetDatumToPhysicalFn(ct)(constArg)
 	if err != nil {
 		return nil, err
 	}
-	switch t := types.FromColumnType(ct); t {
+	switch t := conv.FromColumnType(ct); t {
 
 	case types.Bool:
 		switch cmpOp {
@@ -5990,7 +5992,7 @@ func GetSelectionOperator(
 	col1Idx int,
 	col2Idx int,
 ) (Operator, error) {
-	switch t := types.FromColumnType(ct); t {
+	switch t := conv.FromColumnType(ct); t {
 
 	case types.Bool:
 		switch cmpOp {

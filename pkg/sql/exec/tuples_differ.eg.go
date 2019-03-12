@@ -15,6 +15,7 @@ package exec
 import (
 	"bytes"
 
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
@@ -23,7 +24,7 @@ import (
 // tuplesDiffer takes in two ColVecs as well as tuple indices to check whether
 // the tuples differ.
 func tuplesDiffer(
-	t types.T, aColVec ColVec, aTupleIdx int, bColVec ColVec, bTupleIdx int, differ *bool,
+	t types.T, aColVec coldata.Vec, aTupleIdx int, bColVec coldata.Vec, bTupleIdx int, differ *bool,
 ) error {
 	switch t {
 	case types.Bool:

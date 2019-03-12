@@ -14,6 +14,7 @@ package exec
 
 import (
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/pkg/errors"
 )
@@ -53,7 +54,7 @@ type anyNotNullBoolAgg struct {
 	curIdx int
 }
 
-func (a *anyNotNullBoolAgg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Bool()
 	a.Reset()
@@ -73,7 +74,7 @@ func (a *anyNotNullBoolAgg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullBoolAgg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -113,7 +114,7 @@ type anyNotNullBytesAgg struct {
 	curIdx int
 }
 
-func (a *anyNotNullBytesAgg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Bytes()
 	a.Reset()
@@ -133,7 +134,7 @@ func (a *anyNotNullBytesAgg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullBytesAgg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -173,7 +174,7 @@ type anyNotNullDecimalAgg struct {
 	curIdx int
 }
 
-func (a *anyNotNullDecimalAgg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Decimal()
 	a.Reset()
@@ -193,7 +194,7 @@ func (a *anyNotNullDecimalAgg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullDecimalAgg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -233,7 +234,7 @@ type anyNotNullInt8Agg struct {
 	curIdx int
 }
 
-func (a *anyNotNullInt8Agg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullInt8Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int8()
 	a.Reset()
@@ -253,7 +254,7 @@ func (a *anyNotNullInt8Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullInt8Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -293,7 +294,7 @@ type anyNotNullInt16Agg struct {
 	curIdx int
 }
 
-func (a *anyNotNullInt16Agg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int16()
 	a.Reset()
@@ -313,7 +314,7 @@ func (a *anyNotNullInt16Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullInt16Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -353,7 +354,7 @@ type anyNotNullInt32Agg struct {
 	curIdx int
 }
 
-func (a *anyNotNullInt32Agg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int32()
 	a.Reset()
@@ -373,7 +374,7 @@ func (a *anyNotNullInt32Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullInt32Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -413,7 +414,7 @@ type anyNotNullInt64Agg struct {
 	curIdx int
 }
 
-func (a *anyNotNullInt64Agg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int64()
 	a.Reset()
@@ -433,7 +434,7 @@ func (a *anyNotNullInt64Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullInt64Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -473,7 +474,7 @@ type anyNotNullFloat32Agg struct {
 	curIdx int
 }
 
-func (a *anyNotNullFloat32Agg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullFloat32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Float32()
 	a.Reset()
@@ -493,7 +494,7 @@ func (a *anyNotNullFloat32Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullFloat32Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -533,7 +534,7 @@ type anyNotNullFloat64Agg struct {
 	curIdx int
 }
 
-func (a *anyNotNullFloat64Agg) Init(groups []bool, vec ColVec) {
+func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Float64()
 	a.Reset()
@@ -553,7 +554,7 @@ func (a *anyNotNullFloat64Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *anyNotNullFloat64Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}

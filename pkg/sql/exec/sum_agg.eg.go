@@ -14,6 +14,7 @@ package exec
 
 import (
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
@@ -55,9 +56,9 @@ var _ aggregateFunc = &sumDecimalAgg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroDecimalBatch = make([]apd.Decimal, ColBatchSize)
+var zeroDecimalBatch = make([]apd.Decimal, coldata.BatchSize)
 
-func (a *sumDecimalAgg) Init(groups []bool, v ColVec) {
+func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Decimal()
 	a.Reset()
@@ -79,7 +80,7 @@ func (a *sumDecimalAgg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumDecimalAgg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -133,9 +134,9 @@ var _ aggregateFunc = &sumInt8Agg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroInt8Batch = make([]int8, ColBatchSize)
+var zeroInt8Batch = make([]int8, coldata.BatchSize)
 
-func (a *sumInt8Agg) Init(groups []bool, v ColVec) {
+func (a *sumInt8Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int8()
 	a.Reset()
@@ -157,7 +158,7 @@ func (a *sumInt8Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumInt8Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -207,9 +208,9 @@ var _ aggregateFunc = &sumInt16Agg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroInt16Batch = make([]int16, ColBatchSize)
+var zeroInt16Batch = make([]int16, coldata.BatchSize)
 
-func (a *sumInt16Agg) Init(groups []bool, v ColVec) {
+func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int16()
 	a.Reset()
@@ -231,7 +232,7 @@ func (a *sumInt16Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumInt16Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -281,9 +282,9 @@ var _ aggregateFunc = &sumInt32Agg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroInt32Batch = make([]int32, ColBatchSize)
+var zeroInt32Batch = make([]int32, coldata.BatchSize)
 
-func (a *sumInt32Agg) Init(groups []bool, v ColVec) {
+func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int32()
 	a.Reset()
@@ -305,7 +306,7 @@ func (a *sumInt32Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumInt32Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -355,9 +356,9 @@ var _ aggregateFunc = &sumInt64Agg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroInt64Batch = make([]int64, ColBatchSize)
+var zeroInt64Batch = make([]int64, coldata.BatchSize)
 
-func (a *sumInt64Agg) Init(groups []bool, v ColVec) {
+func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int64()
 	a.Reset()
@@ -379,7 +380,7 @@ func (a *sumInt64Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumInt64Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -429,9 +430,9 @@ var _ aggregateFunc = &sumFloat32Agg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroFloat32Batch = make([]float32, ColBatchSize)
+var zeroFloat32Batch = make([]float32, coldata.BatchSize)
 
-func (a *sumFloat32Agg) Init(groups []bool, v ColVec) {
+func (a *sumFloat32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float32()
 	a.Reset()
@@ -453,7 +454,7 @@ func (a *sumFloat32Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumFloat32Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -503,9 +504,9 @@ var _ aggregateFunc = &sumFloat64Agg{}
 
 // TODO(asubiotto): Have all these zero batches somewhere else templated
 // separately.
-var zeroFloat64Batch = make([]float64, ColBatchSize)
+var zeroFloat64Batch = make([]float64, coldata.BatchSize)
 
-func (a *sumFloat64Agg) Init(groups []bool, v ColVec) {
+func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float64()
 	a.Reset()
@@ -527,7 +528,7 @@ func (a *sumFloat64Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *sumFloat64Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}

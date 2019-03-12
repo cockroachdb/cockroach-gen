@@ -14,6 +14,7 @@ package exec
 
 import (
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
@@ -51,7 +52,7 @@ type avgDecimalAgg struct {
 
 var _ aggregateFunc = &avgDecimalAgg{}
 
-func (a *avgDecimalAgg) Init(groups []bool, v ColVec) {
+func (a *avgDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Decimal()
 	a.scratch.groupSums = make([]apd.Decimal, len(a.scratch.vec))
@@ -81,7 +82,7 @@ func (a *avgDecimalAgg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *avgDecimalAgg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -154,7 +155,7 @@ type avgFloat32Agg struct {
 
 var _ aggregateFunc = &avgFloat32Agg{}
 
-func (a *avgFloat32Agg) Init(groups []bool, v ColVec) {
+func (a *avgFloat32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float32()
 	a.scratch.groupSums = make([]float32, len(a.scratch.vec))
@@ -184,7 +185,7 @@ func (a *avgFloat32Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *avgFloat32Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *avgFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}
@@ -247,7 +248,7 @@ type avgFloat64Agg struct {
 
 var _ aggregateFunc = &avgFloat64Agg{}
 
-func (a *avgFloat64Agg) Init(groups []bool, v ColVec) {
+func (a *avgFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float64()
 	a.scratch.groupSums = make([]float64, len(a.scratch.vec))
@@ -277,7 +278,7 @@ func (a *avgFloat64Agg) SetOutputIndex(idx int) {
 	}
 }
 
-func (a *avgFloat64Agg) Compute(b ColBatch, inputIdxs []uint32) {
+func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if a.done {
 		return
 	}

@@ -16,6 +16,7 @@ import (
 	"bytes"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
@@ -27,7 +28,7 @@ import (
 func orderedDistinctColsToOperators(
 	input Operator, distinctCols []uint32, typs []types.T,
 ) (Operator, []bool, error) {
-	distinctCol := make([]bool, ColBatchSize)
+	distinctCol := make([]bool, coldata.BatchSize)
 	var err error
 	for i := range distinctCols {
 		input, err = newSingleOrderedDistinct(input, int(distinctCols[i]), distinctCol, typs[i])
@@ -115,11 +116,11 @@ func newSingleOrderedDistinct(
 }
 
 // partitioner is a simple implementation of sorted distinct that's useful for
-// other operators that need to partition an arbitrarily-sized ColVec.
+// other operators that need to partition an arbitrarily-sized Vec.
 type partitioner interface {
 	// partition partitions the input colVec of size n, writing true to the
 	// outputCol for every value that differs from the previous one.
-	partition(colVec ColVec, outputCol []bool, n uint64)
+	partition(colVec coldata.Vec, outputCol []bool, n uint64)
 }
 
 // newPartitioner returns a new partitioner on type t.
@@ -177,7 +178,7 @@ func (p *sortedDistinctBoolOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctBoolOp) Next() ColBatch {
+func (p *sortedDistinctBoolOp) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -245,7 +246,7 @@ func (p *sortedDistinctBoolOp) Next() ColBatch {
 // input column.
 type partitionerBool struct{}
 
-func (p partitionerBool) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Bool()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -289,7 +290,7 @@ func (p *sortedDistinctBytesOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctBytesOp) Next() ColBatch {
+func (p *sortedDistinctBytesOp) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -357,7 +358,7 @@ func (p *sortedDistinctBytesOp) Next() ColBatch {
 // input column.
 type partitionerBytes struct{}
 
-func (p partitionerBytes) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Bytes()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -401,7 +402,7 @@ func (p *sortedDistinctDecimalOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctDecimalOp) Next() ColBatch {
+func (p *sortedDistinctDecimalOp) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -469,7 +470,7 @@ func (p *sortedDistinctDecimalOp) Next() ColBatch {
 // input column.
 type partitionerDecimal struct{}
 
-func (p partitionerDecimal) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Decimal()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -513,7 +514,7 @@ func (p *sortedDistinctInt8Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt8Op) Next() ColBatch {
+func (p *sortedDistinctInt8Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -581,7 +582,7 @@ func (p *sortedDistinctInt8Op) Next() ColBatch {
 // input column.
 type partitionerInt8 struct{}
 
-func (p partitionerInt8) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Int8()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -625,7 +626,7 @@ func (p *sortedDistinctInt16Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt16Op) Next() ColBatch {
+func (p *sortedDistinctInt16Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -693,7 +694,7 @@ func (p *sortedDistinctInt16Op) Next() ColBatch {
 // input column.
 type partitionerInt16 struct{}
 
-func (p partitionerInt16) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Int16()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -737,7 +738,7 @@ func (p *sortedDistinctInt32Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt32Op) Next() ColBatch {
+func (p *sortedDistinctInt32Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -805,7 +806,7 @@ func (p *sortedDistinctInt32Op) Next() ColBatch {
 // input column.
 type partitionerInt32 struct{}
 
-func (p partitionerInt32) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Int32()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -849,7 +850,7 @@ func (p *sortedDistinctInt64Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt64Op) Next() ColBatch {
+func (p *sortedDistinctInt64Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -917,7 +918,7 @@ func (p *sortedDistinctInt64Op) Next() ColBatch {
 // input column.
 type partitionerInt64 struct{}
 
-func (p partitionerInt64) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Int64()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -961,7 +962,7 @@ func (p *sortedDistinctFloat32Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctFloat32Op) Next() ColBatch {
+func (p *sortedDistinctFloat32Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -1029,7 +1030,7 @@ func (p *sortedDistinctFloat32Op) Next() ColBatch {
 // input column.
 type partitionerFloat32 struct{}
 
-func (p partitionerFloat32) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerFloat32) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Float32()
 	lastVal := col[0]
 	outputCol[0] = true
@@ -1073,7 +1074,7 @@ func (p *sortedDistinctFloat64Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctFloat64Op) Next() ColBatch {
+func (p *sortedDistinctFloat64Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
 		return batch
@@ -1141,7 +1142,7 @@ func (p *sortedDistinctFloat64Op) Next() ColBatch {
 // input column.
 type partitionerFloat64 struct{}
 
-func (p partitionerFloat64) partition(colVec ColVec, outputCol []bool, n uint64) {
+func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
 	col := colVec.Float64()
 	lastVal := col[0]
 	outputCol[0] = true
