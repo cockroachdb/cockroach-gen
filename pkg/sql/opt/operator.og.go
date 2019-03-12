@@ -704,6 +704,9 @@ const (
 	//   Left:  [2, 1]
 	//   Right: [4, 3]
 	//   Out:   [5, 6]  <-- synthesized output columns
+	//
+	// To make normalization rules and execution simpler, both inputs to the set op
+	// must have matching types.
 	SetPrivateOp
 
 	// ShowTraceForSession returns the current session traces.
