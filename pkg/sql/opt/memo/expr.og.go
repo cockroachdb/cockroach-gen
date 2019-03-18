@@ -3,7 +3,6 @@
 package memo
 
 import (
-	"fmt"
 	"unsafe"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
@@ -11,6 +10,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
+	"github.com/cockroachdb/cockroach/pkg/sql/pgwire/pgerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
 )
@@ -36,7 +36,7 @@ func (e *SortExpr) Child(nth int) opt.Expr {
 	if nth == 0 {
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SortExpr) Private() interface{} {
@@ -54,7 +54,7 @@ func (e *SortExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SortExpr) Memo() *Memo {
@@ -94,11 +94,11 @@ func (e *SortExpr) group() exprGroup {
 }
 
 func (e *SortExpr) setNext(member RelExpr) {
-	panic("setNext cannot be called on enforcers")
+	panic(pgerror.NewAssertionErrorf("setNext cannot be called on enforcers"))
 }
 
 func (e *SortExpr) setGroup(member exprGroup) {
-	panic("setGroup cannot be called on enforcers")
+	panic(pgerror.NewAssertionErrorf("setGroup cannot be called on enforcers"))
 }
 
 // ScanExpr returns a result set containing every row in a table by scanning one of
@@ -127,7 +127,7 @@ func (e *ScanExpr) ChildCount() int {
 }
 
 func (e *ScanExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ScanExpr) Private() interface{} {
@@ -141,7 +141,7 @@ func (e *ScanExpr) String() string {
 }
 
 func (e *ScanExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ScanExpr) Memo() *Memo {
@@ -182,14 +182,14 @@ func (e *ScanExpr) bestProps() *bestProps {
 
 func (e *ScanExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ScanExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -279,7 +279,7 @@ func (e *VirtualScanExpr) ChildCount() int {
 }
 
 func (e *VirtualScanExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *VirtualScanExpr) Private() interface{} {
@@ -293,7 +293,7 @@ func (e *VirtualScanExpr) String() string {
 }
 
 func (e *VirtualScanExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *VirtualScanExpr) Memo() *Memo {
@@ -334,14 +334,14 @@ func (e *VirtualScanExpr) bestProps() *bestProps {
 
 func (e *VirtualScanExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *VirtualScanExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -406,7 +406,7 @@ func (e *SequenceSelectExpr) ChildCount() int {
 }
 
 func (e *SequenceSelectExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SequenceSelectExpr) Private() interface{} {
@@ -420,7 +420,7 @@ func (e *SequenceSelectExpr) String() string {
 }
 
 func (e *SequenceSelectExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SequenceSelectExpr) Memo() *Memo {
@@ -461,14 +461,14 @@ func (e *SequenceSelectExpr) bestProps() *bestProps {
 
 func (e *SequenceSelectExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *SequenceSelectExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -539,7 +539,7 @@ func (e *ValuesExpr) Child(nth int) opt.Expr {
 	case 0:
 		return &e.Rows
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ValuesExpr) Private() interface{} {
@@ -558,7 +558,7 @@ func (e *ValuesExpr) SetChild(nth int, child opt.Expr) {
 		e.Rows = *child.(*ScalarListExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ValuesExpr) Memo() *Memo {
@@ -599,14 +599,14 @@ func (e *ValuesExpr) bestProps() *bestProps {
 
 func (e *ValuesExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ValuesExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -677,7 +677,7 @@ func (e *SelectExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.Filters
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SelectExpr) Private() interface{} {
@@ -699,7 +699,7 @@ func (e *SelectExpr) SetChild(nth int, child opt.Expr) {
 		e.Filters = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SelectExpr) Memo() *Memo {
@@ -740,14 +740,14 @@ func (e *SelectExpr) bestProps() *bestProps {
 
 func (e *SelectExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *SelectExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -811,7 +811,7 @@ func (e *ProjectExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.Projections
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ProjectExpr) Private() interface{} {
@@ -833,7 +833,7 @@ func (e *ProjectExpr) SetChild(nth int, child opt.Expr) {
 		e.Projections = *child.(*ProjectionsExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ProjectExpr) Memo() *Memo {
@@ -874,14 +874,14 @@ func (e *ProjectExpr) bestProps() *bestProps {
 
 func (e *ProjectExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ProjectExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -946,7 +946,7 @@ func (e *InnerJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InnerJoinExpr) Private() interface{} {
@@ -971,7 +971,7 @@ func (e *InnerJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InnerJoinExpr) Memo() *Memo {
@@ -1012,14 +1012,14 @@ func (e *InnerJoinExpr) bestProps() *bestProps {
 
 func (e *InnerJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *InnerJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1079,7 +1079,7 @@ func (e *LeftJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LeftJoinExpr) Private() interface{} {
@@ -1104,7 +1104,7 @@ func (e *LeftJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LeftJoinExpr) Memo() *Memo {
@@ -1145,14 +1145,14 @@ func (e *LeftJoinExpr) bestProps() *bestProps {
 
 func (e *LeftJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *LeftJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1212,7 +1212,7 @@ func (e *RightJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RightJoinExpr) Private() interface{} {
@@ -1237,7 +1237,7 @@ func (e *RightJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RightJoinExpr) Memo() *Memo {
@@ -1278,14 +1278,14 @@ func (e *RightJoinExpr) bestProps() *bestProps {
 
 func (e *RightJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *RightJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1345,7 +1345,7 @@ func (e *FullJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FullJoinExpr) Private() interface{} {
@@ -1370,7 +1370,7 @@ func (e *FullJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FullJoinExpr) Memo() *Memo {
@@ -1411,14 +1411,14 @@ func (e *FullJoinExpr) bestProps() *bestProps {
 
 func (e *FullJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *FullJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1478,7 +1478,7 @@ func (e *SemiJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SemiJoinExpr) Private() interface{} {
@@ -1503,7 +1503,7 @@ func (e *SemiJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SemiJoinExpr) Memo() *Memo {
@@ -1544,14 +1544,14 @@ func (e *SemiJoinExpr) bestProps() *bestProps {
 
 func (e *SemiJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *SemiJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1611,7 +1611,7 @@ func (e *AntiJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AntiJoinExpr) Private() interface{} {
@@ -1636,7 +1636,7 @@ func (e *AntiJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AntiJoinExpr) Memo() *Memo {
@@ -1677,14 +1677,14 @@ func (e *AntiJoinExpr) bestProps() *bestProps {
 
 func (e *AntiJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *AntiJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1752,7 +1752,7 @@ func (e *IndexJoinExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IndexJoinExpr) Private() interface{} {
@@ -1771,7 +1771,7 @@ func (e *IndexJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IndexJoinExpr) Memo() *Memo {
@@ -1812,14 +1812,14 @@ func (e *IndexJoinExpr) bestProps() *bestProps {
 
 func (e *IndexJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *IndexJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -1888,7 +1888,7 @@ func (e *LookupJoinExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LookupJoinExpr) Private() interface{} {
@@ -1910,7 +1910,7 @@ func (e *LookupJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LookupJoinExpr) Memo() *Memo {
@@ -1951,14 +1951,14 @@ func (e *LookupJoinExpr) bestProps() *bestProps {
 
 func (e *LookupJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *LookupJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2059,7 +2059,7 @@ func (e *MergeJoinExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MergeJoinExpr) Private() interface{} {
@@ -2084,7 +2084,7 @@ func (e *MergeJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MergeJoinExpr) Memo() *Memo {
@@ -2125,14 +2125,14 @@ func (e *MergeJoinExpr) bestProps() *bestProps {
 
 func (e *MergeJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *MergeJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2217,7 +2217,7 @@ func (e *ZigzagJoinExpr) Child(nth int) opt.Expr {
 	case 0:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ZigzagJoinExpr) Private() interface{} {
@@ -2236,7 +2236,7 @@ func (e *ZigzagJoinExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ZigzagJoinExpr) Memo() *Memo {
@@ -2277,14 +2277,14 @@ func (e *ZigzagJoinExpr) bestProps() *bestProps {
 
 func (e *ZigzagJoinExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ZigzagJoinExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2390,7 +2390,7 @@ func (e *InnerJoinApplyExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InnerJoinApplyExpr) Private() interface{} {
@@ -2415,7 +2415,7 @@ func (e *InnerJoinApplyExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InnerJoinApplyExpr) Memo() *Memo {
@@ -2456,14 +2456,14 @@ func (e *InnerJoinApplyExpr) bestProps() *bestProps {
 
 func (e *InnerJoinApplyExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *InnerJoinApplyExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2523,7 +2523,7 @@ func (e *LeftJoinApplyExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LeftJoinApplyExpr) Private() interface{} {
@@ -2548,7 +2548,7 @@ func (e *LeftJoinApplyExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LeftJoinApplyExpr) Memo() *Memo {
@@ -2589,14 +2589,14 @@ func (e *LeftJoinApplyExpr) bestProps() *bestProps {
 
 func (e *LeftJoinApplyExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *LeftJoinApplyExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2656,7 +2656,7 @@ func (e *RightJoinApplyExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RightJoinApplyExpr) Private() interface{} {
@@ -2681,7 +2681,7 @@ func (e *RightJoinApplyExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RightJoinApplyExpr) Memo() *Memo {
@@ -2722,14 +2722,14 @@ func (e *RightJoinApplyExpr) bestProps() *bestProps {
 
 func (e *RightJoinApplyExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *RightJoinApplyExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2789,7 +2789,7 @@ func (e *FullJoinApplyExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FullJoinApplyExpr) Private() interface{} {
@@ -2814,7 +2814,7 @@ func (e *FullJoinApplyExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FullJoinApplyExpr) Memo() *Memo {
@@ -2855,14 +2855,14 @@ func (e *FullJoinApplyExpr) bestProps() *bestProps {
 
 func (e *FullJoinApplyExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *FullJoinApplyExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -2922,7 +2922,7 @@ func (e *SemiJoinApplyExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SemiJoinApplyExpr) Private() interface{} {
@@ -2947,7 +2947,7 @@ func (e *SemiJoinApplyExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SemiJoinApplyExpr) Memo() *Memo {
@@ -2988,14 +2988,14 @@ func (e *SemiJoinApplyExpr) bestProps() *bestProps {
 
 func (e *SemiJoinApplyExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *SemiJoinApplyExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3055,7 +3055,7 @@ func (e *AntiJoinApplyExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.On
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AntiJoinApplyExpr) Private() interface{} {
@@ -3080,7 +3080,7 @@ func (e *AntiJoinApplyExpr) SetChild(nth int, child opt.Expr) {
 		e.On = *child.(*FiltersExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AntiJoinApplyExpr) Memo() *Memo {
@@ -3121,14 +3121,14 @@ func (e *AntiJoinApplyExpr) bestProps() *bestProps {
 
 func (e *AntiJoinApplyExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *AntiJoinApplyExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3203,7 +3203,7 @@ func (e *GroupByExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.Aggregations
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *GroupByExpr) Private() interface{} {
@@ -3225,7 +3225,7 @@ func (e *GroupByExpr) SetChild(nth int, child opt.Expr) {
 		e.Aggregations = *child.(*AggregationsExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *GroupByExpr) Memo() *Memo {
@@ -3266,14 +3266,14 @@ func (e *GroupByExpr) bestProps() *bestProps {
 
 func (e *GroupByExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *GroupByExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3365,7 +3365,7 @@ func (e *ScalarGroupByExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.Aggregations
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ScalarGroupByExpr) Private() interface{} {
@@ -3387,7 +3387,7 @@ func (e *ScalarGroupByExpr) SetChild(nth int, child opt.Expr) {
 		e.Aggregations = *child.(*AggregationsExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ScalarGroupByExpr) Memo() *Memo {
@@ -3428,14 +3428,14 @@ func (e *ScalarGroupByExpr) bestProps() *bestProps {
 
 func (e *ScalarGroupByExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ScalarGroupByExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3526,7 +3526,7 @@ func (e *DistinctOnExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.Aggregations
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *DistinctOnExpr) Private() interface{} {
@@ -3548,7 +3548,7 @@ func (e *DistinctOnExpr) SetChild(nth int, child opt.Expr) {
 		e.Aggregations = *child.(*AggregationsExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *DistinctOnExpr) Memo() *Memo {
@@ -3589,14 +3589,14 @@ func (e *DistinctOnExpr) bestProps() *bestProps {
 
 func (e *DistinctOnExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *DistinctOnExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3658,7 +3658,7 @@ func (e *UnionExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnionExpr) Private() interface{} {
@@ -3680,7 +3680,7 @@ func (e *UnionExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnionExpr) Memo() *Memo {
@@ -3721,14 +3721,14 @@ func (e *UnionExpr) bestProps() *bestProps {
 
 func (e *UnionExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *UnionExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3820,7 +3820,7 @@ func (e *IntersectExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IntersectExpr) Private() interface{} {
@@ -3842,7 +3842,7 @@ func (e *IntersectExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IntersectExpr) Memo() *Memo {
@@ -3883,14 +3883,14 @@ func (e *IntersectExpr) bestProps() *bestProps {
 
 func (e *IntersectExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *IntersectExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -3952,7 +3952,7 @@ func (e *ExceptExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExceptExpr) Private() interface{} {
@@ -3974,7 +3974,7 @@ func (e *ExceptExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExceptExpr) Memo() *Memo {
@@ -4015,14 +4015,14 @@ func (e *ExceptExpr) bestProps() *bestProps {
 
 func (e *ExceptExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ExceptExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4096,7 +4096,7 @@ func (e *UnionAllExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnionAllExpr) Private() interface{} {
@@ -4118,7 +4118,7 @@ func (e *UnionAllExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnionAllExpr) Memo() *Memo {
@@ -4159,14 +4159,14 @@ func (e *UnionAllExpr) bestProps() *bestProps {
 
 func (e *UnionAllExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *UnionAllExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4242,7 +4242,7 @@ func (e *IntersectAllExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IntersectAllExpr) Private() interface{} {
@@ -4264,7 +4264,7 @@ func (e *IntersectAllExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IntersectAllExpr) Memo() *Memo {
@@ -4305,14 +4305,14 @@ func (e *IntersectAllExpr) bestProps() *bestProps {
 
 func (e *IntersectAllExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *IntersectAllExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4387,7 +4387,7 @@ func (e *ExceptAllExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExceptAllExpr) Private() interface{} {
@@ -4409,7 +4409,7 @@ func (e *ExceptAllExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExceptAllExpr) Memo() *Memo {
@@ -4450,14 +4450,14 @@ func (e *ExceptAllExpr) bestProps() *bestProps {
 
 func (e *ExceptAllExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ExceptAllExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4519,7 +4519,7 @@ func (e *LimitExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Limit
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LimitExpr) Private() interface{} {
@@ -4541,7 +4541,7 @@ func (e *LimitExpr) SetChild(nth int, child opt.Expr) {
 		e.Limit = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LimitExpr) Memo() *Memo {
@@ -4582,14 +4582,14 @@ func (e *LimitExpr) bestProps() *bestProps {
 
 func (e *LimitExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *LimitExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4648,7 +4648,7 @@ func (e *OffsetExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Offset
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *OffsetExpr) Private() interface{} {
@@ -4670,7 +4670,7 @@ func (e *OffsetExpr) SetChild(nth int, child opt.Expr) {
 		e.Offset = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *OffsetExpr) Memo() *Memo {
@@ -4711,14 +4711,14 @@ func (e *OffsetExpr) bestProps() *bestProps {
 
 func (e *OffsetExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *OffsetExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4774,7 +4774,7 @@ func (e *Max1RowExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *Max1RowExpr) Private() interface{} {
@@ -4793,7 +4793,7 @@ func (e *Max1RowExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *Max1RowExpr) Memo() *Memo {
@@ -4834,14 +4834,14 @@ func (e *Max1RowExpr) bestProps() *bestProps {
 
 func (e *Max1RowExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *Max1RowExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -4897,7 +4897,7 @@ func (e *ExplainExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExplainExpr) Private() interface{} {
@@ -4916,7 +4916,7 @@ func (e *ExplainExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExplainExpr) Memo() *Memo {
@@ -4957,14 +4957,14 @@ func (e *ExplainExpr) bestProps() *bestProps {
 
 func (e *ExplainExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ExplainExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -5028,7 +5028,7 @@ func (e *ShowTraceForSessionExpr) ChildCount() int {
 }
 
 func (e *ShowTraceForSessionExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ShowTraceForSessionExpr) Private() interface{} {
@@ -5042,7 +5042,7 @@ func (e *ShowTraceForSessionExpr) String() string {
 }
 
 func (e *ShowTraceForSessionExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ShowTraceForSessionExpr) Memo() *Memo {
@@ -5083,14 +5083,14 @@ func (e *ShowTraceForSessionExpr) bestProps() *bestProps {
 
 func (e *ShowTraceForSessionExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ShowTraceForSessionExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -5157,7 +5157,7 @@ func (e *RowNumberExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RowNumberExpr) Private() interface{} {
@@ -5176,7 +5176,7 @@ func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RowNumberExpr) Memo() *Memo {
@@ -5217,14 +5217,14 @@ func (e *RowNumberExpr) bestProps() *bestProps {
 
 func (e *RowNumberExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *RowNumberExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -5303,7 +5303,7 @@ func (e *ProjectSetExpr) Child(nth int) opt.Expr {
 	case 1:
 		return &e.Zip
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ProjectSetExpr) Private() interface{} {
@@ -5325,7 +5325,7 @@ func (e *ProjectSetExpr) SetChild(nth int, child opt.Expr) {
 		e.Zip = *child.(*ZipExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ProjectSetExpr) Memo() *Memo {
@@ -5366,14 +5366,14 @@ func (e *ProjectSetExpr) bestProps() *bestProps {
 
 func (e *ProjectSetExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *ProjectSetExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -5448,7 +5448,7 @@ func (e *SubqueryExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SubqueryExpr) Private() interface{} {
@@ -5467,7 +5467,7 @@ func (e *SubqueryExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SubqueryExpr) DataType() types.T {
@@ -5544,7 +5544,7 @@ func (e *AnyExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Scalar
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AnyExpr) Private() interface{} {
@@ -5566,7 +5566,7 @@ func (e *AnyExpr) SetChild(nth int, child opt.Expr) {
 		e.Scalar = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AnyExpr) DataType() types.T {
@@ -5601,7 +5601,7 @@ func (e *ExistsExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExistsExpr) Private() interface{} {
@@ -5620,7 +5620,7 @@ func (e *ExistsExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ExistsExpr) DataType() types.T {
@@ -5651,7 +5651,7 @@ func (e *VariableExpr) ChildCount() int {
 }
 
 func (e *VariableExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *VariableExpr) Private() interface{} {
@@ -5665,7 +5665,7 @@ func (e *VariableExpr) String() string {
 }
 
 func (e *VariableExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *VariableExpr) DataType() types.T {
@@ -5696,7 +5696,7 @@ func (e *ConstExpr) ChildCount() int {
 }
 
 func (e *ConstExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConstExpr) Private() interface{} {
@@ -5710,7 +5710,7 @@ func (e *ConstExpr) String() string {
 }
 
 func (e *ConstExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConstExpr) DataType() types.T {
@@ -5754,7 +5754,7 @@ func (e *NullExpr) ChildCount() int {
 }
 
 func (e *NullExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NullExpr) Private() interface{} {
@@ -5768,7 +5768,7 @@ func (e *NullExpr) String() string {
 }
 
 func (e *NullExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NullExpr) DataType() types.T {
@@ -5797,7 +5797,7 @@ func (e *TrueExpr) ChildCount() int {
 }
 
 func (e *TrueExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *TrueExpr) Private() interface{} {
@@ -5811,7 +5811,7 @@ func (e *TrueExpr) String() string {
 }
 
 func (e *TrueExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *TrueExpr) DataType() types.T {
@@ -5840,7 +5840,7 @@ func (e *FalseExpr) ChildCount() int {
 }
 
 func (e *FalseExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FalseExpr) Private() interface{} {
@@ -5854,7 +5854,7 @@ func (e *FalseExpr) String() string {
 }
 
 func (e *FalseExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FalseExpr) DataType() types.T {
@@ -5883,7 +5883,7 @@ func (e *PlaceholderExpr) ChildCount() int {
 }
 
 func (e *PlaceholderExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *PlaceholderExpr) Private() interface{} {
@@ -5897,7 +5897,7 @@ func (e *PlaceholderExpr) String() string {
 }
 
 func (e *PlaceholderExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *PlaceholderExpr) DataType() types.T {
@@ -5930,7 +5930,7 @@ func (e *TupleExpr) Child(nth int) opt.Expr {
 	case 0:
 		return &e.Elems
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *TupleExpr) Private() interface{} {
@@ -5949,7 +5949,7 @@ func (e *TupleExpr) SetChild(nth int, child opt.Expr) {
 		e.Elems = *child.(*ScalarListExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *TupleExpr) DataType() types.T {
@@ -5967,7 +5967,7 @@ var EmptyProjectionsExpr = ProjectionsExpr{}
 var _ opt.ScalarExpr = &ProjectionsExpr{}
 
 func (e *ProjectionsExpr) ID() opt.ScalarID {
-	panic("lists have no id")
+	panic(pgerror.NewAssertionErrorf("lists have no id"))
 }
 
 func (e *ProjectionsExpr) Op() opt.Operator {
@@ -6040,7 +6040,7 @@ func (e *ProjectionsItem) Child(nth int) opt.Expr {
 	case 0:
 		return e.Element
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ProjectionsItem) Private() interface{} {
@@ -6059,7 +6059,7 @@ func (e *ProjectionsItem) SetChild(nth int, child opt.Expr) {
 		e.Element = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ProjectionsItem) DataType() types.T {
@@ -6096,7 +6096,7 @@ var EmptyAggregationsExpr = AggregationsExpr{}
 var _ opt.ScalarExpr = &AggregationsExpr{}
 
 func (e *AggregationsExpr) ID() opt.ScalarID {
-	panic("lists have no id")
+	panic(pgerror.NewAssertionErrorf("lists have no id"))
 }
 
 func (e *AggregationsExpr) Op() opt.Operator {
@@ -6171,7 +6171,7 @@ func (e *AggregationsItem) Child(nth int) opt.Expr {
 	case 0:
 		return e.Agg
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AggregationsItem) Private() interface{} {
@@ -6190,7 +6190,7 @@ func (e *AggregationsItem) SetChild(nth int, child opt.Expr) {
 		e.Agg = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AggregationsItem) DataType() types.T {
@@ -6216,7 +6216,7 @@ var EmptyFiltersExpr = FiltersExpr{}
 var _ opt.ScalarExpr = &FiltersExpr{}
 
 func (e *FiltersExpr) ID() opt.ScalarID {
-	panic("lists have no id")
+	panic(pgerror.NewAssertionErrorf("lists have no id"))
 }
 
 func (e *FiltersExpr) Op() opt.Operator {
@@ -6280,7 +6280,7 @@ func (e *FiltersItem) Child(nth int) opt.Expr {
 	case 0:
 		return e.Condition
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FiltersItem) Private() interface{} {
@@ -6299,7 +6299,7 @@ func (e *FiltersItem) SetChild(nth int, child opt.Expr) {
 		e.Condition = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FiltersItem) DataType() types.T {
@@ -6343,7 +6343,7 @@ var EmptyZipExpr = ZipExpr{}
 var _ opt.ScalarExpr = &ZipExpr{}
 
 func (e *ZipExpr) ID() opt.ScalarID {
-	panic("lists have no id")
+	panic(pgerror.NewAssertionErrorf("lists have no id"))
 }
 
 func (e *ZipExpr) Op() opt.Operator {
@@ -6405,7 +6405,7 @@ func (e *ZipItem) Child(nth int) opt.Expr {
 	case 0:
 		return e.Func
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ZipItem) Private() interface{} {
@@ -6424,7 +6424,7 @@ func (e *ZipItem) SetChild(nth int, child opt.Expr) {
 		e.Func = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ZipItem) DataType() types.T {
@@ -6480,7 +6480,7 @@ func (e *AndExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AndExpr) Private() interface{} {
@@ -6502,7 +6502,7 @@ func (e *AndExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AndExpr) DataType() types.T {
@@ -6539,7 +6539,7 @@ func (e *OrExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *OrExpr) Private() interface{} {
@@ -6561,7 +6561,7 @@ func (e *OrExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *OrExpr) DataType() types.T {
@@ -6595,7 +6595,7 @@ func (e *NotExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotExpr) Private() interface{} {
@@ -6614,7 +6614,7 @@ func (e *NotExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotExpr) DataType() types.T {
@@ -6649,7 +6649,7 @@ func (e *EqExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *EqExpr) Private() interface{} {
@@ -6671,7 +6671,7 @@ func (e *EqExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *EqExpr) DataType() types.T {
@@ -6706,7 +6706,7 @@ func (e *LtExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LtExpr) Private() interface{} {
@@ -6728,7 +6728,7 @@ func (e *LtExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LtExpr) DataType() types.T {
@@ -6763,7 +6763,7 @@ func (e *GtExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *GtExpr) Private() interface{} {
@@ -6785,7 +6785,7 @@ func (e *GtExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *GtExpr) DataType() types.T {
@@ -6820,7 +6820,7 @@ func (e *LeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LeExpr) Private() interface{} {
@@ -6842,7 +6842,7 @@ func (e *LeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LeExpr) DataType() types.T {
@@ -6877,7 +6877,7 @@ func (e *GeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *GeExpr) Private() interface{} {
@@ -6899,7 +6899,7 @@ func (e *GeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *GeExpr) DataType() types.T {
@@ -6934,7 +6934,7 @@ func (e *NeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NeExpr) Private() interface{} {
@@ -6956,7 +6956,7 @@ func (e *NeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NeExpr) DataType() types.T {
@@ -6991,7 +6991,7 @@ func (e *InExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InExpr) Private() interface{} {
@@ -7013,7 +7013,7 @@ func (e *InExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InExpr) DataType() types.T {
@@ -7048,7 +7048,7 @@ func (e *NotInExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotInExpr) Private() interface{} {
@@ -7070,7 +7070,7 @@ func (e *NotInExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotInExpr) DataType() types.T {
@@ -7105,7 +7105,7 @@ func (e *LikeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LikeExpr) Private() interface{} {
@@ -7127,7 +7127,7 @@ func (e *LikeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LikeExpr) DataType() types.T {
@@ -7162,7 +7162,7 @@ func (e *NotLikeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotLikeExpr) Private() interface{} {
@@ -7184,7 +7184,7 @@ func (e *NotLikeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotLikeExpr) DataType() types.T {
@@ -7219,7 +7219,7 @@ func (e *ILikeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ILikeExpr) Private() interface{} {
@@ -7241,7 +7241,7 @@ func (e *ILikeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ILikeExpr) DataType() types.T {
@@ -7276,7 +7276,7 @@ func (e *NotILikeExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotILikeExpr) Private() interface{} {
@@ -7298,7 +7298,7 @@ func (e *NotILikeExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotILikeExpr) DataType() types.T {
@@ -7333,7 +7333,7 @@ func (e *SimilarToExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SimilarToExpr) Private() interface{} {
@@ -7355,7 +7355,7 @@ func (e *SimilarToExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SimilarToExpr) DataType() types.T {
@@ -7390,7 +7390,7 @@ func (e *NotSimilarToExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotSimilarToExpr) Private() interface{} {
@@ -7412,7 +7412,7 @@ func (e *NotSimilarToExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotSimilarToExpr) DataType() types.T {
@@ -7447,7 +7447,7 @@ func (e *RegMatchExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RegMatchExpr) Private() interface{} {
@@ -7469,7 +7469,7 @@ func (e *RegMatchExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RegMatchExpr) DataType() types.T {
@@ -7504,7 +7504,7 @@ func (e *NotRegMatchExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotRegMatchExpr) Private() interface{} {
@@ -7526,7 +7526,7 @@ func (e *NotRegMatchExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotRegMatchExpr) DataType() types.T {
@@ -7561,7 +7561,7 @@ func (e *RegIMatchExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RegIMatchExpr) Private() interface{} {
@@ -7583,7 +7583,7 @@ func (e *RegIMatchExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RegIMatchExpr) DataType() types.T {
@@ -7618,7 +7618,7 @@ func (e *NotRegIMatchExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotRegIMatchExpr) Private() interface{} {
@@ -7640,7 +7640,7 @@ func (e *NotRegIMatchExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *NotRegIMatchExpr) DataType() types.T {
@@ -7675,7 +7675,7 @@ func (e *IsExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IsExpr) Private() interface{} {
@@ -7697,7 +7697,7 @@ func (e *IsExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IsExpr) DataType() types.T {
@@ -7732,7 +7732,7 @@ func (e *IsNotExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IsNotExpr) Private() interface{} {
@@ -7754,7 +7754,7 @@ func (e *IsNotExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IsNotExpr) DataType() types.T {
@@ -7789,7 +7789,7 @@ func (e *ContainsExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ContainsExpr) Private() interface{} {
@@ -7811,7 +7811,7 @@ func (e *ContainsExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ContainsExpr) DataType() types.T {
@@ -7846,7 +7846,7 @@ func (e *JsonExistsExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonExistsExpr) Private() interface{} {
@@ -7868,7 +7868,7 @@ func (e *JsonExistsExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonExistsExpr) DataType() types.T {
@@ -7903,7 +7903,7 @@ func (e *JsonAllExistsExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonAllExistsExpr) Private() interface{} {
@@ -7925,7 +7925,7 @@ func (e *JsonAllExistsExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonAllExistsExpr) DataType() types.T {
@@ -7960,7 +7960,7 @@ func (e *JsonSomeExistsExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonSomeExistsExpr) Private() interface{} {
@@ -7982,7 +7982,7 @@ func (e *JsonSomeExistsExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonSomeExistsExpr) DataType() types.T {
@@ -8020,7 +8020,7 @@ func (e *AnyScalarExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AnyScalarExpr) Private() interface{} {
@@ -8042,7 +8042,7 @@ func (e *AnyScalarExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AnyScalarExpr) DataType() types.T {
@@ -8078,7 +8078,7 @@ func (e *BitandExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BitandExpr) Private() interface{} {
@@ -8100,7 +8100,7 @@ func (e *BitandExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BitandExpr) DataType() types.T {
@@ -8136,7 +8136,7 @@ func (e *BitorExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BitorExpr) Private() interface{} {
@@ -8158,7 +8158,7 @@ func (e *BitorExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BitorExpr) DataType() types.T {
@@ -8194,7 +8194,7 @@ func (e *BitxorExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BitxorExpr) Private() interface{} {
@@ -8216,7 +8216,7 @@ func (e *BitxorExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BitxorExpr) DataType() types.T {
@@ -8252,7 +8252,7 @@ func (e *PlusExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *PlusExpr) Private() interface{} {
@@ -8274,7 +8274,7 @@ func (e *PlusExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *PlusExpr) DataType() types.T {
@@ -8310,7 +8310,7 @@ func (e *MinusExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MinusExpr) Private() interface{} {
@@ -8332,7 +8332,7 @@ func (e *MinusExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MinusExpr) DataType() types.T {
@@ -8368,7 +8368,7 @@ func (e *MultExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MultExpr) Private() interface{} {
@@ -8390,7 +8390,7 @@ func (e *MultExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MultExpr) DataType() types.T {
@@ -8426,7 +8426,7 @@ func (e *DivExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *DivExpr) Private() interface{} {
@@ -8448,7 +8448,7 @@ func (e *DivExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *DivExpr) DataType() types.T {
@@ -8484,7 +8484,7 @@ func (e *FloorDivExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FloorDivExpr) Private() interface{} {
@@ -8506,7 +8506,7 @@ func (e *FloorDivExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FloorDivExpr) DataType() types.T {
@@ -8542,7 +8542,7 @@ func (e *ModExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ModExpr) Private() interface{} {
@@ -8564,7 +8564,7 @@ func (e *ModExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ModExpr) DataType() types.T {
@@ -8600,7 +8600,7 @@ func (e *PowExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *PowExpr) Private() interface{} {
@@ -8622,7 +8622,7 @@ func (e *PowExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *PowExpr) DataType() types.T {
@@ -8658,7 +8658,7 @@ func (e *ConcatExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConcatExpr) Private() interface{} {
@@ -8680,7 +8680,7 @@ func (e *ConcatExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConcatExpr) DataType() types.T {
@@ -8716,7 +8716,7 @@ func (e *LShiftExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LShiftExpr) Private() interface{} {
@@ -8738,7 +8738,7 @@ func (e *LShiftExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *LShiftExpr) DataType() types.T {
@@ -8774,7 +8774,7 @@ func (e *RShiftExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Right
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RShiftExpr) Private() interface{} {
@@ -8796,7 +8796,7 @@ func (e *RShiftExpr) SetChild(nth int, child opt.Expr) {
 		e.Right = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *RShiftExpr) DataType() types.T {
@@ -8832,7 +8832,7 @@ func (e *FetchValExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Index
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchValExpr) Private() interface{} {
@@ -8854,7 +8854,7 @@ func (e *FetchValExpr) SetChild(nth int, child opt.Expr) {
 		e.Index = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchValExpr) DataType() types.T {
@@ -8890,7 +8890,7 @@ func (e *FetchTextExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Index
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchTextExpr) Private() interface{} {
@@ -8912,7 +8912,7 @@ func (e *FetchTextExpr) SetChild(nth int, child opt.Expr) {
 		e.Index = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchTextExpr) DataType() types.T {
@@ -8948,7 +8948,7 @@ func (e *FetchValPathExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Path
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchValPathExpr) Private() interface{} {
@@ -8970,7 +8970,7 @@ func (e *FetchValPathExpr) SetChild(nth int, child opt.Expr) {
 		e.Path = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchValPathExpr) DataType() types.T {
@@ -9006,7 +9006,7 @@ func (e *FetchTextPathExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Path
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchTextPathExpr) Private() interface{} {
@@ -9028,7 +9028,7 @@ func (e *FetchTextPathExpr) SetChild(nth int, child opt.Expr) {
 		e.Path = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FetchTextPathExpr) DataType() types.T {
@@ -9061,7 +9061,7 @@ func (e *UnaryMinusExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnaryMinusExpr) Private() interface{} {
@@ -9080,7 +9080,7 @@ func (e *UnaryMinusExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnaryMinusExpr) DataType() types.T {
@@ -9113,7 +9113,7 @@ func (e *UnaryComplementExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnaryComplementExpr) Private() interface{} {
@@ -9132,7 +9132,7 @@ func (e *UnaryComplementExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnaryComplementExpr) DataType() types.T {
@@ -9176,7 +9176,7 @@ func (e *CastExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CastExpr) Private() interface{} {
@@ -9195,7 +9195,7 @@ func (e *CastExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CastExpr) DataType() types.T {
@@ -9251,7 +9251,7 @@ func (e *IfErrExpr) Child(nth int) opt.Expr {
 	case 2:
 		return &e.ErrCode
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IfErrExpr) Private() interface{} {
@@ -9276,7 +9276,7 @@ func (e *IfErrExpr) SetChild(nth int, child opt.Expr) {
 		e.ErrCode = *child.(*ScalarListExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IfErrExpr) DataType() types.T {
@@ -9334,7 +9334,7 @@ func (e *CaseExpr) Child(nth int) opt.Expr {
 	case 2:
 		return e.OrElse
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CaseExpr) Private() interface{} {
@@ -9359,7 +9359,7 @@ func (e *CaseExpr) SetChild(nth int, child opt.Expr) {
 		e.OrElse = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CaseExpr) DataType() types.T {
@@ -9398,7 +9398,7 @@ func (e *WhenExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Value
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *WhenExpr) Private() interface{} {
@@ -9420,7 +9420,7 @@ func (e *WhenExpr) SetChild(nth int, child opt.Expr) {
 		e.Value = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *WhenExpr) DataType() types.T {
@@ -9454,7 +9454,7 @@ func (e *ArrayExpr) Child(nth int) opt.Expr {
 	case 0:
 		return &e.Elems
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ArrayExpr) Private() interface{} {
@@ -9473,7 +9473,7 @@ func (e *ArrayExpr) SetChild(nth int, child opt.Expr) {
 		e.Elems = *child.(*ScalarListExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ArrayExpr) DataType() types.T {
@@ -9512,7 +9512,7 @@ func (e *IndirectionExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Index
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IndirectionExpr) Private() interface{} {
@@ -9534,7 +9534,7 @@ func (e *IndirectionExpr) SetChild(nth int, child opt.Expr) {
 		e.Index = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *IndirectionExpr) DataType() types.T {
@@ -9572,7 +9572,7 @@ func (e *ArrayFlattenExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ArrayFlattenExpr) Private() interface{} {
@@ -9591,7 +9591,7 @@ func (e *ArrayFlattenExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ArrayFlattenExpr) DataType() types.T {
@@ -9627,7 +9627,7 @@ func (e *FunctionExpr) Child(nth int) opt.Expr {
 	case 0:
 		return &e.Args
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FunctionExpr) Private() interface{} {
@@ -9646,7 +9646,7 @@ func (e *FunctionExpr) SetChild(nth int, child opt.Expr) {
 		e.Args = *child.(*ScalarListExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FunctionExpr) DataType() types.T {
@@ -9693,7 +9693,7 @@ func (e *CollateExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CollateExpr) Private() interface{} {
@@ -9712,7 +9712,7 @@ func (e *CollateExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CollateExpr) DataType() types.T {
@@ -9745,7 +9745,7 @@ func (e *CoalesceExpr) Child(nth int) opt.Expr {
 	case 0:
 		return &e.Args
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CoalesceExpr) Private() interface{} {
@@ -9764,7 +9764,7 @@ func (e *CoalesceExpr) SetChild(nth int, child opt.Expr) {
 		e.Args = *child.(*ScalarListExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CoalesceExpr) DataType() types.T {
@@ -9801,7 +9801,7 @@ func (e *ColumnAccessExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ColumnAccessExpr) Private() interface{} {
@@ -9820,7 +9820,7 @@ func (e *ColumnAccessExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ColumnAccessExpr) DataType() types.T {
@@ -9851,7 +9851,7 @@ func (e *UnsupportedExprExpr) ChildCount() int {
 }
 
 func (e *UnsupportedExprExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnsupportedExprExpr) Private() interface{} {
@@ -9865,7 +9865,7 @@ func (e *UnsupportedExprExpr) String() string {
 }
 
 func (e *UnsupportedExprExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UnsupportedExprExpr) DataType() types.T {
@@ -9898,7 +9898,7 @@ func (e *ArrayAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ArrayAggExpr) Private() interface{} {
@@ -9917,7 +9917,7 @@ func (e *ArrayAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ArrayAggExpr) DataType() types.T {
@@ -9950,7 +9950,7 @@ func (e *AvgExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AvgExpr) Private() interface{} {
@@ -9969,7 +9969,7 @@ func (e *AvgExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AvgExpr) DataType() types.T {
@@ -10002,7 +10002,7 @@ func (e *BoolAndExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BoolAndExpr) Private() interface{} {
@@ -10021,7 +10021,7 @@ func (e *BoolAndExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BoolAndExpr) DataType() types.T {
@@ -10054,7 +10054,7 @@ func (e *BoolOrExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BoolOrExpr) Private() interface{} {
@@ -10073,7 +10073,7 @@ func (e *BoolOrExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *BoolOrExpr) DataType() types.T {
@@ -10106,7 +10106,7 @@ func (e *ConcatAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConcatAggExpr) Private() interface{} {
@@ -10125,7 +10125,7 @@ func (e *ConcatAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConcatAggExpr) DataType() types.T {
@@ -10158,7 +10158,7 @@ func (e *CountExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CountExpr) Private() interface{} {
@@ -10177,7 +10177,7 @@ func (e *CountExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CountExpr) DataType() types.T {
@@ -10203,7 +10203,7 @@ func (e *CountRowsExpr) ChildCount() int {
 }
 
 func (e *CountRowsExpr) Child(nth int) opt.Expr {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CountRowsExpr) Private() interface{} {
@@ -10217,7 +10217,7 @@ func (e *CountRowsExpr) String() string {
 }
 
 func (e *CountRowsExpr) SetChild(nth int, child opt.Expr) {
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CountRowsExpr) DataType() types.T {
@@ -10250,7 +10250,7 @@ func (e *MaxExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MaxExpr) Private() interface{} {
@@ -10269,7 +10269,7 @@ func (e *MaxExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MaxExpr) DataType() types.T {
@@ -10302,7 +10302,7 @@ func (e *MinExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MinExpr) Private() interface{} {
@@ -10321,7 +10321,7 @@ func (e *MinExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *MinExpr) DataType() types.T {
@@ -10354,7 +10354,7 @@ func (e *SumIntExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SumIntExpr) Private() interface{} {
@@ -10373,7 +10373,7 @@ func (e *SumIntExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SumIntExpr) DataType() types.T {
@@ -10406,7 +10406,7 @@ func (e *SumExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SumExpr) Private() interface{} {
@@ -10425,7 +10425,7 @@ func (e *SumExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SumExpr) DataType() types.T {
@@ -10458,7 +10458,7 @@ func (e *SqrDiffExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SqrDiffExpr) Private() interface{} {
@@ -10477,7 +10477,7 @@ func (e *SqrDiffExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *SqrDiffExpr) DataType() types.T {
@@ -10510,7 +10510,7 @@ func (e *VarianceExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *VarianceExpr) Private() interface{} {
@@ -10529,7 +10529,7 @@ func (e *VarianceExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *VarianceExpr) DataType() types.T {
@@ -10562,7 +10562,7 @@ func (e *StdDevExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *StdDevExpr) Private() interface{} {
@@ -10581,7 +10581,7 @@ func (e *StdDevExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *StdDevExpr) DataType() types.T {
@@ -10614,7 +10614,7 @@ func (e *XorAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *XorAggExpr) Private() interface{} {
@@ -10633,7 +10633,7 @@ func (e *XorAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *XorAggExpr) DataType() types.T {
@@ -10666,7 +10666,7 @@ func (e *JsonAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonAggExpr) Private() interface{} {
@@ -10685,7 +10685,7 @@ func (e *JsonAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonAggExpr) DataType() types.T {
@@ -10718,7 +10718,7 @@ func (e *JsonbAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonbAggExpr) Private() interface{} {
@@ -10737,7 +10737,7 @@ func (e *JsonbAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *JsonbAggExpr) DataType() types.T {
@@ -10776,7 +10776,7 @@ func (e *StringAggExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Sep
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *StringAggExpr) Private() interface{} {
@@ -10798,7 +10798,7 @@ func (e *StringAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Sep = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *StringAggExpr) DataType() types.T {
@@ -10837,7 +10837,7 @@ func (e *ConstAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConstAggExpr) Private() interface{} {
@@ -10856,7 +10856,7 @@ func (e *ConstAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConstAggExpr) DataType() types.T {
@@ -10897,7 +10897,7 @@ func (e *ConstNotNullAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConstNotNullAggExpr) Private() interface{} {
@@ -10916,7 +10916,7 @@ func (e *ConstNotNullAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *ConstNotNullAggExpr) DataType() types.T {
@@ -10954,7 +10954,7 @@ func (e *AnyNotNullAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AnyNotNullAggExpr) Private() interface{} {
@@ -10973,7 +10973,7 @@ func (e *AnyNotNullAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AnyNotNullAggExpr) DataType() types.T {
@@ -11010,7 +11010,7 @@ func (e *FirstAggExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FirstAggExpr) Private() interface{} {
@@ -11029,7 +11029,7 @@ func (e *FirstAggExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *FirstAggExpr) DataType() types.T {
@@ -11065,7 +11065,7 @@ func (e *AggDistinctExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AggDistinctExpr) Private() interface{} {
@@ -11084,7 +11084,7 @@ func (e *AggDistinctExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AggDistinctExpr) DataType() types.T {
@@ -11124,7 +11124,7 @@ func (e *AggFilterExpr) Child(nth int) opt.Expr {
 	case 1:
 		return e.Filter
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AggFilterExpr) Private() interface{} {
@@ -11146,7 +11146,7 @@ func (e *AggFilterExpr) SetChild(nth int, child opt.Expr) {
 		e.Filter = child.(opt.ScalarExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *AggFilterExpr) DataType() types.T {
@@ -11167,7 +11167,7 @@ var EmptyScalarListExpr = ScalarListExpr{}
 var _ opt.ScalarExpr = &ScalarListExpr{}
 
 func (e *ScalarListExpr) ID() opt.ScalarID {
-	panic("lists have no id")
+	panic(pgerror.NewAssertionErrorf("lists have no id"))
 }
 
 func (e *ScalarListExpr) Op() opt.Operator {
@@ -11239,7 +11239,7 @@ func (e *InsertExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InsertExpr) Private() interface{} {
@@ -11258,7 +11258,7 @@ func (e *InsertExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *InsertExpr) Memo() *Memo {
@@ -11299,14 +11299,14 @@ func (e *InsertExpr) bestProps() *bestProps {
 
 func (e *InsertExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *InsertExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -11465,7 +11465,7 @@ func (e *UpdateExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UpdateExpr) Private() interface{} {
@@ -11484,7 +11484,7 @@ func (e *UpdateExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UpdateExpr) Memo() *Memo {
@@ -11525,14 +11525,14 @@ func (e *UpdateExpr) bestProps() *bestProps {
 
 func (e *UpdateExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *UpdateExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -11602,7 +11602,7 @@ func (e *UpsertExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UpsertExpr) Private() interface{} {
@@ -11621,7 +11621,7 @@ func (e *UpsertExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *UpsertExpr) Memo() *Memo {
@@ -11662,14 +11662,14 @@ func (e *UpsertExpr) bestProps() *bestProps {
 
 func (e *UpsertExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *UpsertExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -11728,7 +11728,7 @@ func (e *DeleteExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *DeleteExpr) Private() interface{} {
@@ -11747,7 +11747,7 @@ func (e *DeleteExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *DeleteExpr) Memo() *Memo {
@@ -11788,14 +11788,14 @@ func (e *DeleteExpr) bestProps() *bestProps {
 
 func (e *DeleteExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *DeleteExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -11853,7 +11853,7 @@ func (e *CreateTableExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CreateTableExpr) Private() interface{} {
@@ -11872,7 +11872,7 @@ func (e *CreateTableExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	}
-	panic("child index out of range")
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
 func (e *CreateTableExpr) Memo() *Memo {
@@ -11913,14 +11913,14 @@ func (e *CreateTableExpr) bestProps() *bestProps {
 
 func (e *CreateTableExpr) setNext(member RelExpr) {
 	if e.next != nil {
-		panic(fmt.Sprintf("expression already has its next defined: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
 func (e *CreateTableExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
-		panic(fmt.Sprintf("expression is already in a group: %s", e))
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
 	e.grp = member.group()
 	LastGroupMember(member).setNext(e)
@@ -15422,7 +15422,7 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	case *CreateTableExpr:
 		return in.InternCreateTable(t)
 	default:
-		panic(fmt.Sprintf("unhandled op: %s", e.Op()))
+		panic(pgerror.NewAssertionErrorf("unhandled op: %s", e.Op()))
 	}
 }
 
@@ -18592,6 +18592,6 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
 	default:
-		panic(fmt.Sprintf("unhandled type: %s", t.Op()))
+		panic(pgerror.NewAssertionErrorf("unhandled type: %s", t.Op()))
 	}
 }
