@@ -38,6 +38,8 @@ import (
 //  1  |  b
 // Note: this is different from buildRightGroups in that each row of group is repeated
 // numRepeats times, instead of a simple copy of the group as a whole.
+// buildLeftGroups returns the first available index of the output buffer as outStartIdx
+// and the number of elements that were saved into state as savedOutCount.
 // SIDE EFFECTS: writes into c.output (and c.savedOutput if applicable).
 func (c *mergeJoinOp) buildLeftGroups(
 	leftGroups []group,
@@ -47,14 +49,13 @@ func (c *mergeJoinOp) buildLeftGroups(
 	bat coldata.Batch,
 	sel []uint16,
 	destStartIdx uint16,
-) (uint16, int) {
-	savedOutCount := 0
-	outCount := uint16(0)
+) (outStartIdx uint16, savedOutCount int) {
+	savedOutCount = 0
+	outStartIdx = destStartIdx
 	// Loop over every column.
 	for _, colIdx := range input.outCols {
 		savedOutCount = 0
-		outCount = 0
-		outStartIdx := int(destStartIdx)
+		outStartIdx = destStartIdx
 		out := c.output.ColVec(int(colIdx))
 		savedOut := c.savedOutput.ColVec(int(colIdx))
 		src := bat.ColVec(int(colIdx))
@@ -75,11 +76,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -91,7 +92,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -130,12 +130,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -176,11 +175,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -192,7 +191,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -231,12 +229,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -277,11 +274,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -293,7 +290,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -332,12 +328,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -378,11 +373,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -394,7 +389,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -433,12 +427,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -479,11 +472,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -495,7 +488,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -534,12 +526,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -580,11 +571,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -596,7 +587,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -635,12 +625,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -681,11 +670,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -697,7 +686,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -736,12 +724,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -782,11 +769,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -798,7 +785,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -837,12 +823,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -883,11 +868,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
 								t_dest := out
-								t_destStartIdx := outStartIdx
+								t_destStartIdx := int(outStartIdx)
 								t_src := src
 								t_srcStartIdx := srcStartIdx
 								t_srcEndIdx := srcEndIdx
@@ -899,7 +884,6 @@ func (c *mergeJoinOp) buildLeftGroups(
 								}
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -938,12 +922,11 @@ func (c *mergeJoinOp) buildLeftGroups(
 						for k := 0; k < leftGroup.numRepeats; k++ {
 							srcStartIdx := curSrcStartIdx
 							srcEndIdx := curSrcStartIdx + 1
-							if outStartIdx < int(c.outputBatchSize) {
+							if outStartIdx < c.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
-								outCount++
 							} else {
 								t_dest := savedOut
 								t_destStartIdx := c.savedOutputEndIdx + savedOutCount
@@ -976,10 +959,10 @@ func (c *mergeJoinOp) buildLeftGroups(
 	}
 
 	if len(input.outCols) == 0 {
-		outCount = c.getExpectedOutCount(leftGroups, groupsLen)
+		outStartIdx = c.calculateOutputCount(leftGroups, groupsLen, outStartIdx)
 	}
 
-	return outCount, savedOutCount
+	return outStartIdx, savedOutCount
 }
 
 // buildRightGroups takes a []group and repeats each group numRepeats times.
