@@ -18,6 +18,7 @@ const (
 	SimplifyOrTrue
 	SimplifyFalseOr
 	SimplifyOrFalse
+	SimplifyRange
 	FoldNullAndOr
 	FoldNotTrue
 	FoldNotFalse
@@ -164,6 +165,7 @@ const (
 	FoldCollate
 	NormalizeArrayFlattenToAgg
 	SimplifySelectFilters
+	ConsolidateSelectFilters
 	DetectSelectContradiction
 	EliminateSelect
 	MergeSelects

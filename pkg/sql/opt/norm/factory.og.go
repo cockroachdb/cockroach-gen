@@ -747,6 +747,22 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [ConsolidateSelectFilters]
+	{
+		if _f.funcs.CanConsolidateFilters(filters) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ConsolidateSelectFilters) {
+				_expr := _f.ConstructSelect(
+					input,
+					_f.funcs.ConsolidateFilters(filters),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ConsolidateSelectFilters, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeSelect(input, filters)
 	return _f.onConstructRelational(e)
 }
@@ -8473,6 +8489,37 @@ func (_f *Factory) ConstructOr(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructRange constructs an expression for the Range operator.
+// Range contains an And expression that constrains a single variable to a
+// range. For example, the And expression might be x > 5 AND x < 10. The
+// children of the And expression can be arbitrary expressions (including nested
+// And expressions), but they must all constrain the same variable, and the
+// constraints must be tight.
+//
+// Currently, Range expressions are only created by the ConsolidateSelectFilters
+// normalization rule.
+func (_f *Factory) ConstructRange(
+	and opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [SimplifyRange]
+	{
+		input := and
+		_and, _ := input.(*memo.AndExpr)
+		if _and == nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRange) {
+				_expr := input
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyRange, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeRange(and)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructNot constructs an expression for the Not operator.
 // Not is the boolean negation operator that evaluates to true if its input
 // evaluates to false.
@@ -14276,6 +14323,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.RangeExpr:
+		and := replace(t.And).(opt.ScalarExpr)
+		if and != t.And {
+			return f.ConstructRange(and)
+		}
+		return t
+
 	case *memo.NotExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -15353,6 +15407,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.RangeExpr:
+		return f.ConstructRange(
+			f.invokeReplace(t.And, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.NotExpr:
 		return f.ConstructNot(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -16173,6 +16232,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructOr(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
+		)
+	case opt.RangeOp:
+		return f.ConstructRange(
+			args[0].(opt.ScalarExpr),
 		)
 	case opt.NotOp:
 		return f.ConstructNot(

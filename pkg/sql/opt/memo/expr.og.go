@@ -6568,6 +6568,65 @@ func (e *OrExpr) DataType() types.T {
 	return types.Bool
 }
 
+// RangeExpr contains an And expression that constrains a single variable to a
+// range. For example, the And expression might be x > 5 AND x < 10. The
+// children of the And expression can be arbitrary expressions (including nested
+// And expressions), but they must all constrain the same variable, and the
+// constraints must be tight.
+//
+// Currently, Range expressions are only created by the ConsolidateSelectFilters
+// normalization rule.
+type RangeExpr struct {
+	And opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RangeExpr{}
+
+func (e *RangeExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RangeExpr) Op() opt.Operator {
+	return opt.RangeOp
+}
+
+func (e *RangeExpr) ChildCount() int {
+	return 1
+}
+
+func (e *RangeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.And
+	}
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *RangeExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RangeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RangeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.And = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *RangeExpr) DataType() types.T {
+	return types.Bool
+}
+
 // NotExpr is the boolean negation operator that evaluates to true if its input
 // evaluates to false.
 type NotExpr struct {
@@ -12977,6 +13036,22 @@ func (m *Memo) MemoizeOr(
 	return interned
 }
 
+func (m *Memo) MemoizeRange(
+	and opt.ScalarExpr,
+) *RangeExpr {
+	const size = int64(unsafe.Sizeof(RangeExpr{}))
+	e := &RangeExpr{
+		And: and,
+		id:  m.NextID(),
+	}
+	interned := m.interner.InternRange(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeNot(
 	input opt.ScalarExpr,
 ) *NotExpr {
@@ -15247,6 +15322,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAnd(t)
 	case *OrExpr:
 		return in.InternOr(t)
+	case *RangeExpr:
+		return in.InternRange(t)
 	case *NotExpr:
 		return in.InternNot(t)
 	case *EqExpr:
@@ -16741,6 +16818,24 @@ func (in *interner) InternOr(val *OrExpr) *OrExpr {
 		if existing, ok := in.cache.Item().(*OrExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRange(val *RangeExpr) *RangeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RangeOp)
+	in.hasher.HashScalarExpr(val.And)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RangeExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.And, existing.And) {
 				return existing
 			}
 		}
