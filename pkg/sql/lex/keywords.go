@@ -342,6 +342,7 @@ var KeywordsCategories = map[string]string{
 	"testing_relocate":          "U",
 	"text":                      "U",
 	"then":                      "R",
+	"throttling":                "U",
 	"time":                      "C",
 	"timestamp":                 "C",
 	"timestamptz":               "C",
@@ -734,6 +735,7 @@ var KeywordNames = []string{
 	"testing_relocate",
 	"text",
 	"then",
+	"throttling",
 	"time",
 	"timestamp",
 	"timestamptz",
@@ -1470,6 +1472,8 @@ func GetKeywordID(k string) int32 {
 		return TEXT
 	case "then":
 		return THEN
+	case "throttling":
+		return THROTTLING
 	case "time":
 		return TIME
 	case "timestamp":
