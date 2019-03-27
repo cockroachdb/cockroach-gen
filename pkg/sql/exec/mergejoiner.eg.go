@@ -15,7 +15,6 @@ package exec
 import (
 	"fmt"
 
-	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 )
@@ -38,9 +37,8 @@ import (
 //  1  |  b
 // Note: this is different from buildRightGroups in that each row of group is repeated
 // numRepeats times, instead of a simple copy of the group as a whole.
-// buildLeftGroups returns the first available index of the output buffer as outStartIdx
-// and the number of elements that were saved into state as savedOutCount.
-// SIDE EFFECTS: writes into o.output (and o.savedOutput if applicable).
+// buildLeftGroups returns the first available index of the output buffer as outStartIdx.
+// SIDE EFFECTS: writes into o.output.
 func (o *mergeJoinOp) buildLeftGroups(
 	leftGroups []group,
 	groupsLen int,
@@ -48,16 +46,17 @@ func (o *mergeJoinOp) buildLeftGroups(
 	input *mergeJoinInput,
 	bat coldata.Batch,
 	destStartIdx uint16,
-) (outStartIdx uint16, savedOutCount int) {
+) (outStartIdx uint16) {
+	o.builderState.left.finished = false
 	sel := bat.Selection()
-	savedOutCount = 0
 	outStartIdx = destStartIdx
+	initialBuilderState := o.builderState.left
 	// Loop over every column.
-	for _, colIdx := range input.outCols {
-		savedOutCount = 0
+LeftColLoop:
+	for ; o.builderState.left.colIdx < len(input.outCols); o.builderState.left.colIdx++ {
+		colIdx := input.outCols[o.builderState.left.colIdx]
 		outStartIdx = destStartIdx
 		out := o.output.ColVec(int(colIdx))
-		savedOut := o.savedOutput.ColVec(int(colIdx))
 		src := bat.ColVec(int(colIdx))
 		colType := input.sourceTypes[colIdx]
 
@@ -68,14 +67,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -93,73 +96,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Bool()[:t_destStartIdx], make([]bool, batchSize)...)
-								fromCol := t_src.Bool()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Bool())) {
-									t_dest.SetCol(append(t_dest.Bool()[:t_destStartIdx], t_src.Bool()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Bool()[t_destStartIdx:], t_src.Bool()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Bytes:
 			srcCol := src.Bytes()
@@ -167,14 +151,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -192,73 +180,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Bytes()[:t_destStartIdx], make([][]byte, batchSize)...)
-								fromCol := t_src.Bytes()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Bytes())) {
-									t_dest.SetCol(append(t_dest.Bytes()[:t_destStartIdx], t_src.Bytes()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Bytes()[t_destStartIdx:], t_src.Bytes()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Decimal:
 			srcCol := src.Decimal()
@@ -266,14 +235,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -291,73 +264,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Decimal()[:t_destStartIdx], make([]apd.Decimal, batchSize)...)
-								fromCol := t_src.Decimal()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Decimal())) {
-									t_dest.SetCol(append(t_dest.Decimal()[:t_destStartIdx], t_src.Decimal()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Decimal()[t_destStartIdx:], t_src.Decimal()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int8:
 			srcCol := src.Int8()
@@ -365,14 +319,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -390,73 +348,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Int8()[:t_destStartIdx], make([]int8, batchSize)...)
-								fromCol := t_src.Int8()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Int8())) {
-									t_dest.SetCol(append(t_dest.Int8()[:t_destStartIdx], t_src.Int8()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Int8()[t_destStartIdx:], t_src.Int8()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int16:
 			srcCol := src.Int16()
@@ -464,14 +403,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -489,73 +432,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Int16()[:t_destStartIdx], make([]int16, batchSize)...)
-								fromCol := t_src.Int16()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Int16())) {
-									t_dest.SetCol(append(t_dest.Int16()[:t_destStartIdx], t_src.Int16()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Int16()[t_destStartIdx:], t_src.Int16()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int32:
 			srcCol := src.Int32()
@@ -563,14 +487,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -588,73 +516,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Int32()[:t_destStartIdx], make([]int32, batchSize)...)
-								fromCol := t_src.Int32()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Int32())) {
-									t_dest.SetCol(append(t_dest.Int32()[:t_destStartIdx], t_src.Int32()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Int32()[t_destStartIdx:], t_src.Int32()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int64:
 			srcCol := src.Int64()
@@ -662,14 +571,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -687,73 +600,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Int64()[:t_destStartIdx], make([]int64, batchSize)...)
-								fromCol := t_src.Int64()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Int64())) {
-									t_dest.SetCol(append(t_dest.Int64()[:t_destStartIdx], t_src.Int64()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Int64()[t_destStartIdx:], t_src.Int64()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Float32:
 			srcCol := src.Float32()
@@ -761,14 +655,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -786,73 +684,54 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Float32()[:t_destStartIdx], make([]float32, batchSize)...)
-								fromCol := t_src.Float32()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Float32())) {
-									t_dest.SetCol(append(t_dest.Float32()[:t_destStartIdx], t_src.Float32()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Float32()[t_destStartIdx:], t_src.Float32()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Float64:
 			srcCol := src.Float64()
@@ -860,14 +739,18 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								// TODO (georgeutsin): update template language to automatically generate template function function parameter definitions from expressions passed in.
@@ -885,84 +768,67 @@ func (o *mergeJoinOp) buildLeftGroups(
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-								t_sel := sel
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-
-								toCol := append(t_dest.Float64()[:t_destStartIdx], make([]float64, batchSize)...)
-								fromCol := t_src.Float64()
-
-								for i := 0; i < batchSize; i++ {
-									toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
+								continue LeftColLoop
 
-								savedOut.SetCol(toCol)
-
-								if batchSize > 0 {
-									savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-								}
-
-								savedOutCount++
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					leftGroup := leftGroups[i]
+				for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
+					leftGroup := leftGroups[o.builderState.left.groupsIdx]
+					// If curSrcStartIdx is uninitialized, start it at the group's start idx. Otherwise continue where we left off.
+					if o.builderState.left.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+						o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+					}
 					// Loop over every row in the group.
-					for curSrcStartIdx := leftGroup.rowStartIdx; curSrcStartIdx < leftGroup.rowEndIdx; curSrcStartIdx++ {
+					for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 						// Repeat each row numRepeats times.
-						for k := 0; k < leftGroup.numRepeats; k++ {
-							srcStartIdx := curSrcStartIdx
-							srcEndIdx := curSrcStartIdx + 1
+						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
 								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
 
 								outStartIdx++
 							} else {
-								t_dest := savedOut
-								t_destStartIdx := o.savedOutputEndIdx + savedOutCount
-								t_src := src
-								t_srcStartIdx := srcStartIdx
-								t_srcEndIdx := srcEndIdx
-
-								batchSize := t_srcEndIdx - t_srcStartIdx
-								outputLen := t_destStartIdx + batchSize
-
-								if outputLen > (len(savedOut.Float64())) {
-									t_dest.SetCol(append(t_dest.Float64()[:t_destStartIdx], t_src.Float64()[t_srcStartIdx:t_srcEndIdx]...))
-								} else {
-									copy(t_dest.Float64()[t_destStartIdx:], t_src.Float64()[t_srcStartIdx:t_srcEndIdx])
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return outStartIdx
 								}
+								o.builderState.left = initialBuilderState
 
-								if batchSize > 0 {
-									t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-								}
-
-								savedOutCount++
+								continue LeftColLoop
 							}
 						}
+						o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 					}
+					o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 				}
+				o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 			}
 		default:
 			panic(fmt.Sprintf("unhandled type %d", colType))
 		}
+		o.builderState.left.setBuilderColumnState(initialBuilderState)
 	}
 
 	if len(input.outCols) == 0 {
 		outStartIdx = o.calculateOutputCount(leftGroups, groupsLen, outStartIdx)
 	}
 
-	return outStartIdx, savedOutCount
+	o.builderState.left.reset()
+	return outStartIdx
 }
 
 // buildRightGroups takes a []group and repeats each group numRepeats times.
@@ -983,7 +849,7 @@ func (o *mergeJoinOp) buildLeftGroups(
 //  1  |  b
 // Note: this is different from buildLeftGroups in that each group is not expanded,
 // but directly copied numRepeats times.
-// SIDE EFFECTS: writes into o.output (and o.savedOutput if applicable).
+// SIDE EFFECTS: writes into o.output.
 func (o *mergeJoinOp) buildRightGroups(
 	rightGroups []group,
 	groupsLen int,
@@ -992,14 +858,16 @@ func (o *mergeJoinOp) buildRightGroups(
 	bat coldata.Batch,
 	destStartIdx uint16,
 ) {
+	o.builderState.right.finished = false
+	initialBuilderState := o.builderState.right
 	sel := bat.Selection()
-	savedOutputCount := 0
+
 	// Loop over every column.
-	for _, colIdx := range input.outCols {
-		savedOutputCount = 0
+RightColLoop:
+	for ; o.builderState.right.colIdx < len(input.outCols); o.builderState.right.colIdx++ {
+		colIdx := input.outCols[o.builderState.right.colIdx]
 		outStartIdx := int(destStartIdx)
 		out := o.output.ColVec(int(colIdx) + colOffset)
-		savedOut := o.savedOutput.ColVec(int(colIdx) + colOffset)
 		src := bat.ColVec(int(colIdx))
 		colType := input.sourceTypes[colIdx]
 
@@ -1010,11 +878,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1022,8 +893,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1031,72 +902,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Bool()[i+t_destStartIdx] = t_src.Bool()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Bool()[:t_destStartIdx], make([]bool, batchSize)...)
-							fromCol := t_src.Bool()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Bool())) {
-								t_dest.SetCol(append(t_dest.Bool()[:t_destStartIdx], t_src.Bool()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Bool()[t_destStartIdx:], t_src.Bool()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Bytes:
 			srcCol := src.Bytes()
@@ -1104,11 +957,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1116,8 +972,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1125,72 +981,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Bytes()[i+t_destStartIdx] = t_src.Bytes()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Bytes()[:t_destStartIdx], make([][]byte, batchSize)...)
-							fromCol := t_src.Bytes()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Bytes())) {
-								t_dest.SetCol(append(t_dest.Bytes()[:t_destStartIdx], t_src.Bytes()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Bytes()[t_destStartIdx:], t_src.Bytes()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Decimal:
 			srcCol := src.Decimal()
@@ -1198,11 +1036,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1210,8 +1051,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1219,72 +1060,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Decimal()[i+t_destStartIdx] = t_src.Decimal()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Decimal()[:t_destStartIdx], make([]apd.Decimal, batchSize)...)
-							fromCol := t_src.Decimal()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Decimal())) {
-								t_dest.SetCol(append(t_dest.Decimal()[:t_destStartIdx], t_src.Decimal()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Decimal()[t_destStartIdx:], t_src.Decimal()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int8:
 			srcCol := src.Int8()
@@ -1292,11 +1115,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1304,8 +1130,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1313,72 +1139,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Int8()[i+t_destStartIdx] = t_src.Int8()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Int8()[:t_destStartIdx], make([]int8, batchSize)...)
-							fromCol := t_src.Int8()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Int8())) {
-								t_dest.SetCol(append(t_dest.Int8()[:t_destStartIdx], t_src.Int8()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Int8()[t_destStartIdx:], t_src.Int8()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int16:
 			srcCol := src.Int16()
@@ -1386,11 +1194,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1398,8 +1209,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1407,72 +1218,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Int16()[i+t_destStartIdx] = t_src.Int16()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Int16()[:t_destStartIdx], make([]int16, batchSize)...)
-							fromCol := t_src.Int16()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Int16())) {
-								t_dest.SetCol(append(t_dest.Int16()[:t_destStartIdx], t_src.Int16()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Int16()[t_destStartIdx:], t_src.Int16()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int32:
 			srcCol := src.Int32()
@@ -1480,11 +1273,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1492,8 +1288,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1501,72 +1297,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Int32()[i+t_destStartIdx] = t_src.Int32()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Int32()[:t_destStartIdx], make([]int32, batchSize)...)
-							fromCol := t_src.Int32()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Int32())) {
-								t_dest.SetCol(append(t_dest.Int32()[:t_destStartIdx], t_src.Int32()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Int32()[t_destStartIdx:], t_src.Int32()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Int64:
 			srcCol := src.Int64()
@@ -1574,11 +1352,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1586,8 +1367,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1595,72 +1376,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Int64()[i+t_destStartIdx] = t_src.Int64()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Int64()[:t_destStartIdx], make([]int64, batchSize)...)
-							fromCol := t_src.Int64()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Int64())) {
-								t_dest.SetCol(append(t_dest.Int64()[:t_destStartIdx], t_src.Int64()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Int64()[t_destStartIdx:], t_src.Int64()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Float32:
 			srcCol := src.Float32()
@@ -1668,11 +1431,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1680,8 +1446,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1689,72 +1455,54 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Float32()[i+t_destStartIdx] = t_src.Float32()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Float32()[:t_destStartIdx], make([]float32, batchSize)...)
-							fromCol := t_src.Float32()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Float32())) {
-								t_dest.SetCol(append(t_dest.Float32()[:t_destStartIdx], t_src.Float32()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Float32()[t_destStartIdx:], t_src.Float32()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		case types.Float64:
 			srcCol := src.Float64()
@@ -1762,11 +1510,14 @@ func (o *mergeJoinOp) buildRightGroups(
 
 			if sel != nil {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
@@ -1774,8 +1525,8 @@ func (o *mergeJoinOp) buildRightGroups(
 						t_dest := out
 						t_destStartIdx := outStartIdx
 						t_src := src
-						t_srcStartIdx := rightGroup.rowStartIdx
-						t_srcEndIdx := rightGroup.rowStartIdx + toAppend
+						t_srcStartIdx := o.builderState.right.curSrcStartIdx
+						t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
 						t_sel := sel
 
 						batchSize := t_srcEndIdx - t_srcStartIdx
@@ -1783,75 +1534,60 @@ func (o *mergeJoinOp) buildRightGroups(
 							t_dest.Float64()[i+t_destStartIdx] = t_src.Float64()[t_sel[i+t_srcStartIdx]]
 						}
 
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-
-							toCol := append(t_dest.Float64()[:t_destStartIdx], make([]float64, batchSize)...)
-							fromCol := t_src.Float64()
-
-							for i := 0; i < batchSize; i++ {
-								toCol[i+t_destStartIdx] = fromCol[t_sel[i+t_srcStartIdx]]
-							}
-
-							savedOut.SetCol(toCol)
-
-							if batchSize > 0 {
-								savedOut.ExtendNullsWithSel(t_src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize), t_sel)
-							}
-						}
-
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			} else {
 				// Loop over every group.
-				for i := 0; i < groupsLen; i++ {
-					rightGroup := rightGroups[i]
+				for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
+					rightGroup := rightGroups[o.builderState.right.groupsIdx]
 					// Repeat every group numRepeats times.
-					for k := 0; k < rightGroup.numRepeats; k++ {
-						toAppend := rightGroup.rowEndIdx - rightGroup.rowStartIdx
+					for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+						if o.builderState.right.curSrcStartIdx == zeroMJCPcurSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						}
+						toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
 						if outStartIdx+toAppend > int(o.outputBatchSize) {
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[rightGroup.rowStartIdx:rightGroup.rowStartIdx+toAppend])
-
-						if toAppend < rightGroup.rowEndIdx-rightGroup.rowStartIdx {
-							t_dest := savedOut
-							t_destStartIdx := o.savedOutputEndIdx + savedOutputCount
-							t_src := src
-							t_srcStartIdx := (rightGroup.rowStartIdx) + toAppend
-							t_srcEndIdx := rightGroup.rowEndIdx
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							outputLen := t_destStartIdx + batchSize
-
-							if outputLen > (len(savedOut.Float64())) {
-								t_dest.SetCol(append(t_dest.Float64()[:t_destStartIdx], t_src.Float64()[t_srcStartIdx:t_srcEndIdx]...))
-							} else {
-								copy(t_dest.Float64()[t_destStartIdx:], t_src.Float64()[t_srcStartIdx:t_srcEndIdx])
-							}
-
-							if batchSize > 0 {
-								t_dest.ExtendNulls(src, uint64(t_destStartIdx), uint16(t_srcStartIdx), uint16(batchSize))
-							}
-						}
+						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
 
 						outStartIdx += toAppend
-						savedOutputCount += (rightGroup.rowEndIdx - rightGroup.rowStartIdx) - toAppend
+
+						if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+							o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+							if o.builderState.right.colIdx == len(input.outCols)-1 {
+								o.builderState.right.colIdx = zeroMJCPcolIdx
+								return
+							}
+							o.builderState.right = initialBuilderState
+							continue RightColLoop
+						}
+						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
+					o.builderState.right.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 				}
+				o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 			}
 		default:
 			panic(fmt.Sprintf("unhandled type %d", colType))
 		}
+		o.builderState.right.setBuilderColumnState(initialBuilderState)
 	}
+
+	o.builderState.right.reset()
 }
