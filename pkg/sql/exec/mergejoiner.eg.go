@@ -123,10 +123,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -207,10 +206,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -291,10 +289,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -375,10 +372,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -459,10 +455,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -543,10 +538,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -627,10 +621,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -711,10 +704,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -795,10 +787,9 @@ LeftColLoop:
 						// Repeat each row numRepeats times.
 						for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
 							srcStartIdx := o.builderState.left.curSrcStartIdx
-							srcEndIdx := srcStartIdx + 1
 							if outStartIdx < o.outputBatchSize {
 
-								copy(outCol[outStartIdx:], srcCol[srcStartIdx:srcEndIdx])
+								outCol[outStartIdx] = srcCol[srcStartIdx]
 
 								outStartIdx++
 							} else {
@@ -932,7 +923,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1011,7 +1007,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1090,7 +1091,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1169,7 +1175,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1248,7 +1259,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1327,7 +1343,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1406,7 +1427,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1485,7 +1511,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
@@ -1564,7 +1595,12 @@ RightColLoop:
 							toAppend = int(o.outputBatchSize) - outStartIdx
 						}
 
-						copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						// Optimization to use assignment in the case that only 1 element is being appended.
+						if toAppend == 1 {
+							outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
+						} else {
+							copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+						}
 
 						outStartIdx += toAppend
 
