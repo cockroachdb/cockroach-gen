@@ -1086,6 +1086,39 @@ func IsJoinNonApplyOp(e Expr) bool {
 	return false
 }
 
+var TelemetryOperators = [...]Operator{
+	AntiJoinOp,
+	AntiJoinApplyOp,
+	DistinctOnOp,
+	FullJoinOp,
+	FullJoinApplyOp,
+	GroupByOp,
+	InnerJoinOp,
+	InnerJoinApplyOp,
+	LeftJoinOp,
+	LeftJoinApplyOp,
+	LookupJoinOp,
+	MergeJoinOp,
+	ProjectSetOp,
+	RightJoinOp,
+	RightJoinApplyOp,
+	ScalarGroupByOp,
+	SemiJoinOp,
+	SemiJoinApplyOp,
+	ZigzagJoinOp,
+}
+
+func IsTelemetryOp(e Expr) bool {
+	switch e.Op() {
+	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, FullJoinOp,
+		FullJoinApplyOp, GroupByOp, InnerJoinOp, InnerJoinApplyOp, LeftJoinOp,
+		LeftJoinApplyOp, LookupJoinOp, MergeJoinOp, ProjectSetOp, RightJoinOp,
+		RightJoinApplyOp, ScalarGroupByOp, SemiJoinOp, SemiJoinApplyOp, ZigzagJoinOp:
+		return true
+	}
+	return false
+}
+
 var JoinApplyOperators = [...]Operator{
 	AntiJoinApplyOp,
 	FullJoinApplyOp,
