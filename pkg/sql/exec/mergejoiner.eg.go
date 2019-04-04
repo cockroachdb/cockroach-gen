@@ -13,11 +13,3138 @@
 package exec
 
 import (
+	"bytes"
 	"fmt"
 
+	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
+
+func (o *mergeJoinOp) probeBodyLSeltrueRSeltrue() {
+	lSel := o.proberState.lBatch.Selection()
+	rSel := o.proberState.rBatch.Selection()
+EqLoop:
+	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
+		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		switch colType {
+		case types.Bool:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bool()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bool()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareBools(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Bytes:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bytes()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bytes()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = bytes.Equal(lVal, rVal)
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = bytes.Equal(newLVal, lVal)
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = bytes.Equal(newRVal, rVal)
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = bytes.Compare(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Decimal:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Decimal()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Decimal()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = tree.CompareDecimals(&lVal, &rVal) == 0
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = tree.CompareDecimals(&newLVal, &lVal) == 0
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = tree.CompareDecimals(&newRVal, &rVal) == 0
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareDecimals(&lVal, &rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int8:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int8()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int8()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int16:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int16()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int16()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		default:
+			panic(fmt.Sprintf("unhandled type %d", colType))
+		}
+		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
+		o.groups.finishedCol()
+	}
+
+}
+
+func (o *mergeJoinOp) probeBodyLSeltrueRSelfalse() {
+	lSel := o.proberState.lBatch.Selection()
+	rSel := o.proberState.rBatch.Selection()
+EqLoop:
+	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
+		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		switch colType {
+		case types.Bool:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bool()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bool()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareBools(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Bytes:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bytes()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bytes()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = bytes.Equal(lVal, rVal)
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = bytes.Equal(newLVal, lVal)
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = bytes.Equal(newRVal, rVal)
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = bytes.Compare(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Decimal:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Decimal()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Decimal()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = tree.CompareDecimals(&lVal, &rVal) == 0
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = tree.CompareDecimals(&newLVal, &lVal) == 0
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = tree.CompareDecimals(&newRVal, &rVal) == 0
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareDecimals(&lVal, &rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int8:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int8()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int8()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int16:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int16()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int16()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// lSel[curLIdx] is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[lSel[curLIdx]]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[lSel[curLIdx]]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		default:
+			panic(fmt.Sprintf("unhandled type %d", colType))
+		}
+		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
+		o.groups.finishedCol()
+	}
+
+}
+
+func (o *mergeJoinOp) probeBodyLSelfalseRSeltrue() {
+	lSel := o.proberState.lBatch.Selection()
+	rSel := o.proberState.rBatch.Selection()
+EqLoop:
+	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
+		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		switch colType {
+		case types.Bool:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bool()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bool()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareBools(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Bytes:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bytes()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bytes()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = bytes.Equal(lVal, rVal)
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = bytes.Equal(newLVal, lVal)
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = bytes.Equal(newRVal, rVal)
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = bytes.Compare(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Decimal:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Decimal()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Decimal()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = tree.CompareDecimals(&lVal, &rVal) == 0
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = tree.CompareDecimals(&newLVal, &lVal) == 0
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = tree.CompareDecimals(&newRVal, &rVal) == 0
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareDecimals(&lVal, &rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int8:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int8()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int8()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int16:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int16()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int16()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// rSel[curRIdx] is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[rSel[curRIdx]]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[rSel[curRIdx]]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		default:
+			panic(fmt.Sprintf("unhandled type %d", colType))
+		}
+		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
+		o.groups.finishedCol()
+	}
+
+}
+
+func (o *mergeJoinOp) probeBodyLSelfalseRSelfalse() {
+	lSel := o.proberState.lBatch.Selection()
+	rSel := o.proberState.rBatch.Selection()
+EqLoop:
+	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
+		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		switch colType {
+		case types.Bool:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bool()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bool()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareBools(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Bytes:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Bytes()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Bytes()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = bytes.Equal(lVal, rVal)
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = bytes.Equal(newLVal, lVal)
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = bytes.Equal(newRVal, rVal)
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = bytes.Compare(lVal, rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Decimal:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Decimal()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Decimal()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = tree.CompareDecimals(&lVal, &rVal) == 0
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = tree.CompareDecimals(&newLVal, &lVal) == 0
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = tree.CompareDecimals(&newRVal, &rVal) == 0
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = tree.CompareDecimals(&lVal, &rVal) < 0
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int8:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int8()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int8()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int16:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int16()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int16()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Int64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Int64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Int64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float32:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float32()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float32()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		case types.Float64:
+			lKeys := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx])).Float64()
+			rKeys := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx])).Float64()
+			var lGroup, rGroup group
+			for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+				curLIdx := lGroup.rowStartIdx
+				curRIdx := rGroup.rowStartIdx
+				curLLength := lGroup.rowEndIdx
+				curRLength := rGroup.rowEndIdx
+				// Expand or filter each group based on the current equality column.
+				for curLIdx < curLLength && curRIdx < curRLength {
+					// curLIdx is the template type variable for the loop variable that's either
+					// curLIdx or lSel[curLIdx] depending on whether we're in a selection or not.
+					lVal := lKeys[curLIdx]
+					// curRIdx is the template type variable for the loop variable that's either
+					// curRIdx or rSel[curRIdx] depending on whether we're in a selection or not.
+					rVal := rKeys[curRIdx]
+
+					var match bool
+					match = lVal == rVal
+					if match {
+						// Find the length of the groups on each side.
+						lGroupLength, rGroupLength := 0, 0
+						lComplete, rComplete := false, false
+						beginLIdx, beginRIdx := curLIdx, curRIdx
+
+						// Find the length of the group on the left.
+						if curLLength == 0 {
+							lGroupLength, lComplete = 0, true
+						} else {
+							for curLIdx < curLLength {
+								newLVal := lKeys[curLIdx]
+								match = newLVal == lVal
+								if !match {
+									lComplete = true
+									break
+								}
+								lGroupLength++
+								curLIdx++
+							}
+						}
+
+						// Find the length of the group on the right.
+						if curRLength == 0 {
+							rGroupLength, rComplete = 0, true
+						} else {
+							for curRIdx < curRLength {
+								newRVal := rKeys[curRIdx]
+								match = newRVal == rVal
+								if !match {
+									rComplete = true
+									break
+								}
+								rGroupLength++
+								curRIdx++
+							}
+						}
+
+						// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
+						if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+							o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+							o.proberState.lIdx = lGroupLength + beginLIdx
+							o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+							o.proberState.rIdx = rGroupLength + beginRIdx
+
+							o.groups.finishedCol()
+							break EqLoop
+						}
+
+						// Neither group ends with the batch so add the group to the circular buffer and increment the indices.
+						o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+					} else { // mismatch
+						var lSmaller bool
+						lSmaller = lVal < rVal
+						if lSmaller {
+							curLIdx++
+						} else {
+							curRIdx++
+						}
+					}
+				}
+				// Both o.proberState.lIdx and o.proberState.rIdx should point to the last elements processed in their respective batches.
+				o.proberState.lIdx = curLIdx
+				o.proberState.rIdx = curRIdx
+			}
+		default:
+			panic(fmt.Sprintf("unhandled type %d", colType))
+		}
+		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
+		o.groups.finishedCol()
+	}
+
+}
 
 // buildLeftGroups takes a []group and expands each group into the output by repeating
 // each row in the group numRepeats times. For example, given an input table:
@@ -100,7 +3227,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -133,7 +3260,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -183,7 +3310,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -216,7 +3343,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -266,7 +3393,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -299,7 +3426,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -349,7 +3476,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -382,7 +3509,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -432,7 +3559,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -465,7 +3592,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -515,7 +3642,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -548,7 +3675,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -598,7 +3725,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -631,7 +3758,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -681,7 +3808,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -714,7 +3841,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -764,7 +3891,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 
 							}
@@ -797,7 +3924,7 @@ LeftColLoop:
 									o.builderState.left.colIdx = zeroMJCPcolIdx
 									return outStartIdx
 								}
-								o.builderState.left = initialBuilderState
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
 
 								continue LeftColLoop
 							}
@@ -901,7 +4028,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -938,7 +4065,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -985,7 +4112,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1022,7 +4149,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1069,7 +4196,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1106,7 +4233,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1153,7 +4280,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1190,7 +4317,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1237,7 +4364,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1274,7 +4401,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1321,7 +4448,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1358,7 +4485,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1405,7 +4532,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1442,7 +4569,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1489,7 +4616,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1526,7 +4653,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1573,7 +4700,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1610,7 +4737,7 @@ RightColLoop:
 								o.builderState.right.colIdx = zeroMJCPcolIdx
 								return
 							}
-							o.builderState.right = initialBuilderState
+							o.builderState.right.setBuilderColumnState(initialBuilderState)
 							continue RightColLoop
 						}
 						o.builderState.right.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -1626,4 +4753,146 @@ RightColLoop:
 	}
 
 	o.builderState.right.reset()
+}
+
+// isGroupFinished checks to see whether or not the savedGroup continues in bat.
+func (o *mergeJoinOp) isGroupFinished(
+	input *mergeJoinInput,
+	savedGroup coldata.Batch,
+	savedGroupIdx int,
+	bat coldata.Batch,
+	rowIdx int,
+	sel []uint16,
+) bool {
+	if bat.Length() == 0 {
+		return true
+	}
+
+	// Check all equality columns in the first row of the bat to make sure we're in the same group.
+	for _, colIdx := range input.eqCols[:len(input.eqCols)] {
+		colTyp := input.sourceTypes[colIdx]
+
+		switch colTyp {
+		case types.Bool:
+			prevVal := savedGroup.ColVec(int(colIdx)).Bool()[savedGroupIdx-1]
+			var curVal bool
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Bool()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Bool()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		case types.Bytes:
+			prevVal := savedGroup.ColVec(int(colIdx)).Bytes()[savedGroupIdx-1]
+			var curVal []byte
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Bytes()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Bytes()[rowIdx]
+			}
+			var match bool
+			match = bytes.Equal(prevVal, curVal)
+			if !match {
+				return true
+			}
+		case types.Decimal:
+			prevVal := savedGroup.ColVec(int(colIdx)).Decimal()[savedGroupIdx-1]
+			var curVal apd.Decimal
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Decimal()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Decimal()[rowIdx]
+			}
+			var match bool
+			match = tree.CompareDecimals(&prevVal, &curVal) == 0
+			if !match {
+				return true
+			}
+		case types.Int8:
+			prevVal := savedGroup.ColVec(int(colIdx)).Int8()[savedGroupIdx-1]
+			var curVal int8
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Int8()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Int8()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		case types.Int16:
+			prevVal := savedGroup.ColVec(int(colIdx)).Int16()[savedGroupIdx-1]
+			var curVal int16
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Int16()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Int16()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		case types.Int32:
+			prevVal := savedGroup.ColVec(int(colIdx)).Int32()[savedGroupIdx-1]
+			var curVal int32
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Int32()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Int32()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		case types.Int64:
+			prevVal := savedGroup.ColVec(int(colIdx)).Int64()[savedGroupIdx-1]
+			var curVal int64
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Int64()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Int64()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		case types.Float32:
+			prevVal := savedGroup.ColVec(int(colIdx)).Float32()[savedGroupIdx-1]
+			var curVal float32
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Float32()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Float32()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		case types.Float64:
+			prevVal := savedGroup.ColVec(int(colIdx)).Float64()[savedGroupIdx-1]
+			var curVal float64
+			if sel != nil {
+				curVal = bat.ColVec(int(colIdx)).Float64()[sel[rowIdx]]
+			} else {
+				curVal = bat.ColVec(int(colIdx)).Float64()[rowIdx]
+			}
+			var match bool
+			match = prevVal == curVal
+			if !match {
+				return true
+			}
+		default:
+			panic(fmt.Sprintf("unhandled type %d", colTyp))
+		}
+	}
+	return false
 }

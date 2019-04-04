@@ -31,7 +31,7 @@ func orderedDistinctColsToOperators(
 	distinctCol := make([]bool, coldata.BatchSize)
 	var err error
 	for i := range distinctCols {
-		input, err = newSingleOrderedDistinct(input, int(distinctCols[i]), distinctCol, typs[i])
+		input, err = newSingleOrderedDistinct(input, int(distinctCols[i]), distinctCol, typs[distinctCols[i]])
 		if err != nil {
 			return nil, nil, err
 		}
@@ -178,6 +178,10 @@ func (p *sortedDistinctBoolOp) Init() {
 	p.input.Init()
 }
 
+func (p *sortedDistinctBoolOp) reset() {
+	p.foundFirstRow = false
+}
+
 func (p *sortedDistinctBoolOp) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
@@ -288,6 +292,10 @@ var _ Operator = &sortedDistinctBytesOp{}
 
 func (p *sortedDistinctBytesOp) Init() {
 	p.input.Init()
+}
+
+func (p *sortedDistinctBytesOp) reset() {
+	p.foundFirstRow = false
 }
 
 func (p *sortedDistinctBytesOp) Next() coldata.Batch {
@@ -402,6 +410,10 @@ func (p *sortedDistinctDecimalOp) Init() {
 	p.input.Init()
 }
 
+func (p *sortedDistinctDecimalOp) reset() {
+	p.foundFirstRow = false
+}
+
 func (p *sortedDistinctDecimalOp) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
@@ -512,6 +524,10 @@ var _ Operator = &sortedDistinctInt8Op{}
 
 func (p *sortedDistinctInt8Op) Init() {
 	p.input.Init()
+}
+
+func (p *sortedDistinctInt8Op) reset() {
+	p.foundFirstRow = false
 }
 
 func (p *sortedDistinctInt8Op) Next() coldata.Batch {
@@ -626,6 +642,10 @@ func (p *sortedDistinctInt16Op) Init() {
 	p.input.Init()
 }
 
+func (p *sortedDistinctInt16Op) reset() {
+	p.foundFirstRow = false
+}
+
 func (p *sortedDistinctInt16Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
@@ -736,6 +756,10 @@ var _ Operator = &sortedDistinctInt32Op{}
 
 func (p *sortedDistinctInt32Op) Init() {
 	p.input.Init()
+}
+
+func (p *sortedDistinctInt32Op) reset() {
+	p.foundFirstRow = false
 }
 
 func (p *sortedDistinctInt32Op) Next() coldata.Batch {
@@ -850,6 +874,10 @@ func (p *sortedDistinctInt64Op) Init() {
 	p.input.Init()
 }
 
+func (p *sortedDistinctInt64Op) reset() {
+	p.foundFirstRow = false
+}
+
 func (p *sortedDistinctInt64Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
@@ -962,6 +990,10 @@ func (p *sortedDistinctFloat32Op) Init() {
 	p.input.Init()
 }
 
+func (p *sortedDistinctFloat32Op) reset() {
+	p.foundFirstRow = false
+}
+
 func (p *sortedDistinctFloat32Op) Next() coldata.Batch {
 	batch := p.input.Next()
 	if batch.Length() == 0 {
@@ -1072,6 +1104,10 @@ var _ Operator = &sortedDistinctFloat64Op{}
 
 func (p *sortedDistinctFloat64Op) Init() {
 	p.input.Init()
+}
+
+func (p *sortedDistinctFloat64Op) reset() {
+	p.foundFirstRow = false
 }
 
 func (p *sortedDistinctFloat64Op) Next() coldata.Batch {
