@@ -69,6 +69,7 @@ const (
 	FoldUnary
 	FoldComparison
 	FoldCast
+	FoldFunction
 	ConvertGroupByToDistinct
 	EliminateDistinct
 	EliminateGroupByProject

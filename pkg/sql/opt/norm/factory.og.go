@@ -13328,6 +13328,23 @@ func (_f *Factory) ConstructFunction(
 	args memo.ScalarListExpr,
 	functionPrivate *memo.FunctionPrivate,
 ) opt.ScalarExpr {
+	// [FoldFunction]
+	{
+		if _f.funcs.IsListOfConstants(args) {
+			private := functionPrivate
+			result := _f.funcs.FoldFunction(args, private)
+			if _f.funcs.Succeeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldFunction) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldFunction, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeFunction(args, functionPrivate)
 	return _f.onConstructScalar(e)
 }
