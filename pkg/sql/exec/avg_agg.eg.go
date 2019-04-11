@@ -65,6 +65,7 @@ func (a *avgDecimalAgg) Reset() {
 	copy(a.scratch.groupCounts, zeroInt64Batch)
 	copy(a.scratch.vec, zeroDecimalBatch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *avgDecimalAgg) CurrentOutputIndex() int {
@@ -168,6 +169,7 @@ func (a *avgFloat32Agg) Reset() {
 	copy(a.scratch.groupCounts, zeroInt64Batch)
 	copy(a.scratch.vec, zeroFloat32Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *avgFloat32Agg) CurrentOutputIndex() int {
@@ -261,6 +263,7 @@ func (a *avgFloat64Agg) Reset() {
 	copy(a.scratch.groupCounts, zeroInt64Batch)
 	copy(a.scratch.vec, zeroFloat64Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *avgFloat64Agg) CurrentOutputIndex() int {

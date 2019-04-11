@@ -67,6 +67,7 @@ func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 func (a *sumDecimalAgg) Reset() {
 	copy(a.scratch.vec, zeroDecimalBatch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumDecimalAgg) CurrentOutputIndex() int {
@@ -145,6 +146,7 @@ func (a *sumInt8Agg) Init(groups []bool, v coldata.Vec) {
 func (a *sumInt8Agg) Reset() {
 	copy(a.scratch.vec, zeroInt8Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumInt8Agg) CurrentOutputIndex() int {
@@ -219,6 +221,7 @@ func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 func (a *sumInt16Agg) Reset() {
 	copy(a.scratch.vec, zeroInt16Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumInt16Agg) CurrentOutputIndex() int {
@@ -293,6 +296,7 @@ func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 func (a *sumInt32Agg) Reset() {
 	copy(a.scratch.vec, zeroInt32Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumInt32Agg) CurrentOutputIndex() int {
@@ -367,6 +371,7 @@ func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 func (a *sumInt64Agg) Reset() {
 	copy(a.scratch.vec, zeroInt64Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumInt64Agg) CurrentOutputIndex() int {
@@ -441,6 +446,7 @@ func (a *sumFloat32Agg) Init(groups []bool, v coldata.Vec) {
 func (a *sumFloat32Agg) Reset() {
 	copy(a.scratch.vec, zeroFloat32Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumFloat32Agg) CurrentOutputIndex() int {
@@ -515,6 +521,7 @@ func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 func (a *sumFloat64Agg) Reset() {
 	copy(a.scratch.vec, zeroFloat64Batch)
 	a.scratch.curIdx = -1
+	a.done = false
 }
 
 func (a *sumFloat64Agg) CurrentOutputIndex() int {

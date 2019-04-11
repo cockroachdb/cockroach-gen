@@ -180,6 +180,9 @@ func (p *sortedDistinctBoolOp) Init() {
 
 func (p *sortedDistinctBoolOp) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctBoolOp) Next() coldata.Batch {
@@ -296,6 +299,9 @@ func (p *sortedDistinctBytesOp) Init() {
 
 func (p *sortedDistinctBytesOp) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctBytesOp) Next() coldata.Batch {
@@ -412,6 +418,9 @@ func (p *sortedDistinctDecimalOp) Init() {
 
 func (p *sortedDistinctDecimalOp) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctDecimalOp) Next() coldata.Batch {
@@ -528,6 +537,9 @@ func (p *sortedDistinctInt8Op) Init() {
 
 func (p *sortedDistinctInt8Op) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctInt8Op) Next() coldata.Batch {
@@ -644,6 +656,9 @@ func (p *sortedDistinctInt16Op) Init() {
 
 func (p *sortedDistinctInt16Op) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctInt16Op) Next() coldata.Batch {
@@ -760,6 +775,9 @@ func (p *sortedDistinctInt32Op) Init() {
 
 func (p *sortedDistinctInt32Op) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctInt32Op) Next() coldata.Batch {
@@ -876,6 +894,9 @@ func (p *sortedDistinctInt64Op) Init() {
 
 func (p *sortedDistinctInt64Op) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctInt64Op) Next() coldata.Batch {
@@ -992,6 +1013,9 @@ func (p *sortedDistinctFloat32Op) Init() {
 
 func (p *sortedDistinctFloat32Op) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctFloat32Op) Next() coldata.Batch {
@@ -1108,6 +1132,9 @@ func (p *sortedDistinctFloat64Op) Init() {
 
 func (p *sortedDistinctFloat64Op) reset() {
 	p.foundFirstRow = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
 }
 
 func (p *sortedDistinctFloat64Op) Next() coldata.Batch {

@@ -62,6 +62,7 @@ func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullBoolAgg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullBoolAgg) CurrentOutputIndex() int {
@@ -122,6 +123,7 @@ func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullBytesAgg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullBytesAgg) CurrentOutputIndex() int {
@@ -182,6 +184,7 @@ func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullDecimalAgg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullDecimalAgg) CurrentOutputIndex() int {
@@ -242,6 +245,7 @@ func (a *anyNotNullInt8Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt8Agg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullInt8Agg) CurrentOutputIndex() int {
@@ -302,6 +306,7 @@ func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt16Agg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullInt16Agg) CurrentOutputIndex() int {
@@ -362,6 +367,7 @@ func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt32Agg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullInt32Agg) CurrentOutputIndex() int {
@@ -422,6 +428,7 @@ func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt64Agg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullInt64Agg) CurrentOutputIndex() int {
@@ -482,6 +489,7 @@ func (a *anyNotNullFloat32Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullFloat32Agg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullFloat32Agg) CurrentOutputIndex() int {
@@ -542,6 +550,7 @@ func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullFloat64Agg) Reset() {
 	a.curIdx = -1
+	a.done = false
 }
 
 func (a *anyNotNullFloat64Agg) CurrentOutputIndex() int {
