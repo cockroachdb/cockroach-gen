@@ -8069,6 +8069,17 @@ func (_f *Factory) ConstructProjectSet(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructFakeRel constructs an expression for the FakeRel operator.
+// FakeRel is a mock relational operator used for testing; its logical properties
+// are pre-determined and stored in the private. It can be used as the child of
+// an operator for which we are calculating properties or statistics.
+func (_f *Factory) ConstructFakeRel(
+	fakeRelPrivate *memo.FakeRelPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeFakeRel(fakeRelPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructSubquery constructs an expression for the Subquery operator.
 // Subquery is a subquery in a single-row context. Here are some examples:
 //
@@ -14253,6 +14264,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.FakeRelExpr:
+		return t
+
 	case *memo.SubqueryExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -15369,6 +15383,9 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.copyAndReplaceDefaultZipExpr(t.Zip, replace),
 		)
 
+	case *memo.FakeRelExpr:
+		return f.mem.MemoizeFakeRel(&t.FakeRelPrivate)
+
 	case *memo.SubqueryExpr:
 		return f.ConstructSubquery(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -16198,6 +16215,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructProjectSet(
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.ZipExpr),
+		)
+	case opt.FakeRelOp:
+		return f.ConstructFakeRel(
+			args[0].(*memo.FakeRelPrivate),
 		)
 	case opt.SubqueryOp:
 		return f.ConstructSubquery(

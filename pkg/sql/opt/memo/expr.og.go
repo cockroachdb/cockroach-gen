@@ -5404,6 +5404,124 @@ func (g *projectSetGroup) bestProps() *bestProps {
 	return &g.best
 }
 
+// FakeRelExpr is a mock relational operator used for testing; its logical properties
+// are pre-determined and stored in the private. It can be used as the child of
+// an operator for which we are calculating properties or statistics.
+type FakeRelExpr struct {
+	FakeRelPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &FakeRelExpr{}
+
+func (e *FakeRelExpr) Op() opt.Operator {
+	return opt.FakeRelOp
+}
+
+func (e *FakeRelExpr) ChildCount() int {
+	return 0
+}
+
+func (e *FakeRelExpr) Child(nth int) opt.Expr {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *FakeRelExpr) Private() interface{} {
+	return &e.FakeRelPrivate
+}
+
+func (e *FakeRelExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FakeRelExpr) SetChild(nth int, child opt.Expr) {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *FakeRelExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *FakeRelExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *FakeRelExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *FakeRelExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *FakeRelExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *FakeRelExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *FakeRelExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *FakeRelExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *FakeRelExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *FakeRelExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *FakeRelExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type fakeRelGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first FakeRelExpr
+	best  bestProps
+}
+
+var _ exprGroup = &fakeRelGroup{}
+
+func (g *fakeRelGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *fakeRelGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *fakeRelGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *fakeRelGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type FakeRelPrivate struct {
+	Props *props.Relational
+}
+
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
 //
 //   SELECT 1 = (SELECT 1)
@@ -12850,6 +12968,24 @@ func (m *Memo) MemoizeProjectSet(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeFakeRel(
+	fakeRelPrivate *FakeRelPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(fakeRelGroup{}))
+	grp := &fakeRelGroup{mem: m, first: FakeRelExpr{
+		FakeRelPrivate: *fakeRelPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternFakeRel(e)
+	if interned == e {
+		m.logPropsBuilder.buildFakeRelProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeSubquery(
 	input RelExpr,
 	subqueryPrivate *SubqueryPrivate,
@@ -15134,6 +15270,20 @@ func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetE
 	return interned
 }
 
+func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
+	const size = int64(unsafe.Sizeof(FakeRelExpr{}))
+	interned := m.interner.InternFakeRel(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -15282,6 +15432,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternRowNumber(t)
 	case *ProjectSetExpr:
 		return in.InternProjectSet(t)
+	case *FakeRelExpr:
+		return in.InternFakeRel(t)
 	case *SubqueryExpr:
 		return in.InternSubquery(t)
 	case *AnyExpr:
@@ -16420,6 +16572,24 @@ func (in *interner) InternProjectSet(val *ProjectSetExpr) *ProjectSetExpr {
 		if existing, ok := in.cache.Item().(*ProjectSetExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsZipExprEqual(val.Zip, existing.Zip) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFakeRel(val *FakeRelExpr) *FakeRelExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FakeRelOp)
+	in.hasher.HashPointer(unsafe.Pointer(val.Props))
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FakeRelExpr); ok {
+			if in.hasher.IsPointerEqual(unsafe.Pointer(val.Props), unsafe.Pointer(existing.Props)) {
 				return existing
 			}
 		}
@@ -18676,6 +18846,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildRowNumberProps(t, rel)
 	case *ProjectSetExpr:
 		b.buildProjectSetProps(t, rel)
+	case *FakeRelExpr:
+		b.buildFakeRelProps(t, rel)
 	case *InsertExpr:
 		b.buildInsertProps(t, rel)
 	case *UpdateExpr:
