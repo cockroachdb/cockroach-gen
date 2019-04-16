@@ -923,7 +923,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -953,7 +956,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -983,7 +989,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -1013,7 +1022,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -1043,7 +1055,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -1073,7 +1088,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -1103,7 +1121,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -1133,7 +1154,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
@@ -1163,7 +1187,10 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
-			endIdx := end>>6 + 1
+			// end is exclusive, so translate that to an exclusive index in nulls by
+			// figuring out which index the last accessible null should be in and add
+			// 1.
+			endIdx := (end-1)>>6 + 1
 			nulls = m.nulls[startIdx:endIdx]
 			if mod != 0 {
 				// If start is not a multiple of 64, we need to shift over the bitmap
