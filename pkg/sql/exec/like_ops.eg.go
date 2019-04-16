@@ -158,3 +158,153 @@ func (p *selRegexpBytesBytesConstOp) Next() coldata.Batch {
 func (p selRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
+
+type selNotPrefixBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+}
+
+func (p *selNotPrefixBytesBytesConstOp) Next() coldata.Batch {
+	for {
+		batch := p.input.Next()
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
+		var idx uint16
+		n := batch.Length()
+		if sel := batch.Selection(); sel != nil {
+			sel := sel[:n]
+			for _, i := range sel {
+				var cmp bool
+				cmp = !bytes.HasPrefix(coldata[i], p.constArg)
+				if cmp {
+					sel[idx] = i
+					idx++
+				}
+			}
+		} else {
+			batch.SetSelection(true)
+			sel := batch.Selection()
+			for i := uint16(0); i < n; i++ {
+				var cmp bool
+				cmp = !bytes.HasPrefix(coldata[i], p.constArg)
+				if cmp {
+					sel[idx] = i
+					idx++
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNotPrefixBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type selNotSuffixBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg []byte
+}
+
+func (p *selNotSuffixBytesBytesConstOp) Next() coldata.Batch {
+	for {
+		batch := p.input.Next()
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
+		var idx uint16
+		n := batch.Length()
+		if sel := batch.Selection(); sel != nil {
+			sel := sel[:n]
+			for _, i := range sel {
+				var cmp bool
+				cmp = !bytes.HasSuffix(coldata[i], p.constArg)
+				if cmp {
+					sel[idx] = i
+					idx++
+				}
+			}
+		} else {
+			batch.SetSelection(true)
+			sel := batch.Selection()
+			for i := uint16(0); i < n; i++ {
+				var cmp bool
+				cmp = !bytes.HasSuffix(coldata[i], p.constArg)
+				if cmp {
+					sel[idx] = i
+					idx++
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNotSuffixBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type selNotRegexpBytesBytesConstOp struct {
+	input Operator
+
+	colIdx   int
+	constArg *regexp.Regexp
+}
+
+func (p *selNotRegexpBytesBytesConstOp) Next() coldata.Batch {
+	for {
+		batch := p.input.Next()
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		coldata := batch.ColVec(p.colIdx).Bytes()[:coldata.BatchSize]
+		var idx uint16
+		n := batch.Length()
+		if sel := batch.Selection(); sel != nil {
+			sel := sel[:n]
+			for _, i := range sel {
+				var cmp bool
+				cmp = !p.constArg.Match(coldata[i])
+				if cmp {
+					sel[idx] = i
+					idx++
+				}
+			}
+		} else {
+			batch.SetSelection(true)
+			sel := batch.Selection()
+			for i := uint16(0); i < n; i++ {
+				var cmp bool
+				cmp = !p.constArg.Match(coldata[i])
+				if cmp {
+					sel[idx] = i
+					idx++
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNotRegexpBytesBytesConstOp) Init() {
+	p.input.Init()
+}
