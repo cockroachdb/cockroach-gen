@@ -5132,27 +5132,27 @@ type ShowTracePrivate struct {
 	ColList opt.ColList
 }
 
-// RowNumberExpr adds a column to each row in its input containing a unique,
+// OrdinalityExpr adds a column to each row in its input containing a unique,
 // increasing number.
-type RowNumberExpr struct {
+type OrdinalityExpr struct {
 	Input RelExpr
-	RowNumberPrivate
+	OrdinalityPrivate
 
 	grp  exprGroup
 	next RelExpr
 }
 
-var _ RelExpr = &RowNumberExpr{}
+var _ RelExpr = &OrdinalityExpr{}
 
-func (e *RowNumberExpr) Op() opt.Operator {
-	return opt.RowNumberOp
+func (e *OrdinalityExpr) Op() opt.Operator {
+	return opt.OrdinalityOp
 }
 
-func (e *RowNumberExpr) ChildCount() int {
+func (e *OrdinalityExpr) ChildCount() int {
 	return 1
 }
 
-func (e *RowNumberExpr) Child(nth int) opt.Expr {
+func (e *OrdinalityExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
 		return e.Input
@@ -5160,17 +5160,17 @@ func (e *RowNumberExpr) Child(nth int) opt.Expr {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RowNumberExpr) Private() interface{} {
-	return &e.RowNumberPrivate
+func (e *OrdinalityExpr) Private() interface{} {
+	return &e.OrdinalityPrivate
 }
 
-func (e *RowNumberExpr) String() string {
+func (e *OrdinalityExpr) String() string {
 	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
 
-func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
+func (e *OrdinalityExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
 		e.Input = child.(RelExpr)
@@ -5179,50 +5179,50 @@ func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RowNumberExpr) Memo() *Memo {
+func (e *OrdinalityExpr) Memo() *Memo {
 	return e.grp.memo()
 }
 
-func (e *RowNumberExpr) Relational() *props.Relational {
+func (e *OrdinalityExpr) Relational() *props.Relational {
 	return e.grp.relational()
 }
 
-func (e *RowNumberExpr) FirstExpr() RelExpr {
+func (e *OrdinalityExpr) FirstExpr() RelExpr {
 	return e.grp.firstExpr()
 }
 
-func (e *RowNumberExpr) NextExpr() RelExpr {
+func (e *OrdinalityExpr) NextExpr() RelExpr {
 	return e.next
 }
 
-func (e *RowNumberExpr) RequiredPhysical() *physical.Required {
+func (e *OrdinalityExpr) RequiredPhysical() *physical.Required {
 	return e.grp.bestProps().required
 }
 
-func (e *RowNumberExpr) ProvidedPhysical() *physical.Provided {
+func (e *OrdinalityExpr) ProvidedPhysical() *physical.Provided {
 	return &e.grp.bestProps().provided
 }
 
-func (e *RowNumberExpr) Cost() Cost {
+func (e *OrdinalityExpr) Cost() Cost {
 	return e.grp.bestProps().cost
 }
 
-func (e *RowNumberExpr) group() exprGroup {
+func (e *OrdinalityExpr) group() exprGroup {
 	return e.grp
 }
 
-func (e *RowNumberExpr) bestProps() *bestProps {
+func (e *OrdinalityExpr) bestProps() *bestProps {
 	return e.grp.bestProps()
 }
 
-func (e *RowNumberExpr) setNext(member RelExpr) {
+func (e *OrdinalityExpr) setNext(member RelExpr) {
 	if e.next != nil {
 		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
 	}
 	e.next = member
 }
 
-func (e *RowNumberExpr) setGroup(member RelExpr) {
+func (e *OrdinalityExpr) setGroup(member RelExpr) {
 	if e.grp != nil {
 		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
 	}
@@ -5230,32 +5230,32 @@ func (e *RowNumberExpr) setGroup(member RelExpr) {
 	LastGroupMember(member).setNext(e)
 }
 
-type rowNumberGroup struct {
+type ordinalityGroup struct {
 	mem   *Memo
 	rel   props.Relational
-	first RowNumberExpr
+	first OrdinalityExpr
 	best  bestProps
 }
 
-var _ exprGroup = &rowNumberGroup{}
+var _ exprGroup = &ordinalityGroup{}
 
-func (g *rowNumberGroup) memo() *Memo {
+func (g *ordinalityGroup) memo() *Memo {
 	return g.mem
 }
 
-func (g *rowNumberGroup) relational() *props.Relational {
+func (g *ordinalityGroup) relational() *props.Relational {
 	return &g.rel
 }
 
-func (g *rowNumberGroup) firstExpr() RelExpr {
+func (g *ordinalityGroup) firstExpr() RelExpr {
 	return &g.first
 }
 
-func (g *rowNumberGroup) bestProps() *bestProps {
+func (g *ordinalityGroup) bestProps() *bestProps {
 	return &g.best
 }
 
-type RowNumberPrivate struct {
+type OrdinalityPrivate struct {
 	// Ordering denotes the required ordering of the input.
 	Ordering physical.OrderingChoice
 
@@ -5402,6 +5402,149 @@ func (g *projectSetGroup) firstExpr() RelExpr {
 
 func (g *projectSetGroup) bestProps() *bestProps {
 	return &g.best
+}
+
+// WindowExpr represents a window function. Window functions are operators which
+// allow computations that take into consideration other rows in the same result
+// set.
+//
+// More concretely, a window function is a relational operator that takes in a
+// result set and appends a single new column whose value depends on the other
+// rows within the result set, and that row's relative position in it.
+//
+// Depending on the exact window function being computed, the value of the new
+// column could be the position of the row in the output (`row_number`), or a
+// cumulative sum, or something else.
+type WindowExpr struct {
+	Input    RelExpr
+	Function opt.ScalarExpr
+	WindowPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &WindowExpr{}
+
+func (e *WindowExpr) Op() opt.Operator {
+	return opt.WindowOp
+}
+
+func (e *WindowExpr) ChildCount() int {
+	return 2
+}
+
+func (e *WindowExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Function
+	}
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *WindowExpr) Private() interface{} {
+	return &e.WindowPrivate
+}
+
+func (e *WindowExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WindowExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Function = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *WindowExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *WindowExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *WindowExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *WindowExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *WindowExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *WindowExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *WindowExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *WindowExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *WindowExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *WindowExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(pgerror.NewAssertionErrorf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *WindowExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(pgerror.NewAssertionErrorf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type windowGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first WindowExpr
+	best  bestProps
+}
+
+var _ exprGroup = &windowGroup{}
+
+func (g *windowGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *windowGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *windowGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *windowGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type WindowPrivate struct {
+	// ColID holds the id of the column introduced by this operator.
+	ColID opt.ColumnID
 }
 
 // FakeRelExpr is a mock relational operator used for testing; its logical properties
@@ -11268,6 +11411,219 @@ func (e *AggDistinctExpr) DataType() types.T {
 	return e.Typ
 }
 
+// RankExpr computes the position of a row relative to an ordering, with same-valued
+// rows receiving the same value.
+type RankExpr struct {
+	Typ types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RankExpr{}
+
+func (e *RankExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RankExpr) Op() opt.Operator {
+	return opt.RankOp
+}
+
+func (e *RankExpr) ChildCount() int {
+	return 0
+}
+
+func (e *RankExpr) Child(nth int) opt.Expr {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *RankExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RankExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RankExpr) SetChild(nth int, child opt.Expr) {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *RankExpr) DataType() types.T {
+	return e.Typ
+}
+
+// RowNumberExpr computes the position of a row relative to an ordering, with
+// same-valued rows having ties broken arbitrarily.
+type RowNumberExpr struct {
+	Typ types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RowNumberExpr{}
+
+func (e *RowNumberExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RowNumberExpr) Op() opt.Operator {
+	return opt.RowNumberOp
+}
+
+func (e *RowNumberExpr) ChildCount() int {
+	return 0
+}
+
+func (e *RowNumberExpr) Child(nth int) opt.Expr {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *RowNumberExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RowNumberExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *RowNumberExpr) DataType() types.T {
+	return e.Typ
+}
+
+// DenseRankExpr is like Rank, but without gaps. Instead of 1, 1, 3, it gives 1, 1, 2.
+type DenseRankExpr struct {
+	Typ types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &DenseRankExpr{}
+
+func (e *DenseRankExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *DenseRankExpr) Op() opt.Operator {
+	return opt.DenseRankOp
+}
+
+func (e *DenseRankExpr) ChildCount() int {
+	return 0
+}
+
+func (e *DenseRankExpr) Child(nth int) opt.Expr {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *DenseRankExpr) Private() interface{} {
+	return nil
+}
+
+func (e *DenseRankExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *DenseRankExpr) SetChild(nth int, child opt.Expr) {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *DenseRankExpr) DataType() types.T {
+	return e.Typ
+}
+
+// PercentRankExpr is (rank - 1) / (total rows - 1).
+type PercentRankExpr struct {
+	Typ types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &PercentRankExpr{}
+
+func (e *PercentRankExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *PercentRankExpr) Op() opt.Operator {
+	return opt.PercentRankOp
+}
+
+func (e *PercentRankExpr) ChildCount() int {
+	return 0
+}
+
+func (e *PercentRankExpr) Child(nth int) opt.Expr {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *PercentRankExpr) Private() interface{} {
+	return nil
+}
+
+func (e *PercentRankExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *PercentRankExpr) SetChild(nth int, child opt.Expr) {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *PercentRankExpr) DataType() types.T {
+	return e.Typ
+}
+
+// CumeDistExpr is the relative rank of the current row:
+// (number of rows preceding or peer with current row) / (total rows)
+type CumeDistExpr struct {
+	Typ types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &CumeDistExpr{}
+
+func (e *CumeDistExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *CumeDistExpr) Op() opt.Operator {
+	return opt.CumeDistOp
+}
+
+func (e *CumeDistExpr) ChildCount() int {
+	return 0
+}
+
+func (e *CumeDistExpr) Child(nth int) opt.Expr {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *CumeDistExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CumeDistExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CumeDistExpr) SetChild(nth int, child opt.Expr) {
+	panic(pgerror.NewAssertionErrorf("child index out of range"))
+}
+
+func (e *CumeDistExpr) DataType() types.T {
+	return e.Typ
+}
+
 // AggFilterExpr is used as a modifier that wraps the input of an aggregate
 // function. It causes only rows for which the filter expression is true
 // to be processed. AggFilter should always occur on top of AggDistinct
@@ -12928,20 +13284,20 @@ func (m *Memo) MemoizeShowTraceForSession(
 	return interned.FirstExpr()
 }
 
-func (m *Memo) MemoizeRowNumber(
+func (m *Memo) MemoizeOrdinality(
 	input RelExpr,
-	rowNumberPrivate *RowNumberPrivate,
+	ordinalityPrivate *OrdinalityPrivate,
 ) RelExpr {
-	const size = int64(unsafe.Sizeof(rowNumberGroup{}))
-	grp := &rowNumberGroup{mem: m, first: RowNumberExpr{
-		Input:            input,
-		RowNumberPrivate: *rowNumberPrivate,
+	const size = int64(unsafe.Sizeof(ordinalityGroup{}))
+	grp := &ordinalityGroup{mem: m, first: OrdinalityExpr{
+		Input:             input,
+		OrdinalityPrivate: *ordinalityPrivate,
 	}}
 	e := &grp.first
 	e.grp = grp
-	interned := m.interner.InternRowNumber(e)
+	interned := m.interner.InternOrdinality(e)
 	if interned == e {
-		m.logPropsBuilder.buildRowNumberProps(e, &grp.rel)
+		m.logPropsBuilder.buildOrdinalityProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -12962,6 +13318,28 @@ func (m *Memo) MemoizeProjectSet(
 	interned := m.interner.InternProjectSet(e)
 	if interned == e {
 		m.logPropsBuilder.buildProjectSetProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeWindow(
+	input RelExpr,
+	function opt.ScalarExpr,
+	windowPrivate *WindowPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(windowGroup{}))
+	grp := &windowGroup{mem: m, first: WindowExpr{
+		Input:         input,
+		Function:      function,
+		WindowPrivate: *windowPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternWindow(e)
+	if interned == e {
+		m.logPropsBuilder.buildWindowProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -14619,6 +14997,26 @@ func (m *Memo) MemoizeAggDistinct(
 	return interned
 }
 
+func (m *Memo) MemoizeRank() *RankExpr {
+	return RankSingleton
+}
+
+func (m *Memo) MemoizeRowNumber() *RowNumberExpr {
+	return RowNumberSingleton
+}
+
+func (m *Memo) MemoizeDenseRank() *DenseRankExpr {
+	return DenseRankSingleton
+}
+
+func (m *Memo) MemoizePercentRank() *PercentRankExpr {
+	return PercentRankSingleton
+}
+
+func (m *Memo) MemoizeCumeDist() *CumeDistExpr {
+	return CumeDistSingleton
+}
+
 func (m *Memo) MemoizeAggFilter(
 	input opt.ScalarExpr,
 	filter opt.ScalarExpr,
@@ -15242,9 +15640,9 @@ func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp Rel
 	return interned
 }
 
-func (m *Memo) AddRowNumberToGroup(e *RowNumberExpr, grp RelExpr) *RowNumberExpr {
-	const size = int64(unsafe.Sizeof(RowNumberExpr{}))
-	interned := m.interner.InternRowNumber(e)
+func (m *Memo) AddOrdinalityToGroup(e *OrdinalityExpr, grp RelExpr) *OrdinalityExpr {
+	const size = int64(unsafe.Sizeof(OrdinalityExpr{}))
+	interned := m.interner.InternOrdinality(e)
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
@@ -15259,6 +15657,20 @@ func (m *Memo) AddRowNumberToGroup(e *RowNumberExpr, grp RelExpr) *RowNumberExpr
 func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetExpr {
 	const size = int64(unsafe.Sizeof(ProjectSetExpr{}))
 	interned := m.interner.InternProjectSet(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddWindowToGroup(e *WindowExpr, grp RelExpr) *WindowExpr {
+	const size = int64(unsafe.Sizeof(WindowExpr{}))
+	interned := m.interner.InternWindow(e)
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
@@ -15428,10 +15840,12 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternExplain(t)
 	case *ShowTraceForSessionExpr:
 		return in.InternShowTraceForSession(t)
-	case *RowNumberExpr:
-		return in.InternRowNumber(t)
+	case *OrdinalityExpr:
+		return in.InternOrdinality(t)
 	case *ProjectSetExpr:
 		return in.InternProjectSet(t)
+	case *WindowExpr:
+		return in.InternWindow(t)
 	case *FakeRelExpr:
 		return in.InternFakeRel(t)
 	case *SubqueryExpr:
@@ -15636,6 +16050,16 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternFirstAgg(t)
 	case *AggDistinctExpr:
 		return in.InternAggDistinct(t)
+	case *RankExpr:
+		return in.InternRank(t)
+	case *RowNumberExpr:
+		return in.InternRowNumber(t)
+	case *DenseRankExpr:
+		return in.InternDenseRank(t)
+	case *PercentRankExpr:
+		return in.InternPercentRank(t)
+	case *CumeDistExpr:
+		return in.InternCumeDist(t)
 	case *AggFilterExpr:
 		return in.InternAggFilter(t)
 	case *ScalarListExpr:
@@ -16539,16 +16963,16 @@ func (in *interner) InternShowTraceForSession(val *ShowTraceForSessionExpr) *Sho
 	return val
 }
 
-func (in *interner) InternRowNumber(val *RowNumberExpr) *RowNumberExpr {
+func (in *interner) InternOrdinality(val *OrdinalityExpr) *OrdinalityExpr {
 	in.hasher.Init()
-	in.hasher.HashOperator(opt.RowNumberOp)
+	in.hasher.HashOperator(opt.OrdinalityOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashOrderingChoice(val.Ordering)
 	in.hasher.HashColumnID(val.ColID)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*RowNumberExpr); ok {
+		if existing, ok := in.cache.Item().(*OrdinalityExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
 				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) {
@@ -16572,6 +16996,28 @@ func (in *interner) InternProjectSet(val *ProjectSetExpr) *ProjectSetExpr {
 		if existing, ok := in.cache.Item().(*ProjectSetExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsZipExprEqual(val.Zip, existing.Zip) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WindowOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Function)
+	in.hasher.HashColumnID(val.ColID)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WindowExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
+				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) {
 				return existing
 			}
 		}
@@ -18578,6 +19024,81 @@ func (in *interner) InternAggDistinct(val *AggDistinctExpr) *AggDistinctExpr {
 	return val
 }
 
+func (in *interner) InternRank(val *RankExpr) *RankExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RankOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RankExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRowNumber(val *RowNumberExpr) *RowNumberExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RowNumberOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RowNumberExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternDenseRank(val *DenseRankExpr) *DenseRankExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.DenseRankOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*DenseRankExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPercentRank(val *PercentRankExpr) *PercentRankExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PercentRankOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PercentRankExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCumeDist(val *CumeDistExpr) *CumeDistExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CumeDistOp)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CumeDistExpr); ok {
+			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternAggFilter(val *AggFilterExpr) *AggFilterExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.AggFilterOp)
@@ -18842,10 +19363,12 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildExplainProps(t, rel)
 	case *ShowTraceForSessionExpr:
 		b.buildShowTraceForSessionProps(t, rel)
-	case *RowNumberExpr:
-		b.buildRowNumberProps(t, rel)
+	case *OrdinalityExpr:
+		b.buildOrdinalityProps(t, rel)
 	case *ProjectSetExpr:
 		b.buildProjectSetProps(t, rel)
+	case *WindowExpr:
+		b.buildWindowProps(t, rel)
 	case *FakeRelExpr:
 		b.buildFakeRelProps(t, rel)
 	case *InsertExpr:

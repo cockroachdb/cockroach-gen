@@ -1095,25 +1095,25 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
-	// [PruneRowNumberCols]
+	// [PruneOrdinalityCols]
 	{
-		_rowNumber, _ := input.(*memo.RowNumberExpr)
-		if _rowNumber != nil {
-			input := _rowNumber.Input
-			rowNumberPrivate := &_rowNumber.RowNumberPrivate
-			needed := _f.funcs.UnionCols3(_f.funcs.NeededRowNumberCols(rowNumberPrivate), _f.funcs.ProjectionOuterCols(projections), passthrough)
+		_ordinality, _ := input.(*memo.OrdinalityExpr)
+		if _ordinality != nil {
+			input := _ordinality.Input
+			ordinalityPrivate := &_ordinality.OrdinalityPrivate
+			needed := _f.funcs.UnionCols3(_f.funcs.NeededOrdinalityCols(ordinalityPrivate), _f.funcs.ProjectionOuterCols(projections), passthrough)
 			if _f.funcs.CanPruneCols(input, needed) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.PruneRowNumberCols) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneOrdinalityCols) {
 					_expr := _f.ConstructProject(
-						_f.ConstructRowNumber(
+						_f.ConstructOrdinality(
 							_f.funcs.PruneCols(input, needed),
-							_f.funcs.PruneOrderingRowNumber(rowNumberPrivate, needed),
+							_f.funcs.PruneOrderingOrdinality(ordinalityPrivate, needed),
 						),
 						projections,
 						passthrough,
 					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PruneRowNumberCols, nil, _expr)
+						_f.appliedRule(opt.PruneOrdinalityCols, nil, _expr)
 					}
 					return _expr
 				}
@@ -7978,30 +7978,30 @@ func (_f *Factory) ConstructShowTraceForSession(
 	return _f.onConstructRelational(e)
 }
 
-// ConstructRowNumber constructs an expression for the RowNumber operator.
-// RowNumber adds a column to each row in its input containing a unique,
+// ConstructOrdinality constructs an expression for the Ordinality operator.
+// Ordinality adds a column to each row in its input containing a unique,
 // increasing number.
-func (_f *Factory) ConstructRowNumber(
+func (_f *Factory) ConstructOrdinality(
 	input memo.RelExpr,
-	rowNumberPrivate *memo.RowNumberPrivate,
+	ordinalityPrivate *memo.OrdinalityPrivate,
 ) memo.RelExpr {
-	// [SimplifyRowNumberOrdering]
+	// [SimplifyOrdinalityOrdering]
 	{
-		if _f.funcs.CanSimplifyRowNumberOrdering(input, rowNumberPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRowNumberOrdering) {
-				_expr := _f.ConstructRowNumber(
+		if _f.funcs.CanSimplifyOrdinalityOrdering(input, ordinalityPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOrdinalityOrdering) {
+				_expr := _f.ConstructOrdinality(
 					input,
-					_f.funcs.SimplifyRowNumberOrdering(input, rowNumberPrivate),
+					_f.funcs.SimplifyOrdinalityOrdering(input, ordinalityPrivate),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyRowNumberOrdering, nil, _expr)
+					_f.appliedRule(opt.SimplifyOrdinalityOrdering, nil, _expr)
 				}
 				return _expr
 			}
 		}
 	}
 
-	e := _f.mem.MemoizeRowNumber(input, rowNumberPrivate)
+	e := _f.mem.MemoizeOrdinality(input, ordinalityPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -8066,6 +8066,27 @@ func (_f *Factory) ConstructProjectSet(
 	}
 
 	e := _f.mem.MemoizeProjectSet(input, zip)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructWindow constructs an expression for the Window operator.
+// Window represents a window function. Window functions are operators which
+// allow computations that take into consideration other rows in the same result
+// set.
+//
+// More concretely, a window function is a relational operator that takes in a
+// result set and appends a single new column whose value depends on the other
+// rows within the result set, and that row's relative position in it.
+//
+// Depending on the exact window function being computed, the value of the new
+// column could be the position of the row in the output (`row_number`), or a
+// cumulative sum, or something else.
+func (_f *Factory) ConstructWindow(
+	input memo.RelExpr,
+	function opt.ScalarExpr,
+	windowPrivate *memo.WindowPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeWindow(input, function, windowPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -13726,6 +13747,44 @@ func (_f *Factory) ConstructAggDistinct(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructRank constructs an expression for the Rank operator.
+// Rank computes the position of a row relative to an ordering, with same-valued
+// rows receiving the same value.
+func (_f *Factory) ConstructRank() opt.ScalarExpr {
+	e := _f.mem.MemoizeRank()
+	return _f.onConstructScalar(e)
+}
+
+// ConstructRowNumber constructs an expression for the RowNumber operator.
+// RowNumber computes the position of a row relative to an ordering, with
+// same-valued rows having ties broken arbitrarily.
+func (_f *Factory) ConstructRowNumber() opt.ScalarExpr {
+	e := _f.mem.MemoizeRowNumber()
+	return _f.onConstructScalar(e)
+}
+
+// ConstructDenseRank constructs an expression for the DenseRank operator.
+// DenseRank is like Rank, but without gaps. Instead of 1, 1, 3, it gives 1, 1, 2.
+func (_f *Factory) ConstructDenseRank() opt.ScalarExpr {
+	e := _f.mem.MemoizeDenseRank()
+	return _f.onConstructScalar(e)
+}
+
+// ConstructPercentRank constructs an expression for the PercentRank operator.
+// PercentRank is (rank - 1) / (total rows - 1).
+func (_f *Factory) ConstructPercentRank() opt.ScalarExpr {
+	e := _f.mem.MemoizePercentRank()
+	return _f.onConstructScalar(e)
+}
+
+// ConstructCumeDist constructs an expression for the CumeDist operator.
+// CumeDist is the relative rank of the current row:
+// (number of rows preceding or peer with current row) / (total rows)
+func (_f *Factory) ConstructCumeDist() opt.ScalarExpr {
+	e := _f.mem.MemoizeCumeDist()
+	return _f.onConstructScalar(e)
+}
+
 // ConstructAggFilter constructs an expression for the AggFilter operator.
 // AggFilter is used as a modifier that wraps the input of an aggregate
 // function. It causes only rows for which the filter expression is true
@@ -14249,10 +14308,10 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.ShowTraceForSessionExpr:
 		return t
 
-	case *memo.RowNumberExpr:
+	case *memo.OrdinalityExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
-			return f.ConstructRowNumber(input, &t.RowNumberPrivate)
+			return f.ConstructOrdinality(input, &t.OrdinalityPrivate)
 		}
 		return t
 
@@ -14261,6 +14320,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		zip, zipChanged := f.replaceZipExpr(t.Zip, replace)
 		if input != t.Input || zipChanged {
 			return f.ConstructProjectSet(input, zip)
+		}
+		return t
+
+	case *memo.WindowExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		function := replace(t.Function).(opt.ScalarExpr)
+		if input != t.Input || function != t.Function {
+			return f.ConstructWindow(input, function, &t.WindowPrivate)
 		}
 		return t
 
@@ -14962,6 +15029,21 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.RankExpr:
+		return t
+
+	case *memo.RowNumberExpr:
+		return t
+
+	case *memo.DenseRankExpr:
+		return t
+
+	case *memo.PercentRankExpr:
+		return t
+
+	case *memo.CumeDistExpr:
+		return t
+
 	case *memo.AggFilterExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		filter := replace(t.Filter).(opt.ScalarExpr)
@@ -15371,16 +15453,23 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.ShowTraceForSessionExpr:
 		return f.mem.MemoizeShowTraceForSession(&t.ShowTracePrivate)
 
-	case *memo.RowNumberExpr:
-		return f.ConstructRowNumber(
+	case *memo.OrdinalityExpr:
+		return f.ConstructOrdinality(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			&t.RowNumberPrivate,
+			&t.OrdinalityPrivate,
 		)
 
 	case *memo.ProjectSetExpr:
 		return f.ConstructProjectSet(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			f.copyAndReplaceDefaultZipExpr(t.Zip, replace),
+		)
+
+	case *memo.WindowExpr:
+		return f.ConstructWindow(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Function, replace).(opt.ScalarExpr),
+			&t.WindowPrivate,
 		)
 
 	case *memo.FakeRelExpr:
@@ -15898,6 +15987,21 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.RankExpr:
+		return t
+
+	case *memo.RowNumberExpr:
+		return t
+
+	case *memo.DenseRankExpr:
+		return t
+
+	case *memo.PercentRankExpr:
+		return t
+
+	case *memo.CumeDistExpr:
+		return t
+
 	case *memo.AggFilterExpr:
 		return f.ConstructAggFilter(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -16206,15 +16310,21 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructShowTraceForSession(
 			args[0].(*memo.ShowTracePrivate),
 		)
-	case opt.RowNumberOp:
-		return f.ConstructRowNumber(
+	case opt.OrdinalityOp:
+		return f.ConstructOrdinality(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.RowNumberPrivate),
+			args[1].(*memo.OrdinalityPrivate),
 		)
 	case opt.ProjectSetOp:
 		return f.ConstructProjectSet(
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.ZipExpr),
+		)
+	case opt.WindowOp:
+		return f.ConstructWindow(
+			args[0].(memo.RelExpr),
+			args[1].(opt.ScalarExpr),
+			args[2].(*memo.WindowPrivate),
 		)
 	case opt.FakeRelOp:
 		return f.ConstructFakeRel(
@@ -16649,6 +16759,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructAggDistinct(
 			args[0].(opt.ScalarExpr),
 		)
+	case opt.RankOp:
+		return f.ConstructRank()
+	case opt.RowNumberOp:
+		return f.ConstructRowNumber()
+	case opt.DenseRankOp:
+		return f.ConstructDenseRank()
+	case opt.PercentRankOp:
+		return f.ConstructPercentRank()
+	case opt.CumeDistOp:
+		return f.ConstructCumeDist()
 	case opt.AggFilterOp:
 		return f.ConstructAggFilter(
 			args[0].(opt.ScalarExpr),

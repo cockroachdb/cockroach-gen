@@ -117,7 +117,7 @@ const (
 	SimplifyLimitOrdering
 	SimplifyOffsetOrdering
 	SimplifyGroupByOrdering
-	SimplifyRowNumberOrdering
+	SimplifyOrdinalityOrdering
 	SimplifyExplainOrdering
 	EliminateProject
 	MergeProjects
@@ -132,7 +132,7 @@ const (
 	PruneAggCols
 	PruneGroupByCols
 	PruneValuesCols
-	PruneRowNumberCols
+	PruneOrdinalityCols
 	PruneExplainCols
 	PruneProjectSetCols
 	PruneMutationFetchCols
