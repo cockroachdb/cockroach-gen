@@ -12488,9 +12488,9 @@ type CreateTablePrivate struct {
 	// Schema is the ID of the catalog schema into which the new table goes.
 	Schema opt.SchemaID
 
-	// InputCols gives the ordering of input columns. It is only defined when the
-	// AS clause was used in the CREATE TABLE statement.
-	InputCols opt.ColList
+	// InputCols gives the ordering and naming of input columns. It is only
+	// defined when the AS clause was used in the CREATE TABLE statement.
+	InputCols physical.Presentation
 
 	// Syntax is the CREATE TABLE AST node.
 	Syntax *tree.CreateTable
@@ -19270,7 +19270,7 @@ func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 	in.hasher.HashOperator(opt.CreateTableOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashSchemaID(val.Schema)
-	in.hasher.HashColList(val.InputCols)
+	in.hasher.HashPresentation(val.InputCols)
 	in.hasher.HashPointer(unsafe.Pointer(val.Syntax))
 
 	in.cache.Start(in.hasher.hash)
@@ -19278,7 +19278,7 @@ func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 		if existing, ok := in.cache.Item().(*CreateTableExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
-				in.hasher.IsColListEqual(val.InputCols, existing.InputCols) &&
+				in.hasher.IsPresentationEqual(val.InputCols, existing.InputCols) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Syntax), unsafe.Pointer(existing.Syntax)) {
 				return existing
 			}
