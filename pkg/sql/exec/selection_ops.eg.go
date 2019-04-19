@@ -4,6 +4,7 @@ package exec
 
 import (
 	"bytes"
+	"context"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
@@ -21,9 +22,9 @@ type selEQBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selEQBoolBoolConstOp) Next() coldata.Batch {
+func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -71,9 +72,9 @@ type selEQBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selEQBoolBoolOp) Next() coldata.Batch {
+func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -123,9 +124,9 @@ type selNEBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selNEBoolBoolConstOp) Next() coldata.Batch {
+func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -173,9 +174,9 @@ type selNEBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selNEBoolBoolOp) Next() coldata.Batch {
+func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -225,9 +226,9 @@ type selLTBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selLTBoolBoolConstOp) Next() coldata.Batch {
+func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -275,9 +276,9 @@ type selLTBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selLTBoolBoolOp) Next() coldata.Batch {
+func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -327,9 +328,9 @@ type selLEBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selLEBoolBoolConstOp) Next() coldata.Batch {
+func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -377,9 +378,9 @@ type selLEBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selLEBoolBoolOp) Next() coldata.Batch {
+func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -429,9 +430,9 @@ type selGTBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selGTBoolBoolConstOp) Next() coldata.Batch {
+func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -479,9 +480,9 @@ type selGTBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selGTBoolBoolOp) Next() coldata.Batch {
+func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -531,9 +532,9 @@ type selGEBoolBoolConstOp struct {
 	constArg bool
 }
 
-func (p *selGEBoolBoolConstOp) Next() coldata.Batch {
+func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -581,9 +582,9 @@ type selGEBoolBoolOp struct {
 	col2Idx int
 }
 
-func (p *selGEBoolBoolOp) Next() coldata.Batch {
+func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -633,9 +634,9 @@ type selEQBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selEQBytesBytesConstOp) Next() coldata.Batch {
+func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -683,9 +684,9 @@ type selEQBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selEQBytesBytesOp) Next() coldata.Batch {
+func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -735,9 +736,9 @@ type selNEBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selNEBytesBytesConstOp) Next() coldata.Batch {
+func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -785,9 +786,9 @@ type selNEBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selNEBytesBytesOp) Next() coldata.Batch {
+func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -837,9 +838,9 @@ type selLTBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selLTBytesBytesConstOp) Next() coldata.Batch {
+func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -887,9 +888,9 @@ type selLTBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selLTBytesBytesOp) Next() coldata.Batch {
+func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -939,9 +940,9 @@ type selLEBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selLEBytesBytesConstOp) Next() coldata.Batch {
+func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -989,9 +990,9 @@ type selLEBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selLEBytesBytesOp) Next() coldata.Batch {
+func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1041,9 +1042,9 @@ type selGTBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selGTBytesBytesConstOp) Next() coldata.Batch {
+func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1091,9 +1092,9 @@ type selGTBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selGTBytesBytesOp) Next() coldata.Batch {
+func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1143,9 +1144,9 @@ type selGEBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selGEBytesBytesConstOp) Next() coldata.Batch {
+func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1193,9 +1194,9 @@ type selGEBytesBytesOp struct {
 	col2Idx int
 }
 
-func (p *selGEBytesBytesOp) Next() coldata.Batch {
+func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1245,9 +1246,9 @@ type selEQDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selEQDecimalDecimalConstOp) Next() coldata.Batch {
+func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1295,9 +1296,9 @@ type selEQDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selEQDecimalDecimalOp) Next() coldata.Batch {
+func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1347,9 +1348,9 @@ type selNEDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selNEDecimalDecimalConstOp) Next() coldata.Batch {
+func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1397,9 +1398,9 @@ type selNEDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selNEDecimalDecimalOp) Next() coldata.Batch {
+func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1449,9 +1450,9 @@ type selLTDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selLTDecimalDecimalConstOp) Next() coldata.Batch {
+func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1499,9 +1500,9 @@ type selLTDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selLTDecimalDecimalOp) Next() coldata.Batch {
+func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1551,9 +1552,9 @@ type selLEDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selLEDecimalDecimalConstOp) Next() coldata.Batch {
+func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1601,9 +1602,9 @@ type selLEDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selLEDecimalDecimalOp) Next() coldata.Batch {
+func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1653,9 +1654,9 @@ type selGTDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selGTDecimalDecimalConstOp) Next() coldata.Batch {
+func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1703,9 +1704,9 @@ type selGTDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selGTDecimalDecimalOp) Next() coldata.Batch {
+func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1755,9 +1756,9 @@ type selGEDecimalDecimalConstOp struct {
 	constArg apd.Decimal
 }
 
-func (p *selGEDecimalDecimalConstOp) Next() coldata.Batch {
+func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1805,9 +1806,9 @@ type selGEDecimalDecimalOp struct {
 	col2Idx int
 }
 
-func (p *selGEDecimalDecimalOp) Next() coldata.Batch {
+func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1857,9 +1858,9 @@ type selEQInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selEQInt8Int8ConstOp) Next() coldata.Batch {
+func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1907,9 +1908,9 @@ type selEQInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt8Int8Op) Next() coldata.Batch {
+func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -1959,9 +1960,9 @@ type selNEInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selNEInt8Int8ConstOp) Next() coldata.Batch {
+func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2009,9 +2010,9 @@ type selNEInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt8Int8Op) Next() coldata.Batch {
+func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2061,9 +2062,9 @@ type selLTInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selLTInt8Int8ConstOp) Next() coldata.Batch {
+func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2111,9 +2112,9 @@ type selLTInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt8Int8Op) Next() coldata.Batch {
+func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2163,9 +2164,9 @@ type selLEInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selLEInt8Int8ConstOp) Next() coldata.Batch {
+func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2213,9 +2214,9 @@ type selLEInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt8Int8Op) Next() coldata.Batch {
+func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2265,9 +2266,9 @@ type selGTInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selGTInt8Int8ConstOp) Next() coldata.Batch {
+func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2315,9 +2316,9 @@ type selGTInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt8Int8Op) Next() coldata.Batch {
+func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2367,9 +2368,9 @@ type selGEInt8Int8ConstOp struct {
 	constArg int8
 }
 
-func (p *selGEInt8Int8ConstOp) Next() coldata.Batch {
+func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2417,9 +2418,9 @@ type selGEInt8Int8Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt8Int8Op) Next() coldata.Batch {
+func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2469,9 +2470,9 @@ type selEQInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selEQInt16Int16ConstOp) Next() coldata.Batch {
+func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2519,9 +2520,9 @@ type selEQInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt16Int16Op) Next() coldata.Batch {
+func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2571,9 +2572,9 @@ type selNEInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selNEInt16Int16ConstOp) Next() coldata.Batch {
+func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2621,9 +2622,9 @@ type selNEInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt16Int16Op) Next() coldata.Batch {
+func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2673,9 +2674,9 @@ type selLTInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selLTInt16Int16ConstOp) Next() coldata.Batch {
+func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2723,9 +2724,9 @@ type selLTInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt16Int16Op) Next() coldata.Batch {
+func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2775,9 +2776,9 @@ type selLEInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selLEInt16Int16ConstOp) Next() coldata.Batch {
+func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2825,9 +2826,9 @@ type selLEInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt16Int16Op) Next() coldata.Batch {
+func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2877,9 +2878,9 @@ type selGTInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selGTInt16Int16ConstOp) Next() coldata.Batch {
+func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2927,9 +2928,9 @@ type selGTInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt16Int16Op) Next() coldata.Batch {
+func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -2979,9 +2980,9 @@ type selGEInt16Int16ConstOp struct {
 	constArg int16
 }
 
-func (p *selGEInt16Int16ConstOp) Next() coldata.Batch {
+func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3029,9 +3030,9 @@ type selGEInt16Int16Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt16Int16Op) Next() coldata.Batch {
+func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3081,9 +3082,9 @@ type selEQInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selEQInt32Int32ConstOp) Next() coldata.Batch {
+func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3131,9 +3132,9 @@ type selEQInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt32Int32Op) Next() coldata.Batch {
+func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3183,9 +3184,9 @@ type selNEInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selNEInt32Int32ConstOp) Next() coldata.Batch {
+func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3233,9 +3234,9 @@ type selNEInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt32Int32Op) Next() coldata.Batch {
+func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3285,9 +3286,9 @@ type selLTInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selLTInt32Int32ConstOp) Next() coldata.Batch {
+func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3335,9 +3336,9 @@ type selLTInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt32Int32Op) Next() coldata.Batch {
+func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3387,9 +3388,9 @@ type selLEInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selLEInt32Int32ConstOp) Next() coldata.Batch {
+func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3437,9 +3438,9 @@ type selLEInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt32Int32Op) Next() coldata.Batch {
+func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3489,9 +3490,9 @@ type selGTInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selGTInt32Int32ConstOp) Next() coldata.Batch {
+func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3539,9 +3540,9 @@ type selGTInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt32Int32Op) Next() coldata.Batch {
+func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3591,9 +3592,9 @@ type selGEInt32Int32ConstOp struct {
 	constArg int32
 }
 
-func (p *selGEInt32Int32ConstOp) Next() coldata.Batch {
+func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3641,9 +3642,9 @@ type selGEInt32Int32Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt32Int32Op) Next() coldata.Batch {
+func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3693,9 +3694,9 @@ type selEQInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selEQInt64Int64ConstOp) Next() coldata.Batch {
+func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3743,9 +3744,9 @@ type selEQInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selEQInt64Int64Op) Next() coldata.Batch {
+func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3795,9 +3796,9 @@ type selNEInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selNEInt64Int64ConstOp) Next() coldata.Batch {
+func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3845,9 +3846,9 @@ type selNEInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selNEInt64Int64Op) Next() coldata.Batch {
+func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3897,9 +3898,9 @@ type selLTInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selLTInt64Int64ConstOp) Next() coldata.Batch {
+func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3947,9 +3948,9 @@ type selLTInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selLTInt64Int64Op) Next() coldata.Batch {
+func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -3999,9 +4000,9 @@ type selLEInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selLEInt64Int64ConstOp) Next() coldata.Batch {
+func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4049,9 +4050,9 @@ type selLEInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selLEInt64Int64Op) Next() coldata.Batch {
+func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4101,9 +4102,9 @@ type selGTInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selGTInt64Int64ConstOp) Next() coldata.Batch {
+func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4151,9 +4152,9 @@ type selGTInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selGTInt64Int64Op) Next() coldata.Batch {
+func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4203,9 +4204,9 @@ type selGEInt64Int64ConstOp struct {
 	constArg int64
 }
 
-func (p *selGEInt64Int64ConstOp) Next() coldata.Batch {
+func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4253,9 +4254,9 @@ type selGEInt64Int64Op struct {
 	col2Idx int
 }
 
-func (p *selGEInt64Int64Op) Next() coldata.Batch {
+func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4305,9 +4306,9 @@ type selEQFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selEQFloat32Float32ConstOp) Next() coldata.Batch {
+func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4355,9 +4356,9 @@ type selEQFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selEQFloat32Float32Op) Next() coldata.Batch {
+func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4407,9 +4408,9 @@ type selNEFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selNEFloat32Float32ConstOp) Next() coldata.Batch {
+func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4457,9 +4458,9 @@ type selNEFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selNEFloat32Float32Op) Next() coldata.Batch {
+func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4509,9 +4510,9 @@ type selLTFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selLTFloat32Float32ConstOp) Next() coldata.Batch {
+func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4559,9 +4560,9 @@ type selLTFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selLTFloat32Float32Op) Next() coldata.Batch {
+func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4611,9 +4612,9 @@ type selLEFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selLEFloat32Float32ConstOp) Next() coldata.Batch {
+func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4661,9 +4662,9 @@ type selLEFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selLEFloat32Float32Op) Next() coldata.Batch {
+func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4713,9 +4714,9 @@ type selGTFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selGTFloat32Float32ConstOp) Next() coldata.Batch {
+func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4763,9 +4764,9 @@ type selGTFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selGTFloat32Float32Op) Next() coldata.Batch {
+func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4815,9 +4816,9 @@ type selGEFloat32Float32ConstOp struct {
 	constArg float32
 }
 
-func (p *selGEFloat32Float32ConstOp) Next() coldata.Batch {
+func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4865,9 +4866,9 @@ type selGEFloat32Float32Op struct {
 	col2Idx int
 }
 
-func (p *selGEFloat32Float32Op) Next() coldata.Batch {
+func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4917,9 +4918,9 @@ type selEQFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selEQFloat64Float64ConstOp) Next() coldata.Batch {
+func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -4967,9 +4968,9 @@ type selEQFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selEQFloat64Float64Op) Next() coldata.Batch {
+func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5019,9 +5020,9 @@ type selNEFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selNEFloat64Float64ConstOp) Next() coldata.Batch {
+func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5069,9 +5070,9 @@ type selNEFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selNEFloat64Float64Op) Next() coldata.Batch {
+func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5121,9 +5122,9 @@ type selLTFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selLTFloat64Float64ConstOp) Next() coldata.Batch {
+func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5171,9 +5172,9 @@ type selLTFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selLTFloat64Float64Op) Next() coldata.Batch {
+func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5223,9 +5224,9 @@ type selLEFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selLEFloat64Float64ConstOp) Next() coldata.Batch {
+func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5273,9 +5274,9 @@ type selLEFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selLEFloat64Float64Op) Next() coldata.Batch {
+func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5325,9 +5326,9 @@ type selGTFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selGTFloat64Float64ConstOp) Next() coldata.Batch {
+func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5375,9 +5376,9 @@ type selGTFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selGTFloat64Float64Op) Next() coldata.Batch {
+func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5427,9 +5428,9 @@ type selGEFloat64Float64ConstOp struct {
 	constArg float64
 }
 
-func (p *selGEFloat64Float64ConstOp) Next() coldata.Batch {
+func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -5477,9 +5478,9 @@ type selGEFloat64Float64Op struct {
 	col2Idx int
 }
 
-func (p *selGEFloat64Float64Op) Next() coldata.Batch {
+func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}

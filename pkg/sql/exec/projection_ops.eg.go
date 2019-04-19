@@ -4,6 +4,7 @@ package exec
 
 import (
 	"bytes"
+	"context"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
@@ -23,8 +24,8 @@ type projEQBoolBoolConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQBoolBoolConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -57,8 +58,8 @@ type projEQBoolConstBoolOp struct {
 	outputIdx int
 }
 
-func (p *projEQBoolConstBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -91,8 +92,8 @@ type projEQBoolBoolOp struct {
 	outputIdx int
 }
 
-func (p *projEQBoolBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -126,8 +127,8 @@ type projNEBoolBoolConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEBoolBoolConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -160,8 +161,8 @@ type projNEBoolConstBoolOp struct {
 	outputIdx int
 }
 
-func (p *projNEBoolConstBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -194,8 +195,8 @@ type projNEBoolBoolOp struct {
 	outputIdx int
 }
 
-func (p *projNEBoolBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -229,8 +230,8 @@ type projLTBoolBoolConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTBoolBoolConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -263,8 +264,8 @@ type projLTBoolConstBoolOp struct {
 	outputIdx int
 }
 
-func (p *projLTBoolConstBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -297,8 +298,8 @@ type projLTBoolBoolOp struct {
 	outputIdx int
 }
 
-func (p *projLTBoolBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -332,8 +333,8 @@ type projLEBoolBoolConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEBoolBoolConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -366,8 +367,8 @@ type projLEBoolConstBoolOp struct {
 	outputIdx int
 }
 
-func (p *projLEBoolConstBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -400,8 +401,8 @@ type projLEBoolBoolOp struct {
 	outputIdx int
 }
 
-func (p *projLEBoolBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -435,8 +436,8 @@ type projGTBoolBoolConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTBoolBoolConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -469,8 +470,8 @@ type projGTBoolConstBoolOp struct {
 	outputIdx int
 }
 
-func (p *projGTBoolConstBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -503,8 +504,8 @@ type projGTBoolBoolOp struct {
 	outputIdx int
 }
 
-func (p *projGTBoolBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -538,8 +539,8 @@ type projGEBoolBoolConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEBoolBoolConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -572,8 +573,8 @@ type projGEBoolConstBoolOp struct {
 	outputIdx int
 }
 
-func (p *projGEBoolConstBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -606,8 +607,8 @@ type projGEBoolBoolOp struct {
 	outputIdx int
 }
 
-func (p *projGEBoolBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -641,8 +642,8 @@ type projEQBytesBytesConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQBytesBytesConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -675,8 +676,8 @@ type projEQBytesConstBytesOp struct {
 	outputIdx int
 }
 
-func (p *projEQBytesConstBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -709,8 +710,8 @@ type projEQBytesBytesOp struct {
 	outputIdx int
 }
 
-func (p *projEQBytesBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -744,8 +745,8 @@ type projNEBytesBytesConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEBytesBytesConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -778,8 +779,8 @@ type projNEBytesConstBytesOp struct {
 	outputIdx int
 }
 
-func (p *projNEBytesConstBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -812,8 +813,8 @@ type projNEBytesBytesOp struct {
 	outputIdx int
 }
 
-func (p *projNEBytesBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -847,8 +848,8 @@ type projLTBytesBytesConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTBytesBytesConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -881,8 +882,8 @@ type projLTBytesConstBytesOp struct {
 	outputIdx int
 }
 
-func (p *projLTBytesConstBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -915,8 +916,8 @@ type projLTBytesBytesOp struct {
 	outputIdx int
 }
 
-func (p *projLTBytesBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -950,8 +951,8 @@ type projLEBytesBytesConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEBytesBytesConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -984,8 +985,8 @@ type projLEBytesConstBytesOp struct {
 	outputIdx int
 }
 
-func (p *projLEBytesConstBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1018,8 +1019,8 @@ type projLEBytesBytesOp struct {
 	outputIdx int
 }
 
-func (p *projLEBytesBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1053,8 +1054,8 @@ type projGTBytesBytesConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTBytesBytesConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1087,8 +1088,8 @@ type projGTBytesConstBytesOp struct {
 	outputIdx int
 }
 
-func (p *projGTBytesConstBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1121,8 +1122,8 @@ type projGTBytesBytesOp struct {
 	outputIdx int
 }
 
-func (p *projGTBytesBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1156,8 +1157,8 @@ type projGEBytesBytesConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEBytesBytesConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1190,8 +1191,8 @@ type projGEBytesConstBytesOp struct {
 	outputIdx int
 }
 
-func (p *projGEBytesConstBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1224,8 +1225,8 @@ type projGEBytesBytesOp struct {
 	outputIdx int
 }
 
-func (p *projGEBytesBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1259,8 +1260,8 @@ type projPlusDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1297,8 +1298,8 @@ type projPlusDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projPlusDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1335,8 +1336,8 @@ type projPlusDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projPlusDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1374,8 +1375,8 @@ type projMinusDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1412,8 +1413,8 @@ type projMinusDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projMinusDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1450,8 +1451,8 @@ type projMinusDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projMinusDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1489,8 +1490,8 @@ type projMultDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1527,8 +1528,8 @@ type projMultDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projMultDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1565,8 +1566,8 @@ type projMultDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projMultDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1604,8 +1605,8 @@ type projDivDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1642,8 +1643,8 @@ type projDivDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projDivDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1680,8 +1681,8 @@ type projDivDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projDivDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Decimal)
 	}
@@ -1719,8 +1720,8 @@ type projEQDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1753,8 +1754,8 @@ type projEQDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projEQDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1787,8 +1788,8 @@ type projEQDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projEQDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1822,8 +1823,8 @@ type projNEDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1856,8 +1857,8 @@ type projNEDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projNEDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1890,8 +1891,8 @@ type projNEDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projNEDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1925,8 +1926,8 @@ type projLTDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1959,8 +1960,8 @@ type projLTDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projLTDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -1993,8 +1994,8 @@ type projLTDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projLTDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2028,8 +2029,8 @@ type projLEDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2062,8 +2063,8 @@ type projLEDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projLEDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2096,8 +2097,8 @@ type projLEDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projLEDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2131,8 +2132,8 @@ type projGTDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2165,8 +2166,8 @@ type projGTDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projGTDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2199,8 +2200,8 @@ type projGTDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projGTDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2234,8 +2235,8 @@ type projGEDecimalDecimalConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEDecimalDecimalConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2268,8 +2269,8 @@ type projGEDecimalConstDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projGEDecimalConstDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2302,8 +2303,8 @@ type projGEDecimalDecimalOp struct {
 	outputIdx int
 }
 
-func (p *projGEDecimalDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2337,8 +2338,8 @@ type projPlusInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2371,8 +2372,8 @@ type projPlusInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2405,8 +2406,8 @@ type projPlusInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2440,8 +2441,8 @@ type projMinusInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2474,8 +2475,8 @@ type projMinusInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2508,8 +2509,8 @@ type projMinusInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2543,8 +2544,8 @@ type projMultInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2577,8 +2578,8 @@ type projMultInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2611,8 +2612,8 @@ type projMultInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2646,8 +2647,8 @@ type projDivInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2680,8 +2681,8 @@ type projDivInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2714,8 +2715,8 @@ type projDivInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int8)
 	}
@@ -2749,8 +2750,8 @@ type projEQInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2783,8 +2784,8 @@ type projEQInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2817,8 +2818,8 @@ type projEQInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2852,8 +2853,8 @@ type projNEInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2886,8 +2887,8 @@ type projNEInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2920,8 +2921,8 @@ type projNEInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2955,8 +2956,8 @@ type projLTInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -2989,8 +2990,8 @@ type projLTInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3023,8 +3024,8 @@ type projLTInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3058,8 +3059,8 @@ type projLEInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3092,8 +3093,8 @@ type projLEInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3126,8 +3127,8 @@ type projLEInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3161,8 +3162,8 @@ type projGTInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3195,8 +3196,8 @@ type projGTInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3229,8 +3230,8 @@ type projGTInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3264,8 +3265,8 @@ type projGEInt8Int8ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEInt8Int8ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3298,8 +3299,8 @@ type projGEInt8ConstInt8Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt8ConstInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3332,8 +3333,8 @@ type projGEInt8Int8Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt8Int8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3367,8 +3368,8 @@ type projPlusInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3401,8 +3402,8 @@ type projPlusInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3435,8 +3436,8 @@ type projPlusInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3470,8 +3471,8 @@ type projMinusInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3504,8 +3505,8 @@ type projMinusInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3538,8 +3539,8 @@ type projMinusInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3573,8 +3574,8 @@ type projMultInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3607,8 +3608,8 @@ type projMultInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3641,8 +3642,8 @@ type projMultInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3676,8 +3677,8 @@ type projDivInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3710,8 +3711,8 @@ type projDivInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3744,8 +3745,8 @@ type projDivInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int16)
 	}
@@ -3779,8 +3780,8 @@ type projEQInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3813,8 +3814,8 @@ type projEQInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3847,8 +3848,8 @@ type projEQInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3882,8 +3883,8 @@ type projNEInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3916,8 +3917,8 @@ type projNEInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3950,8 +3951,8 @@ type projNEInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -3985,8 +3986,8 @@ type projLTInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4019,8 +4020,8 @@ type projLTInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4053,8 +4054,8 @@ type projLTInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4088,8 +4089,8 @@ type projLEInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4122,8 +4123,8 @@ type projLEInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4156,8 +4157,8 @@ type projLEInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4191,8 +4192,8 @@ type projGTInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4225,8 +4226,8 @@ type projGTInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4259,8 +4260,8 @@ type projGTInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4294,8 +4295,8 @@ type projGEInt16Int16ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEInt16Int16ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4328,8 +4329,8 @@ type projGEInt16ConstInt16Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt16ConstInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4362,8 +4363,8 @@ type projGEInt16Int16Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt16Int16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4397,8 +4398,8 @@ type projPlusInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4431,8 +4432,8 @@ type projPlusInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4465,8 +4466,8 @@ type projPlusInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4500,8 +4501,8 @@ type projMinusInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4534,8 +4535,8 @@ type projMinusInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4568,8 +4569,8 @@ type projMinusInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4603,8 +4604,8 @@ type projMultInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4637,8 +4638,8 @@ type projMultInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4671,8 +4672,8 @@ type projMultInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4706,8 +4707,8 @@ type projDivInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4740,8 +4741,8 @@ type projDivInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4774,8 +4775,8 @@ type projDivInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int32)
 	}
@@ -4809,8 +4810,8 @@ type projEQInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4843,8 +4844,8 @@ type projEQInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4877,8 +4878,8 @@ type projEQInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4912,8 +4913,8 @@ type projNEInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4946,8 +4947,8 @@ type projNEInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -4980,8 +4981,8 @@ type projNEInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5015,8 +5016,8 @@ type projLTInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5049,8 +5050,8 @@ type projLTInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5083,8 +5084,8 @@ type projLTInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5118,8 +5119,8 @@ type projLEInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5152,8 +5153,8 @@ type projLEInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5186,8 +5187,8 @@ type projLEInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5221,8 +5222,8 @@ type projGTInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5255,8 +5256,8 @@ type projGTInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5289,8 +5290,8 @@ type projGTInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5324,8 +5325,8 @@ type projGEInt32Int32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEInt32Int32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5358,8 +5359,8 @@ type projGEInt32ConstInt32Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt32ConstInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5392,8 +5393,8 @@ type projGEInt32Int32Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt32Int32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5427,8 +5428,8 @@ type projPlusInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5461,8 +5462,8 @@ type projPlusInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5495,8 +5496,8 @@ type projPlusInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projPlusInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5530,8 +5531,8 @@ type projMinusInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5564,8 +5565,8 @@ type projMinusInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5598,8 +5599,8 @@ type projMinusInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projMinusInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5633,8 +5634,8 @@ type projMultInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5667,8 +5668,8 @@ type projMultInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5701,8 +5702,8 @@ type projMultInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projMultInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5736,8 +5737,8 @@ type projDivInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5770,8 +5771,8 @@ type projDivInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5804,8 +5805,8 @@ type projDivInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projDivInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Int64)
 	}
@@ -5839,8 +5840,8 @@ type projEQInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5873,8 +5874,8 @@ type projEQInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5907,8 +5908,8 @@ type projEQInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projEQInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5942,8 +5943,8 @@ type projNEInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -5976,8 +5977,8 @@ type projNEInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6010,8 +6011,8 @@ type projNEInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projNEInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6045,8 +6046,8 @@ type projLTInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6079,8 +6080,8 @@ type projLTInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6113,8 +6114,8 @@ type projLTInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projLTInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6148,8 +6149,8 @@ type projLEInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6182,8 +6183,8 @@ type projLEInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6216,8 +6217,8 @@ type projLEInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projLEInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6251,8 +6252,8 @@ type projGTInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6285,8 +6286,8 @@ type projGTInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6319,8 +6320,8 @@ type projGTInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projGTInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6354,8 +6355,8 @@ type projGEInt64Int64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEInt64Int64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6388,8 +6389,8 @@ type projGEInt64ConstInt64Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt64ConstInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6422,8 +6423,8 @@ type projGEInt64Int64Op struct {
 	outputIdx int
 }
 
-func (p *projGEInt64Int64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6457,8 +6458,8 @@ type projPlusFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6491,8 +6492,8 @@ type projPlusFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projPlusFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6525,8 +6526,8 @@ type projPlusFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projPlusFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6560,8 +6561,8 @@ type projMinusFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6594,8 +6595,8 @@ type projMinusFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projMinusFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6628,8 +6629,8 @@ type projMinusFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projMinusFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6663,8 +6664,8 @@ type projMultFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6697,8 +6698,8 @@ type projMultFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projMultFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6731,8 +6732,8 @@ type projMultFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projMultFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6766,8 +6767,8 @@ type projDivFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6800,8 +6801,8 @@ type projDivFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projDivFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6834,8 +6835,8 @@ type projDivFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projDivFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float32)
 	}
@@ -6869,8 +6870,8 @@ type projEQFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6903,8 +6904,8 @@ type projEQFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projEQFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6937,8 +6938,8 @@ type projEQFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projEQFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -6972,8 +6973,8 @@ type projNEFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7006,8 +7007,8 @@ type projNEFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projNEFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7040,8 +7041,8 @@ type projNEFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projNEFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7075,8 +7076,8 @@ type projLTFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7109,8 +7110,8 @@ type projLTFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projLTFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7143,8 +7144,8 @@ type projLTFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projLTFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7178,8 +7179,8 @@ type projLEFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7212,8 +7213,8 @@ type projLEFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projLEFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7246,8 +7247,8 @@ type projLEFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projLEFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7281,8 +7282,8 @@ type projGTFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7315,8 +7316,8 @@ type projGTFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projGTFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7349,8 +7350,8 @@ type projGTFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projGTFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7384,8 +7385,8 @@ type projGEFloat32Float32ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEFloat32Float32ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7418,8 +7419,8 @@ type projGEFloat32ConstFloat32Op struct {
 	outputIdx int
 }
 
-func (p *projGEFloat32ConstFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7452,8 +7453,8 @@ type projGEFloat32Float32Op struct {
 	outputIdx int
 }
 
-func (p *projGEFloat32Float32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7487,8 +7488,8 @@ type projPlusFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projPlusFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7521,8 +7522,8 @@ type projPlusFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projPlusFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7555,8 +7556,8 @@ type projPlusFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projPlusFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7590,8 +7591,8 @@ type projMinusFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMinusFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7624,8 +7625,8 @@ type projMinusFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projMinusFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7658,8 +7659,8 @@ type projMinusFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projMinusFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7693,8 +7694,8 @@ type projMultFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projMultFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7727,8 +7728,8 @@ type projMultFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projMultFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7761,8 +7762,8 @@ type projMultFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projMultFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7796,8 +7797,8 @@ type projDivFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projDivFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7830,8 +7831,8 @@ type projDivFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projDivFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7864,8 +7865,8 @@ type projDivFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projDivFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Float64)
 	}
@@ -7899,8 +7900,8 @@ type projEQFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projEQFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7933,8 +7934,8 @@ type projEQFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projEQFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -7967,8 +7968,8 @@ type projEQFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projEQFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8002,8 +8003,8 @@ type projNEFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projNEFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8036,8 +8037,8 @@ type projNEFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projNEFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8070,8 +8071,8 @@ type projNEFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projNEFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8105,8 +8106,8 @@ type projLTFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLTFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8139,8 +8140,8 @@ type projLTFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projLTFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8173,8 +8174,8 @@ type projLTFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projLTFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8208,8 +8209,8 @@ type projLEFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projLEFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8242,8 +8243,8 @@ type projLEFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projLEFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8276,8 +8277,8 @@ type projLEFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projLEFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8311,8 +8312,8 @@ type projGTFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGTFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8345,8 +8346,8 @@ type projGTFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projGTFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8379,8 +8380,8 @@ type projGTFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projGTFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8414,8 +8415,8 @@ type projGEFloat64Float64ConstOp struct {
 	outputIdx int
 }
 
-func (p *projGEFloat64Float64ConstOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8448,8 +8449,8 @@ type projGEFloat64ConstFloat64Op struct {
 	outputIdx int
 }
 
-func (p *projGEFloat64ConstFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}
@@ -8482,8 +8483,8 @@ type projGEFloat64Float64Op struct {
 	outputIdx int
 }
 
-func (p *projGEFloat64Float64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	}

@@ -4,6 +4,7 @@ package exec
 
 import (
 	"bytes"
+	"context"
 	"regexp"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
@@ -16,9 +17,9 @@ type selPrefixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selPrefixBytesBytesConstOp) Next() coldata.Batch {
+func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -66,9 +67,9 @@ type selSuffixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selSuffixBytesBytesConstOp) Next() coldata.Batch {
+func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -116,9 +117,9 @@ type selRegexpBytesBytesConstOp struct {
 	constArg *regexp.Regexp
 }
 
-func (p *selRegexpBytesBytesConstOp) Next() coldata.Batch {
+func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -166,9 +167,9 @@ type selNotPrefixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selNotPrefixBytesBytesConstOp) Next() coldata.Batch {
+func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -216,9 +217,9 @@ type selNotSuffixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p *selNotSuffixBytesBytesConstOp) Next() coldata.Batch {
+func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}
@@ -266,9 +267,9 @@ type selNotRegexpBytesBytesConstOp struct {
 	constArg *regexp.Regexp
 }
 
-func (p *selNotRegexpBytesBytesConstOp) Next() coldata.Batch {
+func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	for {
-		batch := p.input.Next()
+		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
 			return batch
 		}

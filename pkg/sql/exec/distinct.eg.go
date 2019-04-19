@@ -14,6 +14,7 @@ package exec
 
 import (
 	"bytes"
+	"context"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
@@ -185,8 +186,8 @@ func (p *sortedDistinctBoolOp) reset() {
 	}
 }
 
-func (p *sortedDistinctBoolOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -304,8 +305,8 @@ func (p *sortedDistinctBytesOp) reset() {
 	}
 }
 
-func (p *sortedDistinctBytesOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -423,8 +424,8 @@ func (p *sortedDistinctDecimalOp) reset() {
 	}
 }
 
-func (p *sortedDistinctDecimalOp) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -542,8 +543,8 @@ func (p *sortedDistinctInt8Op) reset() {
 	}
 }
 
-func (p *sortedDistinctInt8Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -661,8 +662,8 @@ func (p *sortedDistinctInt16Op) reset() {
 	}
 }
 
-func (p *sortedDistinctInt16Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -780,8 +781,8 @@ func (p *sortedDistinctInt32Op) reset() {
 	}
 }
 
-func (p *sortedDistinctInt32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -899,8 +900,8 @@ func (p *sortedDistinctInt64Op) reset() {
 	}
 }
 
-func (p *sortedDistinctInt64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -1018,8 +1019,8 @@ func (p *sortedDistinctFloat32Op) reset() {
 	}
 }
 
-func (p *sortedDistinctFloat32Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -1137,8 +1138,8 @@ func (p *sortedDistinctFloat64Op) reset() {
 	}
 }
 
-func (p *sortedDistinctFloat64Op) Next() coldata.Batch {
-	batch := p.input.Next()
+func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
