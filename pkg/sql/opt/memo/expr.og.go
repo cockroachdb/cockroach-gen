@@ -5,14 +5,13 @@ package memo
 import (
 	"unsafe"
 
-	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/pgwire/pgerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
 
 // SortExpr enforces the ordering of rows returned by its input expression. Rows can
@@ -5686,7 +5685,7 @@ type SubqueryExpr struct {
 	Input RelExpr
 	SubqueryPrivate
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -5731,7 +5730,7 @@ func (e *SubqueryExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *SubqueryExpr) DataType() types.T {
+func (e *SubqueryExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -5830,7 +5829,7 @@ func (e *AnyExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AnyExpr) DataType() types.T {
+func (e *AnyExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -5884,7 +5883,7 @@ func (e *ExistsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ExistsExpr) DataType() types.T {
+func (e *ExistsExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -5893,7 +5892,7 @@ func (e *ExistsExpr) DataType() types.T {
 type VariableExpr struct {
 	Col opt.ColumnID
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -5929,7 +5928,7 @@ func (e *VariableExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *VariableExpr) DataType() types.T {
+func (e *VariableExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -5938,7 +5937,7 @@ func (e *VariableExpr) DataType() types.T {
 type ConstExpr struct {
 	Value tree.Datum
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -5974,7 +5973,7 @@ func (e *ConstExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ConstExpr) DataType() types.T {
+func (e *ConstExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -5995,7 +5994,7 @@ func (e *ConstExpr) DataType() types.T {
 // and replacement easier and more efficient, as patterns can contain (Null)
 // expressions.
 type NullExpr struct {
-	Typ types.T
+	Typ *types.T
 
 	id opt.ScalarID
 }
@@ -6032,7 +6031,7 @@ func (e *NullExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NullExpr) DataType() types.T {
+func (e *NullExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -6075,7 +6074,7 @@ func (e *TrueExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *TrueExpr) DataType() types.T {
+func (e *TrueExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -6118,14 +6117,14 @@ func (e *FalseExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FalseExpr) DataType() types.T {
+func (e *FalseExpr) DataType() *types.T {
 	return types.Bool
 }
 
 type PlaceholderExpr struct {
 	Value tree.TypedExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -6161,13 +6160,13 @@ func (e *PlaceholderExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *PlaceholderExpr) DataType() types.T {
+func (e *PlaceholderExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type TupleExpr struct {
 	Elems ScalarListExpr
-	Typ   types.T
+	Typ   *types.T
 
 	id opt.ScalarID
 }
@@ -6213,7 +6212,7 @@ func (e *TupleExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *TupleExpr) DataType() types.T {
+func (e *TupleExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -6257,7 +6256,7 @@ func (e *ProjectionsExpr) SetChild(nth int, child opt.Expr) {
 	(*e)[nth] = *child.(*ProjectionsItem)
 }
 
-func (e *ProjectionsExpr) DataType() types.T {
+func (e *ProjectionsExpr) DataType() *types.T {
 	return types.Any
 }
 
@@ -6278,7 +6277,7 @@ type ProjectionsItem struct {
 	Element opt.ScalarExpr
 	ColPrivate
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -6323,7 +6322,7 @@ func (e *ProjectionsItem) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ProjectionsItem) DataType() types.T {
+func (e *ProjectionsItem) DataType() *types.T {
 	return e.Typ
 }
 
@@ -6386,7 +6385,7 @@ func (e *AggregationsExpr) SetChild(nth int, child opt.Expr) {
 	(*e)[nth] = *child.(*AggregationsItem)
 }
 
-func (e *AggregationsExpr) DataType() types.T {
+func (e *AggregationsExpr) DataType() *types.T {
 	return types.Any
 }
 
@@ -6409,7 +6408,7 @@ type AggregationsItem struct {
 	Agg opt.ScalarExpr
 	ColPrivate
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -6454,7 +6453,7 @@ func (e *AggregationsItem) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AggregationsItem) DataType() types.T {
+func (e *AggregationsItem) DataType() *types.T {
 	return e.Typ
 }
 
@@ -6506,7 +6505,7 @@ func (e *FiltersExpr) SetChild(nth int, child opt.Expr) {
 	(*e)[nth] = *child.(*FiltersItem)
 }
 
-func (e *FiltersExpr) DataType() types.T {
+func (e *FiltersExpr) DataType() *types.T {
 	return types.Any
 }
 
@@ -6563,7 +6562,7 @@ func (e *FiltersItem) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FiltersItem) DataType() types.T {
+func (e *FiltersItem) DataType() *types.T {
 	return types.Bool
 }
 
@@ -6633,7 +6632,7 @@ func (e *ZipExpr) SetChild(nth int, child opt.Expr) {
 	(*e)[nth] = *child.(*ZipItem)
 }
 
-func (e *ZipExpr) DataType() types.T {
+func (e *ZipExpr) DataType() *types.T {
 	return types.Any
 }
 
@@ -6643,7 +6642,7 @@ type ZipItem struct {
 	Func opt.ScalarExpr
 	ZipItemPrivate
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -6688,7 +6687,7 @@ func (e *ZipItem) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ZipItem) DataType() types.T {
+func (e *ZipItem) DataType() *types.T {
 	return e.Typ
 }
 
@@ -6766,7 +6765,7 @@ func (e *AndExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AndExpr) DataType() types.T {
+func (e *AndExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -6825,7 +6824,7 @@ func (e *OrExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *OrExpr) DataType() types.T {
+func (e *OrExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -6884,7 +6883,7 @@ func (e *RangeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RangeExpr) DataType() types.T {
+func (e *RangeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -6937,7 +6936,7 @@ func (e *NotExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotExpr) DataType() types.T {
+func (e *NotExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -6994,7 +6993,7 @@ func (e *EqExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *EqExpr) DataType() types.T {
+func (e *EqExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7051,7 +7050,7 @@ func (e *LtExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *LtExpr) DataType() types.T {
+func (e *LtExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7108,7 +7107,7 @@ func (e *GtExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *GtExpr) DataType() types.T {
+func (e *GtExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7165,7 +7164,7 @@ func (e *LeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *LeExpr) DataType() types.T {
+func (e *LeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7222,7 +7221,7 @@ func (e *GeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *GeExpr) DataType() types.T {
+func (e *GeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7279,7 +7278,7 @@ func (e *NeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NeExpr) DataType() types.T {
+func (e *NeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7336,7 +7335,7 @@ func (e *InExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *InExpr) DataType() types.T {
+func (e *InExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7393,7 +7392,7 @@ func (e *NotInExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotInExpr) DataType() types.T {
+func (e *NotInExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7450,7 +7449,7 @@ func (e *LikeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *LikeExpr) DataType() types.T {
+func (e *LikeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7507,7 +7506,7 @@ func (e *NotLikeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotLikeExpr) DataType() types.T {
+func (e *NotLikeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7564,7 +7563,7 @@ func (e *ILikeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ILikeExpr) DataType() types.T {
+func (e *ILikeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7621,7 +7620,7 @@ func (e *NotILikeExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotILikeExpr) DataType() types.T {
+func (e *NotILikeExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7678,7 +7677,7 @@ func (e *SimilarToExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *SimilarToExpr) DataType() types.T {
+func (e *SimilarToExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7735,7 +7734,7 @@ func (e *NotSimilarToExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotSimilarToExpr) DataType() types.T {
+func (e *NotSimilarToExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7792,7 +7791,7 @@ func (e *RegMatchExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RegMatchExpr) DataType() types.T {
+func (e *RegMatchExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7849,7 +7848,7 @@ func (e *NotRegMatchExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotRegMatchExpr) DataType() types.T {
+func (e *NotRegMatchExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7906,7 +7905,7 @@ func (e *RegIMatchExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RegIMatchExpr) DataType() types.T {
+func (e *RegIMatchExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -7963,7 +7962,7 @@ func (e *NotRegIMatchExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *NotRegIMatchExpr) DataType() types.T {
+func (e *NotRegIMatchExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8020,7 +8019,7 @@ func (e *IsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *IsExpr) DataType() types.T {
+func (e *IsExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8077,7 +8076,7 @@ func (e *IsNotExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *IsNotExpr) DataType() types.T {
+func (e *IsNotExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8134,7 +8133,7 @@ func (e *ContainsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ContainsExpr) DataType() types.T {
+func (e *ContainsExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8191,7 +8190,7 @@ func (e *JsonExistsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *JsonExistsExpr) DataType() types.T {
+func (e *JsonExistsExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8248,7 +8247,7 @@ func (e *JsonAllExistsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *JsonAllExistsExpr) DataType() types.T {
+func (e *JsonAllExistsExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8305,7 +8304,7 @@ func (e *JsonSomeExistsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *JsonSomeExistsExpr) DataType() types.T {
+func (e *JsonSomeExistsExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8365,7 +8364,7 @@ func (e *AnyScalarExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AnyScalarExpr) DataType() types.T {
+func (e *AnyScalarExpr) DataType() *types.T {
 	return types.Bool
 }
 
@@ -8373,7 +8372,7 @@ type BitandExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8423,7 +8422,7 @@ func (e *BitandExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *BitandExpr) DataType() types.T {
+func (e *BitandExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8431,7 +8430,7 @@ type BitorExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8481,7 +8480,7 @@ func (e *BitorExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *BitorExpr) DataType() types.T {
+func (e *BitorExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8489,7 +8488,7 @@ type BitxorExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8539,7 +8538,7 @@ func (e *BitxorExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *BitxorExpr) DataType() types.T {
+func (e *BitxorExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8547,7 +8546,7 @@ type PlusExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8597,7 +8596,7 @@ func (e *PlusExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *PlusExpr) DataType() types.T {
+func (e *PlusExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8605,7 +8604,7 @@ type MinusExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8655,7 +8654,7 @@ func (e *MinusExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *MinusExpr) DataType() types.T {
+func (e *MinusExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8663,7 +8662,7 @@ type MultExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8713,7 +8712,7 @@ func (e *MultExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *MultExpr) DataType() types.T {
+func (e *MultExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8721,7 +8720,7 @@ type DivExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8771,7 +8770,7 @@ func (e *DivExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *DivExpr) DataType() types.T {
+func (e *DivExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8779,7 +8778,7 @@ type FloorDivExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8829,7 +8828,7 @@ func (e *FloorDivExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FloorDivExpr) DataType() types.T {
+func (e *FloorDivExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8837,7 +8836,7 @@ type ModExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8887,7 +8886,7 @@ func (e *ModExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ModExpr) DataType() types.T {
+func (e *ModExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8895,7 +8894,7 @@ type PowExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -8945,7 +8944,7 @@ func (e *PowExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *PowExpr) DataType() types.T {
+func (e *PowExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -8953,7 +8952,7 @@ type ConcatExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9003,7 +9002,7 @@ func (e *ConcatExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ConcatExpr) DataType() types.T {
+func (e *ConcatExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9011,7 +9010,7 @@ type LShiftExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9061,7 +9060,7 @@ func (e *LShiftExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *LShiftExpr) DataType() types.T {
+func (e *LShiftExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9069,7 +9068,7 @@ type RShiftExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9119,7 +9118,7 @@ func (e *RShiftExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RShiftExpr) DataType() types.T {
+func (e *RShiftExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9127,7 +9126,7 @@ type FetchValExpr struct {
 	Json  opt.ScalarExpr
 	Index opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9177,7 +9176,7 @@ func (e *FetchValExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FetchValExpr) DataType() types.T {
+func (e *FetchValExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9185,7 +9184,7 @@ type FetchTextExpr struct {
 	Json  opt.ScalarExpr
 	Index opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9235,7 +9234,7 @@ func (e *FetchTextExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FetchTextExpr) DataType() types.T {
+func (e *FetchTextExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9243,7 +9242,7 @@ type FetchValPathExpr struct {
 	Json opt.ScalarExpr
 	Path opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9293,7 +9292,7 @@ func (e *FetchValPathExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FetchValPathExpr) DataType() types.T {
+func (e *FetchValPathExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9301,7 +9300,7 @@ type FetchTextPathExpr struct {
 	Json opt.ScalarExpr
 	Path opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9351,14 +9350,14 @@ func (e *FetchTextPathExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FetchTextPathExpr) DataType() types.T {
+func (e *FetchTextPathExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type UnaryMinusExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9403,14 +9402,14 @@ func (e *UnaryMinusExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *UnaryMinusExpr) DataType() types.T {
+func (e *UnaryMinusExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type UnaryComplementExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9455,14 +9454,13 @@ func (e *UnaryComplementExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *UnaryComplementExpr) DataType() types.T {
+func (e *UnaryComplementExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // CastExpr converts the input expression into an expression of the target type.
-// While the input's type is restricted to the datum types in the types package,
-// the target type can be any of the column types in the coltypes package. For
-// example, this is a legal cast:
+// Note that the conversion may cause trunction based on the target types' width,
+// such as in this example:
 //
 //   'hello'::VARCHAR(2)
 //
@@ -9470,11 +9468,10 @@ func (e *UnaryComplementExpr) DataType() types.T {
 // the target data type allows a maximum of two characters. This is one example
 // of a "lossy" cast.
 type CastExpr struct {
-	Input     opt.ScalarExpr
-	TargetTyp coltypes.T
+	Input opt.ScalarExpr
+	Typ   *types.T
 
-	Typ types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CastExpr{}
@@ -9500,7 +9497,7 @@ func (e *CastExpr) Child(nth int) opt.Expr {
 }
 
 func (e *CastExpr) Private() interface{} {
-	return e.TargetTyp
+	return e.Typ
 }
 
 func (e *CastExpr) String() string {
@@ -9518,7 +9515,7 @@ func (e *CastExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CastExpr) DataType() types.T {
+func (e *CastExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9544,7 +9541,7 @@ type IfErrExpr struct {
 	OrElse  ScalarListExpr
 	ErrCode ScalarListExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9599,7 +9596,7 @@ func (e *IfErrExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *IfErrExpr) DataType() types.T {
+func (e *IfErrExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9627,7 +9624,7 @@ type CaseExpr struct {
 	Whens  ScalarListExpr
 	OrElse opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9682,7 +9679,7 @@ func (e *CaseExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CaseExpr) DataType() types.T {
+func (e *CaseExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9693,7 +9690,7 @@ type WhenExpr struct {
 	Condition opt.ScalarExpr
 	Value     opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9743,14 +9740,14 @@ func (e *WhenExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *WhenExpr) DataType() types.T {
+func (e *WhenExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // ArrayExpr is an ARRAY literal of the form ARRAY[<expr1>, <expr2>, ..., <exprN>].
 type ArrayExpr struct {
 	Elems ScalarListExpr
-	Typ   types.T
+	Typ   *types.T
 
 	id opt.ScalarID
 }
@@ -9796,7 +9793,7 @@ func (e *ArrayExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ArrayExpr) DataType() types.T {
+func (e *ArrayExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9807,7 +9804,7 @@ type IndirectionExpr struct {
 	Input opt.ScalarExpr
 	Index opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9857,7 +9854,7 @@ func (e *IndirectionExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *IndirectionExpr) DataType() types.T {
+func (e *IndirectionExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9869,7 +9866,7 @@ type ArrayFlattenExpr struct {
 	Input RelExpr
 	SubqueryPrivate
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -9914,7 +9911,7 @@ func (e *ArrayFlattenExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ArrayFlattenExpr) DataType() types.T {
+func (e *ArrayFlattenExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -9969,13 +9966,13 @@ func (e *FunctionExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FunctionExpr) DataType() types.T {
+func (e *FunctionExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type FunctionPrivate struct {
 	Name       string
-	Typ        types.T
+	Typ        *types.T
 	Properties *tree.FunctionProperties
 	Overload   *tree.Overload
 }
@@ -9990,7 +9987,7 @@ type CollateExpr struct {
 	Input  opt.ScalarExpr
 	Locale string
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10035,14 +10032,14 @@ func (e *CollateExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CollateExpr) DataType() types.T {
+func (e *CollateExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type CoalesceExpr struct {
 	Args ScalarListExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10087,7 +10084,7 @@ func (e *CoalesceExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CoalesceExpr) DataType() types.T {
+func (e *CoalesceExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -10098,7 +10095,7 @@ type ColumnAccessExpr struct {
 	Input opt.ScalarExpr
 	Idx   TupleOrdinal
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10143,7 +10140,7 @@ func (e *ColumnAccessExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ColumnAccessExpr) DataType() types.T {
+func (e *ColumnAccessExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -10152,7 +10149,7 @@ func (e *ColumnAccessExpr) DataType() types.T {
 type UnsupportedExprExpr struct {
 	Value tree.TypedExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10188,14 +10185,14 @@ func (e *UnsupportedExprExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *UnsupportedExprExpr) DataType() types.T {
+func (e *UnsupportedExprExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type ArrayAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10240,14 +10237,14 @@ func (e *ArrayAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ArrayAggExpr) DataType() types.T {
+func (e *ArrayAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type AvgExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10292,14 +10289,14 @@ func (e *AvgExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AvgExpr) DataType() types.T {
+func (e *AvgExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type BoolAndExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10344,14 +10341,14 @@ func (e *BoolAndExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *BoolAndExpr) DataType() types.T {
+func (e *BoolAndExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type BoolOrExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10396,14 +10393,14 @@ func (e *BoolOrExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *BoolOrExpr) DataType() types.T {
+func (e *BoolOrExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type ConcatAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10448,14 +10445,14 @@ func (e *ConcatAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ConcatAggExpr) DataType() types.T {
+func (e *ConcatAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type CountExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10500,7 +10497,7 @@ func (e *CountExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CountExpr) DataType() types.T {
+func (e *CountExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -10540,14 +10537,14 @@ func (e *CountRowsExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CountRowsExpr) DataType() types.T {
+func (e *CountRowsExpr) DataType() *types.T {
 	return types.Int
 }
 
 type MaxExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10592,14 +10589,14 @@ func (e *MaxExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *MaxExpr) DataType() types.T {
+func (e *MaxExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type MinExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10644,14 +10641,14 @@ func (e *MinExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *MinExpr) DataType() types.T {
+func (e *MinExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type SumIntExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10696,14 +10693,14 @@ func (e *SumIntExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *SumIntExpr) DataType() types.T {
+func (e *SumIntExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type SumExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10748,14 +10745,14 @@ func (e *SumExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *SumExpr) DataType() types.T {
+func (e *SumExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type SqrDiffExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10800,14 +10797,14 @@ func (e *SqrDiffExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *SqrDiffExpr) DataType() types.T {
+func (e *SqrDiffExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type VarianceExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10852,14 +10849,14 @@ func (e *VarianceExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *VarianceExpr) DataType() types.T {
+func (e *VarianceExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type StdDevExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10904,14 +10901,14 @@ func (e *StdDevExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *StdDevExpr) DataType() types.T {
+func (e *StdDevExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type XorAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -10956,14 +10953,14 @@ func (e *XorAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *XorAggExpr) DataType() types.T {
+func (e *XorAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type JsonAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11008,14 +11005,14 @@ func (e *JsonAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *JsonAggExpr) DataType() types.T {
+func (e *JsonAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
 type JsonbAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11060,7 +11057,7 @@ func (e *JsonbAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *JsonbAggExpr) DataType() types.T {
+func (e *JsonbAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11071,7 +11068,7 @@ type StringAggExpr struct {
 	// Note that it must always be a constant expression.
 	Sep opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11121,7 +11118,7 @@ func (e *StringAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *StringAggExpr) DataType() types.T {
+func (e *StringAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11134,7 +11131,7 @@ func (e *StringAggExpr) DataType() types.T {
 type ConstAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11179,7 +11176,7 @@ func (e *ConstAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ConstAggExpr) DataType() types.T {
+func (e *ConstAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11194,7 +11191,7 @@ func (e *ConstAggExpr) DataType() types.T {
 type ConstNotNullAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11239,7 +11236,7 @@ func (e *ConstNotNullAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *ConstNotNullAggExpr) DataType() types.T {
+func (e *ConstNotNullAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11251,7 +11248,7 @@ func (e *ConstNotNullAggExpr) DataType() types.T {
 type AnyNotNullAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11296,7 +11293,7 @@ func (e *AnyNotNullAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AnyNotNullAggExpr) DataType() types.T {
+func (e *AnyNotNullAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11307,7 +11304,7 @@ func (e *AnyNotNullAggExpr) DataType() types.T {
 type FirstAggExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11352,7 +11349,7 @@ func (e *FirstAggExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *FirstAggExpr) DataType() types.T {
+func (e *FirstAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11362,7 +11359,7 @@ func (e *FirstAggExpr) DataType() types.T {
 type AggDistinctExpr struct {
 	Input opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11407,14 +11404,14 @@ func (e *AggDistinctExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AggDistinctExpr) DataType() types.T {
+func (e *AggDistinctExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // RankExpr computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
 type RankExpr struct {
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11450,14 +11447,14 @@ func (e *RankExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RankExpr) DataType() types.T {
+func (e *RankExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // RowNumberExpr computes the position of a row relative to an ordering, with
 // same-valued rows having ties broken arbitrarily.
 type RowNumberExpr struct {
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11493,13 +11490,13 @@ func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *RowNumberExpr) DataType() types.T {
+func (e *RowNumberExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // DenseRankExpr is like Rank, but without gaps. Instead of 1, 1, 3, it gives 1, 1, 2.
 type DenseRankExpr struct {
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11535,13 +11532,13 @@ func (e *DenseRankExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *DenseRankExpr) DataType() types.T {
+func (e *DenseRankExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // PercentRankExpr is (rank - 1) / (total rows - 1).
 type PercentRankExpr struct {
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11577,14 +11574,14 @@ func (e *PercentRankExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *PercentRankExpr) DataType() types.T {
+func (e *PercentRankExpr) DataType() *types.T {
 	return e.Typ
 }
 
 // CumeDistExpr is the relative rank of the current row:
 // (number of rows preceding or peer with current row) / (total rows)
 type CumeDistExpr struct {
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11620,7 +11617,7 @@ func (e *CumeDistExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *CumeDistExpr) DataType() types.T {
+func (e *CumeDistExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11632,7 +11629,7 @@ type AggFilterExpr struct {
 	Input  opt.ScalarExpr
 	Filter opt.ScalarExpr
 
-	Typ types.T
+	Typ *types.T
 	id  opt.ScalarID
 }
 
@@ -11682,7 +11679,7 @@ func (e *AggFilterExpr) SetChild(nth int, child opt.Expr) {
 	panic(pgerror.NewAssertionErrorf("child index out of range"))
 }
 
-func (e *AggFilterExpr) DataType() types.T {
+func (e *AggFilterExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -11729,7 +11726,7 @@ func (e *ScalarListExpr) SetChild(nth int, child opt.Expr) {
 	(*e)[nth] = child.(opt.ScalarExpr)
 }
 
-func (e *ScalarListExpr) DataType() types.T {
+func (e *ScalarListExpr) DataType() *types.T {
 	return types.Any
 }
 
@@ -13456,7 +13453,7 @@ func (m *Memo) MemoizeConst(
 }
 
 func (m *Memo) MemoizeNull(
-	typ types.T,
+	typ *types.T,
 ) *NullExpr {
 	const size = int64(unsafe.Sizeof(NullExpr{}))
 	e := &NullExpr{
@@ -13498,7 +13495,7 @@ func (m *Memo) MemoizePlaceholder(
 
 func (m *Memo) MemoizeTuple(
 	elems ScalarListExpr,
-	typ types.T,
+	typ *types.T,
 ) *TupleExpr {
 	const size = int64(unsafe.Sizeof(TupleExpr{}))
 	e := &TupleExpr{
@@ -14393,15 +14390,14 @@ func (m *Memo) MemoizeUnaryComplement(
 
 func (m *Memo) MemoizeCast(
 	input opt.ScalarExpr,
-	targetTyp coltypes.T,
+	typ *types.T,
 ) *CastExpr {
 	const size = int64(unsafe.Sizeof(CastExpr{}))
 	e := &CastExpr{
-		Input:     input,
-		TargetTyp: targetTyp,
-		id:        m.NextID(),
+		Input: input,
+		Typ:   typ,
+		id:    m.NextID(),
 	}
-	e.Typ = InferType(m, e)
 	interned := m.interner.InternCast(e)
 	if interned == e {
 		m.memEstimate += size
@@ -14473,7 +14469,7 @@ func (m *Memo) MemoizeWhen(
 
 func (m *Memo) MemoizeArray(
 	elems ScalarListExpr,
-	typ types.T,
+	typ *types.T,
 ) *ArrayExpr {
 	const size = int64(unsafe.Sizeof(ArrayExpr{}))
 	e := &ArrayExpr{
@@ -17170,12 +17166,12 @@ func (in *interner) InternConst(val *ConstExpr) *ConstExpr {
 func (in *interner) InternNull(val *NullExpr) *NullExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.NullOp)
-	in.hasher.HashDatumType(val.Typ)
+	in.hasher.HashType(val.Typ)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*NullExpr); ok {
-			if in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) {
+			if in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
 		}
@@ -17237,13 +17233,13 @@ func (in *interner) InternTuple(val *TupleExpr) *TupleExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.TupleOp)
 	in.hasher.HashScalarListExpr(val.Elems)
-	in.hasher.HashDatumType(val.Typ)
+	in.hasher.HashType(val.Typ)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*TupleExpr); ok {
 			if in.hasher.IsScalarListExprEqual(val.Elems, existing.Elems) &&
-				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) {
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
 		}
@@ -18361,13 +18357,13 @@ func (in *interner) InternCast(val *CastExpr) *CastExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CastOp)
 	in.hasher.HashScalarExpr(val.Input)
-	in.hasher.HashColType(val.TargetTyp)
+	in.hasher.HashType(val.Typ)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CastExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsColTypeEqual(val.TargetTyp, existing.TargetTyp) {
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
 		}
@@ -18445,13 +18441,13 @@ func (in *interner) InternArray(val *ArrayExpr) *ArrayExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ArrayOp)
 	in.hasher.HashScalarListExpr(val.Elems)
-	in.hasher.HashDatumType(val.Typ)
+	in.hasher.HashType(val.Typ)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ArrayExpr); ok {
 			if in.hasher.IsScalarListExprEqual(val.Elems, existing.Elems) &&
-				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) {
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
 		}
@@ -18514,7 +18510,7 @@ func (in *interner) InternFunction(val *FunctionExpr) *FunctionExpr {
 	in.hasher.HashOperator(opt.FunctionOp)
 	in.hasher.HashScalarListExpr(val.Args)
 	in.hasher.HashString(val.Name)
-	in.hasher.HashDatumType(val.Typ)
+	in.hasher.HashType(val.Typ)
 	in.hasher.HashPointer(unsafe.Pointer(val.Properties))
 	in.hasher.HashPointer(unsafe.Pointer(val.Overload))
 
@@ -18523,7 +18519,7 @@ func (in *interner) InternFunction(val *FunctionExpr) *FunctionExpr {
 		if existing, ok := in.cache.Item().(*FunctionExpr); ok {
 			if in.hasher.IsScalarListExprEqual(val.Args, existing.Args) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
-				in.hasher.IsDatumTypeEqual(val.Typ, existing.Typ) &&
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Properties), unsafe.Pointer(existing.Properties)) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Overload), unsafe.Pointer(existing.Overload)) {
 				return existing

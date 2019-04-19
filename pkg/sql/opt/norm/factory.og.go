@@ -3,13 +3,12 @@
 package norm
 
 import (
-	"github.com/cockroachdb/cockroach/pkg/sql/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/pgwire/pgerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	"github.com/cockroachdb/cockroach/pkg/sql/sem/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/log"
 )
 
@@ -8269,7 +8268,7 @@ func (_f *Factory) ConstructConst(
 // and replacement easier and more efficient, as patterns can contain (Null)
 // expressions.
 func (_f *Factory) ConstructNull(
-	typ types.T,
+	typ *types.T,
 ) opt.ScalarExpr {
 	e := _f.mem.MemoizeNull(typ)
 	return _f.onConstructScalar(e)
@@ -8304,7 +8303,7 @@ func (_f *Factory) ConstructPlaceholder(
 // ConstructTuple constructs an expression for the Tuple operator.
 func (_f *Factory) ConstructTuple(
 	elems memo.ScalarListExpr,
-	typ types.T,
+	typ *types.T,
 ) opt.ScalarExpr {
 	e := _f.mem.MemoizeTuple(elems, typ)
 	return _f.onConstructScalar(e)
@@ -11954,7 +11953,7 @@ func (_f *Factory) ConstructPlus(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldPlusZero) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryColType(opt.PlusOp, left, right),
+						_f.funcs.BinaryType(opt.PlusOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldPlusZero, nil, _expr)
@@ -11973,7 +11972,7 @@ func (_f *Factory) ConstructPlus(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldZeroPlus) {
 					_expr := _f.ConstructCast(
 						right,
-						_f.funcs.BinaryColType(opt.PlusOp, left, right),
+						_f.funcs.BinaryType(opt.PlusOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldZeroPlus, nil, _expr)
@@ -12090,7 +12089,7 @@ func (_f *Factory) ConstructMinus(
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
 						_expr := _f.ConstructCast(
 							left,
-							_f.funcs.BinaryColType(opt.MinusOp, left, right),
+							_f.funcs.BinaryType(opt.MinusOp, left, right),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.FoldMinusZero, nil, _expr)
@@ -12169,7 +12168,7 @@ func (_f *Factory) ConstructMult(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMultOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryColType(opt.MultOp, left, right),
+						_f.funcs.BinaryType(opt.MultOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldMultOne, nil, _expr)
@@ -12188,7 +12187,7 @@ func (_f *Factory) ConstructMult(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldOneMult) {
 					_expr := _f.ConstructCast(
 						right,
-						_f.funcs.BinaryColType(opt.MultOp, left, right),
+						_f.funcs.BinaryType(opt.MultOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldOneMult, nil, _expr)
@@ -12304,7 +12303,7 @@ func (_f *Factory) ConstructDiv(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryColType(opt.DivOp, left, right),
+						_f.funcs.BinaryType(opt.DivOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
@@ -12382,7 +12381,7 @@ func (_f *Factory) ConstructFloorDiv(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryColType(opt.FloorDivOp, left, right),
+						_f.funcs.BinaryType(opt.FloorDivOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
@@ -13116,9 +13115,8 @@ func (_f *Factory) ConstructUnaryComplement(
 
 // ConstructCast constructs an expression for the Cast operator.
 // Cast converts the input expression into an expression of the target type.
-// While the input's type is restricted to the datum types in the types package,
-// the target type can be any of the column types in the coltypes package. For
-// example, this is a legal cast:
+// Note that the conversion may cause trunction based on the target types' width,
+// such as in this example:
 //
 //   'hello'::VARCHAR(2)
 //
@@ -13127,10 +13125,11 @@ func (_f *Factory) ConstructUnaryComplement(
 // of a "lossy" cast.
 func (_f *Factory) ConstructCast(
 	input opt.ScalarExpr,
-	targetTyp coltypes.T,
+	typ *types.T,
 ) opt.ScalarExpr {
 	// [EliminateCast]
 	{
+		targetTyp := typ
 		if _f.funcs.HasColType(input, targetTyp) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
 				_expr := input
@@ -13146,9 +13145,10 @@ func (_f *Factory) ConstructCast(
 	{
 		_null, _ := input.(*memo.NullExpr)
 		if _null != nil {
+			targetTyp := typ
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullCast) {
 				_expr := _f.ConstructNull(
-					_f.funcs.ColTypeToDatumType(targetTyp),
+					targetTyp,
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldNullCast, nil, _expr)
@@ -13160,7 +13160,6 @@ func (_f *Factory) ConstructCast(
 
 	// [FoldCast]
 	{
-		typ := targetTyp
 		if _f.funcs.IsConstValueOrTuple(input) {
 			result := _f.funcs.FoldCast(input, typ)
 			if _f.funcs.Succeeded(result) {
@@ -13175,7 +13174,7 @@ func (_f *Factory) ConstructCast(
 		}
 	}
 
-	e := _f.mem.MemoizeCast(input, targetTyp)
+	e := _f.mem.MemoizeCast(input, typ)
 	return _f.onConstructScalar(e)
 }
 
@@ -13270,7 +13269,7 @@ func (_f *Factory) ConstructWhen(
 // Array is an ARRAY literal of the form ARRAY[<expr1>, <expr2>, ..., <exprN>].
 func (_f *Factory) ConstructArray(
 	elems memo.ScalarListExpr,
-	typ types.T,
+	typ *types.T,
 ) opt.ScalarExpr {
 	// [FoldArray]
 	{
@@ -14788,7 +14787,7 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.CastExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
-			return f.ConstructCast(input, t.TargetTyp)
+			return f.ConstructCast(input, t.Typ)
 		}
 		return t
 
@@ -15806,7 +15805,7 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.CastExpr:
 		return f.ConstructCast(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
-			t.TargetTyp,
+			t.Typ,
 		)
 
 	case *memo.IfErrExpr:
@@ -16356,7 +16355,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.NullOp:
 		return f.ConstructNull(
-			args[0].(types.T),
+			args[0].(*types.T),
 		)
 	case opt.TrueOp:
 		return f.ConstructTrue()
@@ -16369,7 +16368,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.TupleOp:
 		return f.ConstructTuple(
 			*args[0].(*memo.ScalarListExpr),
-			args[1].(types.T),
+			args[1].(*types.T),
 		)
 	case opt.AndOp:
 		return f.ConstructAnd(
@@ -16611,7 +16610,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.CastOp:
 		return f.ConstructCast(
 			args[0].(opt.ScalarExpr),
-			args[1].(coltypes.T),
+			args[1].(*types.T),
 		)
 	case opt.IfErrOp:
 		return f.ConstructIfErr(
@@ -16633,7 +16632,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ArrayOp:
 		return f.ConstructArray(
 			*args[0].(*memo.ScalarListExpr),
-			args[1].(types.T),
+			args[1].(*types.T),
 		)
 	case opt.IndirectionOp:
 		return f.ConstructIndirection(

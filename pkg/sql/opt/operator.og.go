@@ -126,9 +126,8 @@ const (
 	CaseOp
 
 	// Cast converts the input expression into an expression of the target type.
-	// While the input's type is restricted to the datum types in the types package,
-	// the target type can be any of the column types in the coltypes package. For
-	// example, this is a legal cast:
+	// Note that the conversion may cause trunction based on the target types' width,
+	// such as in this example:
 	//
 	//   'hello'::VARCHAR(2)
 	//
