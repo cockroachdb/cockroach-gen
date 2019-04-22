@@ -197,6 +197,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -205,11 +206,12 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -219,8 +221,6 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -230,11 +230,10 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -243,7 +242,6 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -261,6 +259,7 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint6
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
@@ -316,6 +315,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -324,11 +324,12 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -338,8 +339,6 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = !bytes.Equal(v, lastVal)
 			outputCol[i] = outputCol[i] || unique
@@ -349,11 +348,10 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = !bytes.Equal(v, lastVal)
 			outputCol[i] = outputCol[i] || unique
@@ -362,7 +360,6 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -380,6 +377,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = !bytes.Equal(v, lastVal)
@@ -435,6 +433,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -443,11 +442,12 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -457,8 +457,6 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = tree.CompareDecimals(&v, &lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
@@ -468,11 +466,10 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = tree.CompareDecimals(&v, &lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
@@ -481,7 +478,6 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -499,6 +495,7 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = tree.CompareDecimals(&v, &lastVal) != 0
@@ -554,6 +551,7 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -562,11 +560,12 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -576,8 +575,6 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -587,11 +584,10 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -600,7 +596,6 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -618,6 +613,7 @@ func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint6
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
@@ -673,6 +669,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -681,11 +678,12 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -695,8 +693,6 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -706,11 +702,10 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -719,7 +714,6 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -737,6 +731,7 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
@@ -792,6 +787,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -800,11 +796,12 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -814,8 +811,6 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -825,11 +820,10 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -838,7 +832,6 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -856,6 +849,7 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
@@ -911,6 +905,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -919,11 +914,12 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -933,8 +929,6 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -944,11 +938,10 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -957,7 +950,6 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -975,6 +967,7 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
@@ -1030,6 +1023,7 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -1038,11 +1032,12 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -1052,8 +1047,6 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -1063,11 +1056,10 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -1076,7 +1068,6 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -1094,6 +1085,7 @@ func (p partitionerFloat32) partition(colVec coldata.Vec, outputCol []bool, n ui
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
@@ -1149,6 +1141,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// We always output the first row.
 	lastVal := p.lastVal
 	sel := batch.Selection()
+	startIdx := uint16(0)
 	if !p.foundFirstRow {
 		if sel != nil {
 			lastVal = col[sel[0]]
@@ -1157,11 +1150,12 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 			lastVal = col[0]
 			outputCol[0] = true
 		}
-	}
-
-	startIdx := uint16(0)
-	if !p.foundFirstRow {
 		startIdx = 1
+		p.foundFirstRow = true
+		if batch.Length() == 1 {
+			p.lastVal = lastVal
+			return batch
+		}
 	}
 
 	n := batch.Length()
@@ -1171,8 +1165,6 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -1182,11 +1174,10 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[startIdx:n]
 		outputCol = outputCol[startIdx:n]
+		_ = outputCol[len(col)-1]
 		for i := range col {
 
 			v := col[i]
-			// Note that not inlining this unique var actually makes a non-trivial
-			// performance difference.
 			var unique bool
 			unique = v != lastVal
 			outputCol[i] = outputCol[i] || unique
@@ -1195,7 +1186,6 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 	}
 
 	p.lastVal = lastVal
-	p.foundFirstRow = true
 
 	return batch
 }
@@ -1213,6 +1203,7 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n ui
 	outputCol = outputCol[1:n]
 	col = col[1:n]
 	for i := range col {
+
 		v := col[i]
 		var unique bool
 		unique = v != lastVal
