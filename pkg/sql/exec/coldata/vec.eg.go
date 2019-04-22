@@ -44,7 +44,7 @@ func (m *memColumn) Append(vec Vec, colType types.T, toLength uint64, fromLength
 	}
 
 	if fromLength > 0 {
-		m.nulls = append(m.nulls, make([]int64, (fromLength-1)>>6+1)...)
+		m.nulls = append(m.nulls, make([]uint64, (fromLength-1)>>6+1)...)
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < fromLength; i++ {
@@ -214,7 +214,7 @@ func (m *memColumn) AppendWithSel(
 	}
 
 	if batchSize > 0 {
-		m.nulls = append(m.nulls, make([]int64, (batchSize-1)>>6+1)...)
+		m.nulls = append(m.nulls, make([]uint64, (batchSize-1)>>6+1)...)
 		for i := uint16(0); i < batchSize; i++ {
 			if vec.NullAt(sel[i]) {
 				m.SetNull64(toLength + uint64(i))
@@ -919,7 +919,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 	switch colType {
 	case types.Bool:
 		col := m.Bool()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -932,7 +932,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -952,7 +952,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Bytes:
 		col := m.Bytes()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -965,7 +965,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -985,7 +985,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Decimal:
 		col := m.Decimal()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -998,7 +998,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1018,7 +1018,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Int8:
 		col := m.Int8()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -1031,7 +1031,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1051,7 +1051,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Int16:
 		col := m.Int16()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -1064,7 +1064,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1084,7 +1084,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Int32:
 		col := m.Int32()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -1097,7 +1097,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1117,7 +1117,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Int64:
 		col := m.Int64()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -1130,7 +1130,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1150,7 +1150,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Float32:
 		col := m.Float32()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -1163,7 +1163,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1183,7 +1183,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 		}
 	case types.Float64:
 		col := m.Float64()
-		var nulls []int64
+		var nulls []uint64
 		if m.hasNulls {
 			mod := start % 64
 			startIdx := start >> 6
@@ -1196,7 +1196,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 				// If start is not a multiple of 64, we need to shift over the bitmap
 				// to have the first index correspond. Allocate new null bitmap as we
 				// want to keep the original bitmap safe for reuse.
-				nulls = make([]int64, len(nulls))
+				nulls = make([]uint64, len(nulls))
 				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
 					// Bring the first null to the beginning.
 					nulls[j] = m.nulls[i] >> mod
@@ -1252,7 +1252,7 @@ func (m *memColumn) ExtendNulls(vec Vec, destStartIdx uint64, srcStartIdx uint16
 	if uint64(cap(m.nulls)) < outputLen/64 {
 		// (batchSize-1)>>6+1 is the number of Int64s needed to encode the additional elements/nulls in the Vec.
 		// This is equivalent to ceil(batchSize/64).
-		m.nulls = append(m.nulls, make([]int64, (toAppend-1)>>6+1)...)
+		m.nulls = append(m.nulls, make([]uint64, (toAppend-1)>>6+1)...)
 	}
 	if vec.HasNulls() {
 		for i := uint16(0); i < toAppend; i++ {
@@ -1272,7 +1272,7 @@ func (m *memColumn) ExtendNullsWithSel(
 	if uint64(cap(m.nulls)) < outputLen/64 {
 		// (batchSize-1)>>6+1 is the number of Int64s needed to encode the additional elements/nulls in the Vec.
 		// This is equivalent to ceil(batchSize/64).
-		m.nulls = append(m.nulls, make([]int64, (toAppend-1)>>6+1)...)
+		m.nulls = append(m.nulls, make([]uint64, (toAppend-1)>>6+1)...)
 	}
 	for i := uint16(0); i < toAppend; i++ {
 		// TODO(yuzefovich): this can be done more efficiently with a bitwise OR:

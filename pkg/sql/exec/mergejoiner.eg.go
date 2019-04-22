@@ -28576,13 +28576,12 @@ func (o *mergeJoinOp) buildLeftGroups(
 ) {
 	o.builderState.left.finished = false
 	sel := bat.Selection()
-	outStartIdx := destStartIdx
 	initialBuilderState := o.builderState.left
 	// Loop over every column.
 LeftColLoop:
 	for ; o.builderState.left.colIdx < len(input.outCols); o.builderState.left.colIdx++ {
 		colIdx := input.outCols[o.builderState.left.colIdx]
-		outStartIdx = destStartIdx
+		outStartIdx := int(destStartIdx)
 		out := o.output.ColVec(int(colIdx))
 		src := bat.ColVec(int(colIdx))
 		colType := input.sourceTypes[colIdx]
@@ -28603,16 +28602,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28656,16 +28656,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28709,16 +28710,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28762,16 +28764,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28815,16 +28818,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28868,16 +28872,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28921,16 +28926,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -28974,16 +28980,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29027,16 +29034,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29086,10 +29094,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29133,10 +29141,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29180,10 +29188,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29227,10 +29235,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29274,10 +29282,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29321,10 +29329,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29368,10 +29376,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29415,10 +29423,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29462,10 +29470,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									// TODO (georgeutsin): update template language to automatically generate template
 									//  function parameter definitions from expressions passed in.
@@ -29519,16 +29527,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29562,16 +29571,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29605,16 +29615,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29648,16 +29659,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29691,16 +29703,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29734,16 +29747,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29777,16 +29791,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29820,16 +29835,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29863,16 +29879,17 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							toAppend := leftGroup.numRepeats
+							if outStartIdx+toAppend > int(o.outputBatchSize) {
+								toAppend = int(o.outputBatchSize) - outStartIdx
+							}
+							if src.NullAt64(uint64(srcStartIdx)) {
+								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							}
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
-
-									// TODO (georgeutsin): create a SetNullRange(start, end) function in coldata.Nulls,
-									//  and place this outside the tight loop.
-									if src.NullAt64(uint64(srcStartIdx)) {
-										out.SetNull64(uint64(outStartIdx))
-									}
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29912,10 +29929,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29949,10 +29966,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -29986,10 +30003,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -30023,10 +30040,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -30060,10 +30077,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -30097,10 +30114,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -30134,10 +30151,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -30171,10 +30188,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
@@ -30208,10 +30225,10 @@ LeftColLoop:
 						}
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							srcStartIdx := o.builderState.left.curSrcStartIdx
 							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
 							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < o.outputBatchSize {
+								if outStartIdx < int(o.outputBatchSize) {
 
 									outCol[outStartIdx] = srcCol[srcStartIdx]
 
