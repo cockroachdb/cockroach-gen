@@ -14,6 +14,7 @@ package exec
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"reflect"
 	"unsafe"
@@ -27,7 +28,13 @@ import (
 // column values) at a given column and computes a new hash by applying a
 // transformation to the existing hash.
 func (ht *hashTable) rehash(
-	buckets []uint64, keyIdx int, t types.T, col coldata.Vec, nKeys uint64, sel []uint16,
+	ctx context.Context,
+	buckets []uint64,
+	keyIdx int,
+	t types.T,
+	col coldata.Vec,
+	nKeys uint64,
+	sel []uint16,
 ) {
 	switch t {
 	case types.Bool:
@@ -35,6 +42,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 
@@ -49,6 +57,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 
@@ -67,6 +76,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 
@@ -78,6 +88,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 
@@ -93,6 +104,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 
@@ -108,6 +120,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 
@@ -127,6 +140,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 				p = memhash8(noescape(unsafe.Pointer(&v)), p)
@@ -135,6 +149,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 				p = memhash8(noescape(unsafe.Pointer(&v)), p)
@@ -147,6 +162,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 				p = memhash16(noescape(unsafe.Pointer(&v)), p)
@@ -155,6 +171,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 				p = memhash16(noescape(unsafe.Pointer(&v)), p)
@@ -167,6 +184,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 				p = memhash32(noescape(unsafe.Pointer(&v)), p)
@@ -175,6 +193,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 				p = memhash32(noescape(unsafe.Pointer(&v)), p)
@@ -187,6 +206,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 				p = memhash64(noescape(unsafe.Pointer(&v)), p)
@@ -195,6 +215,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 				p = memhash64(noescape(unsafe.Pointer(&v)), p)
@@ -207,6 +228,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 				p = f32hash(noescape(unsafe.Pointer(&v)), p)
@@ -215,6 +237,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 				p = f32hash(noescape(unsafe.Pointer(&v)), p)
@@ -227,6 +250,7 @@ func (ht *hashTable) rehash(
 		if sel != nil {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[sel[i]]
 				p := uintptr(buckets[i])
 				p = f64hash(noescape(unsafe.Pointer(&v)), p)
@@ -235,6 +259,7 @@ func (ht *hashTable) rehash(
 		} else {
 
 			for i := uint64(0); i < nKeys; i++ {
+				ht.cancelChecker.check(ctx)
 				v := keys[i]
 				p := uintptr(buckets[i])
 				p = f64hash(noescape(unsafe.Pointer(&v)), p)

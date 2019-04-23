@@ -14,6 +14,7 @@ package exec
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/cockroachdb/apd"
@@ -113,9 +114,10 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction) (colSor
 }
 
 type sortBoolAscOp struct {
-	sortCol      []bool
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []bool
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortBoolAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -124,9 +126,9 @@ func (s *sortBoolAscOp) init(col coldata.Vec, order []uint64, workingSpace []uin
 	s.workingSpace = workingSpace
 }
 
-func (s *sortBoolAscOp) sort() {
+func (s *sortBoolAscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortBoolAscOp) reorder() {
@@ -152,7 +154,7 @@ func (s *sortBoolAscOp) reorder() {
 	}
 }
 
-func (s *sortBoolAscOp) sortPartitions(partitions []uint64) {
+func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -168,7 +170,7 @@ func (s *sortBoolAscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -191,9 +193,10 @@ func (s *sortBoolAscOp) Len() int {
 }
 
 type sortBoolDescOp struct {
-	sortCol      []bool
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []bool
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortBoolDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -202,9 +205,9 @@ func (s *sortBoolDescOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 	s.workingSpace = workingSpace
 }
 
-func (s *sortBoolDescOp) sort() {
+func (s *sortBoolDescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortBoolDescOp) reorder() {
@@ -230,7 +233,7 @@ func (s *sortBoolDescOp) reorder() {
 	}
 }
 
-func (s *sortBoolDescOp) sortPartitions(partitions []uint64) {
+func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -246,7 +249,7 @@ func (s *sortBoolDescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -269,9 +272,10 @@ func (s *sortBoolDescOp) Len() int {
 }
 
 type sortBytesAscOp struct {
-	sortCol      [][]byte
-	order        []uint64
-	workingSpace []uint64
+	sortCol       [][]byte
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -280,9 +284,9 @@ func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 	s.workingSpace = workingSpace
 }
 
-func (s *sortBytesAscOp) sort() {
+func (s *sortBytesAscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortBytesAscOp) reorder() {
@@ -308,7 +312,7 @@ func (s *sortBytesAscOp) reorder() {
 	}
 }
 
-func (s *sortBytesAscOp) sortPartitions(partitions []uint64) {
+func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -324,7 +328,7 @@ func (s *sortBytesAscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -347,9 +351,10 @@ func (s *sortBytesAscOp) Len() int {
 }
 
 type sortBytesDescOp struct {
-	sortCol      [][]byte
-	order        []uint64
-	workingSpace []uint64
+	sortCol       [][]byte
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -358,9 +363,9 @@ func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64, workingSpace []u
 	s.workingSpace = workingSpace
 }
 
-func (s *sortBytesDescOp) sort() {
+func (s *sortBytesDescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortBytesDescOp) reorder() {
@@ -386,7 +391,7 @@ func (s *sortBytesDescOp) reorder() {
 	}
 }
 
-func (s *sortBytesDescOp) sortPartitions(partitions []uint64) {
+func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -402,7 +407,7 @@ func (s *sortBytesDescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -425,9 +430,10 @@ func (s *sortBytesDescOp) Len() int {
 }
 
 type sortDecimalAscOp struct {
-	sortCol      []apd.Decimal
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []apd.Decimal
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortDecimalAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -436,9 +442,9 @@ func (s *sortDecimalAscOp) init(col coldata.Vec, order []uint64, workingSpace []
 	s.workingSpace = workingSpace
 }
 
-func (s *sortDecimalAscOp) sort() {
+func (s *sortDecimalAscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortDecimalAscOp) reorder() {
@@ -464,7 +470,7 @@ func (s *sortDecimalAscOp) reorder() {
 	}
 }
 
-func (s *sortDecimalAscOp) sortPartitions(partitions []uint64) {
+func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -480,7 +486,7 @@ func (s *sortDecimalAscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -503,9 +509,10 @@ func (s *sortDecimalAscOp) Len() int {
 }
 
 type sortDecimalDescOp struct {
-	sortCol      []apd.Decimal
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []apd.Decimal
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortDecimalDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -514,9 +521,9 @@ func (s *sortDecimalDescOp) init(col coldata.Vec, order []uint64, workingSpace [
 	s.workingSpace = workingSpace
 }
 
-func (s *sortDecimalDescOp) sort() {
+func (s *sortDecimalDescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortDecimalDescOp) reorder() {
@@ -542,7 +549,7 @@ func (s *sortDecimalDescOp) reorder() {
 	}
 }
 
-func (s *sortDecimalDescOp) sortPartitions(partitions []uint64) {
+func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -558,7 +565,7 @@ func (s *sortDecimalDescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -581,9 +588,10 @@ func (s *sortDecimalDescOp) Len() int {
 }
 
 type sortInt8AscOp struct {
-	sortCol      []int8
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int8
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt8AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -592,9 +600,9 @@ func (s *sortInt8AscOp) init(col coldata.Vec, order []uint64, workingSpace []uin
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt8AscOp) sort() {
+func (s *sortInt8AscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt8AscOp) reorder() {
@@ -620,7 +628,7 @@ func (s *sortInt8AscOp) reorder() {
 	}
 }
 
-func (s *sortInt8AscOp) sortPartitions(partitions []uint64) {
+func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -636,7 +644,7 @@ func (s *sortInt8AscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -659,9 +667,10 @@ func (s *sortInt8AscOp) Len() int {
 }
 
 type sortInt8DescOp struct {
-	sortCol      []int8
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int8
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt8DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -670,9 +679,9 @@ func (s *sortInt8DescOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt8DescOp) sort() {
+func (s *sortInt8DescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt8DescOp) reorder() {
@@ -698,7 +707,7 @@ func (s *sortInt8DescOp) reorder() {
 	}
 }
 
-func (s *sortInt8DescOp) sortPartitions(partitions []uint64) {
+func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -714,7 +723,7 @@ func (s *sortInt8DescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -737,9 +746,10 @@ func (s *sortInt8DescOp) Len() int {
 }
 
 type sortInt16AscOp struct {
-	sortCol      []int16
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int16
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt16AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -748,9 +758,9 @@ func (s *sortInt16AscOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt16AscOp) sort() {
+func (s *sortInt16AscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt16AscOp) reorder() {
@@ -776,7 +786,7 @@ func (s *sortInt16AscOp) reorder() {
 	}
 }
 
-func (s *sortInt16AscOp) sortPartitions(partitions []uint64) {
+func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -792,7 +802,7 @@ func (s *sortInt16AscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -815,9 +825,10 @@ func (s *sortInt16AscOp) Len() int {
 }
 
 type sortInt16DescOp struct {
-	sortCol      []int16
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int16
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt16DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -826,9 +837,9 @@ func (s *sortInt16DescOp) init(col coldata.Vec, order []uint64, workingSpace []u
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt16DescOp) sort() {
+func (s *sortInt16DescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt16DescOp) reorder() {
@@ -854,7 +865,7 @@ func (s *sortInt16DescOp) reorder() {
 	}
 }
 
-func (s *sortInt16DescOp) sortPartitions(partitions []uint64) {
+func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -870,7 +881,7 @@ func (s *sortInt16DescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -893,9 +904,10 @@ func (s *sortInt16DescOp) Len() int {
 }
 
 type sortInt32AscOp struct {
-	sortCol      []int32
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int32
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt32AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -904,9 +916,9 @@ func (s *sortInt32AscOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt32AscOp) sort() {
+func (s *sortInt32AscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt32AscOp) reorder() {
@@ -932,7 +944,7 @@ func (s *sortInt32AscOp) reorder() {
 	}
 }
 
-func (s *sortInt32AscOp) sortPartitions(partitions []uint64) {
+func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -948,7 +960,7 @@ func (s *sortInt32AscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -971,9 +983,10 @@ func (s *sortInt32AscOp) Len() int {
 }
 
 type sortInt32DescOp struct {
-	sortCol      []int32
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int32
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt32DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -982,9 +995,9 @@ func (s *sortInt32DescOp) init(col coldata.Vec, order []uint64, workingSpace []u
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt32DescOp) sort() {
+func (s *sortInt32DescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt32DescOp) reorder() {
@@ -1010,7 +1023,7 @@ func (s *sortInt32DescOp) reorder() {
 	}
 }
 
-func (s *sortInt32DescOp) sortPartitions(partitions []uint64) {
+func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1026,7 +1039,7 @@ func (s *sortInt32DescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -1049,9 +1062,10 @@ func (s *sortInt32DescOp) Len() int {
 }
 
 type sortInt64AscOp struct {
-	sortCol      []int64
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int64
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt64AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -1060,9 +1074,9 @@ func (s *sortInt64AscOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt64AscOp) sort() {
+func (s *sortInt64AscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt64AscOp) reorder() {
@@ -1088,7 +1102,7 @@ func (s *sortInt64AscOp) reorder() {
 	}
 }
 
-func (s *sortInt64AscOp) sortPartitions(partitions []uint64) {
+func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1104,7 +1118,7 @@ func (s *sortInt64AscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -1127,9 +1141,10 @@ func (s *sortInt64AscOp) Len() int {
 }
 
 type sortInt64DescOp struct {
-	sortCol      []int64
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []int64
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortInt64DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -1138,9 +1153,9 @@ func (s *sortInt64DescOp) init(col coldata.Vec, order []uint64, workingSpace []u
 	s.workingSpace = workingSpace
 }
 
-func (s *sortInt64DescOp) sort() {
+func (s *sortInt64DescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortInt64DescOp) reorder() {
@@ -1166,7 +1181,7 @@ func (s *sortInt64DescOp) reorder() {
 	}
 }
 
-func (s *sortInt64DescOp) sortPartitions(partitions []uint64) {
+func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1182,7 +1197,7 @@ func (s *sortInt64DescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -1205,9 +1220,10 @@ func (s *sortInt64DescOp) Len() int {
 }
 
 type sortFloat32AscOp struct {
-	sortCol      []float32
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []float32
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortFloat32AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -1216,9 +1232,9 @@ func (s *sortFloat32AscOp) init(col coldata.Vec, order []uint64, workingSpace []
 	s.workingSpace = workingSpace
 }
 
-func (s *sortFloat32AscOp) sort() {
+func (s *sortFloat32AscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortFloat32AscOp) reorder() {
@@ -1244,7 +1260,7 @@ func (s *sortFloat32AscOp) reorder() {
 	}
 }
 
-func (s *sortFloat32AscOp) sortPartitions(partitions []uint64) {
+func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1260,7 +1276,7 @@ func (s *sortFloat32AscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -1283,9 +1299,10 @@ func (s *sortFloat32AscOp) Len() int {
 }
 
 type sortFloat32DescOp struct {
-	sortCol      []float32
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []float32
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortFloat32DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -1294,9 +1311,9 @@ func (s *sortFloat32DescOp) init(col coldata.Vec, order []uint64, workingSpace [
 	s.workingSpace = workingSpace
 }
 
-func (s *sortFloat32DescOp) sort() {
+func (s *sortFloat32DescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortFloat32DescOp) reorder() {
@@ -1322,7 +1339,7 @@ func (s *sortFloat32DescOp) reorder() {
 	}
 }
 
-func (s *sortFloat32DescOp) sortPartitions(partitions []uint64) {
+func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1338,7 +1355,7 @@ func (s *sortFloat32DescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -1361,9 +1378,10 @@ func (s *sortFloat32DescOp) Len() int {
 }
 
 type sortFloat64AscOp struct {
-	sortCol      []float64
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []float64
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortFloat64AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -1372,9 +1390,9 @@ func (s *sortFloat64AscOp) init(col coldata.Vec, order []uint64, workingSpace []
 	s.workingSpace = workingSpace
 }
 
-func (s *sortFloat64AscOp) sort() {
+func (s *sortFloat64AscOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortFloat64AscOp) reorder() {
@@ -1400,7 +1418,7 @@ func (s *sortFloat64AscOp) reorder() {
 	}
 }
 
-func (s *sortFloat64AscOp) sortPartitions(partitions []uint64) {
+func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1416,7 +1434,7 @@ func (s *sortFloat64AscOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
@@ -1439,9 +1457,10 @@ func (s *sortFloat64AscOp) Len() int {
 }
 
 type sortFloat64DescOp struct {
-	sortCol      []float64
-	order        []uint64
-	workingSpace []uint64
+	sortCol       []float64
+	order         []uint64
+	workingSpace  []uint64
+	cancelChecker CancelChecker
 }
 
 func (s *sortFloat64DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
@@ -1450,9 +1469,9 @@ func (s *sortFloat64DescOp) init(col coldata.Vec, order []uint64, workingSpace [
 	s.workingSpace = workingSpace
 }
 
-func (s *sortFloat64DescOp) sort() {
+func (s *sortFloat64DescOp) sort(ctx context.Context) {
 	n := len(s.sortCol)
-	s.quickSort(0, n, maxDepth(n))
+	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
 func (s *sortFloat64DescOp) reorder() {
@@ -1478,7 +1497,7 @@ func (s *sortFloat64DescOp) reorder() {
 	}
 }
 
-func (s *sortFloat64DescOp) sortPartitions(partitions []uint64) {
+func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
@@ -1494,7 +1513,7 @@ func (s *sortFloat64DescOp) sortPartitions(partitions []uint64) {
 		s.order = order[partitionStart:partitionEnd]
 		s.sortCol = sortCol[partitionStart:partitionEnd]
 		n := int(partitionEnd - partitionStart)
-		s.quickSort(0, n, maxDepth(n))
+		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 

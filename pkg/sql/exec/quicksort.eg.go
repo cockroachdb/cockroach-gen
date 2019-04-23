@@ -5,6 +5,8 @@
 
 package exec
 
+import "context"
+
 // This file is copied from the the Go standard library's sort
 // implementation, found in https://golang.org/src/sort/sort.go. The only
 // modifications are to template each function into each sort_* struct, so
@@ -50,13 +52,14 @@ func (p *sortBoolAscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortBoolAscOp) heapSort(a, b int) {
+func (p *sortBoolAscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -180,21 +183,22 @@ func (p *sortBoolAscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortBoolAscOp) quickSort(a, b, maxDepth int) {
+func (p *sortBoolAscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -239,13 +243,14 @@ func (p *sortBoolDescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortBoolDescOp) heapSort(a, b int) {
+func (p *sortBoolDescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -369,21 +374,22 @@ func (p *sortBoolDescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortBoolDescOp) quickSort(a, b, maxDepth int) {
+func (p *sortBoolDescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -428,13 +434,14 @@ func (p *sortBytesAscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortBytesAscOp) heapSort(a, b int) {
+func (p *sortBytesAscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -558,21 +565,22 @@ func (p *sortBytesAscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortBytesAscOp) quickSort(a, b, maxDepth int) {
+func (p *sortBytesAscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -617,13 +625,14 @@ func (p *sortBytesDescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortBytesDescOp) heapSort(a, b int) {
+func (p *sortBytesDescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -747,21 +756,22 @@ func (p *sortBytesDescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortBytesDescOp) quickSort(a, b, maxDepth int) {
+func (p *sortBytesDescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -806,13 +816,14 @@ func (p *sortDecimalAscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortDecimalAscOp) heapSort(a, b int) {
+func (p *sortDecimalAscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -936,21 +947,22 @@ func (p *sortDecimalAscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortDecimalAscOp) quickSort(a, b, maxDepth int) {
+func (p *sortDecimalAscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -995,13 +1007,14 @@ func (p *sortDecimalDescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortDecimalDescOp) heapSort(a, b int) {
+func (p *sortDecimalDescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -1125,21 +1138,22 @@ func (p *sortDecimalDescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortDecimalDescOp) quickSort(a, b, maxDepth int) {
+func (p *sortDecimalDescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -1184,13 +1198,14 @@ func (p *sortInt8AscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt8AscOp) heapSort(a, b int) {
+func (p *sortInt8AscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -1314,21 +1329,22 @@ func (p *sortInt8AscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt8AscOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt8AscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -1373,13 +1389,14 @@ func (p *sortInt8DescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt8DescOp) heapSort(a, b int) {
+func (p *sortInt8DescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -1503,21 +1520,22 @@ func (p *sortInt8DescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt8DescOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt8DescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -1562,13 +1580,14 @@ func (p *sortInt16AscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt16AscOp) heapSort(a, b int) {
+func (p *sortInt16AscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -1692,21 +1711,22 @@ func (p *sortInt16AscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt16AscOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt16AscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -1751,13 +1771,14 @@ func (p *sortInt16DescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt16DescOp) heapSort(a, b int) {
+func (p *sortInt16DescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -1881,21 +1902,22 @@ func (p *sortInt16DescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt16DescOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt16DescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -1940,13 +1962,14 @@ func (p *sortInt32AscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt32AscOp) heapSort(a, b int) {
+func (p *sortInt32AscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -2070,21 +2093,22 @@ func (p *sortInt32AscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt32AscOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt32AscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -2129,13 +2153,14 @@ func (p *sortInt32DescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt32DescOp) heapSort(a, b int) {
+func (p *sortInt32DescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -2259,21 +2284,22 @@ func (p *sortInt32DescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt32DescOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt32DescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -2318,13 +2344,14 @@ func (p *sortInt64AscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt64AscOp) heapSort(a, b int) {
+func (p *sortInt64AscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -2448,21 +2475,22 @@ func (p *sortInt64AscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt64AscOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt64AscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -2507,13 +2535,14 @@ func (p *sortInt64DescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortInt64DescOp) heapSort(a, b int) {
+func (p *sortInt64DescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -2637,21 +2666,22 @@ func (p *sortInt64DescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortInt64DescOp) quickSort(a, b, maxDepth int) {
+func (p *sortInt64DescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -2696,13 +2726,14 @@ func (p *sortFloat32AscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortFloat32AscOp) heapSort(a, b int) {
+func (p *sortFloat32AscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -2826,21 +2857,22 @@ func (p *sortFloat32AscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortFloat32AscOp) quickSort(a, b, maxDepth int) {
+func (p *sortFloat32AscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -2885,13 +2917,14 @@ func (p *sortFloat32DescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortFloat32DescOp) heapSort(a, b int) {
+func (p *sortFloat32DescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -3015,21 +3048,22 @@ func (p *sortFloat32DescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortFloat32DescOp) quickSort(a, b, maxDepth int) {
+func (p *sortFloat32DescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -3074,13 +3108,14 @@ func (p *sortFloat64AscOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortFloat64AscOp) heapSort(a, b int) {
+func (p *sortFloat64AscOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -3204,21 +3239,22 @@ func (p *sortFloat64AscOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortFloat64AscOp) quickSort(a, b, maxDepth int) {
+func (p *sortFloat64AscOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
@@ -3263,13 +3299,14 @@ func (p *sortFloat64DescOp) siftDown(lo, hi, first int) {
 	}
 }
 
-func (p *sortFloat64DescOp) heapSort(a, b int) {
+func (p *sortFloat64DescOp) heapSort(ctx context.Context, a, b int) {
 	first := a
 	lo := 0
 	hi := b - a
 
 	// Build heap with greatest element at top.
 	for i := (hi - 1) / 2; i >= 0; i-- {
+		p.cancelChecker.check(ctx)
 		p.siftDown(i, hi, first)
 	}
 
@@ -3393,21 +3430,22 @@ func (p *sortFloat64DescOp) doPivot(lo, hi int) (midlo, midhi int) {
 	return b - 1, c
 }
 
-func (p *sortFloat64DescOp) quickSort(a, b, maxDepth int) {
+func (p *sortFloat64DescOp) quickSort(ctx context.Context, a, b, maxDepth int) {
 	for b-a > 12 { // Use ShellSort for slices <= 12 elements
 		if maxDepth == 0 {
-			p.heapSort(a, b)
+			p.heapSort(ctx, a, b)
 			return
 		}
 		maxDepth--
+		p.cancelChecker.check(ctx)
 		mlo, mhi := p.doPivot(a, b)
 		// Avoiding recursion on the larger subproblem guarantees
 		// a stack depth of at most lg(b-a).
 		if mlo-a < b-mhi {
-			p.quickSort(a, mlo, maxDepth)
+			p.quickSort(ctx, a, mlo, maxDepth)
 			a = mhi // i.e., quickSort(data, mhi, b)
 		} else {
-			p.quickSort(mhi, b, maxDepth)
+			p.quickSort(ctx, mhi, b, maxDepth)
 			b = mlo // i.e., quickSort(data, a, mlo)
 		}
 	}
