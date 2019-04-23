@@ -5415,7 +5415,10 @@ func (g *projectSetGroup) bestProps() *bestProps {
 // column could be the position of the row in the output (`row_number`), or a
 // cumulative sum, or something else.
 type WindowExpr struct {
-	Input    RelExpr
+	Input RelExpr
+
+	// Function contains the window function being computed. It will always be
+	// a member of the Window class and its arguments will always be Variables.
 	Function opt.ScalarExpr
 	WindowPrivate
 
@@ -5544,6 +5547,13 @@ func (g *windowGroup) bestProps() *bestProps {
 type WindowPrivate struct {
 	// ColID holds the id of the column introduced by this operator.
 	ColID opt.ColumnID
+
+	// Passthrough is the set of columns the window function passes through
+	// unchanged. Note the only columns pruned by a Window operator are the
+	// window function's arguments.
+	// TODO(justin): This could be derived from the input's output columns and
+	// the function itself.
+	Passthrough opt.ColSet
 }
 
 // FakeRelExpr is a mock relational operator used for testing; its logical properties
@@ -11408,6 +11418,68 @@ func (e *AggDistinctExpr) DataType() *types.T {
 	return e.Typ
 }
 
+// AggFilterExpr is used as a modifier that wraps the input of an aggregate
+// function. It causes only rows for which the filter expression is true
+// to be processed. AggFilter should always occur on top of AggDistinct
+// if they are both present.
+type AggFilterExpr struct {
+	Input  opt.ScalarExpr
+	Filter opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &AggFilterExpr{}
+
+func (e *AggFilterExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *AggFilterExpr) Op() opt.Operator {
+	return opt.AggFilterOp
+}
+
+func (e *AggFilterExpr) ChildCount() int {
+	return 2
+}
+
+func (e *AggFilterExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Filter
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *AggFilterExpr) Private() interface{} {
+	return nil
+}
+
+func (e *AggFilterExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AggFilterExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Filter = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *AggFilterExpr) DataType() *types.T {
+	return e.Typ
+}
+
 // RankExpr computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
 type RankExpr struct {
@@ -11621,65 +11693,360 @@ func (e *CumeDistExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// AggFilterExpr is used as a modifier that wraps the input of an aggregate
-// function. It causes only rows for which the filter expression is true
-// to be processed. AggFilter should always occur on top of AggDistinct
-// if they are both present.
-type AggFilterExpr struct {
-	Input  opt.ScalarExpr
-	Filter opt.ScalarExpr
+// NtileExpr builds a histogram with the specified number of buckets and evaluates
+// to which bucket the row falls in.
+type NtileExpr struct {
+	NumBuckets opt.ScalarExpr
 
 	Typ *types.T
 	id  opt.ScalarID
 }
 
-var _ opt.ScalarExpr = &AggFilterExpr{}
+var _ opt.ScalarExpr = &NtileExpr{}
 
-func (e *AggFilterExpr) ID() opt.ScalarID {
+func (e *NtileExpr) ID() opt.ScalarID {
 	return e.id
 }
 
-func (e *AggFilterExpr) Op() opt.Operator {
-	return opt.AggFilterOp
+func (e *NtileExpr) Op() opt.Operator {
+	return opt.NtileOp
 }
 
-func (e *AggFilterExpr) ChildCount() int {
-	return 2
+func (e *NtileExpr) ChildCount() int {
+	return 1
 }
 
-func (e *AggFilterExpr) Child(nth int) opt.Expr {
+func (e *NtileExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
-		return e.Input
-	case 1:
-		return e.Filter
+		return e.NumBuckets
 	}
 	panic(pgerror.AssertionFailedf("child index out of range"))
 }
 
-func (e *AggFilterExpr) Private() interface{} {
+func (e *NtileExpr) Private() interface{} {
 	return nil
 }
 
-func (e *AggFilterExpr) String() string {
+func (e *NtileExpr) String() string {
 	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
 
-func (e *AggFilterExpr) SetChild(nth int, child opt.Expr) {
+func (e *NtileExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
-		e.Input = child.(opt.ScalarExpr)
-		return
-	case 1:
-		e.Filter = child.(opt.ScalarExpr)
+		e.NumBuckets = child.(opt.ScalarExpr)
 		return
 	}
 	panic(pgerror.AssertionFailedf("child index out of range"))
 }
 
-func (e *AggFilterExpr) DataType() *types.T {
+func (e *NtileExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// LagExpr returns Value evaluated at the row Offset rows before this one. If no
+// such row exists, returns Def.
+type LagExpr struct {
+	Value  opt.ScalarExpr
+	Offset opt.ScalarExpr
+
+	// Def is the default value.
+	Def opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &LagExpr{}
+
+func (e *LagExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *LagExpr) Op() opt.Operator {
+	return opt.LagOp
+}
+
+func (e *LagExpr) ChildCount() int {
+	return 3
+}
+
+func (e *LagExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Value
+	case 1:
+		return e.Offset
+	case 2:
+		return e.Def
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *LagExpr) Private() interface{} {
+	return nil
+}
+
+func (e *LagExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LagExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Offset = child.(opt.ScalarExpr)
+		return
+	case 2:
+		e.Def = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *LagExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// LeadExpr returns Value evaluated at the row Offset rows after this one. If no
+// such row exists, returns Def.
+type LeadExpr struct {
+	Value  opt.ScalarExpr
+	Offset opt.ScalarExpr
+
+	// Def is the default value.
+	Def opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &LeadExpr{}
+
+func (e *LeadExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *LeadExpr) Op() opt.Operator {
+	return opt.LeadOp
+}
+
+func (e *LeadExpr) ChildCount() int {
+	return 3
+}
+
+func (e *LeadExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Value
+	case 1:
+		return e.Offset
+	case 2:
+		return e.Def
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *LeadExpr) Private() interface{} {
+	return nil
+}
+
+func (e *LeadExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LeadExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Offset = child.(opt.ScalarExpr)
+		return
+	case 2:
+		e.Def = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *LeadExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// FirstValueExpr returns Value evaluated at the first row in the row's frame.
+// TODO(justin): can this be unified with FirstAgg?
+type FirstValueExpr struct {
+	Value opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &FirstValueExpr{}
+
+func (e *FirstValueExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *FirstValueExpr) Op() opt.Operator {
+	return opt.FirstValueOp
+}
+
+func (e *FirstValueExpr) ChildCount() int {
+	return 1
+}
+
+func (e *FirstValueExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Value
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *FirstValueExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FirstValueExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FirstValueExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *FirstValueExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// LastValueExpr returns Value evaluated at the last row in the row's frame.
+type LastValueExpr struct {
+	Value opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &LastValueExpr{}
+
+func (e *LastValueExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *LastValueExpr) Op() opt.Operator {
+	return opt.LastValueOp
+}
+
+func (e *LastValueExpr) ChildCount() int {
+	return 1
+}
+
+func (e *LastValueExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Value
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *LastValueExpr) Private() interface{} {
+	return nil
+}
+
+func (e *LastValueExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LastValueExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *LastValueExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// NthValueExpr returns Value evaluated at the nth row in the row's frame.
+// Out-of-bounds references evaluate to NULL.
+type NthValueExpr struct {
+	Value opt.ScalarExpr
+	Nth   opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &NthValueExpr{}
+
+func (e *NthValueExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *NthValueExpr) Op() opt.Operator {
+	return opt.NthValueOp
+}
+
+func (e *NthValueExpr) ChildCount() int {
+	return 2
+}
+
+func (e *NthValueExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Value
+	case 1:
+		return e.Nth
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *NthValueExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NthValueExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NthValueExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Nth = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *NthValueExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -14993,6 +15360,25 @@ func (m *Memo) MemoizeAggDistinct(
 	return interned
 }
 
+func (m *Memo) MemoizeAggFilter(
+	input opt.ScalarExpr,
+	filter opt.ScalarExpr,
+) *AggFilterExpr {
+	const size = int64(unsafe.Sizeof(AggFilterExpr{}))
+	e := &AggFilterExpr{
+		Input:  input,
+		Filter: filter,
+		id:     m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternAggFilter(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeRank() *RankExpr {
 	return RankSingleton
 }
@@ -15013,18 +15399,111 @@ func (m *Memo) MemoizeCumeDist() *CumeDistExpr {
 	return CumeDistSingleton
 }
 
-func (m *Memo) MemoizeAggFilter(
-	input opt.ScalarExpr,
-	filter opt.ScalarExpr,
-) *AggFilterExpr {
-	const size = int64(unsafe.Sizeof(AggFilterExpr{}))
-	e := &AggFilterExpr{
-		Input:  input,
-		Filter: filter,
+func (m *Memo) MemoizeNtile(
+	numBuckets opt.ScalarExpr,
+) *NtileExpr {
+	const size = int64(unsafe.Sizeof(NtileExpr{}))
+	e := &NtileExpr{
+		NumBuckets: numBuckets,
+		id:         m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternNtile(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLag(
+	value opt.ScalarExpr,
+	offset opt.ScalarExpr,
+	def opt.ScalarExpr,
+) *LagExpr {
+	const size = int64(unsafe.Sizeof(LagExpr{}))
+	e := &LagExpr{
+		Value:  value,
+		Offset: offset,
+		Def:    def,
 		id:     m.NextID(),
 	}
 	e.Typ = InferType(m, e)
-	interned := m.interner.InternAggFilter(e)
+	interned := m.interner.InternLag(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLead(
+	value opt.ScalarExpr,
+	offset opt.ScalarExpr,
+	def opt.ScalarExpr,
+) *LeadExpr {
+	const size = int64(unsafe.Sizeof(LeadExpr{}))
+	e := &LeadExpr{
+		Value:  value,
+		Offset: offset,
+		Def:    def,
+		id:     m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternLead(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeFirstValue(
+	value opt.ScalarExpr,
+) *FirstValueExpr {
+	const size = int64(unsafe.Sizeof(FirstValueExpr{}))
+	e := &FirstValueExpr{
+		Value: value,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternFirstValue(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeLastValue(
+	value opt.ScalarExpr,
+) *LastValueExpr {
+	const size = int64(unsafe.Sizeof(LastValueExpr{}))
+	e := &LastValueExpr{
+		Value: value,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternLastValue(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeNthValue(
+	value opt.ScalarExpr,
+	nth opt.ScalarExpr,
+) *NthValueExpr {
+	const size = int64(unsafe.Sizeof(NthValueExpr{}))
+	e := &NthValueExpr{
+		Value: value,
+		Nth:   nth,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternNthValue(e)
 	if interned == e {
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16046,6 +16525,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternFirstAgg(t)
 	case *AggDistinctExpr:
 		return in.InternAggDistinct(t)
+	case *AggFilterExpr:
+		return in.InternAggFilter(t)
 	case *RankExpr:
 		return in.InternRank(t)
 	case *RowNumberExpr:
@@ -16056,8 +16537,18 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternPercentRank(t)
 	case *CumeDistExpr:
 		return in.InternCumeDist(t)
-	case *AggFilterExpr:
-		return in.InternAggFilter(t)
+	case *NtileExpr:
+		return in.InternNtile(t)
+	case *LagExpr:
+		return in.InternLag(t)
+	case *LeadExpr:
+		return in.InternLead(t)
+	case *FirstValueExpr:
+		return in.InternFirstValue(t)
+	case *LastValueExpr:
+		return in.InternLastValue(t)
+	case *NthValueExpr:
+		return in.InternNthValue(t)
 	case *ScalarListExpr:
 		return in.InternScalarList(t)
 	case *InsertExpr:
@@ -17007,13 +17498,15 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashScalarExpr(val.Function)
 	in.hasher.HashColumnID(val.ColID)
+	in.hasher.HashColSet(val.Passthrough)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*WindowExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
-				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) {
+				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) &&
+				in.hasher.IsColSetEqual(val.Passthrough, existing.Passthrough) {
 				return existing
 			}
 		}
@@ -19020,6 +19513,26 @@ func (in *interner) InternAggDistinct(val *AggDistinctExpr) *AggDistinctExpr {
 	return val
 }
 
+func (in *interner) InternAggFilter(val *AggFilterExpr) *AggFilterExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AggFilterOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Filter)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AggFilterExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Filter, existing.Filter) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternRank(val *RankExpr) *RankExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.RankOp)
@@ -19095,17 +19608,115 @@ func (in *interner) InternCumeDist(val *CumeDistExpr) *CumeDistExpr {
 	return val
 }
 
-func (in *interner) InternAggFilter(val *AggFilterExpr) *AggFilterExpr {
+func (in *interner) InternNtile(val *NtileExpr) *NtileExpr {
 	in.hasher.Init()
-	in.hasher.HashOperator(opt.AggFilterOp)
-	in.hasher.HashScalarExpr(val.Input)
-	in.hasher.HashScalarExpr(val.Filter)
+	in.hasher.HashOperator(opt.NtileOp)
+	in.hasher.HashScalarExpr(val.NumBuckets)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*AggFilterExpr); ok {
-			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsScalarExprEqual(val.Filter, existing.Filter) {
+		if existing, ok := in.cache.Item().(*NtileExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.NumBuckets, existing.NumBuckets) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLag(val *LagExpr) *LagExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LagOp)
+	in.hasher.HashScalarExpr(val.Value)
+	in.hasher.HashScalarExpr(val.Offset)
+	in.hasher.HashScalarExpr(val.Def)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LagExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) &&
+				in.hasher.IsScalarExprEqual(val.Offset, existing.Offset) &&
+				in.hasher.IsScalarExprEqual(val.Def, existing.Def) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLead(val *LeadExpr) *LeadExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LeadOp)
+	in.hasher.HashScalarExpr(val.Value)
+	in.hasher.HashScalarExpr(val.Offset)
+	in.hasher.HashScalarExpr(val.Def)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LeadExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) &&
+				in.hasher.IsScalarExprEqual(val.Offset, existing.Offset) &&
+				in.hasher.IsScalarExprEqual(val.Def, existing.Def) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFirstValue(val *FirstValueExpr) *FirstValueExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FirstValueOp)
+	in.hasher.HashScalarExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FirstValueExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLastValue(val *LastValueExpr) *LastValueExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LastValueOp)
+	in.hasher.HashScalarExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LastValueExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNthValue(val *NthValueExpr) *NthValueExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NthValueOp)
+	in.hasher.HashScalarExpr(val.Value)
+	in.hasher.HashScalarExpr(val.Nth)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NthValueExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) &&
+				in.hasher.IsScalarExprEqual(val.Nth, existing.Nth) {
 				return existing
 			}
 		}

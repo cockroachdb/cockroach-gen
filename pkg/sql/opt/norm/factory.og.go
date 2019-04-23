@@ -13746,6 +13746,19 @@ func (_f *Factory) ConstructAggDistinct(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructAggFilter constructs an expression for the AggFilter operator.
+// AggFilter is used as a modifier that wraps the input of an aggregate
+// function. It causes only rows for which the filter expression is true
+// to be processed. AggFilter should always occur on top of AggDistinct
+// if they are both present.
+func (_f *Factory) ConstructAggFilter(
+	input opt.ScalarExpr,
+	filter opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeAggFilter(input, filter)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructRank constructs an expression for the Rank operator.
 // Rank computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
@@ -13784,16 +13797,67 @@ func (_f *Factory) ConstructCumeDist() opt.ScalarExpr {
 	return _f.onConstructScalar(e)
 }
 
-// ConstructAggFilter constructs an expression for the AggFilter operator.
-// AggFilter is used as a modifier that wraps the input of an aggregate
-// function. It causes only rows for which the filter expression is true
-// to be processed. AggFilter should always occur on top of AggDistinct
-// if they are both present.
-func (_f *Factory) ConstructAggFilter(
-	input opt.ScalarExpr,
-	filter opt.ScalarExpr,
+// ConstructNtile constructs an expression for the Ntile operator.
+// Ntile builds a histogram with the specified number of buckets and evaluates
+// to which bucket the row falls in.
+func (_f *Factory) ConstructNtile(
+	numBuckets opt.ScalarExpr,
 ) opt.ScalarExpr {
-	e := _f.mem.MemoizeAggFilter(input, filter)
+	e := _f.mem.MemoizeNtile(numBuckets)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructLag constructs an expression for the Lag operator.
+// Lag returns Value evaluated at the row Offset rows before this one. If no
+// such row exists, returns Def.
+func (_f *Factory) ConstructLag(
+	value opt.ScalarExpr,
+	offset opt.ScalarExpr,
+	def opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeLag(value, offset, def)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructLead constructs an expression for the Lead operator.
+// Lead returns Value evaluated at the row Offset rows after this one. If no
+// such row exists, returns Def.
+func (_f *Factory) ConstructLead(
+	value opt.ScalarExpr,
+	offset opt.ScalarExpr,
+	def opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeLead(value, offset, def)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructFirstValue constructs an expression for the FirstValue operator.
+// FirstValue returns Value evaluated at the first row in the row's frame.
+// TODO(justin): can this be unified with FirstAgg?
+func (_f *Factory) ConstructFirstValue(
+	value opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeFirstValue(value)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructLastValue constructs an expression for the LastValue operator.
+// LastValue returns Value evaluated at the last row in the row's frame.
+func (_f *Factory) ConstructLastValue(
+	value opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeLastValue(value)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructNthValue constructs an expression for the NthValue operator.
+// NthValue returns Value evaluated at the nth row in the row's frame.
+// Out-of-bounds references evaluate to NULL.
+func (_f *Factory) ConstructNthValue(
+	value opt.ScalarExpr,
+	nth opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeNthValue(value, nth)
 	return _f.onConstructScalar(e)
 }
 
@@ -15028,6 +15092,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.AggFilterExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		filter := replace(t.Filter).(opt.ScalarExpr)
+		if input != t.Input || filter != t.Filter {
+			return f.ConstructAggFilter(input, filter)
+		}
+		return t
+
 	case *memo.RankExpr:
 		return t
 
@@ -15043,11 +15115,50 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.CumeDistExpr:
 		return t
 
-	case *memo.AggFilterExpr:
-		input := replace(t.Input).(opt.ScalarExpr)
-		filter := replace(t.Filter).(opt.ScalarExpr)
-		if input != t.Input || filter != t.Filter {
-			return f.ConstructAggFilter(input, filter)
+	case *memo.NtileExpr:
+		numBuckets := replace(t.NumBuckets).(opt.ScalarExpr)
+		if numBuckets != t.NumBuckets {
+			return f.ConstructNtile(numBuckets)
+		}
+		return t
+
+	case *memo.LagExpr:
+		value := replace(t.Value).(opt.ScalarExpr)
+		offset := replace(t.Offset).(opt.ScalarExpr)
+		def := replace(t.Def).(opt.ScalarExpr)
+		if value != t.Value || offset != t.Offset || def != t.Def {
+			return f.ConstructLag(value, offset, def)
+		}
+		return t
+
+	case *memo.LeadExpr:
+		value := replace(t.Value).(opt.ScalarExpr)
+		offset := replace(t.Offset).(opt.ScalarExpr)
+		def := replace(t.Def).(opt.ScalarExpr)
+		if value != t.Value || offset != t.Offset || def != t.Def {
+			return f.ConstructLead(value, offset, def)
+		}
+		return t
+
+	case *memo.FirstValueExpr:
+		value := replace(t.Value).(opt.ScalarExpr)
+		if value != t.Value {
+			return f.ConstructFirstValue(value)
+		}
+		return t
+
+	case *memo.LastValueExpr:
+		value := replace(t.Value).(opt.ScalarExpr)
+		if value != t.Value {
+			return f.ConstructLastValue(value)
+		}
+		return t
+
+	case *memo.NthValueExpr:
+		value := replace(t.Value).(opt.ScalarExpr)
+		nth := replace(t.Nth).(opt.ScalarExpr)
+		if value != t.Value || nth != t.Nth {
+			return f.ConstructNthValue(value, nth)
 		}
 		return t
 
@@ -15986,6 +16097,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.AggFilterExpr:
+		return f.ConstructAggFilter(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Filter, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.RankExpr:
 		return t
 
@@ -16001,10 +16118,39 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.CumeDistExpr:
 		return t
 
-	case *memo.AggFilterExpr:
-		return f.ConstructAggFilter(
-			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
-			f.invokeReplace(t.Filter, replace).(opt.ScalarExpr),
+	case *memo.NtileExpr:
+		return f.ConstructNtile(
+			f.invokeReplace(t.NumBuckets, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.LagExpr:
+		return f.ConstructLag(
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Offset, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Def, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.LeadExpr:
+		return f.ConstructLead(
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Offset, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Def, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.FirstValueExpr:
+		return f.ConstructFirstValue(
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.LastValueExpr:
+		return f.ConstructLastValue(
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.NthValueExpr:
+		return f.ConstructNthValue(
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Nth, replace).(opt.ScalarExpr),
 		)
 
 	case *memo.InsertExpr:
@@ -16758,6 +16904,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructAggDistinct(
 			args[0].(opt.ScalarExpr),
 		)
+	case opt.AggFilterOp:
+		return f.ConstructAggFilter(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
 	case opt.RankOp:
 		return f.ConstructRank()
 	case opt.RowNumberOp:
@@ -16768,8 +16919,32 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructPercentRank()
 	case opt.CumeDistOp:
 		return f.ConstructCumeDist()
-	case opt.AggFilterOp:
-		return f.ConstructAggFilter(
+	case opt.NtileOp:
+		return f.ConstructNtile(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.LagOp:
+		return f.ConstructLag(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+			args[2].(opt.ScalarExpr),
+		)
+	case opt.LeadOp:
+		return f.ConstructLead(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+			args[2].(opt.ScalarExpr),
+		)
+	case opt.FirstValueOp:
+		return f.ConstructFirstValue(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.LastValueOp:
+		return f.ConstructLastValue(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.NthValueOp:
+		return f.ConstructNthValue(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
