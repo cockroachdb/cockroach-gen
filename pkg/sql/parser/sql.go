@@ -15018,7 +15018,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 //line sql-gen.y:3263
 		{
-			sqlVAL.union.val = &tree.ShowClusterSetting{Name: "all"}
+			sqlVAL.union.val = &tree.ShowAllClusterSettings{}
 		}
 	case 576:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
@@ -15030,7 +15030,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 //line sql-gen.y:3268
 		{
-			sqlVAL.union.val = &tree.ShowClusterSetting{Name: "all"}
+			sqlVAL.union.val = &tree.ShowAllClusterSettings{}
 		}
 	case 578:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
