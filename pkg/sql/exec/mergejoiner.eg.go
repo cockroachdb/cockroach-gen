@@ -7151,7 +7151,6 @@ EqLoop:
 		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
 		o.groups.finishedCol()
 	}
-
 }
 
 func (o *mergeJoinOp) probeBodyLSeltrueRSelfalse() {
@@ -14282,7 +14281,6 @@ EqLoop:
 		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
 		o.groups.finishedCol()
 	}
-
 }
 
 func (o *mergeJoinOp) probeBodyLSelfalseRSeltrue() {
@@ -21413,7 +21411,6 @@ EqLoop:
 		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
 		o.groups.finishedCol()
 	}
-
 }
 
 func (o *mergeJoinOp) probeBodyLSelfalseRSelfalse() {
@@ -28544,7 +28541,6 @@ EqLoop:
 		// Look at the groups associated with the next equality column by moving the circular buffer pointer up.
 		o.groups.finishedCol()
 	}
-
 }
 
 // buildLeftGroups takes a []group and expands each group into the output by repeating
@@ -28577,6 +28573,7 @@ func (o *mergeJoinOp) buildLeftGroups(
 	o.builderState.left.finished = false
 	sel := bat.Selection()
 	initialBuilderState := o.builderState.left
+	outputBatchSize := int(o.outputBatchSize)
 	// Loop over every column.
 LeftColLoop:
 	for ; o.builderState.left.colIdx < len(input.outCols); o.builderState.left.colIdx++ {
@@ -28591,7 +28588,10 @@ LeftColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bool()
+					outCol := out.Bool()
+					var val bool
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28603,49 +28603,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Bool()[i+t_destStartIdx] = t_src.Bool()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bytes()
+					outCol := out.Bytes()
+					var val []byte
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28657,49 +28653,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Bytes()[i+t_destStartIdx] = t_src.Bytes()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Decimal()
+					outCol := out.Decimal()
+					var val apd.Decimal
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28711,49 +28703,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Decimal()[i+t_destStartIdx] = t_src.Decimal()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int8()
+					outCol := out.Int8()
+					var val int8
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28765,49 +28753,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int8()[i+t_destStartIdx] = t_src.Int8()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int16()
+					outCol := out.Int16()
+					var val int16
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28819,49 +28803,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int16()[i+t_destStartIdx] = t_src.Int16()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int32()
+					outCol := out.Int32()
+					var val int32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28873,49 +28853,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int32()[i+t_destStartIdx] = t_src.Int32()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int64()
+					outCol := out.Int64()
+					var val int64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28927,49 +28903,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int64()[i+t_destStartIdx] = t_src.Int64()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float32()
+					outCol := out.Float32()
+					var val float32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -28981,49 +28953,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Float32()[i+t_destStartIdx] = t_src.Float32()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float64()
+					outCol := out.Float64()
+					var val float64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29035,42 +29003,35 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Float64()[i+t_destStartIdx] = t_src.Float64()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -29083,7 +29044,10 @@ LeftColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bool()
+					outCol := out.Bool()
+					var val bool
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29095,42 +29059,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Bool()[i+t_destStartIdx] = t_src.Bool()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bytes()
+					outCol := out.Bytes()
+					var val []byte
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29142,42 +29105,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Bytes()[i+t_destStartIdx] = t_src.Bytes()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Decimal()
+					outCol := out.Decimal()
+					var val apd.Decimal
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29189,42 +29151,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Decimal()[i+t_destStartIdx] = t_src.Decimal()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int8()
+					outCol := out.Int8()
+					var val int8
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29236,42 +29197,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int8()[i+t_destStartIdx] = t_src.Int8()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int16()
+					outCol := out.Int16()
+					var val int16
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29283,42 +29243,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int16()[i+t_destStartIdx] = t_src.Int16()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int32()
+					outCol := out.Int32()
+					var val int32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29330,42 +29289,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int32()[i+t_destStartIdx] = t_src.Int32()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int64()
+					outCol := out.Int64()
+					var val int64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29377,42 +29335,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Int64()[i+t_destStartIdx] = t_src.Int64()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float32()
+					outCol := out.Float32()
+					var val float32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29424,42 +29381,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Float32()[i+t_destStartIdx] = t_src.Float32()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float64()
+					outCol := out.Float64()
+					var val float64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29471,35 +29427,31 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[sel[srcStartIdx]]
 
-									// TODO (georgeutsin): update template language to automatically generate template
-									//  function parameter definitions from expressions passed in.
-									t_dest := out
-									t_destStartIdx := int(outStartIdx)
-									t_src := src
-									t_srcStartIdx := srcStartIdx
-									t_srcEndIdx := srcStartIdx + 1
-									t_sel := sel
-
-									batchSize := t_srcEndIdx - t_srcStartIdx
-									for i := 0; i < batchSize; i++ {
-										t_dest.Float64()[i+t_destStartIdx] = t_src.Float64()[t_sel[i+t_srcStartIdx]]
-									}
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -29514,9 +29466,10 @@ LeftColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bool()
 					outCol := out.Bool()
+					var val bool
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29528,39 +29481,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bytes()
 					outCol := out.Bytes()
+					var val []byte
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29572,39 +29531,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Decimal()
 					outCol := out.Decimal()
+					var val apd.Decimal
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29616,39 +29581,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int8()
 					outCol := out.Int8()
+					var val int8
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29660,39 +29631,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int16()
 					outCol := out.Int16()
+					var val int16
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29704,39 +29681,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int32()
 					outCol := out.Int32()
+					var val int32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29748,39 +29731,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int64()
 					outCol := out.Int64()
+					var val int64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29792,39 +29781,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float32()
 					outCol := out.Float32()
+					var val float32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29836,39 +29831,45 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float64()
 					outCol := out.Float64()
+					var val float64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29880,30 +29881,35 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							toAppend := leftGroup.numRepeats
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
+
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
 							if src.NullAt64(uint64(srcStartIdx)) {
 								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
 							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -29916,9 +29922,10 @@ LeftColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bool()
 					outCol := out.Bool()
+					var val bool
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29930,32 +29937,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bytes()
 					outCol := out.Bytes()
+					var val []byte
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -29967,32 +29983,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Decimal()
 					outCol := out.Decimal()
+					var val apd.Decimal
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30004,32 +30029,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int8()
 					outCol := out.Int8()
+					var val int8
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30041,32 +30075,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int16()
 					outCol := out.Int16()
+					var val int16
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30078,32 +30121,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int32()
 					outCol := out.Int32()
+					var val int32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30115,32 +30167,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int64()
 					outCol := out.Int64()
+					var val int64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30152,32 +30213,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float32()
 					outCol := out.Float32()
+					var val float32
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30189,32 +30259,41 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
 					}
 					o.builderState.left.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float64()
 					outCol := out.Float64()
+					var val float64
+					var srcStartIdx int
 
 					// Loop over every group.
 					for ; o.builderState.left.groupsIdx < groupsLen; o.builderState.left.groupsIdx++ {
@@ -30226,23 +30305,31 @@ LeftColLoop:
 						// Loop over every row in the group.
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
-							srcStartIdx := o.builderState.left.curSrcStartIdx
-							for ; o.builderState.left.numRepeatsIdx < leftGroup.numRepeats; o.builderState.left.numRepeatsIdx++ {
-								if outStartIdx < int(o.outputBatchSize) {
+							srcStartIdx = o.builderState.left.curSrcStartIdx
+							val = srcCol[srcStartIdx]
 
-									outCol[outStartIdx] = srcCol[srcStartIdx]
-
-									outStartIdx++
-								} else {
-									if o.builderState.left.colIdx == len(input.outCols)-1 {
-										o.builderState.left.colIdx = zeroMJCPcolIdx
-										return
-									}
-									o.builderState.left.setBuilderColumnState(initialBuilderState)
-									continue LeftColLoop
-
-								}
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
+
+							for i := 0; i < toAppend; i++ {
+								outCol[outStartIdx] = val
+								outStartIdx++
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the group so save state and move to next column.
+								o.builderState.left.numRepeatsIdx += toAppend
+								if o.builderState.left.colIdx == len(input.outCols)-1 {
+									o.builderState.left.colIdx = zeroMJCPcolIdx
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+
 							o.builderState.left.numRepeatsIdx = zeroMJCPnumRepeatsIdx
 						}
 						o.builderState.left.curSrcStartIdx = zeroMJCPcurSrcStartIdx
@@ -30253,10 +30340,8 @@ LeftColLoop:
 				}
 			}
 		}
-
 		o.builderState.left.setBuilderColumnState(initialBuilderState)
 	}
-
 	o.builderState.left.reset()
 }
 
@@ -30290,6 +30375,7 @@ func (o *mergeJoinOp) buildRightGroups(
 	o.builderState.right.finished = false
 	initialBuilderState := o.builderState.right
 	sel := bat.Selection()
+	outputBatchSize := int(o.outputBatchSize)
 
 	// Loop over every column.
 RightColLoop:
@@ -30305,7 +30391,8 @@ RightColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bool()
+					outCol := out.Bool()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30316,24 +30403,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Bool()[i+t_destStartIdx] = t_src.Bool()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30356,7 +30438,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bytes()
+					outCol := out.Bytes()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30367,24 +30450,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Bytes()[i+t_destStartIdx] = t_src.Bytes()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30407,7 +30485,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Decimal()
+					outCol := out.Decimal()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30418,24 +30497,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Decimal()[i+t_destStartIdx] = t_src.Decimal()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30458,7 +30532,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int8()
+					outCol := out.Int8()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30469,24 +30544,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int8()[i+t_destStartIdx] = t_src.Int8()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30509,7 +30579,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int16()
+					outCol := out.Int16()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30520,24 +30591,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int16()[i+t_destStartIdx] = t_src.Int16()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30560,7 +30626,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int32()
+					outCol := out.Int32()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30571,24 +30638,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int32()[i+t_destStartIdx] = t_src.Int32()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30611,7 +30673,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int64()
+					outCol := out.Int64()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30622,24 +30685,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int64()[i+t_destStartIdx] = t_src.Int64()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30662,7 +30720,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float32()
+					outCol := out.Float32()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30673,24 +30732,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Float32()[i+t_destStartIdx] = t_src.Float32()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30713,7 +30767,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float64()
+					outCol := out.Float64()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30724,24 +30779,19 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Float64()[i+t_destStartIdx] = t_src.Float64()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30770,7 +30820,8 @@ RightColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bool()
+					outCol := out.Bool()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30781,22 +30832,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Bool()[i+t_destStartIdx] = t_src.Bool()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30819,7 +30865,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Bytes()
+					outCol := out.Bytes()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30830,22 +30877,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Bytes()[i+t_destStartIdx] = t_src.Bytes()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30868,7 +30910,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Decimal()
+					outCol := out.Decimal()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30879,22 +30922,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Decimal()[i+t_destStartIdx] = t_src.Decimal()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30917,7 +30955,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int8()
+					outCol := out.Int8()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30928,22 +30967,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int8()[i+t_destStartIdx] = t_src.Int8()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -30966,7 +31000,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int16()
+					outCol := out.Int16()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -30977,22 +31012,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int16()[i+t_destStartIdx] = t_src.Int16()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -31015,7 +31045,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int32()
+					outCol := out.Int32()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -31026,22 +31057,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int32()[i+t_destStartIdx] = t_src.Int32()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -31064,7 +31090,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Int64()
+					outCol := out.Int64()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -31075,22 +31102,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Int64()[i+t_destStartIdx] = t_src.Int64()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -31113,7 +31135,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float32()
+					outCol := out.Float32()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -31124,22 +31147,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Float32()[i+t_destStartIdx] = t_src.Float32()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -31162,7 +31180,8 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
+					srcCol := src.Float64()
+					outCol := out.Float64()
 
 					// Loop over every group.
 					for ; o.builderState.right.groupsIdx < groupsLen; o.builderState.right.groupsIdx++ {
@@ -31173,22 +31192,17 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
-							// TODO (georgeutsin): update template language to automatically generate template
-							//  function parameter definitions from expressions passed in.
-							t_dest := out
-							t_destStartIdx := outStartIdx
-							t_src := src
-							t_srcStartIdx := o.builderState.right.curSrcStartIdx
-							t_srcEndIdx := o.builderState.right.curSrcStartIdx + toAppend
-							t_sel := sel
-
-							batchSize := t_srcEndIdx - t_srcStartIdx
-							for i := 0; i < batchSize; i++ {
-								t_dest.Float64()[i+t_destStartIdx] = t_src.Float64()[t_sel[i+t_srcStartIdx]]
+							// Optimization in the case that group length is 1, use assign instead of copy.
+							if toAppend == 1 {
+								outCol[outStartIdx] = srcCol[sel[o.builderState.right.curSrcStartIdx]]
+							} else {
+								for i := 0; i < toAppend; i++ {
+									outCol[i+outStartIdx] = srcCol[sel[i+o.builderState.right.curSrcStartIdx]]
+								}
 							}
 
 							outStartIdx += toAppend
@@ -31219,7 +31233,6 @@ RightColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bool()
 					outCol := out.Bool()
 
@@ -31232,12 +31245,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31264,7 +31278,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bytes()
 					outCol := out.Bytes()
 
@@ -31277,12 +31290,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31309,7 +31323,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Decimal()
 					outCol := out.Decimal()
 
@@ -31322,12 +31335,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31354,7 +31368,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int8()
 					outCol := out.Int8()
 
@@ -31367,12 +31380,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31399,7 +31413,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int16()
 					outCol := out.Int16()
 
@@ -31412,12 +31425,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31444,7 +31458,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int32()
 					outCol := out.Int32()
 
@@ -31457,12 +31470,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31489,7 +31503,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int64()
 					outCol := out.Int64()
 
@@ -31502,12 +31515,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31534,7 +31548,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float32()
 					outCol := out.Float32()
 
@@ -31547,12 +31560,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31579,7 +31593,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float64()
 					outCol := out.Float64()
 
@@ -31592,12 +31605,13 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
 							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31630,7 +31644,6 @@ RightColLoop:
 
 				switch colType {
 				case types.Bool:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bool()
 					outCol := out.Bool()
 
@@ -31643,10 +31656,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31673,7 +31687,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Bytes:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Bytes()
 					outCol := out.Bytes()
 
@@ -31686,10 +31699,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31716,7 +31730,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Decimal:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Decimal()
 					outCol := out.Decimal()
 
@@ -31729,10 +31742,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31759,7 +31773,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int8:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int8()
 					outCol := out.Int8()
 
@@ -31772,10 +31785,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31802,7 +31816,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int16:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int16()
 					outCol := out.Int16()
 
@@ -31815,10 +31828,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31845,7 +31859,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int32()
 					outCol := out.Int32()
 
@@ -31858,10 +31871,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31888,7 +31902,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Int64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Int64()
 					outCol := out.Int64()
 
@@ -31901,10 +31914,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31931,7 +31945,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float32:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float32()
 					outCol := out.Float32()
 
@@ -31944,10 +31957,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -31974,7 +31988,6 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPgroupsIdx
 				case types.Float64:
-					// If there isn't a selection vector, create local variables outside the tight loop.
 					srcCol := src.Float64()
 					outCol := out.Float64()
 
@@ -31987,10 +32000,11 @@ RightColLoop:
 								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 							}
 							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > int(o.outputBatchSize) {
-								toAppend = int(o.outputBatchSize) - outStartIdx
+							if outStartIdx+toAppend > outputBatchSize {
+								toAppend = outputBatchSize - outStartIdx
 							}
 
+							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
 								outCol[outStartIdx] = srcCol[o.builderState.right.curSrcStartIdx]
 							} else {
@@ -32024,7 +32038,6 @@ RightColLoop:
 
 		o.builderState.right.setBuilderColumnState(initialBuilderState)
 	}
-
 	o.builderState.right.reset()
 }
 
