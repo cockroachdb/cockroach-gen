@@ -299,9 +299,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -327,7 +327,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -355,7 +355,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -410,9 +410,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -438,7 +438,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -466,7 +466,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -529,9 +529,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -557,7 +557,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -585,7 +585,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -640,9 +640,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -668,7 +668,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -696,7 +696,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -759,9 +759,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -787,7 +787,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -815,7 +815,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -870,9 +870,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -898,7 +898,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -926,7 +926,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -989,9 +989,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1017,7 +1017,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1045,7 +1045,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1100,9 +1100,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1128,7 +1128,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1156,7 +1156,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1219,9 +1219,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1247,7 +1247,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1275,7 +1275,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1330,9 +1330,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1358,7 +1358,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1386,7 +1386,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1449,9 +1449,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1477,7 +1477,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1505,7 +1505,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1560,9 +1560,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1588,7 +1588,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1616,7 +1616,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1679,9 +1679,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1707,7 +1707,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1735,7 +1735,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1790,9 +1790,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1818,7 +1818,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1846,7 +1846,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1909,9 +1909,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -1937,7 +1937,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -1965,7 +1965,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -2020,9 +2020,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -2048,7 +2048,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -2076,7 +2076,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -2139,9 +2139,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -2167,7 +2167,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(sel[ht.toCheck[i]]) {
+							if probeVec.Nulls().NullAt(sel[ht.toCheck[i]]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -2195,7 +2195,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -2250,9 +2250,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
-							} else /*  */ if buildVec.NullAt64(keyID - 1) {
+							} else /*  */ if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 
@@ -2278,7 +2278,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*  */
-							if probeVec.NullAt(ht.toCheck[i]) {
+							if probeVec.Nulls().NullAt(ht.toCheck[i]) {
 								ht.groupID[ht.toCheck[i]] = 0
 							} else /*  */ {
 
@@ -2306,7 +2306,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 							// found.
 
 							/*   */
-							if buildVec.NullAt64(keyID - 1) {
+							if buildVec.Nulls().NullAt64(keyID - 1) {
 								ht.differs[ht.toCheck[i]] = true
 							} else /* */ {
 

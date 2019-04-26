@@ -44,15 +44,7 @@ func (m *memColumn) Append(vec Vec, colType types.T, toLength uint64, fromLength
 	}
 
 	if fromLength > 0 {
-		m.nulls = append(m.nulls, make([]uint64, (fromLength-1)>>6+1)...)
-
-		if vec.HasNulls() {
-			for i := uint16(0); i < fromLength; i++ {
-				if vec.NullAt(i) {
-					m.SetNull64(toLength + uint64(i))
-				}
-			}
-		}
+		m.nulls.Extend(vec.Nulls(), toLength, 0 /* srcStartIdx */, fromLength)
 	}
 }
 
@@ -121,7 +113,7 @@ func (m *memColumn) AppendSlice(
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
 
-	m.ExtendNulls(vec, destStartIdx, srcStartIdx, batchSize)
+	m.nulls.Extend(vec.Nulls(), destStartIdx, srcStartIdx, batchSize)
 }
 
 func (m *memColumn) AppendWithSel(
@@ -214,12 +206,7 @@ func (m *memColumn) AppendWithSel(
 	}
 
 	if batchSize > 0 {
-		m.nulls = append(m.nulls, make([]uint64, (batchSize-1)>>6+1)...)
-		for i := uint16(0); i < batchSize; i++ {
-			if vec.NullAt(sel[i]) {
-				m.SetNull64(toLength + uint64(i))
-			}
-		}
+		m.nulls.ExtendWithSel(vec.Nulls(), toLength, 0 /* srcStartIdx */, batchSize, sel)
 	}
 }
 
@@ -313,7 +300,7 @@ func (m *memColumn) AppendSliceWithSel(
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
 
-	m.ExtendNullsWithSel(vec, destStartIdx, srcStartIdx, batchSize, sel)
+	m.nulls.ExtendWithSel(vec.Nulls(), destStartIdx, srcStartIdx, batchSize, sel)
 }
 
 func (m *memColumn) Copy(src Vec, srcStartIdx, srcEndIdx uint64, typ types.T) {
@@ -346,7 +333,7 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 }
 
 func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType types.T) {
-	m.UnsetNulls()
+	m.nulls.UnsetNulls()
 
 	// todo (changangela): handle the case when nSel > BatchSize
 	switch colType {
@@ -356,8 +343,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -373,8 +360,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -390,8 +377,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -407,8 +394,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -424,8 +411,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -441,8 +428,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -458,8 +445,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -475,8 +462,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -492,8 +479,8 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt64(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt64(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -509,7 +496,7 @@ func (m *memColumn) CopyWithSelInt64(vec Vec, sel []uint64, nSel uint16, colType
 }
 
 func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType types.T) {
-	m.UnsetNulls()
+	m.nulls.UnsetNulls()
 
 	switch colType {
 	case types.Bool:
@@ -518,8 +505,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -535,8 +522,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -552,8 +539,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -569,8 +556,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -586,8 +573,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -603,8 +590,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -620,8 +607,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -637,8 +624,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -654,8 +641,8 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 
 		if vec.HasNulls() {
 			for i := uint16(0); i < nSel; i++ {
-				if vec.NullAt(sel[i]) {
-					m.SetNull(i)
+				if vec.Nulls().NullAt(sel[i]) {
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -673,7 +660,7 @@ func (m *memColumn) CopyWithSelInt16(vec Vec, sel []uint16, nSel uint16, colType
 func (m *memColumn) CopyWithSelAndNilsInt64(
 	vec Vec, sel []uint64, nSel uint16, nils []bool, colType types.T,
 ) {
-	m.UnsetNulls()
+	m.nulls.UnsetNulls()
 
 	switch colType {
 	case types.Bool:
@@ -684,10 +671,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -696,7 +683,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -710,10 +697,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -722,7 +709,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -736,10 +723,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -748,7 +735,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -762,10 +749,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -774,7 +761,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -788,10 +775,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -800,7 +787,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -814,10 +801,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -826,7 +813,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -840,10 +827,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -852,7 +839,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -866,10 +853,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -878,7 +865,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -892,10 +879,10 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 			// TODO(jordan): copy the null arrays in batch.
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
-					if vec.NullAt64(sel[i]) {
-						m.SetNull(i)
+					if vec.Nulls().NullAt64(sel[i]) {
+						m.nulls.SetNull(i)
 					} else {
 						toCol[i] = fromCol[sel[i]]
 					}
@@ -904,7 +891,7 @@ func (m *memColumn) CopyWithSelAndNilsInt64(
 		} else {
 			for i := uint16(0); i < nSel; i++ {
 				if nils[i] {
-					m.SetNull(i)
+					m.nulls.SetNull(i)
 				} else {
 					toCol[i] = fromCol[sel[i]]
 				}
@@ -919,300 +906,57 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 	switch colType {
 	case types.Bool:
 		col := m.Bool()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Bytes:
 		col := m.Bytes()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Decimal:
 		col := m.Decimal()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int8:
 		col := m.Int8()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int16:
 		col := m.Int16()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int32:
 		col := m.Int32()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int64:
 		col := m.Int64()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Float32:
 		col := m.Float32()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Float64:
 		col := m.Float64()
-		var nulls []uint64
-		if m.hasNulls {
-			mod := start % 64
-			startIdx := start >> 6
-			// end is exclusive, so translate that to an exclusive index in nulls by
-			// figuring out which index the last accessible null should be in and add
-			// 1.
-			endIdx := (end-1)>>6 + 1
-			nulls = m.nulls[startIdx:endIdx]
-			if mod != 0 {
-				// If start is not a multiple of 64, we need to shift over the bitmap
-				// to have the first index correspond. Allocate new null bitmap as we
-				// want to keep the original bitmap safe for reuse.
-				nulls = make([]uint64, len(nulls))
-				for i, j := startIdx, 0; i < endIdx-1; i, j = i+1, j+1 {
-					// Bring the first null to the beginning.
-					nulls[j] = m.nulls[i] >> mod
-					// And now bitwise or the remaining bits with the bits we want to
-					// bring over from the next index, note that we handle endIdx-1
-					// separately.
-					nulls[j] |= (m.nulls[i+1] << (64 - mod))
-				}
-				// Get the first bits to where we want them for endIdx-1.
-				nulls[len(nulls)-1] = m.nulls[endIdx-1] >> mod
-			}
-		}
 		return &memColumn{
-			col:      col[start:end],
-			nulls:    nulls,
-			hasNulls: m.hasNulls,
+			col:   col[start:end],
+			nulls: m.nulls.Slice(start, end),
 		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
@@ -1220,7 +964,7 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 }
 
 func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
-	if m.NullAt(colIdx) {
+	if m.nulls.NullAt(colIdx) {
 		return "NULL"
 	}
 	switch colType {
@@ -1244,56 +988,5 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 		return fmt.Sprintf("%v", m.Float64()[colIdx])
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
-	}
-}
-
-func (m *memColumn) ExtendNulls(vec Vec, destStartIdx uint64, srcStartIdx uint16, toAppend uint16) {
-	outputLen := destStartIdx + uint64(toAppend)
-	if uint64(cap(m.nulls)) < outputLen/64 {
-		// (batchSize-1)>>6+1 is the number of Int64s needed to encode the additional elements/nulls in the Vec.
-		// This is equivalent to ceil(batchSize/64).
-		m.nulls = append(m.nulls, make([]uint64, (toAppend-1)>>6+1)...)
-	}
-	if vec.HasNulls() {
-		for i := uint16(0); i < toAppend; i++ {
-			// TODO(yuzefovich): this can be done more efficiently with a bitwise OR:
-			// like m.nulls[i] |= vec.nulls[i].
-			if vec.NullAt(srcStartIdx + i) {
-				m.SetNull64(destStartIdx + uint64(i))
-			}
-		}
-	}
-}
-
-func (m *memColumn) ExtendNullsWithSel(
-	vec Vec, destStartIdx uint64, srcStartIdx uint16, toAppend uint16, sel []uint16,
-) {
-	outputLen := destStartIdx + uint64(toAppend)
-	if uint64(cap(m.nulls)) < outputLen/64 {
-		// (batchSize-1)>>6+1 is the number of Int64s needed to encode the additional elements/nulls in the Vec.
-		// This is equivalent to ceil(batchSize/64).
-		m.nulls = append(m.nulls, make([]uint64, (toAppend-1)>>6+1)...)
-	}
-	for i := uint16(0); i < toAppend; i++ {
-		// TODO(yuzefovich): this can be done more efficiently with a bitwise OR:
-		// like m.nulls[i] |= vec.nulls[i].
-		if vec.NullAt(sel[srcStartIdx+i]) {
-			m.SetNull64(destStartIdx + uint64(i))
-		}
-	}
-}
-
-func (m *memColumn) NullBitmap() []uint64 {
-	return m.nulls
-}
-
-func (m *memColumn) SetNullBitmap(bm []uint64) {
-	m.nulls = bm
-	m.hasNulls = false
-	for _, i := range bm {
-		if i != 0 {
-			m.hasNulls = true
-			return
-		}
 	}
 }

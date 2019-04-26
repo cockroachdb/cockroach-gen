@@ -48,11 +48,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -78,7 +78,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -99,7 +99,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -154,11 +154,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -184,7 +184,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -205,7 +205,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -260,11 +260,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -290,7 +290,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -311,7 +311,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -366,11 +366,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -396,7 +396,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -417,7 +417,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -472,11 +472,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -502,7 +502,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -523,7 +523,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -578,11 +578,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -608,7 +608,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -629,7 +629,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -684,11 +684,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -714,7 +714,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -735,7 +735,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -790,11 +790,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -820,7 +820,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -841,7 +841,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -896,11 +896,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -926,7 +926,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -947,7 +947,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1008,11 +1008,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1038,7 +1038,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1059,7 +1059,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1114,11 +1114,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1144,7 +1144,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1165,7 +1165,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1220,11 +1220,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1250,7 +1250,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1271,7 +1271,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1326,11 +1326,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1356,7 +1356,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1377,7 +1377,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1432,11 +1432,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1462,7 +1462,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1483,7 +1483,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1538,11 +1538,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1568,7 +1568,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1589,7 +1589,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1644,11 +1644,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1674,7 +1674,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1695,7 +1695,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1750,11 +1750,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1780,7 +1780,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1801,7 +1801,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1856,11 +1856,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -1886,7 +1886,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -1907,7 +1907,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -1970,7 +1970,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -1996,7 +1996,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2068,7 +2068,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2094,7 +2094,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2166,7 +2166,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2192,7 +2192,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2264,7 +2264,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2290,7 +2290,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2362,7 +2362,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2388,7 +2388,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2460,7 +2460,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2486,7 +2486,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2558,7 +2558,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2584,7 +2584,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2656,7 +2656,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2682,7 +2682,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2754,7 +2754,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2780,7 +2780,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2858,7 +2858,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2884,7 +2884,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -2956,7 +2956,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -2982,7 +2982,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3054,7 +3054,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3080,7 +3080,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3152,7 +3152,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3178,7 +3178,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3250,7 +3250,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3276,7 +3276,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3348,7 +3348,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3374,7 +3374,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3446,7 +3446,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3472,7 +3472,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3544,7 +3544,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3570,7 +3570,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3642,7 +3642,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -3668,7 +3668,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -3750,7 +3750,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -3793,7 +3793,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -3848,7 +3848,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -3891,7 +3891,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -3946,7 +3946,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -3989,7 +3989,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4044,7 +4044,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4087,7 +4087,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4142,7 +4142,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4185,7 +4185,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4240,7 +4240,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4283,7 +4283,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4338,7 +4338,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4381,7 +4381,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4436,7 +4436,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4479,7 +4479,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4534,7 +4534,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4577,7 +4577,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4638,7 +4638,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4681,7 +4681,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4736,7 +4736,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4779,7 +4779,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4834,7 +4834,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4877,7 +4877,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -4932,7 +4932,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -4975,7 +4975,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -5030,7 +5030,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -5073,7 +5073,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -5128,7 +5128,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -5171,7 +5171,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -5226,7 +5226,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -5269,7 +5269,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -5324,7 +5324,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -5367,7 +5367,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -5422,7 +5422,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -5465,7 +5465,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -7178,11 +7178,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7208,7 +7208,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7229,7 +7229,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7284,11 +7284,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7314,7 +7314,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7335,7 +7335,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7390,11 +7390,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7420,7 +7420,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7441,7 +7441,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7496,11 +7496,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7526,7 +7526,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7547,7 +7547,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7602,11 +7602,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7632,7 +7632,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7653,7 +7653,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7708,11 +7708,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7738,7 +7738,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7759,7 +7759,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7814,11 +7814,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7844,7 +7844,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7865,7 +7865,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -7920,11 +7920,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -7950,7 +7950,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -7971,7 +7971,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8026,11 +8026,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8056,7 +8056,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8077,7 +8077,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8138,11 +8138,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8168,7 +8168,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8189,7 +8189,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8244,11 +8244,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8274,7 +8274,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8295,7 +8295,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8350,11 +8350,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8380,7 +8380,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8401,7 +8401,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8456,11 +8456,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8486,7 +8486,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8507,7 +8507,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8562,11 +8562,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8592,7 +8592,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8613,7 +8613,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8668,11 +8668,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8698,7 +8698,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8719,7 +8719,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8774,11 +8774,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8804,7 +8804,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8825,7 +8825,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8880,11 +8880,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -8910,7 +8910,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -8931,7 +8931,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -8986,11 +8986,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -9016,7 +9016,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9037,7 +9037,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -9100,7 +9100,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9126,7 +9126,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9198,7 +9198,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9224,7 +9224,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9296,7 +9296,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9322,7 +9322,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9394,7 +9394,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9420,7 +9420,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9492,7 +9492,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9518,7 +9518,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9590,7 +9590,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9616,7 +9616,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9688,7 +9688,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9714,7 +9714,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9786,7 +9786,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9812,7 +9812,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9884,7 +9884,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -9910,7 +9910,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -9988,7 +9988,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10014,7 +10014,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10086,7 +10086,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10112,7 +10112,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10184,7 +10184,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10210,7 +10210,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10282,7 +10282,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10308,7 +10308,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10380,7 +10380,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10406,7 +10406,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10478,7 +10478,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10504,7 +10504,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10576,7 +10576,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10602,7 +10602,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10674,7 +10674,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10700,7 +10700,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10772,7 +10772,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(lSel[curLIdx])) {
+								if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 									curLIdx++
 									continue
 								}
@@ -10798,7 +10798,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(lSel[curLIdx])) {
+											if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
 												lComplete = true
 												break
 											}
@@ -10880,7 +10880,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -10923,7 +10923,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -10978,7 +10978,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11021,7 +11021,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11076,7 +11076,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11119,7 +11119,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11174,7 +11174,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11217,7 +11217,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11272,7 +11272,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11315,7 +11315,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11370,7 +11370,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11413,7 +11413,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11468,7 +11468,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11511,7 +11511,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11566,7 +11566,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11609,7 +11609,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11664,7 +11664,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11707,7 +11707,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11768,7 +11768,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11811,7 +11811,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11866,7 +11866,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -11909,7 +11909,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -11964,7 +11964,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12007,7 +12007,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -12062,7 +12062,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12105,7 +12105,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -12160,7 +12160,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12203,7 +12203,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -12258,7 +12258,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12301,7 +12301,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -12356,7 +12356,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12399,7 +12399,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -12454,7 +12454,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12497,7 +12497,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -12552,7 +12552,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -12595,7 +12595,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -14308,11 +14308,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14338,7 +14338,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14359,7 +14359,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -14414,11 +14414,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14444,7 +14444,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14465,7 +14465,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -14520,11 +14520,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14550,7 +14550,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14571,7 +14571,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -14626,11 +14626,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14656,7 +14656,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14677,7 +14677,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -14732,11 +14732,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14762,7 +14762,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14783,7 +14783,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -14838,11 +14838,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14868,7 +14868,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14889,7 +14889,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -14944,11 +14944,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -14974,7 +14974,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -14995,7 +14995,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15050,11 +15050,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15080,7 +15080,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15101,7 +15101,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15156,11 +15156,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15186,7 +15186,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15207,7 +15207,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15268,11 +15268,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15298,7 +15298,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15319,7 +15319,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15374,11 +15374,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15404,7 +15404,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15425,7 +15425,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15480,11 +15480,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15510,7 +15510,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15531,7 +15531,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15586,11 +15586,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15616,7 +15616,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15637,7 +15637,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15692,11 +15692,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15722,7 +15722,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15743,7 +15743,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15798,11 +15798,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15828,7 +15828,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15849,7 +15849,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -15904,11 +15904,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -15934,7 +15934,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -15955,7 +15955,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -16010,11 +16010,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -16040,7 +16040,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16061,7 +16061,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -16116,11 +16116,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -16146,7 +16146,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16167,7 +16167,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -16230,7 +16230,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16256,7 +16256,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16328,7 +16328,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16354,7 +16354,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16426,7 +16426,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16452,7 +16452,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16524,7 +16524,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16550,7 +16550,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16622,7 +16622,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16648,7 +16648,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16720,7 +16720,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16746,7 +16746,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16818,7 +16818,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16844,7 +16844,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -16916,7 +16916,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -16942,7 +16942,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17014,7 +17014,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17040,7 +17040,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17118,7 +17118,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17144,7 +17144,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17216,7 +17216,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17242,7 +17242,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17314,7 +17314,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17340,7 +17340,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17412,7 +17412,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17438,7 +17438,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17510,7 +17510,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17536,7 +17536,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17608,7 +17608,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17634,7 +17634,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17706,7 +17706,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17732,7 +17732,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17804,7 +17804,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17830,7 +17830,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -17902,7 +17902,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -17928,7 +17928,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -18010,7 +18010,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18053,7 +18053,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18108,7 +18108,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18151,7 +18151,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18206,7 +18206,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18249,7 +18249,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18304,7 +18304,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18347,7 +18347,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18402,7 +18402,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18445,7 +18445,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18500,7 +18500,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18543,7 +18543,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18598,7 +18598,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18641,7 +18641,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18696,7 +18696,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18739,7 +18739,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18794,7 +18794,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18837,7 +18837,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18898,7 +18898,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -18941,7 +18941,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -18996,7 +18996,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19039,7 +19039,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19094,7 +19094,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19137,7 +19137,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19192,7 +19192,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19235,7 +19235,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19290,7 +19290,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19333,7 +19333,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19388,7 +19388,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19431,7 +19431,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19486,7 +19486,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19529,7 +19529,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19584,7 +19584,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19627,7 +19627,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -19682,7 +19682,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(rSel[curRIdx])) {
+								if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 									curRIdx++
 									continue
 								}
@@ -19725,7 +19725,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(rSel[curRIdx])) {
+											if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
 												rComplete = true
 												break
 											}
@@ -21438,11 +21438,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -21468,7 +21468,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -21489,7 +21489,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -21544,11 +21544,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -21574,7 +21574,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -21595,7 +21595,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -21650,11 +21650,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -21680,7 +21680,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -21701,7 +21701,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -21756,11 +21756,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -21786,7 +21786,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -21807,7 +21807,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -21862,11 +21862,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -21892,7 +21892,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -21913,7 +21913,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -21968,11 +21968,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -21998,7 +21998,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22019,7 +22019,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22074,11 +22074,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22104,7 +22104,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22125,7 +22125,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22180,11 +22180,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22210,7 +22210,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22231,7 +22231,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22286,11 +22286,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22316,7 +22316,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22337,7 +22337,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22398,11 +22398,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22428,7 +22428,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22449,7 +22449,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22504,11 +22504,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22534,7 +22534,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22555,7 +22555,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22610,11 +22610,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22640,7 +22640,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22661,7 +22661,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22716,11 +22716,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22746,7 +22746,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22767,7 +22767,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22822,11 +22822,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22852,7 +22852,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22873,7 +22873,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -22928,11 +22928,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -22958,7 +22958,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -22979,7 +22979,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -23034,11 +23034,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -23064,7 +23064,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23085,7 +23085,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -23140,11 +23140,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -23170,7 +23170,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23191,7 +23191,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -23246,11 +23246,11 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -23276,7 +23276,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23297,7 +23297,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -23360,7 +23360,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23386,7 +23386,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23458,7 +23458,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23484,7 +23484,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23556,7 +23556,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23582,7 +23582,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23654,7 +23654,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23680,7 +23680,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23752,7 +23752,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23778,7 +23778,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23850,7 +23850,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23876,7 +23876,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -23948,7 +23948,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -23974,7 +23974,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24046,7 +24046,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24072,7 +24072,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24144,7 +24144,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24170,7 +24170,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24248,7 +24248,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24274,7 +24274,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24346,7 +24346,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24372,7 +24372,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24444,7 +24444,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24470,7 +24470,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24542,7 +24542,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24568,7 +24568,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24640,7 +24640,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24666,7 +24666,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24738,7 +24738,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24764,7 +24764,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24836,7 +24836,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24862,7 +24862,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -24934,7 +24934,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -24960,7 +24960,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -25032,7 +25032,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if lVec.NullAt64(uint64(curLIdx)) {
+								if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 									curLIdx++
 									continue
 								}
@@ -25058,7 +25058,7 @@ EqLoop:
 									} else {
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if lVec.NullAt64(uint64(curLIdx)) {
+											if lVec.Nulls().NullAt64(uint64(curLIdx)) {
 												lComplete = true
 												break
 											}
@@ -25140,7 +25140,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25183,7 +25183,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25238,7 +25238,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25281,7 +25281,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25336,7 +25336,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25379,7 +25379,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25434,7 +25434,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25477,7 +25477,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25532,7 +25532,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25575,7 +25575,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25630,7 +25630,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25673,7 +25673,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25728,7 +25728,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25771,7 +25771,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25826,7 +25826,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25869,7 +25869,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -25924,7 +25924,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -25967,7 +25967,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26028,7 +26028,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26071,7 +26071,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26126,7 +26126,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26169,7 +26169,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26224,7 +26224,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26267,7 +26267,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26322,7 +26322,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26365,7 +26365,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26420,7 +26420,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26463,7 +26463,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26518,7 +26518,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26561,7 +26561,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26616,7 +26616,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26659,7 +26659,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26714,7 +26714,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26757,7 +26757,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -26812,7 +26812,7 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLLength && curRIdx < curRLength {
 								// TODO(georgeutsin): change null check logic for non INNER joins.
-								if rVec.NullAt64(uint64(curRIdx)) {
+								if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 									curRIdx++
 									continue
 								}
@@ -26855,7 +26855,7 @@ EqLoop:
 									} else {
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
-											if rVec.NullAt64(uint64(curRIdx)) {
+											if rVec.Nulls().NullAt64(uint64(curRIdx)) {
 												rComplete = true
 												break
 											}
@@ -28612,8 +28612,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28662,8 +28662,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28712,8 +28712,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28762,8 +28762,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28812,8 +28812,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28862,8 +28862,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28912,8 +28912,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -28962,8 +28962,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29012,8 +29012,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29490,8 +29490,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29540,8 +29540,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29590,8 +29590,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29640,8 +29640,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29690,8 +29690,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29740,8 +29740,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29790,8 +29790,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29840,8 +29840,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -29890,8 +29890,8 @@ LeftColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							if src.NullAt64(uint64(srcStartIdx)) {
-								out.SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+							if src.Nulls().NullAt64(uint64(srcStartIdx)) {
+								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							}
 
 							for i := 0; i < toAppend; i++ {
@@ -30407,7 +30407,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30454,7 +30454,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30501,7 +30501,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30548,7 +30548,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30595,7 +30595,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30642,7 +30642,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30689,7 +30689,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30736,7 +30736,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30783,7 +30783,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31249,7 +31249,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31294,7 +31294,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31339,7 +31339,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31384,7 +31384,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31429,7 +31429,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31474,7 +31474,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31519,7 +31519,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31564,7 +31564,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -31609,7 +31609,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.ExtendNulls(src, uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -32064,13 +32064,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal bool
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Bool()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Bool()[rowIdx]
@@ -32085,13 +32085,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal []byte
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Bytes()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Bytes()[rowIdx]
@@ -32106,13 +32106,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal apd.Decimal
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Decimal()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Decimal()[rowIdx]
@@ -32127,13 +32127,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal int8
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int8()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int8()[rowIdx]
@@ -32148,13 +32148,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal int16
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int16()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int16()[rowIdx]
@@ -32169,13 +32169,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal int32
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int32()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int32()[rowIdx]
@@ -32190,13 +32190,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal int64
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int64()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Int64()[rowIdx]
@@ -32211,13 +32211,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal float32
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Float32()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Float32()[rowIdx]
@@ -32232,13 +32232,13 @@ func (o *mergeJoinOp) isGroupFinished(
 			var curVal float64
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(sel[rowIdx])) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Float64()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).NullAt64(uint64(rowIdx)) {
+				if bat.ColVec(int(colIdx)).HasNulls() && bat.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = bat.ColVec(int(colIdx)).Float64()[rowIdx]
