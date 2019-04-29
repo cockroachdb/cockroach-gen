@@ -5548,12 +5548,9 @@ type WindowPrivate struct {
 	// ColID holds the id of the column introduced by this operator.
 	ColID opt.ColumnID
 
-	// Passthrough is the set of columns the window function passes through
-	// unchanged. Note the only columns pruned by a Window operator are the
-	// window function's arguments.
-	// TODO(justin): This could be derived from the input's output columns and
-	// the function itself.
-	Passthrough opt.ColSet
+	// Partition is the set of columns to partition on. Every set of rows
+	// sharing the values for this set of columns will be treated independently.
+	Partition opt.ColSet
 }
 
 // FakeRelExpr is a mock relational operator used for testing; its logical properties
@@ -17498,7 +17495,7 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashScalarExpr(val.Function)
 	in.hasher.HashColumnID(val.ColID)
-	in.hasher.HashColSet(val.Passthrough)
+	in.hasher.HashColSet(val.Partition)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -17506,7 +17503,7 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
 				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) &&
-				in.hasher.IsColSetEqual(val.Passthrough, existing.Passthrough) {
+				in.hasher.IsColSetEqual(val.Partition, existing.Partition) {
 				return existing
 			}
 		}
