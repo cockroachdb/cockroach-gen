@@ -23,10 +23,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-// orderedDistinctColsToOperators is a utility function that given an input and
+// OrderedDistinctColsToOperators is a utility function that given an input and
 // a slice of columns, creates a chain of distinct operators and returns the
 // last distinct operator in that chain as well as its output column.
-func orderedDistinctColsToOperators(
+func OrderedDistinctColsToOperators(
 	input Operator, distinctCols []uint32, typs []types.T,
 ) (Operator, []bool, error) {
 	distinctCol := make([]bool, coldata.BatchSize)
@@ -45,7 +45,7 @@ func orderedDistinctColsToOperators(
 // NewOrderedDistinct creates a new ordered distinct operator on the given
 // input columns with the given types.
 func NewOrderedDistinct(input Operator, distinctCols []uint32, typs []types.T) (Operator, error) {
-	op, outputCol, err := orderedDistinctColsToOperators(input, distinctCols, typs)
+	op, outputCol, err := OrderedDistinctColsToOperators(input, distinctCols, typs)
 	if err != nil {
 		return nil, err
 	}
