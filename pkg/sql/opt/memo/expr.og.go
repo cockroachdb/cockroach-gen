@@ -5551,6 +5551,10 @@ type WindowPrivate struct {
 	// Partition is the set of columns to partition on. Every set of rows
 	// sharing the values for this set of columns will be treated independently.
 	Partition opt.ColSet
+
+	// Ordering is the ordering that the window function is computed relative to
+	// within each partition.
+	Ordering physical.OrderingChoice
 }
 
 // FakeRelExpr is a mock relational operator used for testing; its logical properties
@@ -17496,6 +17500,7 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 	in.hasher.HashScalarExpr(val.Function)
 	in.hasher.HashColumnID(val.ColID)
 	in.hasher.HashColSet(val.Partition)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -17503,7 +17508,8 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
 				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) &&
-				in.hasher.IsColSetEqual(val.Partition, existing.Partition) {
+				in.hasher.IsColSetEqual(val.Partition, existing.Partition) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
