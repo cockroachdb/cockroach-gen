@@ -5417,9 +5417,8 @@ func (g *projectSetGroup) bestProps() *bestProps {
 type WindowExpr struct {
 	Input RelExpr
 
-	// Function contains the window function being computed. It will always be
-	// a member of the Window class and its arguments will always be Variables.
-	Function opt.ScalarExpr
+	// Windows is the set of window functions to be computed for this operator.
+	Windows WindowsExpr
 	WindowPrivate
 
 	grp  exprGroup
@@ -5441,7 +5440,7 @@ func (e *WindowExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	case 1:
-		return e.Function
+		return &e.Windows
 	}
 	panic(pgerror.AssertionFailedf("child index out of range"))
 }
@@ -5462,7 +5461,7 @@ func (e *WindowExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	case 1:
-		e.Function = child.(opt.ScalarExpr)
+		e.Windows = *child.(*WindowsExpr)
 		return
 	}
 	panic(pgerror.AssertionFailedf("child index out of range"))
@@ -5545,9 +5544,6 @@ func (g *windowGroup) bestProps() *bestProps {
 }
 
 type WindowPrivate struct {
-	// ColID holds the id of the column introduced by this operator.
-	ColID opt.ColumnID
-
 	// Partition is the set of columns to partition on. Every set of rows
 	// sharing the values for this set of columns will be treated independently.
 	Partition opt.ColSet
@@ -11481,6 +11477,110 @@ func (e *AggFilterExpr) DataType() *types.T {
 	return e.Typ
 }
 
+// WindowsExpr is a set of window functions to be computed in the context of a
+// Window expression.
+type WindowsExpr []WindowsItem
+
+var EmptyWindowsExpr = WindowsExpr{}
+
+var _ opt.ScalarExpr = &WindowsExpr{}
+
+func (e *WindowsExpr) ID() opt.ScalarID {
+	panic(pgerror.AssertionFailedf("lists have no id"))
+}
+
+func (e *WindowsExpr) Op() opt.Operator {
+	return opt.WindowsOp
+}
+
+func (e *WindowsExpr) ChildCount() int {
+	return len(*e)
+}
+
+func (e *WindowsExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
+}
+
+func (e *WindowsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *WindowsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WindowsExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*WindowsItem)
+}
+
+func (e *WindowsExpr) DataType() *types.T {
+	return types.Any
+}
+
+// WindowsItem is a single window function to be computed in the context of a
+// Window expression.
+type WindowsItem struct {
+	Function opt.ScalarExpr
+	ColPrivate
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &WindowsItem{}
+
+func (e *WindowsItem) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *WindowsItem) Op() opt.Operator {
+	return opt.WindowsItemOp
+}
+
+func (e *WindowsItem) ChildCount() int {
+	return 1
+}
+
+func (e *WindowsItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Function
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *WindowsItem) Private() interface{} {
+	return &e.ColPrivate
+}
+
+func (e *WindowsItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WindowsItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Function = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *WindowsItem) DataType() *types.T {
+	return e.Typ
+}
+
+func (e *WindowsItem) ScalarProps(mem *Memo) *props.Scalar {
+	if !e.scalar.Populated {
+		mem.logPropsBuilder.buildWindowsItemProps(e, &e.scalar)
+	}
+	return &e.scalar
+}
+
 // RankExpr computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
 type RankExpr struct {
@@ -13691,13 +13791,13 @@ func (m *Memo) MemoizeProjectSet(
 
 func (m *Memo) MemoizeWindow(
 	input RelExpr,
-	function opt.ScalarExpr,
+	windows WindowsExpr,
 	windowPrivate *WindowPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(windowGroup{}))
 	grp := &windowGroup{mem: m, first: WindowExpr{
 		Input:         input,
-		Function:      function,
+		Windows:       windows,
 		WindowPrivate: *windowPrivate,
 	}}
 	e := &grp.first
@@ -16528,6 +16628,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAggDistinct(t)
 	case *AggFilterExpr:
 		return in.InternAggFilter(t)
+	case *WindowsExpr:
+		return in.InternWindows(t)
+	case *WindowsItem:
+		return in.InternWindowsItem(t)
 	case *RankExpr:
 		return in.InternRank(t)
 	case *RowNumberExpr:
@@ -17497,8 +17601,7 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.WindowOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashScalarExpr(val.Function)
-	in.hasher.HashColumnID(val.ColID)
+	in.hasher.HashWindowsExpr(val.Windows)
 	in.hasher.HashColSet(val.Partition)
 	in.hasher.HashOrderingChoice(val.Ordering)
 
@@ -17506,8 +17609,7 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*WindowExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
-				in.hasher.IsColumnIDEqual(val.ColID, existing.ColID) &&
+				in.hasher.IsWindowsExprEqual(val.Windows, existing.Windows) &&
 				in.hasher.IsColSetEqual(val.Partition, existing.Partition) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
@@ -19527,6 +19629,44 @@ func (in *interner) InternAggFilter(val *AggFilterExpr) *AggFilterExpr {
 		if existing, ok := in.cache.Item().(*AggFilterExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Filter, existing.Filter) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWindows(val *WindowsExpr) *WindowsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WindowsOp)
+	in.hasher.HashWindowsExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WindowsExpr); ok {
+			if in.hasher.IsWindowsExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWindowsItem(val *WindowsItem) *WindowsItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WindowsItemOp)
+	in.hasher.HashScalarExpr(val.Function)
+	in.hasher.HashColumnID(val.Col)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WindowsItem); ok {
+			if in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
+				in.hasher.IsColumnIDEqual(val.Col, existing.Col) {
 				return existing
 			}
 		}

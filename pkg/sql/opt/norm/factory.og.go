@@ -8082,10 +8082,10 @@ func (_f *Factory) ConstructProjectSet(
 // cumulative sum, or something else.
 func (_f *Factory) ConstructWindow(
 	input memo.RelExpr,
-	function opt.ScalarExpr,
+	windows memo.WindowsExpr,
 	windowPrivate *memo.WindowPrivate,
 ) memo.RelExpr {
-	e := _f.mem.MemoizeWindow(input, function, windowPrivate)
+	e := _f.mem.MemoizeWindow(input, windows, windowPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14388,9 +14388,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 
 	case *memo.WindowExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		function := replace(t.Function).(opt.ScalarExpr)
-		if input != t.Input || function != t.Function {
-			return f.ConstructWindow(input, function, &t.WindowPrivate)
+		windows, windowsChanged := f.replaceWindowsExpr(t.Windows, replace)
+		if input != t.Input || windowsChanged {
+			return f.ConstructWindow(input, windows, &t.WindowPrivate)
 		}
 		return t
 
@@ -15100,6 +15100,12 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.WindowsExpr:
+		if after, changed := f.replaceWindowsExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
 	case *memo.RankExpr:
 		return t
 
@@ -15284,6 +15290,28 @@ func (f *Factory) replaceZipExpr(list memo.ZipExpr, replace ReplaceFunc) (_ memo
 			}
 			newList[i].Func = after
 			newList[i].Cols = list[i].Cols
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) replaceWindowsExpr(list memo.WindowsExpr, replace ReplaceFunc) (_ memo.WindowsExpr, changed bool) {
+	var newList []memo.WindowsItem
+	for i := range list {
+		before := list[i].Function
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.WindowsItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Function = after
+			newList[i].Col = list[i].Col
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15578,7 +15606,7 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.WindowExpr:
 		return f.ConstructWindow(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			f.invokeReplace(t.Function, replace).(opt.ScalarExpr),
+			f.copyAndReplaceDefaultWindowsExpr(t.Windows, replace),
 			&t.WindowPrivate,
 		)
 
@@ -16222,6 +16250,15 @@ func (f *Factory) copyAndReplaceDefaultZipExpr(src memo.ZipExpr, replace Replace
 	return dst
 }
 
+func (f *Factory) copyAndReplaceDefaultWindowsExpr(src memo.WindowsExpr, replace ReplaceFunc) (dst memo.WindowsExpr) {
+	dst = make(memo.WindowsExpr, len(src))
+	for i := range src {
+		dst[i].Function = f.invokeReplace(src[i].Function, replace).(opt.ScalarExpr)
+		dst[i].Col = src[i].Col
+	}
+	return dst
+}
+
 func (f *Factory) copyAndReplaceDefaultScalarListExpr(src memo.ScalarListExpr, replace ReplaceFunc) (dst memo.ScalarListExpr) {
 	dst = make(memo.ScalarListExpr, len(src))
 	for i := range src {
@@ -16468,7 +16505,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.WindowOp:
 		return f.ConstructWindow(
 			args[0].(memo.RelExpr),
-			args[1].(opt.ScalarExpr),
+			*args[1].(*memo.WindowsExpr),
 			args[2].(*memo.WindowPrivate),
 		)
 	case opt.FakeRelOp:
