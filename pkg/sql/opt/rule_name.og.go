@@ -64,11 +64,20 @@ const (
 	NormalizeJoinAnyFilter
 	NormalizeSelectNotAnyFilter
 	NormalizeJoinNotAnyFilter
+	FoldNullCast
+	FoldNullUnary
+	FoldNullBinaryLeft
+	FoldNullBinaryRight
+	FoldNullInNonEmpty
+	FoldNullInEmpty
+	FoldNullNotInEmpty
 	FoldArray
 	FoldBinary
 	FoldUnary
 	FoldComparison
 	FoldCast
+	FoldIndirection
+	FoldColumnAccess
 	FoldFunction
 	ConvertGroupByToDistinct
 	EliminateDistinct
@@ -145,13 +154,6 @@ const (
 	EliminateCoalesce
 	SimplifyCoalesce
 	EliminateCast
-	FoldNullCast
-	FoldNullUnary
-	FoldNullBinaryLeft
-	FoldNullBinaryRight
-	FoldNullInNonEmpty
-	FoldNullInEmpty
-	FoldNullNotInEmpty
 	NormalizeInConst
 	FoldInNull
 	UnifyComparisonTypes

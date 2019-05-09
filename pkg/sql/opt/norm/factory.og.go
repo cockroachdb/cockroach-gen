@@ -8813,6 +8813,24 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.EqOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [CommuteVar]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -8897,24 +8915,6 @@ func (_f *Factory) ConstructEq(
 								return _expr
 							}
 						}
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.EqOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
-						}
-						return _expr
 					}
 				}
 			}
@@ -9084,6 +9084,24 @@ func (_f *Factory) ConstructLt(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.LtOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -9099,24 +9117,6 @@ func (_f *Factory) ConstructLt(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.LtOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -9288,6 +9288,24 @@ func (_f *Factory) ConstructGt(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.GtOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -9303,24 +9321,6 @@ func (_f *Factory) ConstructGt(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.GtOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -9492,6 +9492,24 @@ func (_f *Factory) ConstructLe(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.LeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -9507,24 +9525,6 @@ func (_f *Factory) ConstructLe(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.LeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -9696,6 +9696,24 @@ func (_f *Factory) ConstructGe(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.GeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -9711,24 +9729,6 @@ func (_f *Factory) ConstructGe(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.GeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -9774,6 +9774,24 @@ func (_f *Factory) ConstructNe(
 					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
 			}
 		}
 	}
@@ -9839,24 +9857,6 @@ func (_f *Factory) ConstructNe(
 		}
 	}
 
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeNe(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -9898,6 +9898,24 @@ func (_f *Factory) ConstructIn(
 						_expr := _f.ConstructFalse()
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.FoldNullInEmpty, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.InOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -9973,24 +9991,6 @@ func (_f *Factory) ConstructIn(
 		}
 	}
 
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.InOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeIn(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -10032,6 +10032,24 @@ func (_f *Factory) ConstructNotIn(
 						_expr := _f.ConstructTrue()
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.FoldNullNotInEmpty, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotInOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10107,24 +10125,6 @@ func (_f *Factory) ConstructNotIn(
 		}
 	}
 
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NotInOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeNotIn(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -10166,6 +10166,24 @@ func (_f *Factory) ConstructLike(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.LikeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10181,24 +10199,6 @@ func (_f *Factory) ConstructLike(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.LikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10248,6 +10248,24 @@ func (_f *Factory) ConstructNotLike(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotLikeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10263,24 +10281,6 @@ func (_f *Factory) ConstructNotLike(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NotLikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10330,6 +10330,24 @@ func (_f *Factory) ConstructILike(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.ILikeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10345,24 +10363,6 @@ func (_f *Factory) ConstructILike(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.ILikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10412,6 +10412,24 @@ func (_f *Factory) ConstructNotILike(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotILikeOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10427,24 +10445,6 @@ func (_f *Factory) ConstructNotILike(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NotILikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10494,6 +10494,24 @@ func (_f *Factory) ConstructSimilarTo(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.SimilarToOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10509,24 +10527,6 @@ func (_f *Factory) ConstructSimilarTo(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.SimilarToOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10576,6 +10576,24 @@ func (_f *Factory) ConstructNotSimilarTo(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotSimilarToOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10591,24 +10609,6 @@ func (_f *Factory) ConstructNotSimilarTo(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NotSimilarToOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10658,6 +10658,24 @@ func (_f *Factory) ConstructRegMatch(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.RegMatchOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10673,24 +10691,6 @@ func (_f *Factory) ConstructRegMatch(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.RegMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10740,6 +10740,24 @@ func (_f *Factory) ConstructNotRegMatch(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotRegMatchOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10755,24 +10773,6 @@ func (_f *Factory) ConstructNotRegMatch(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NotRegMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10822,6 +10822,24 @@ func (_f *Factory) ConstructRegIMatch(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.RegIMatchOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10837,24 +10855,6 @@ func (_f *Factory) ConstructRegIMatch(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.RegIMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -10904,6 +10904,24 @@ func (_f *Factory) ConstructNotRegIMatch(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.NotRegIMatchOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -10919,24 +10937,6 @@ func (_f *Factory) ConstructNotRegIMatch(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.NotRegIMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -11010,6 +11010,24 @@ func (_f *Factory) ConstructIs(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.IsOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [CommuteVar]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11063,24 +11081,6 @@ func (_f *Factory) ConstructIs(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.IsOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -11154,6 +11154,24 @@ func (_f *Factory) ConstructIsNot(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.IsNotOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [CommuteVar]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11215,24 +11233,6 @@ func (_f *Factory) ConstructIsNot(
 		}
 	}
 
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.IsNotOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeIsNot(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -11270,6 +11270,24 @@ func (_f *Factory) ConstructContains(
 					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.ContainsOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
 			}
 		}
 	}
@@ -11326,24 +11344,6 @@ func (_f *Factory) ConstructContains(
 		}
 	}
 
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.ContainsOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeContains(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -11385,6 +11385,24 @@ func (_f *Factory) ConstructJsonExists(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.JsonExistsOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11400,24 +11418,6 @@ func (_f *Factory) ConstructJsonExists(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.JsonExistsOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -11467,6 +11467,24 @@ func (_f *Factory) ConstructJsonAllExists(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.JsonAllExistsOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11482,24 +11500,6 @@ func (_f *Factory) ConstructJsonAllExists(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.JsonAllExistsOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -11549,6 +11549,24 @@ func (_f *Factory) ConstructJsonSomeExists(
 		}
 	}
 
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.JsonSomeExistsOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11564,24 +11582,6 @@ func (_f *Factory) ConstructJsonSomeExists(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [FoldComparison]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldComparison(opt.JsonSomeExistsOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldComparison, nil, _expr)
 						}
 						return _expr
 					}
@@ -11654,44 +11654,6 @@ func (_f *Factory) ConstructBitand(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [CommuteVar]
-	{
-		_variable, _ := left.(*memo.VariableExpr)
-		if _variable == nil {
-			_variable2, _ := right.(*memo.VariableExpr)
-			if _variable2 != nil {
-				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_expr := _f.ConstructBitand(
-						right,
-						left,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteVar, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [CommuteConst]
-	{
-		if opt.IsConstValueOp(left) {
-			if !(opt.IsConstValueOp(right)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_expr := _f.ConstructBitand(
-						right,
-						left,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.CommuteConst, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_null, _ := left.(*memo.NullExpr)
@@ -11742,15 +11704,6 @@ func (_f *Factory) ConstructBitand(
 		}
 	}
 
-	e := _f.mem.MemoizeBitand(left, right)
-	return _f.onConstructScalar(e)
-}
-
-// ConstructBitor constructs an expression for the Bitor operator.
-func (_f *Factory) ConstructBitor(
-	left opt.ScalarExpr,
-	right opt.ScalarExpr,
-) opt.ScalarExpr {
 	// [CommuteVar]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11758,7 +11711,7 @@ func (_f *Factory) ConstructBitor(
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_expr := _f.ConstructBitor(
+					_expr := _f.ConstructBitand(
 						right,
 						left,
 					)
@@ -11776,7 +11729,7 @@ func (_f *Factory) ConstructBitor(
 		if opt.IsConstValueOp(left) {
 			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_expr := _f.ConstructBitor(
+					_expr := _f.ConstructBitand(
 						right,
 						left,
 					)
@@ -11789,6 +11742,15 @@ func (_f *Factory) ConstructBitor(
 		}
 	}
 
+	e := _f.mem.MemoizeBitand(left, right)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructBitor constructs an expression for the Bitor operator.
+func (_f *Factory) ConstructBitor(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		_null, _ := left.(*memo.NullExpr)
@@ -11839,15 +11801,6 @@ func (_f *Factory) ConstructBitor(
 		}
 	}
 
-	e := _f.mem.MemoizeBitor(left, right)
-	return _f.onConstructScalar(e)
-}
-
-// ConstructBitxor constructs an expression for the Bitxor operator.
-func (_f *Factory) ConstructBitxor(
-	left opt.ScalarExpr,
-	right opt.ScalarExpr,
-) opt.ScalarExpr {
 	// [CommuteVar]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -11855,7 +11808,7 @@ func (_f *Factory) ConstructBitxor(
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
-					_expr := _f.ConstructBitxor(
+					_expr := _f.ConstructBitor(
 						right,
 						left,
 					)
@@ -11873,7 +11826,7 @@ func (_f *Factory) ConstructBitxor(
 		if opt.IsConstValueOp(left) {
 			if !(opt.IsConstValueOp(right)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
-					_expr := _f.ConstructBitxor(
+					_expr := _f.ConstructBitor(
 						right,
 						left,
 					)
@@ -11886,6 +11839,15 @@ func (_f *Factory) ConstructBitxor(
 		}
 	}
 
+	e := _f.mem.MemoizeBitor(left, right)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructBitxor constructs an expression for the Bitxor operator.
+func (_f *Factory) ConstructBitxor(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		_null, _ := left.(*memo.NullExpr)
@@ -11936,6 +11898,44 @@ func (_f *Factory) ConstructBitxor(
 		}
 	}
 
+	// [CommuteVar]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable == nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
+					_expr := _f.ConstructBitxor(
+						right,
+						left,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.CommuteVar, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [CommuteConst]
+	{
+		if opt.IsConstValueOp(left) {
+			if !(opt.IsConstValueOp(right)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteConst) {
+					_expr := _f.ConstructBitxor(
+						right,
+						left,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.CommuteConst, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeBitxor(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -11945,6 +11945,56 @@ func (_f *Factory) ConstructPlus(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
 ) opt.ScalarExpr {
+	// [FoldNullBinaryLeft]
+	{
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
+					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldNullBinaryRight]
+	{
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
+			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
+					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.PlusOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldPlusZero]
 	{
 		_const, _ := right.(*memo.ConstExpr)
@@ -12021,56 +12071,6 @@ func (_f *Factory) ConstructPlus(
 		}
 	}
 
-	// [FoldNullBinaryLeft]
-	{
-		_null, _ := left.(*memo.NullExpr)
-		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [FoldNullBinaryRight]
-	{
-		_null, _ := right.(*memo.NullExpr)
-		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [FoldBinary]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldBinary(opt.PlusOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizePlus(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -12080,27 +12080,6 @@ func (_f *Factory) ConstructMinus(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [FoldMinusZero]
-	{
-		if _f.funcs.IsAdditive(left) {
-			_const, _ := right.(*memo.ConstExpr)
-			if _const != nil {
-				if _f.funcs.EqualsNumber(_const.Value, 0) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
-						_expr := _f.ConstructCast(
-							left,
-							_f.funcs.BinaryType(opt.MinusOp, left, right),
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldMinusZero, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_null, _ := left.(*memo.NullExpr)
@@ -12151,6 +12130,27 @@ func (_f *Factory) ConstructMinus(
 		}
 	}
 
+	// [FoldMinusZero]
+	{
+		if _f.funcs.IsAdditive(left) {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
+				if _f.funcs.EqualsNumber(_const.Value, 0) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
+						_expr := _f.ConstructCast(
+							left,
+							_f.funcs.BinaryType(opt.MinusOp, left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldMinusZero, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeMinus(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -12160,6 +12160,56 @@ func (_f *Factory) ConstructMult(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
 ) opt.ScalarExpr {
+	// [FoldNullBinaryLeft]
+	{
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
+					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldNullBinaryRight]
+	{
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
+			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
+					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldBinary]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldBinary(opt.MultOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldBinary, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldMultOne]
 	{
 		_const, _ := right.(*memo.ConstExpr)
@@ -12236,56 +12286,6 @@ func (_f *Factory) ConstructMult(
 		}
 	}
 
-	// [FoldNullBinaryLeft]
-	{
-		_null, _ := left.(*memo.NullExpr)
-		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [FoldNullBinaryRight]
-	{
-		_null, _ := right.(*memo.NullExpr)
-		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [FoldBinary]
-	{
-		if _f.funcs.IsConstValueOrTuple(left) {
-			if _f.funcs.IsConstValueOrTuple(right) {
-				result := _f.funcs.FoldBinary(opt.MultOp, left, right)
-				if _f.funcs.Succeeded(result) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
-						_expr := result.(opt.ScalarExpr)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldBinary, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeMult(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -12295,25 +12295,6 @@ func (_f *Factory) ConstructDiv(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [FoldDivOne]
-	{
-		_const, _ := right.(*memo.ConstExpr)
-		if _const != nil {
-			if _f.funcs.EqualsNumber(_const.Value, 1) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
-					_expr := _f.ConstructCast(
-						left,
-						_f.funcs.BinaryType(opt.DivOp, left, right),
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldDivOne, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
 	// [FoldNullBinaryLeft]
 	{
 		_null, _ := left.(*memo.NullExpr)
@@ -12364,15 +12345,6 @@ func (_f *Factory) ConstructDiv(
 		}
 	}
 
-	e := _f.mem.MemoizeDiv(left, right)
-	return _f.onConstructScalar(e)
-}
-
-// ConstructFloorDiv constructs an expression for the FloorDiv operator.
-func (_f *Factory) ConstructFloorDiv(
-	left opt.ScalarExpr,
-	right opt.ScalarExpr,
-) opt.ScalarExpr {
 	// [FoldDivOne]
 	{
 		_const, _ := right.(*memo.ConstExpr)
@@ -12381,7 +12353,7 @@ func (_f *Factory) ConstructFloorDiv(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryType(opt.FloorDivOp, left, right),
+						_f.funcs.BinaryType(opt.DivOp, left, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
@@ -12392,6 +12364,15 @@ func (_f *Factory) ConstructFloorDiv(
 		}
 	}
 
+	e := _f.mem.MemoizeDiv(left, right)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructFloorDiv constructs an expression for the FloorDiv operator.
+func (_f *Factory) ConstructFloorDiv(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
 	// [FoldNullBinaryLeft]
 	{
 		_null, _ := left.(*memo.NullExpr)
@@ -12437,6 +12418,25 @@ func (_f *Factory) ConstructFloorDiv(
 						}
 						return _expr
 					}
+				}
+			}
+		}
+	}
+
+	// [FoldDivOne]
+	{
+		_const, _ := right.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 1) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
+					_expr := _f.ConstructCast(
+						left,
+						_f.funcs.BinaryType(opt.FloorDivOp, left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldDivOne, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -13005,6 +13005,36 @@ func (_f *Factory) ConstructFetchTextPath(
 func (_f *Factory) ConstructUnaryMinus(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
+	// [FoldNullUnary]
+	{
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryMinusOp, input).(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldUnary]
+	{
+		if _f.funcs.IsConstValueOrTuple(input) {
+			result := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
+			if _f.funcs.Succeeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnary, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [InvertMinus]
 	{
 		_minus, _ := input.(*memo.MinusExpr)
@@ -13037,36 +13067,6 @@ func (_f *Factory) ConstructUnaryMinus(
 					_f.appliedRule(opt.EliminateUnaryMinus, nil, _expr)
 				}
 				return _expr
-			}
-		}
-	}
-
-	// [FoldNullUnary]
-	{
-		_null, _ := input.(*memo.NullExpr)
-		if _null != nil {
-			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_expr := _f.funcs.FoldNullUnary(opt.UnaryMinusOp, input).(opt.ScalarExpr)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	// [FoldUnary]
-	{
-		if _f.funcs.IsConstValueOrTuple(input) {
-			result := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
-			if _f.funcs.Succeeded(result) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
-					_expr := result.(opt.ScalarExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldUnary, nil, _expr)
-					}
-					return _expr
-				}
 			}
 		}
 	}
@@ -13127,20 +13127,6 @@ func (_f *Factory) ConstructCast(
 	input opt.ScalarExpr,
 	typ *types.T,
 ) opt.ScalarExpr {
-	// [EliminateCast]
-	{
-		targetTyp := typ
-		if _f.funcs.HasColType(input, targetTyp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
-				_expr := input
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateCast, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	// [FoldNullCast]
 	{
 		_null, _ := input.(*memo.NullExpr)
@@ -13170,6 +13156,20 @@ func (_f *Factory) ConstructCast(
 					}
 					return _expr
 				}
+			}
+		}
+	}
+
+	// [EliminateCast]
+	{
+		targetTyp := typ
+		if _f.funcs.HasColType(input, targetTyp) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
+				_expr := input
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateCast, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}
@@ -13296,6 +13296,22 @@ func (_f *Factory) ConstructIndirection(
 	input opt.ScalarExpr,
 	index opt.ScalarExpr,
 ) opt.ScalarExpr {
+	// [FoldIndirection]
+	{
+		if _f.funcs.IsConstValueOrTuple(index) {
+			result := _f.funcs.FoldIndirection(input, index)
+			if _f.funcs.Succeeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldIndirection) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldIndirection, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeIndirection(input, index)
 	return _f.onConstructScalar(e)
 }
@@ -13455,6 +13471,20 @@ func (_f *Factory) ConstructColumnAccess(
 	input opt.ScalarExpr,
 	idx memo.TupleOrdinal,
 ) opt.ScalarExpr {
+	// [FoldColumnAccess]
+	{
+		result := _f.funcs.FoldColumnAccess(input, idx)
+		if _f.funcs.Succeeded(result) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldColumnAccess) {
+				_expr := result.(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldColumnAccess, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeColumnAccess(input, idx)
 	return _f.onConstructScalar(e)
 }
