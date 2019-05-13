@@ -1146,6 +1146,62 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PruneWindowOutputCols]
+	{
+		_window, _ := input.(*memo.WindowExpr)
+		if _window != nil {
+			input := _window.Input
+			windows := _window.Windows
+			private := &_window.WindowPrivate
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneWindows(needed, windows) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneWindowOutputCols) {
+					_expr := _f.ConstructProject(
+						_f.ConstructWindow(
+							input,
+							_f.funcs.PruneWindows(needed, windows),
+							private,
+						),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneWindowOutputCols, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [PruneWindowInputCols]
+	{
+		_window, _ := input.(*memo.WindowExpr)
+		if _window != nil {
+			innerInput := _window.Input
+			fn := _window.Windows
+			private := &_window.WindowPrivate
+			needed := _f.funcs.UnionCols3(_f.funcs.NeededWindowCols(fn, private), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneWindowInputCols) {
+					_expr := _f.ConstructProject(
+						_f.ConstructWindow(
+							_f.funcs.PruneCols(innerInput, needed),
+							fn,
+							private,
+						),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneWindowInputCols, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [HoistProjectSubquery]
 	{
 		for i := range projections {
@@ -8085,6 +8141,57 @@ func (_f *Factory) ConstructWindow(
 	windows memo.WindowsExpr,
 	windowPrivate *memo.WindowPrivate,
 ) memo.RelExpr {
+	// [EliminateWindow]
+	{
+		if len(windows) == 0 {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateWindow) {
+				_expr := input
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateWindow, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [ReduceWindowPartitionCols]
+	{
+		fn := windows
+		private := windowPrivate
+		if _f.funcs.CanReduceWindowPartitionCols(input, private) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceWindowPartitionCols) {
+				_expr := _f.ConstructWindow(
+					input,
+					fn,
+					_f.funcs.ReduceWindowPartitionCols(input, private),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ReduceWindowPartitionCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyWindowOrdering]
+	{
+		fn := windows
+		private := windowPrivate
+		if _f.funcs.CanSimplifyWindowOrdering(input, private) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyWindowOrdering) {
+				_expr := _f.ConstructWindow(
+					input,
+					fn,
+					_f.funcs.SimplifyWindowOrdering(input, private),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyWindowOrdering, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeWindow(input, windows, windowPrivate)
 	return _f.onConstructRelational(e)
 }

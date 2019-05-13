@@ -144,6 +144,8 @@ const (
 	PruneOrdinalityCols
 	PruneExplainCols
 	PruneProjectSetCols
+	PruneWindowOutputCols
+	PruneWindowInputCols
 	PruneMutationFetchCols
 	PruneMutationInputCols
 	RejectNullsLeftJoin
@@ -182,6 +184,9 @@ const (
 	RemoveNotNullCondition
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
+	EliminateWindow
+	ReduceWindowPartitionCols
+	SimplifyWindowOrdering
 
 	// startExploreRule tracks the number of normalization rules;
 	// all rules greater than this value are exploration rules.
