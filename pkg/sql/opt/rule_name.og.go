@@ -184,6 +184,7 @@ const (
 	RemoveNotNullCondition
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
+	PushFilterIntoSetOp
 	EliminateWindow
 	ReduceWindowPartitionCols
 	SimplifyWindowOrdering
