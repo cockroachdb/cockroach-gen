@@ -1367,12 +1367,12 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 6019
+	//line sql.y: 6025
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 6020
+		//line sql.y: 6026
 		Category: hDML,
-		//line sql.y: 6021
+		//line sql.y: 6027
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexflags> } ]
@@ -1390,12 +1390,13 @@ Data sources:
 Index flags:
   '{' FORCE_INDEX = <idxname> [, ...] '}'
   '{' NO_INDEX_JOIN [, ...] '}'
+  '{' IGNORE_FOREIGN_KEYS [, ...] '}'
 
 Join types:
   { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP } ]
 
 `,
-		//line sql.y: 6042
+		//line sql.y: 6049
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},

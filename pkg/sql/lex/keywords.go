@@ -144,6 +144,7 @@ var KeywordsCategories = map[string]string{
 	"if":                        "C",
 	"iferror":                   "C",
 	"ifnull":                    "C",
+	"ignore_foreign_keys":       "U",
 	"ilike":                     "T",
 	"immediate":                 "U",
 	"import":                    "U",
@@ -538,6 +539,7 @@ var KeywordNames = []string{
 	"if",
 	"iferror",
 	"ifnull",
+	"ignore_foreign_keys",
 	"ilike",
 	"immediate",
 	"import",
@@ -1078,6 +1080,8 @@ func GetKeywordID(k string) int32 {
 		return IFERROR
 	case "ifnull":
 		return IFNULL
+	case "ignore_foreign_keys":
+		return IGNORE_FOREIGN_KEYS
 	case "ilike":
 		return ILIKE
 	case "immediate":
