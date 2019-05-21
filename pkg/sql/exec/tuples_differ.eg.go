@@ -31,14 +31,14 @@ func tuplesDiffer(
 		aCol := aColVec.Bool()
 		bCol := bColVec.Bool()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		unique = tree.CompareBools(aCol[aTupleIdx], bCol[bTupleIdx]) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Bytes:
 		aCol := aColVec.Bytes()
 		bCol := bColVec.Bytes()
 		var unique bool
-		unique = !bytes.Equal(aCol[aTupleIdx], bCol[bTupleIdx])
+		unique = bytes.Compare(aCol[aTupleIdx], bCol[bTupleIdx]) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Decimal:

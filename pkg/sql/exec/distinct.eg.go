@@ -224,7 +224,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			v := col[i]
 			var unique bool
-			unique = v != lastVal
+			unique = tree.CompareBools(v, lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -237,7 +237,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			v := col[i]
 			var unique bool
-			unique = v != lastVal
+			unique = tree.CompareBools(v, lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -264,7 +264,7 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint6
 
 		v := col[i]
 		var unique bool
-		unique = v != lastVal
+		unique = tree.CompareBools(v, lastVal) != 0
 		outputCol[i] = outputCol[i] || unique
 		lastVal = v
 	}
@@ -342,7 +342,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			v := col[i]
 			var unique bool
-			unique = !bytes.Equal(v, lastVal)
+			unique = bytes.Compare(v, lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -355,7 +355,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			v := col[i]
 			var unique bool
-			unique = !bytes.Equal(v, lastVal)
+			unique = bytes.Compare(v, lastVal) != 0
 			outputCol[i] = outputCol[i] || unique
 			lastVal = v
 		}
@@ -382,7 +382,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 
 		v := col[i]
 		var unique bool
-		unique = !bytes.Equal(v, lastVal)
+		unique = bytes.Compare(v, lastVal) != 0
 		outputCol[i] = outputCol[i] || unique
 		lastVal = v
 	}

@@ -308,7 +308,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -334,7 +334,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -362,7 +362,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -386,7 +386,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -419,7 +419,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -445,7 +445,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -473,7 +473,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -497,7 +497,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = buildVal != probeVal
+								unique = tree.CompareBools(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -538,7 +538,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -564,7 +564,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -592,7 +592,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -616,7 +616,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[sel[ht.toCheck[i]]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -649,7 +649,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -675,7 +675,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -703,7 +703,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -727,7 +727,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								buildVal := buildKeys[keyID-1]
 								probeVal := probeKeys[ht.toCheck[i]]
 								var unique bool
-								unique = !bytes.Equal(buildVal, probeVal)
+								unique = bytes.Compare(buildVal, probeVal) != 0
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true

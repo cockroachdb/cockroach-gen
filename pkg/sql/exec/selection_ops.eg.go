@@ -40,7 +40,7 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -52,7 +52,7 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -66,7 +66,7 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -78,7 +78,7 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -126,7 +126,7 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -139,7 +139,7 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -153,7 +153,7 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -166,7 +166,7 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -211,7 +211,7 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -223,7 +223,7 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -237,7 +237,7 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -249,7 +249,7 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = tree.CompareBools(col[i], p.constArg) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -297,7 +297,7 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -310,7 +310,7 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -324,7 +324,7 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -337,7 +337,7 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = tree.CompareBools(col1[i], col2[i]) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1066,7 +1066,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1078,7 +1078,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1092,7 +1092,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1104,7 +1104,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1152,7 +1152,7 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1165,7 +1165,7 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1179,7 +1179,7 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1192,7 +1192,7 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1237,7 +1237,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1249,7 +1249,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = !bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1263,7 +1263,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1275,7 +1275,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = !bytes.Equal(col[i], p.constArg)
+					cmp = bytes.Compare(col[i], p.constArg) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1323,7 +1323,7 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1336,7 +1336,7 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = !bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1350,7 +1350,7 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1363,7 +1363,7 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = !bytes.Equal(col1[i], col2[i])
+					cmp = bytes.Compare(col1[i], col2[i]) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++

@@ -39,13 +39,13 @@ func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] == p.constArg
+			projCol[i] = tree.CompareBools(col[i], p.constArg) == 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] == p.constArg
+			projCol[i] = tree.CompareBools(col[i], p.constArg) == 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -83,13 +83,13 @@ func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg == col[i]
+			projCol[i] = tree.CompareBools(p.constArg, col[i]) == 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg == col[i]
+			projCol[i] = tree.CompareBools(p.constArg, col[i]) == 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -129,14 +129,14 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] == col2[i]
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) == 0
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] == col2[i]
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) == 0
 		}
 	}
 	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
@@ -173,13 +173,13 @@ func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] != p.constArg
+			projCol[i] = tree.CompareBools(col[i], p.constArg) != 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] != p.constArg
+			projCol[i] = tree.CompareBools(col[i], p.constArg) != 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -217,13 +217,13 @@ func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg != col[i]
+			projCol[i] = tree.CompareBools(p.constArg, col[i]) != 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg != col[i]
+			projCol[i] = tree.CompareBools(p.constArg, col[i]) != 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -263,14 +263,14 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] != col2[i]
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) != 0
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] != col2[i]
+			projCol[i] = tree.CompareBools(col1[i], col2[i]) != 0
 		}
 	}
 	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
@@ -843,13 +843,13 @@ func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = bytes.Equal(col[i], p.constArg)
+			projCol[i] = bytes.Compare(col[i], p.constArg) == 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = bytes.Equal(col[i], p.constArg)
+			projCol[i] = bytes.Compare(col[i], p.constArg) == 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -887,13 +887,13 @@ func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = bytes.Equal(p.constArg, col[i])
+			projCol[i] = bytes.Compare(p.constArg, col[i]) == 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = bytes.Equal(p.constArg, col[i])
+			projCol[i] = bytes.Compare(p.constArg, col[i]) == 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -933,14 +933,14 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Bytes()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = bytes.Equal(col1[i], col2[i])
+			projCol[i] = bytes.Compare(col1[i], col2[i]) == 0
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = bytes.Equal(col1[i], col2[i])
+			projCol[i] = bytes.Compare(col1[i], col2[i]) == 0
 		}
 	}
 	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
@@ -977,13 +977,13 @@ func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = !bytes.Equal(col[i], p.constArg)
+			projCol[i] = bytes.Compare(col[i], p.constArg) != 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = !bytes.Equal(col[i], p.constArg)
+			projCol[i] = bytes.Compare(col[i], p.constArg) != 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -1021,13 +1021,13 @@ func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = !bytes.Equal(p.constArg, col[i])
+			projCol[i] = bytes.Compare(p.constArg, col[i]) != 0
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = !bytes.Equal(p.constArg, col[i])
+			projCol[i] = bytes.Compare(p.constArg, col[i]) != 0
 		}
 	}
 	if vec.Nulls().HasNulls() {
@@ -1067,14 +1067,14 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Bytes()[:coldata.BatchSize]
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = !bytes.Equal(col1[i], col2[i])
+			projCol[i] = bytes.Compare(col1[i], col2[i]) != 0
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = !bytes.Equal(col1[i], col2[i])
+			projCol[i] = bytes.Compare(col1[i], col2[i]) != 0
 		}
 	}
 	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {

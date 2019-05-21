@@ -65,7 +65,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -83,7 +83,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -104,7 +104,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -171,7 +171,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -189,7 +189,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -210,7 +210,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -1025,7 +1025,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -1043,7 +1043,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -1064,7 +1064,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -1131,7 +1131,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -1149,7 +1149,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -1170,7 +1170,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -1983,7 +1983,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -2001,7 +2001,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -2018,7 +2018,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -2081,7 +2081,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -2099,7 +2099,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -2116,7 +2116,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -2871,7 +2871,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -2889,7 +2889,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -2906,7 +2906,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -2969,7 +2969,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -2987,7 +2987,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -3004,7 +3004,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -3763,7 +3763,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -3777,7 +3777,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -3798,7 +3798,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -3861,7 +3861,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -3875,7 +3875,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -3896,7 +3896,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -4651,7 +4651,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -4665,7 +4665,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -4686,7 +4686,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -4749,7 +4749,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -4763,7 +4763,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -4784,7 +4784,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -5537,7 +5537,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -5551,7 +5551,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -5568,7 +5568,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -5627,7 +5627,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -5641,7 +5641,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -5658,7 +5658,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -6353,7 +6353,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -6367,7 +6367,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -6384,7 +6384,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -6443,7 +6443,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -6457,7 +6457,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -6474,7 +6474,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -7195,7 +7195,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -7213,7 +7213,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -7234,7 +7234,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -7301,7 +7301,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -7319,7 +7319,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -7340,7 +7340,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -8155,7 +8155,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -8173,7 +8173,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -8194,7 +8194,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -8261,7 +8261,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -8279,7 +8279,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -8300,7 +8300,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -9113,7 +9113,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -9131,7 +9131,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -9148,7 +9148,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -9211,7 +9211,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -9229,7 +9229,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -9246,7 +9246,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -10001,7 +10001,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -10019,7 +10019,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -10036,7 +10036,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -10099,7 +10099,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -10117,7 +10117,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -10134,7 +10134,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -10893,7 +10893,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -10907,7 +10907,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -10928,7 +10928,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -10991,7 +10991,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -11005,7 +11005,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -11026,7 +11026,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -11781,7 +11781,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -11795,7 +11795,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -11816,7 +11816,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -11879,7 +11879,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -11893,7 +11893,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -11914,7 +11914,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -12667,7 +12667,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -12681,7 +12681,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -12698,7 +12698,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -12757,7 +12757,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -12771,7 +12771,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -12788,7 +12788,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -13483,7 +13483,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -13497,7 +13497,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -13514,7 +13514,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -13573,7 +13573,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -13587,7 +13587,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[lSel[curLIdx]]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -13604,7 +13604,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -14325,7 +14325,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -14343,7 +14343,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -14364,7 +14364,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -14431,7 +14431,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -14449,7 +14449,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -14470,7 +14470,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -15285,7 +15285,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -15303,7 +15303,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -15324,7 +15324,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -15391,7 +15391,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -15409,7 +15409,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -15430,7 +15430,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -16243,7 +16243,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -16261,7 +16261,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -16278,7 +16278,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -16341,7 +16341,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -16359,7 +16359,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -16376,7 +16376,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -17131,7 +17131,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -17149,7 +17149,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -17166,7 +17166,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -17229,7 +17229,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -17247,7 +17247,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -17264,7 +17264,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -18023,7 +18023,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -18037,7 +18037,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -18058,7 +18058,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -18121,7 +18121,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -18135,7 +18135,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -18156,7 +18156,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -18911,7 +18911,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -18925,7 +18925,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -18946,7 +18946,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -19009,7 +19009,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -19023,7 +19023,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -19044,7 +19044,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -19797,7 +19797,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -19811,7 +19811,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -19828,7 +19828,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -19887,7 +19887,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -19901,7 +19901,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -19918,7 +19918,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -20613,7 +20613,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -20627,7 +20627,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -20644,7 +20644,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -20703,7 +20703,7 @@ EqLoop:
 								rVal := rKeys[rSel[curRIdx]]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -20717,7 +20717,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -20734,7 +20734,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[rSel[curRIdx]]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -21455,7 +21455,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -21473,7 +21473,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -21494,7 +21494,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -21561,7 +21561,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -21579,7 +21579,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -21600,7 +21600,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -22415,7 +22415,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -22433,7 +22433,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -22454,7 +22454,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -22521,7 +22521,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -22539,7 +22539,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -22560,7 +22560,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -23373,7 +23373,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -23391,7 +23391,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -23408,7 +23408,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -23471,7 +23471,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -23489,7 +23489,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -23506,7 +23506,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -24261,7 +24261,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -24279,7 +24279,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -24296,7 +24296,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -24359,7 +24359,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -24377,7 +24377,7 @@ EqLoop:
 												break
 											}
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -24394,7 +24394,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -25153,7 +25153,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -25167,7 +25167,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -25188,7 +25188,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -25251,7 +25251,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -25265,7 +25265,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -25286,7 +25286,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -26041,7 +26041,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -26055,7 +26055,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -26076,7 +26076,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -26139,7 +26139,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -26153,7 +26153,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -26174,7 +26174,7 @@ EqLoop:
 												break
 											}
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -26927,7 +26927,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -26941,7 +26941,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -26958,7 +26958,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -27017,7 +27017,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -27031,7 +27031,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -27048,7 +27048,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -27743,7 +27743,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = lVal == rVal
+								match = tree.CompareBools(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -27757,7 +27757,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = newLVal == lVal
+											match = tree.CompareBools(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -27774,7 +27774,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = newRVal == rVal
+											match = tree.CompareBools(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -27833,7 +27833,7 @@ EqLoop:
 								rVal := rKeys[curRIdx]
 
 								var match bool
-								match = bytes.Equal(lVal, rVal)
+								match = bytes.Compare(lVal, rVal) == 0
 								if match {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 0, 0
@@ -27847,7 +27847,7 @@ EqLoop:
 										for curLIdx < curLLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newLVal := lKeys[curLIdx]
-											match = bytes.Equal(newLVal, lVal)
+											match = bytes.Compare(newLVal, lVal) == 0
 											if !match {
 												lComplete = true
 												break
@@ -27864,7 +27864,7 @@ EqLoop:
 										for curRIdx < curRLength {
 											// TODO(georgeutsin): change null check logic for non INNER joins.
 											newRVal := rKeys[curRIdx]
-											match = bytes.Equal(newRVal, rVal)
+											match = bytes.Compare(newRVal, rVal) == 0
 											if !match {
 												rComplete = true
 												break
@@ -32076,7 +32076,7 @@ func (o *mergeJoinOp) isGroupFinished(
 				curVal = bat.ColVec(int(colIdx)).Bool()[rowIdx]
 			}
 			var match bool
-			match = prevVal == curVal
+			match = tree.CompareBools(prevVal, curVal) == 0
 			if !match {
 				return true
 			}
@@ -32097,7 +32097,7 @@ func (o *mergeJoinOp) isGroupFinished(
 				curVal = bat.ColVec(int(colIdx)).Bytes()[rowIdx]
 			}
 			var match bool
-			match = bytes.Equal(prevVal, curVal)
+			match = bytes.Compare(prevVal, curVal) == 0
 			if !match {
 				return true
 			}
