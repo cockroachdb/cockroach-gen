@@ -11523,7 +11523,7 @@ func (e *WindowsExpr) DataType() *types.T {
 // Window expression.
 type WindowsItem struct {
 	Function opt.ScalarExpr
-	ColPrivate
+	WindowsItemPrivate
 
 	Typ *types.T
 	id  opt.ScalarID
@@ -11552,7 +11552,7 @@ func (e *WindowsItem) Child(nth int) opt.Expr {
 }
 
 func (e *WindowsItem) Private() interface{} {
-	return &e.ColPrivate
+	return &e.WindowsItemPrivate
 }
 
 func (e *WindowsItem) String() string {
@@ -11579,6 +11579,13 @@ func (e *WindowsItem) ScalarProps(mem *Memo) *props.Scalar {
 		mem.logPropsBuilder.buildWindowsItemProps(e, &e.scalar)
 	}
 	return &e.scalar
+}
+
+type WindowsItemPrivate struct {
+	// Frame is the frame that this item is computed relative to within its
+	// partition. The bounds pointers within it are guaranteed to be non-nil.
+	Frame *tree.WindowFrame
+	ColPrivate
 }
 
 // RankExpr computes the position of a row relative to an ordering, with same-valued
@@ -19660,12 +19667,14 @@ func (in *interner) InternWindowsItem(val *WindowsItem) *WindowsItem {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.WindowsItemOp)
 	in.hasher.HashScalarExpr(val.Function)
+	in.hasher.HashWindowFrame(val.Frame)
 	in.hasher.HashColumnID(val.Col)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*WindowsItem); ok {
 			if in.hasher.IsScalarExprEqual(val.Function, existing.Function) &&
+				in.hasher.IsWindowFrameEqual(val.Frame, existing.Frame) &&
 				in.hasher.IsColumnIDEqual(val.Col, existing.Col) {
 				return existing
 			}

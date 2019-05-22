@@ -15492,6 +15492,7 @@ func (f *Factory) replaceWindowsExpr(list memo.WindowsExpr, replace ReplaceFunc)
 				copy(newList, list[:i])
 			}
 			newList[i].Function = after
+			newList[i].Frame = list[i].Frame
 			newList[i].Col = list[i].Col
 		} else if newList != nil {
 			newList[i] = list[i]
@@ -16435,6 +16436,7 @@ func (f *Factory) copyAndReplaceDefaultWindowsExpr(src memo.WindowsExpr, replace
 	dst = make(memo.WindowsExpr, len(src))
 	for i := range src {
 		dst[i].Function = f.invokeReplace(src[i].Function, replace).(opt.ScalarExpr)
+		dst[i].Frame = src[i].Frame
 		dst[i].Col = src[i].Col
 	}
 	return dst
