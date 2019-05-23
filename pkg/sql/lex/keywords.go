@@ -366,6 +366,7 @@ var KeywordsCategories = map[string]string{
 	"unique":                    "R",
 	"unknown":                   "U",
 	"unlogged":                  "U",
+	"unsplit":                   "U",
 	"update":                    "U",
 	"upsert":                    "U",
 	"use":                       "U",
@@ -761,6 +762,7 @@ var KeywordNames = []string{
 	"unique",
 	"unknown",
 	"unlogged",
+	"unsplit",
 	"update",
 	"upsert",
 	"use",
@@ -1524,6 +1526,8 @@ func GetKeywordID(k string) int32 {
 		return UNKNOWN
 	case "unlogged":
 		return UNLOGGED
+	case "unsplit":
+		return UNSPLIT
 	case "update":
 		return UPDATE
 	case "upsert":
