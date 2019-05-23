@@ -311,22 +311,112 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 	switch typ {
 	case types.Bool:
 		copy(m.Bool()[destStartIdx:], src.Bool()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Bytes:
 		copy(m.Bytes()[destStartIdx:], src.Bytes()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Decimal:
 		copy(m.Decimal()[destStartIdx:], src.Decimal()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Int8:
 		copy(m.Int8()[destStartIdx:], src.Int8()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Int16:
 		copy(m.Int16()[destStartIdx:], src.Int16()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Int32:
 		copy(m.Int32()[destStartIdx:], src.Int32()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Int64:
 		copy(m.Int64()[destStartIdx:], src.Int64()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Float32:
 		copy(m.Float32()[destStartIdx:], src.Float32()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	case types.Float64:
 		copy(m.Float64()[destStartIdx:], src.Float64()[srcStartIdx:srcEndIdx])
+		// TODO(asubiotto): Improve this, there are cases where we don't need to
+		// allocate a new bitmap.
+		srcBitmap := src.Nulls().NullBitmap()
+		m.nulls.nulls = make([]byte, len(srcBitmap))
+		if src.HasNulls() {
+			m.nulls.hasNulls = true
+			copy(m.nulls.nulls, srcBitmap)
+		} else {
+			m.nulls.UnsetNulls()
+		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", typ))
 	}
