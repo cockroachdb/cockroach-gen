@@ -1549,6 +1549,42 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [TryDecorrelateWindow]
+	{
+		_window, _ := right.(*memo.WindowExpr)
+		if _window != nil {
+			input := _window.Input
+			windows := _window.Windows
+			private := &_window.WindowPrivate
+			if _f.funcs.HasOuterCols(right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateWindow) {
+					newLeft := _f.funcs.EnsureKey(left)
+					_expr := _f.ConstructProject(
+						_f.ConstructSelect(
+							_f.ConstructWindow(
+								_f.ConstructInnerJoin(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+									joinPrivate,
+								),
+								windows,
+								_f.funcs.AddColsToPartition(private, _f.funcs.KeyCols(newLeft)),
+							),
+							on,
+						),
+						memo.EmptyProjectionsExpr,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateWindow, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [NormalizeJoinAnyFilter]
 	{
 		for i := range on {
@@ -4702,6 +4738,42 @@ func (_f *Factory) ConstructInnerJoinApply(
 					_f.appliedRule(opt.TryDecorrelateProjectSet, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [TryDecorrelateWindow]
+	{
+		_window, _ := right.(*memo.WindowExpr)
+		if _window != nil {
+			input := _window.Input
+			windows := _window.Windows
+			private := &_window.WindowPrivate
+			if _f.funcs.HasOuterCols(right) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateWindow) {
+					newLeft := _f.funcs.EnsureKey(left)
+					_expr := _f.ConstructProject(
+						_f.ConstructSelect(
+							_f.ConstructWindow(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+									joinPrivate,
+								),
+								windows,
+								_f.funcs.AddColsToPartition(private, _f.funcs.KeyCols(newLeft)),
+							),
+							on,
+						),
+						memo.EmptyProjectionsExpr,
+						_f.funcs.OutputCols2(left, right),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.TryDecorrelateWindow, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}

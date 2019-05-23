@@ -53,6 +53,7 @@ const (
 	TryDecorrelateSemiJoin
 	TryDecorrelateLimitOne
 	TryDecorrelateProjectSet
+	TryDecorrelateWindow
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery
