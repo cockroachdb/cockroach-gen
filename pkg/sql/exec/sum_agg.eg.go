@@ -54,10 +54,6 @@ type sumDecimalAgg struct {
 
 var _ aggregateFunc = &sumDecimalAgg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroDecimalBatch = make([]apd.Decimal, coldata.BatchSize)
-
 func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Decimal()
@@ -65,7 +61,7 @@ func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumDecimalAgg) Reset() {
-	copy(a.scratch.vec, zeroDecimalBatch)
+	copy(a.scratch.vec, zeroDecimalColumn)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -77,7 +73,7 @@ func (a *sumDecimalAgg) CurrentOutputIndex() int {
 func (a *sumDecimalAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroDecimalBatch)
+		copy(a.scratch.vec[idx+1:], zeroDecimalColumn)
 	}
 }
 
@@ -133,10 +129,6 @@ type sumInt8Agg struct {
 
 var _ aggregateFunc = &sumInt8Agg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroInt8Batch = make([]int8, coldata.BatchSize)
-
 func (a *sumInt8Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int8()
@@ -144,7 +136,7 @@ func (a *sumInt8Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt8Agg) Reset() {
-	copy(a.scratch.vec, zeroInt8Batch)
+	copy(a.scratch.vec, zeroInt8Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -156,7 +148,7 @@ func (a *sumInt8Agg) CurrentOutputIndex() int {
 func (a *sumInt8Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt8Batch)
+		copy(a.scratch.vec[idx+1:], zeroInt8Column)
 	}
 }
 
@@ -208,10 +200,6 @@ type sumInt16Agg struct {
 
 var _ aggregateFunc = &sumInt16Agg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroInt16Batch = make([]int16, coldata.BatchSize)
-
 func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int16()
@@ -219,7 +207,7 @@ func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt16Agg) Reset() {
-	copy(a.scratch.vec, zeroInt16Batch)
+	copy(a.scratch.vec, zeroInt16Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -231,7 +219,7 @@ func (a *sumInt16Agg) CurrentOutputIndex() int {
 func (a *sumInt16Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt16Batch)
+		copy(a.scratch.vec[idx+1:], zeroInt16Column)
 	}
 }
 
@@ -283,10 +271,6 @@ type sumInt32Agg struct {
 
 var _ aggregateFunc = &sumInt32Agg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroInt32Batch = make([]int32, coldata.BatchSize)
-
 func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int32()
@@ -294,7 +278,7 @@ func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt32Agg) Reset() {
-	copy(a.scratch.vec, zeroInt32Batch)
+	copy(a.scratch.vec, zeroInt32Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -306,7 +290,7 @@ func (a *sumInt32Agg) CurrentOutputIndex() int {
 func (a *sumInt32Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt32Batch)
+		copy(a.scratch.vec[idx+1:], zeroInt32Column)
 	}
 }
 
@@ -358,10 +342,6 @@ type sumInt64Agg struct {
 
 var _ aggregateFunc = &sumInt64Agg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroInt64Batch = make([]int64, coldata.BatchSize)
-
 func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int64()
@@ -369,7 +349,7 @@ func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt64Agg) Reset() {
-	copy(a.scratch.vec, zeroInt64Batch)
+	copy(a.scratch.vec, zeroInt64Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -381,7 +361,7 @@ func (a *sumInt64Agg) CurrentOutputIndex() int {
 func (a *sumInt64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt64Batch)
+		copy(a.scratch.vec[idx+1:], zeroInt64Column)
 	}
 }
 
@@ -433,10 +413,6 @@ type sumFloat32Agg struct {
 
 var _ aggregateFunc = &sumFloat32Agg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroFloat32Batch = make([]float32, coldata.BatchSize)
-
 func (a *sumFloat32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float32()
@@ -444,7 +420,7 @@ func (a *sumFloat32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumFloat32Agg) Reset() {
-	copy(a.scratch.vec, zeroFloat32Batch)
+	copy(a.scratch.vec, zeroFloat32Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -456,7 +432,7 @@ func (a *sumFloat32Agg) CurrentOutputIndex() int {
 func (a *sumFloat32Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroFloat32Batch)
+		copy(a.scratch.vec[idx+1:], zeroFloat32Column)
 	}
 }
 
@@ -508,10 +484,6 @@ type sumFloat64Agg struct {
 
 var _ aggregateFunc = &sumFloat64Agg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zeroFloat64Batch = make([]float64, coldata.BatchSize)
-
 func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float64()
@@ -519,7 +491,7 @@ func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumFloat64Agg) Reset() {
-	copy(a.scratch.vec, zeroFloat64Batch)
+	copy(a.scratch.vec, zeroFloat64Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -531,7 +503,7 @@ func (a *sumFloat64Agg) CurrentOutputIndex() int {
 func (a *sumFloat64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroFloat64Batch)
+		copy(a.scratch.vec[idx+1:], zeroFloat64Column)
 	}
 }
 

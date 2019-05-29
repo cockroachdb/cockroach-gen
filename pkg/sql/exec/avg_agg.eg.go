@@ -61,9 +61,9 @@ func (a *avgDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *avgDecimalAgg) Reset() {
-	copy(a.scratch.groupSums, zeroDecimalBatch)
-	copy(a.scratch.groupCounts, zeroInt64Batch)
-	copy(a.scratch.vec, zeroDecimalBatch)
+	copy(a.scratch.groupSums, zeroDecimalColumn)
+	copy(a.scratch.groupCounts, zeroInt64Column)
+	copy(a.scratch.vec, zeroDecimalColumn)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -75,11 +75,11 @@ func (a *avgDecimalAgg) CurrentOutputIndex() int {
 func (a *avgDecimalAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.groupSums[idx+1:], zeroDecimalBatch)
-		copy(a.scratch.groupCounts[idx+1:], zeroInt64Batch)
+		copy(a.scratch.groupSums[idx+1:], zeroDecimalColumn)
+		copy(a.scratch.groupCounts[idx+1:], zeroInt64Column)
 		// TODO(asubiotto): We might not have to zero a.scratch.vec since we
 		// overwrite with an independent value.
-		copy(a.scratch.vec[idx+1:], zeroDecimalBatch)
+		copy(a.scratch.vec[idx+1:], zeroDecimalColumn)
 	}
 }
 
@@ -165,9 +165,9 @@ func (a *avgFloat32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *avgFloat32Agg) Reset() {
-	copy(a.scratch.groupSums, zeroFloat32Batch)
-	copy(a.scratch.groupCounts, zeroInt64Batch)
-	copy(a.scratch.vec, zeroFloat32Batch)
+	copy(a.scratch.groupSums, zeroFloat32Column)
+	copy(a.scratch.groupCounts, zeroInt64Column)
+	copy(a.scratch.vec, zeroFloat32Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -179,11 +179,11 @@ func (a *avgFloat32Agg) CurrentOutputIndex() int {
 func (a *avgFloat32Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.groupSums[idx+1:], zeroFloat32Batch)
-		copy(a.scratch.groupCounts[idx+1:], zeroInt64Batch)
+		copy(a.scratch.groupSums[idx+1:], zeroFloat32Column)
+		copy(a.scratch.groupCounts[idx+1:], zeroInt64Column)
 		// TODO(asubiotto): We might not have to zero a.scratch.vec since we
 		// overwrite with an independent value.
-		copy(a.scratch.vec[idx+1:], zeroFloat32Batch)
+		copy(a.scratch.vec[idx+1:], zeroFloat32Column)
 	}
 }
 
@@ -259,9 +259,9 @@ func (a *avgFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *avgFloat64Agg) Reset() {
-	copy(a.scratch.groupSums, zeroFloat64Batch)
-	copy(a.scratch.groupCounts, zeroInt64Batch)
-	copy(a.scratch.vec, zeroFloat64Batch)
+	copy(a.scratch.groupSums, zeroFloat64Column)
+	copy(a.scratch.groupCounts, zeroInt64Column)
+	copy(a.scratch.vec, zeroFloat64Column)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -273,11 +273,11 @@ func (a *avgFloat64Agg) CurrentOutputIndex() int {
 func (a *avgFloat64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.groupSums[idx+1:], zeroFloat64Batch)
-		copy(a.scratch.groupCounts[idx+1:], zeroInt64Batch)
+		copy(a.scratch.groupSums[idx+1:], zeroFloat64Column)
+		copy(a.scratch.groupCounts[idx+1:], zeroInt64Column)
 		// TODO(asubiotto): We might not have to zero a.scratch.vec since we
 		// overwrite with an independent value.
-		copy(a.scratch.vec[idx+1:], zeroFloat64Batch)
+		copy(a.scratch.vec[idx+1:], zeroFloat64Column)
 	}
 }
 

@@ -74,10 +74,6 @@ type sum_TYPEAgg struct {
 
 var _ aggregateFunc = &sum_TYPEAgg{}
 
-// TODO(asubiotto): Have all these zero batches somewhere else templated
-// separately.
-var zero_TYPEBatch = make([]_GOTYPE, coldata.BatchSize)
-
 func (a *sum_TYPEAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v._TemplateType()
@@ -85,7 +81,7 @@ func (a *sum_TYPEAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sum_TYPEAgg) Reset() {
-	copy(a.scratch.vec, zero_TYPEBatch)
+	copy(a.scratch.vec, zero_TYPEColumn)
 	a.scratch.curIdx = -1
 	a.done = false
 }
@@ -97,7 +93,7 @@ func (a *sum_TYPEAgg) CurrentOutputIndex() int {
 func (a *sum_TYPEAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zero_TYPEBatch)
+		copy(a.scratch.vec[idx+1:], zero_TYPEColumn)
 	}
 }
 
