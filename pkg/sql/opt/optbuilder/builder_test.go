@@ -49,7 +49,7 @@ import (
 //    Builds a memo structure from a SQL scalar expression and outputs a
 //    representation of the "expression view" of the memo structure.
 //
-//    The supported args (in addition to the ones supported by OptTester:
+//    The supported args (in addition to the ones supported by OptTester):
 //
 //      - vars=(type1,type2,...)
 //
