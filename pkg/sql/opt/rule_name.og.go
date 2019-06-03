@@ -113,6 +113,7 @@ const (
 	ExtractJoinEqualities
 	SortFiltersInJoin
 	EliminateLimit
+	EliminateOffset
 	PushLimitIntoProject
 	PushOffsetIntoProject
 	EliminateMax1Row

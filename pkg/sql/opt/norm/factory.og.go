@@ -8057,6 +8057,22 @@ func (_f *Factory) ConstructOffset(
 	offset opt.ScalarExpr,
 	ordering physical.OrderingChoice,
 ) memo.RelExpr {
+	// [EliminateOffset]
+	{
+		_const, _ := offset.(*memo.ConstExpr)
+		if _const != nil {
+			if _f.funcs.EqualsNumber(_const.Value, 0) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateOffset) {
+					_expr := input
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateOffset, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [PushOffsetIntoProject]
 	{
 		_project, _ := input.(*memo.ProjectExpr)
