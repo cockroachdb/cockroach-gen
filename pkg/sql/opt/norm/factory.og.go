@@ -647,6 +647,39 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [PushSelectIntoWindow]
+	{
+		_window, _ := input.(*memo.WindowExpr)
+		if _window != nil {
+			input := _window.Input
+			fn := _window.Windows
+			private := &_window.WindowPrivate
+			for i := range filters {
+				item := &filters[i]
+				partitionCols := _f.funcs.WindowPartition(private)
+				if _f.funcs.IsDeterminedBy(item, partitionCols, input) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoWindow) {
+						_expr := _f.ConstructSelect(
+							_f.ConstructWindow(
+								_f.ConstructSelect(
+									input,
+									_f.funcs.ExtractDeterminedConditions(filters, partitionCols, input),
+								),
+								fn,
+								private,
+							),
+							_f.funcs.ExtractUndeterminedConditions(filters, partitionCols, input),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoWindow, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistSelectExists]
 	{
 		for i := range filters {
