@@ -19231,7 +19231,7 @@ sqldefault:
 //line sql-gen.y:6869
 		{
 			prec := sqlDollar[3].union.int32()
-			if prec != 6 {
+			if !(prec == 6 || prec == 0) {
 				return unimplementedWithIssue(sqllex, 32098)
 			}
 			if sqlDollar[5].union.bool() {
@@ -19251,7 +19251,7 @@ sqldefault:
 //line sql-gen.y:6885
 		{
 			prec := sqlDollar[3].union.int32()
-			if prec != 6 {
+			if !(prec == 6 || prec == 0) {
 				return unimplementedWithIssue(sqllex, 32098)
 			}
 			sqlVAL.union.val = types.MakeTimestampTZ(prec)
