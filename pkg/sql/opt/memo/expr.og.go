@@ -11477,6 +11477,128 @@ func (e *AggFilterExpr) DataType() *types.T {
 	return e.Typ
 }
 
+// WindowFromOffsetExpr is used as a modifier that wraps the input of a window
+// function. It supplies the expression to be used as the lower bound of the
+// window frame, if the lower bound uses OFFSET mode.
+type WindowFromOffsetExpr struct {
+	Input  opt.ScalarExpr
+	Offset opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &WindowFromOffsetExpr{}
+
+func (e *WindowFromOffsetExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *WindowFromOffsetExpr) Op() opt.Operator {
+	return opt.WindowFromOffsetOp
+}
+
+func (e *WindowFromOffsetExpr) ChildCount() int {
+	return 2
+}
+
+func (e *WindowFromOffsetExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Offset
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *WindowFromOffsetExpr) Private() interface{} {
+	return nil
+}
+
+func (e *WindowFromOffsetExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WindowFromOffsetExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Offset = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *WindowFromOffsetExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// WindowToOffsetExpr is used as a modifier that wraps the input of a window
+// function. It supplies the expression to be used as the upper bound of the
+// window frame, if the upper bound uses OFFSET mode.
+type WindowToOffsetExpr struct {
+	Input  opt.ScalarExpr
+	Offset opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &WindowToOffsetExpr{}
+
+func (e *WindowToOffsetExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *WindowToOffsetExpr) Op() opt.Operator {
+	return opt.WindowToOffsetOp
+}
+
+func (e *WindowToOffsetExpr) ChildCount() int {
+	return 2
+}
+
+func (e *WindowToOffsetExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Offset
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *WindowToOffsetExpr) Private() interface{} {
+	return nil
+}
+
+func (e *WindowToOffsetExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WindowToOffsetExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Offset = child.(opt.ScalarExpr)
+		return
+	}
+	panic(pgerror.AssertionFailedf("child index out of range"))
+}
+
+func (e *WindowToOffsetExpr) DataType() *types.T {
+	return e.Typ
+}
+
 // WindowsExpr is a set of window functions to be computed in the context of a
 // Window expression.
 type WindowsExpr []WindowsItem
@@ -11522,6 +11644,15 @@ func (e *WindowsExpr) DataType() *types.T {
 // WindowsItem is a single window function to be computed in the context of a
 // Window expression.
 type WindowsItem struct {
+	// Function is the window function being computed. If the frame has offset
+	// expressions, the window function will be hanging off of additional
+	// operators containing those expressions, similar to AggDistinct and
+	// AggFilter.
+	//
+	// This is a little clunky sometimes because it means that any time you want
+	// to look at the window function itself you need to go through a helper to
+	// strip off the additional layers. The benefit is that we have additional data
+	// without having a bunch of fields that are empty in the common case.
 	Function opt.ScalarExpr
 	WindowsItemPrivate
 
@@ -11583,8 +11714,11 @@ func (e *WindowsItem) ScalarProps(mem *Memo) *props.Scalar {
 
 type WindowsItemPrivate struct {
 	// Frame is the frame that this item is computed relative to within its
-	// partition. The bounds pointers within it are guaranteed to be non-nil.
-	Frame *tree.WindowFrame
+	// partition. The bounds pointers within it are guaranteed to be non-nil,
+	// however the OFFSET expressions are unused.
+	// TODO(justin): at this point we should probably just have a separate opt
+	// version of this structure.
+	Frame WindowFrame
 	ColPrivate
 }
 
@@ -15487,6 +15621,44 @@ func (m *Memo) MemoizeAggFilter(
 	return interned
 }
 
+func (m *Memo) MemoizeWindowFromOffset(
+	input opt.ScalarExpr,
+	offset opt.ScalarExpr,
+) *WindowFromOffsetExpr {
+	const size = int64(unsafe.Sizeof(WindowFromOffsetExpr{}))
+	e := &WindowFromOffsetExpr{
+		Input:  input,
+		Offset: offset,
+		id:     m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternWindowFromOffset(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeWindowToOffset(
+	input opt.ScalarExpr,
+	offset opt.ScalarExpr,
+) *WindowToOffsetExpr {
+	const size = int64(unsafe.Sizeof(WindowToOffsetExpr{}))
+	e := &WindowToOffsetExpr{
+		Input:  input,
+		Offset: offset,
+		id:     m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternWindowToOffset(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeRank() *RankExpr {
 	return RankSingleton
 }
@@ -16635,6 +16807,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAggDistinct(t)
 	case *AggFilterExpr:
 		return in.InternAggFilter(t)
+	case *WindowFromOffsetExpr:
+		return in.InternWindowFromOffset(t)
+	case *WindowToOffsetExpr:
+		return in.InternWindowToOffset(t)
 	case *WindowsExpr:
 		return in.InternWindows(t)
 	case *WindowsItem:
@@ -19636,6 +19812,46 @@ func (in *interner) InternAggFilter(val *AggFilterExpr) *AggFilterExpr {
 		if existing, ok := in.cache.Item().(*AggFilterExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Filter, existing.Filter) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWindowFromOffset(val *WindowFromOffsetExpr) *WindowFromOffsetExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WindowFromOffsetOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Offset)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WindowFromOffsetExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Offset, existing.Offset) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWindowToOffset(val *WindowToOffsetExpr) *WindowToOffsetExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WindowToOffsetOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Offset)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WindowToOffsetExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Offset, existing.Offset) {
 				return existing
 			}
 		}

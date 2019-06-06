@@ -14061,6 +14061,30 @@ func (_f *Factory) ConstructAggFilter(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructWindowFromOffset constructs an expression for the WindowFromOffset operator.
+// WindowFromOffset is used as a modifier that wraps the input of a window
+// function. It supplies the expression to be used as the lower bound of the
+// window frame, if the lower bound uses OFFSET mode.
+func (_f *Factory) ConstructWindowFromOffset(
+	input opt.ScalarExpr,
+	offset opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeWindowFromOffset(input, offset)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructWindowToOffset constructs an expression for the WindowToOffset operator.
+// WindowToOffset is used as a modifier that wraps the input of a window
+// function. It supplies the expression to be used as the upper bound of the
+// window frame, if the upper bound uses OFFSET mode.
+func (_f *Factory) ConstructWindowToOffset(
+	input opt.ScalarExpr,
+	offset opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeWindowToOffset(input, offset)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructRank constructs an expression for the Rank operator.
 // Rank computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
@@ -15402,6 +15426,22 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.WindowFromOffsetExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		offset := replace(t.Offset).(opt.ScalarExpr)
+		if input != t.Input || offset != t.Offset {
+			return f.ConstructWindowFromOffset(input, offset)
+		}
+		return t
+
+	case *memo.WindowToOffsetExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		offset := replace(t.Offset).(opt.ScalarExpr)
+		if input != t.Input || offset != t.Offset {
+			return f.ConstructWindowToOffset(input, offset)
+		}
+		return t
+
 	case *memo.WindowsExpr:
 		if after, changed := f.replaceWindowsExpr(*t, replace); changed {
 			return &after
@@ -16434,6 +16474,18 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Filter, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.WindowFromOffsetExpr:
+		return f.ConstructWindowFromOffset(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Offset, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.WindowToOffsetExpr:
+		return f.ConstructWindowToOffset(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Offset, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.RankExpr:
 		return t
 
@@ -17247,6 +17299,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.AggFilterOp:
 		return f.ConstructAggFilter(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.WindowFromOffsetOp:
+		return f.ConstructWindowFromOffset(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.WindowToOffsetOp:
+		return f.ConstructWindowToOffset(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
