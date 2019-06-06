@@ -108,6 +108,7 @@ var KeywordsCategories = map[string]string{
 	"experimental_ranges":       "U",
 	"experimental_relocate":     "U",
 	"experimental_replica":      "U",
+	"expiration":                "U",
 	"explain":                   "U",
 	"export":                    "U",
 	"extension":                 "U",
@@ -504,6 +505,7 @@ var KeywordNames = []string{
 	"experimental_ranges",
 	"experimental_relocate",
 	"experimental_replica",
+	"expiration",
 	"explain",
 	"export",
 	"extension",
@@ -1010,6 +1012,8 @@ func GetKeywordID(k string) int32 {
 		return EXPERIMENTAL_RELOCATE
 	case "experimental_replica":
 		return EXPERIMENTAL_REPLICA
+	case "expiration":
+		return EXPIRATION
 	case "explain":
 		return EXPLAIN
 	case "export":
