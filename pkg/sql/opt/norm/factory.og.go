@@ -6,10 +6,9 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
-	"github.com/cockroachdb/cockroach/pkg/sql/pgwire/pgerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
-	"github.com/cockroachdb/cockroach/pkg/util/log"
+	"github.com/cockroachdb/errors"
 )
 
 // ConstructScan constructs an expression for the Scan operator.
@@ -15552,7 +15551,7 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		return t
 
 	}
-	panic(pgerror.AssertionFailedf("unhandled op %s", log.Safe(e.Op())))
+	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
 
 func (f *Factory) replaceProjectionsExpr(list memo.ProjectionsExpr, replace ReplaceFunc) (_ memo.ProjectionsExpr, changed bool) {
@@ -16567,7 +16566,7 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		)
 
 	}
-	panic(pgerror.AssertionFailedf("unhandled op %s", log.Safe(src.Op())))
+	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
 
 func (f *Factory) copyAndReplaceDefaultProjectionsExpr(src memo.ProjectionsExpr, replace ReplaceFunc) (dst memo.ProjectionsExpr) {
@@ -17377,5 +17376,5 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[1].(*memo.CreateTablePrivate),
 		)
 	}
-	panic(pgerror.AssertionFailedf("cannot dynamically construct operator %s", log.Safe(op)))
+	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))
 }

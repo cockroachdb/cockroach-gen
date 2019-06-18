@@ -16276,7 +16276,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:4325
 		{
-			sqllex.Error("syntax error: use AS ( <expr> ) STORED")
+			sqllex.Error("use AS ( <expr> ) STORED")
 			return 1
 		}
 	case 754:
