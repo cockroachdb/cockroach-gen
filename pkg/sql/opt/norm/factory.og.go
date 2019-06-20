@@ -14205,6 +14205,7 @@ func (_f *Factory) ConstructNthValue(
 // mutation columns) by SQL users.
 func (_f *Factory) ConstructInsert(
 	input memo.RelExpr,
+	checks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationInputCols]
@@ -14214,6 +14215,7 @@ func (_f *Factory) ConstructInsert(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructInsert(
 					_f.funcs.PruneCols(input, needed),
+					checks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -14224,7 +14226,7 @@ func (_f *Factory) ConstructInsert(
 		}
 	}
 
-	e := _f.mem.MemoizeInsert(input, mutationPrivate)
+	e := _f.mem.MemoizeInsert(input, checks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14240,6 +14242,7 @@ func (_f *Factory) ConstructInsert(
 // columns that are computed.
 func (_f *Factory) ConstructUpdate(
 	input memo.RelExpr,
+	checks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationFetchCols]
@@ -14249,6 +14252,7 @@ func (_f *Factory) ConstructUpdate(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructUpdate(
 					input,
+					checks,
 					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
@@ -14266,6 +14270,7 @@ func (_f *Factory) ConstructUpdate(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructUpdate(
 					_f.funcs.PruneCols(input, needed),
+					checks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -14276,7 +14281,7 @@ func (_f *Factory) ConstructUpdate(
 		}
 	}
 
-	e := _f.mem.MemoizeUpdate(input, mutationPrivate)
+	e := _f.mem.MemoizeUpdate(input, checks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14299,6 +14304,7 @@ func (_f *Factory) ConstructUpdate(
 // mutation columns that are computed.
 func (_f *Factory) ConstructUpsert(
 	input memo.RelExpr,
+	checks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationFetchCols]
@@ -14308,6 +14314,7 @@ func (_f *Factory) ConstructUpsert(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructUpsert(
 					input,
+					checks,
 					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
@@ -14325,6 +14332,7 @@ func (_f *Factory) ConstructUpsert(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructUpsert(
 					_f.funcs.PruneCols(input, needed),
+					checks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -14335,7 +14343,7 @@ func (_f *Factory) ConstructUpsert(
 		}
 	}
 
-	e := _f.mem.MemoizeUpsert(input, mutationPrivate)
+	e := _f.mem.MemoizeUpsert(input, checks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14347,6 +14355,7 @@ func (_f *Factory) ConstructUpsert(
 //
 func (_f *Factory) ConstructDelete(
 	input memo.RelExpr,
+	checks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationFetchCols]
@@ -14356,6 +14365,7 @@ func (_f *Factory) ConstructDelete(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructDelete(
 					input,
+					checks,
 					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
@@ -14373,6 +14383,7 @@ func (_f *Factory) ConstructDelete(
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructDelete(
 					_f.funcs.PruneCols(input, needed),
+					checks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -14383,7 +14394,7 @@ func (_f *Factory) ConstructDelete(
 		}
 	}
 
-	e := _f.mem.MemoizeDelete(input, mutationPrivate)
+	e := _f.mem.MemoizeDelete(input, checks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -15517,29 +15528,39 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 
 	case *memo.InsertExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructInsert(input, &t.MutationPrivate)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructInsert(input, checks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.UpdateExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructUpdate(input, &t.MutationPrivate)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructUpdate(input, checks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.UpsertExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructUpsert(input, &t.MutationPrivate)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructUpsert(input, checks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.DeleteExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructDelete(input, &t.MutationPrivate)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructDelete(input, checks, &t.MutationPrivate)
+		}
+		return t
+
+	case *memo.FKChecksExpr:
+		if after, changed := f.replaceFKChecksExpr(*t, replace); changed {
+			return &after
 		}
 		return t
 
@@ -15675,6 +15696,27 @@ func (f *Factory) replaceScalarListExpr(list memo.ScalarListExpr, replace Replac
 				copy(newList, list[:i])
 			}
 			newList[i] = after
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFunc) (_ memo.FKChecksExpr, changed bool) {
+	var newList []memo.FKChecksItem
+	for i := range list {
+		before := list[i].Check
+		after := replace(before).(memo.RelExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.FKChecksItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Check = after
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -16538,24 +16580,28 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.InsertExpr:
 		return f.ConstructInsert(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
 	case *memo.UpdateExpr:
 		return f.ConstructUpdate(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
 	case *memo.UpsertExpr:
 		return f.ConstructUpsert(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
 	case *memo.DeleteExpr:
 		return f.ConstructDelete(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
@@ -16618,6 +16664,14 @@ func (f *Factory) copyAndReplaceDefaultScalarListExpr(src memo.ScalarListExpr, r
 	dst = make(memo.ScalarListExpr, len(src))
 	for i := range src {
 		dst[i] = f.invokeReplace(src[i], replace).(opt.ScalarExpr)
+	}
+	return dst
+}
+
+func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, replace ReplaceFunc) (dst memo.FKChecksExpr) {
+	dst = make(memo.FKChecksExpr, len(src))
+	for i := range src {
+		dst[i].Check = f.invokeReplace(src[i].Check, replace).(memo.RelExpr)
 	}
 	return dst
 }
@@ -17353,22 +17407,26 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.InsertOp:
 		return f.ConstructInsert(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.MutationPrivate),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
 		)
 	case opt.UpdateOp:
 		return f.ConstructUpdate(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.MutationPrivate),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
 		)
 	case opt.UpsertOp:
 		return f.ConstructUpsert(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.MutationPrivate),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
 		)
 	case opt.DeleteOp:
 		return f.ConstructDelete(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.MutationPrivate),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
 		)
 	case opt.CreateTableOp:
 		return f.ConstructCreateTable(
