@@ -100,6 +100,752 @@ func (e *SortExpr) setGroup(member exprGroup) {
 	panic(errors.AssertionFailedf("setGroup cannot be called on enforcers"))
 }
 
+// InsertExpr evaluates a relational input expression, and inserts values from it
+// into a target table. The input may be an arbitrarily complex expression:
+//
+//   INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
+//
+// It can also be a simple VALUES clause:
+//
+//   INSERT INTO ab VALUES (1, 2)
+//
+// It may also return rows, which can be further composed:
+//
+//   SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
+//
+// The Insert operator is capable of inserting values into computed columns and
+// mutation columns, which are not writable (or even visible in the case of
+// mutation columns) by SQL users.
+type InsertExpr struct {
+	Input  RelExpr
+	Checks FKChecksExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &InsertExpr{}
+
+func (e *InsertExpr) Op() opt.Operator {
+	return opt.InsertOp
+}
+
+func (e *InsertExpr) ChildCount() int {
+	return 2
+}
+
+func (e *InsertExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Checks
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *InsertExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *InsertExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *InsertExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Checks = *child.(*FKChecksExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *InsertExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *InsertExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *InsertExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *InsertExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *InsertExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *InsertExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *InsertExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *InsertExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *InsertExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *InsertExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *InsertExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type insertGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first InsertExpr
+	best  bestProps
+}
+
+var _ exprGroup = &insertGroup{}
+
+func (g *insertGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *insertGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *insertGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *insertGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type MutationPrivate struct {
+	// Table identifies the table which is being mutated. It is an id that can be
+	// passed to the Metadata.Table method in order to fetch cat.Table metadata.
+	Table opt.TableID
+
+	// InsertCols are columns from the Input expression that will be inserted into
+	// the target table. They must be a subset of the Input expression's output
+	// columns. The count and order of columns corresponds to the count and order
+	// of the target table's columns, including in-progress schema mutation
+	// columns. If any column ID is zero, then that column will not be part of
+	// the insert operation (e.g. delete-only mutation column). Column values are
+	// read from the input columns and are then inserted into the corresponding
+	// table columns. For example:
+	//
+	//   INSERT INTO ab VALUES (1, 2)
+	//
+	// If there is a delete-only mutation column "c", then InsertCols would contain
+	// [a_colid, b_colid, 0].
+	InsertCols opt.ColList
+
+	// FetchCols are columns from the Input expression that will be fetched from
+	// the target table. They must be a subset of the Input expression's output
+	// columns. The count and order of columns corresponds to the count and order
+	// of the target table's columns, including in-progress schema mutation
+	// columns. If any column ID is zero, then that column will not take part in
+	// the update operation (e.g. columns in unreferenced column family).
+	//
+	// Fetch columns are referenced by update, computed, and constraint
+	// expressions. They're also needed to formulate the final key/value pairs;
+	// updating even one column in a family requires the entire value to be
+	// reformulated. For example:
+	//
+	//   CREATE TABLE abcd (
+	//     a INT PRIMARY KEY, b INT, c INT, d INT, e INT,
+	//     FAMILY (a, b), FAMILY (c, d), FAMILY (e))
+	//   UPDATE ab SET c=c+1
+	//
+	// The (a, c, d) columns need to be fetched from the store in order to satisfy
+	// the UPDATE query. The "a" column is needed because it's in the primary key.
+	// The "c" column is needed because its value is used as part of computing an
+	// updated value, and the "d" column is needed because it's in the same family
+	// as "c". Taking all this into account, FetchCols would contain this list:
+	// [a_colid, 0, c_colid, d_colid, 0].
+	FetchCols opt.ColList
+
+	// UpdateCols are columns from the Input expression that contain updated values
+	// for columns of the target table. They must be a subset of the Input
+	// expression's output columns. The count and order of columns corresponds to
+	// the count and order of the target table's columns, including in-progress
+	// schema mutation columns. If any column ID is zero, then that column will not
+	// take part in the update operation (e.g. columns that are not updated).
+	// Updated column values are read from the input columns and are then inserted
+	// into the corresponding table columns. For example:
+	//
+	//   CREATE TABLE abc (a INT PRIMARY KEY, b INT, c INT AS (b+1) AS STORED)
+	//   UPDATE abc SET b=1
+	//
+	// Since column "b" is updated, and "c" is a computed column dependent on "b",
+	// then UpdateCols would contain [0, b_colid, c_colid].
+	UpdateCols opt.ColList
+
+	// CheckCols are columns from the Input expression containing the results of
+	// evaluating the check constraints from the target table. Evaluating a check
+	// check constraint expression produces a boolean value which is projected as
+	// a column and then checked by the mutation operator. Check columns must be
+	// a subset of the Input expression's output columns. The count and order of
+	// columns corresponds to the count and order of the target table's Check
+	// collection (see the opt.Table.CheckCount and opt.Table.Check methods). If
+	// any column ID is zero, then that check will not be performed (i.e. because
+	// it's been statically proved to be true). For example:
+	//
+	//   CREATE TABLE abc (a INT CHECK (a > 0), b INT, c INT CHECK (c <> 0))
+	//   UPDATE abc SET a=1, b=b+1
+	//
+	// Since the check constraint for column "a" can be statically proven to be
+	// true, CheckCols would contain [0, b_colid].
+	CheckCols opt.ColList
+
+	// CanaryCol is used only with the Upsert operator. It identifies the column
+	// that the execution engine uses to decide whether to insert or to update.
+	// If the canary column value is null for a particular input row, then a new
+	// row is inserted into the table. Otherwise, the existing row is updated.
+	// While CanaryCol is 0 for all non-Upsert operators, it is also 0 for the
+	// "blind" Upsert case in which a "Put" KV operator inserts a new row or
+	// overwrites an existing row.
+	CanaryCol opt.ColumnID
+
+	// ReturnCols are the set of columns returned by the mutation operator when
+	// the RETURNING clause has been specified. By default, the return columns
+	// include all columns in the table, including hidden columns, but not
+	// including any columns that are undergoing mutation (being added or dropped
+	// as part of online schema change). If no RETURNING clause was specified,
+	// then ReturnCols is nil.
+	ReturnCols opt.ColList
+}
+
+// UpdateExpr evaluates a relational input expression that fetches existing rows from
+// a target table and computes new values for one or more columns. Arbitrary
+// subsets of rows can be selected from the target table and processed in order,
+// as with this example:
+//
+//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
+//
+// The Update operator will also update any computed columns, including mutation
+// columns that are computed.
+type UpdateExpr struct {
+	Input  RelExpr
+	Checks FKChecksExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &UpdateExpr{}
+
+func (e *UpdateExpr) Op() opt.Operator {
+	return opt.UpdateOp
+}
+
+func (e *UpdateExpr) ChildCount() int {
+	return 2
+}
+
+func (e *UpdateExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Checks
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UpdateExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *UpdateExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UpdateExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Checks = *child.(*FKChecksExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UpdateExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UpdateExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UpdateExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UpdateExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UpdateExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *UpdateExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *UpdateExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *UpdateExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UpdateExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *UpdateExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UpdateExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type updateGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first UpdateExpr
+	best  bestProps
+}
+
+var _ exprGroup = &updateGroup{}
+
+func (g *updateGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *updateGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *updateGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *updateGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// UpsertExpr evaluates a relational input expression that tries to insert a new row
+// into a target table. If a conflicting row already exists, then Upsert will
+// instead update the existing row. The Upsert operator is used for all of these
+// syntactic variants:
+//
+//   INSERT..ON CONFLICT DO UPDATE
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
+//
+//   INSERT..ON CONFLICT DO NOTHING
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
+//
+//   UPSERT
+//     UPSERT INTO abc VALUES (1, 2, 3)
+//
+// The Update operator will also insert/update any computed columns, including
+// mutation columns that are computed.
+type UpsertExpr struct {
+	Input  RelExpr
+	Checks FKChecksExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &UpsertExpr{}
+
+func (e *UpsertExpr) Op() opt.Operator {
+	return opt.UpsertOp
+}
+
+func (e *UpsertExpr) ChildCount() int {
+	return 2
+}
+
+func (e *UpsertExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Checks
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UpsertExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *UpsertExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UpsertExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Checks = *child.(*FKChecksExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UpsertExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UpsertExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UpsertExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UpsertExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UpsertExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *UpsertExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *UpsertExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *UpsertExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UpsertExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *UpsertExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UpsertExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type upsertGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first UpsertExpr
+	best  bestProps
+}
+
+var _ exprGroup = &upsertGroup{}
+
+func (g *upsertGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *upsertGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *upsertGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *upsertGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// DeleteExpr is an operator used to delete all rows that are selected by a
+// relational input expression:
+//
+//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
+//
+type DeleteExpr struct {
+	Input  RelExpr
+	Checks FKChecksExpr
+	MutationPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &DeleteExpr{}
+
+func (e *DeleteExpr) Op() opt.Operator {
+	return opt.DeleteOp
+}
+
+func (e *DeleteExpr) ChildCount() int {
+	return 2
+}
+
+func (e *DeleteExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Checks
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *DeleteExpr) Private() interface{} {
+	return &e.MutationPrivate
+}
+
+func (e *DeleteExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *DeleteExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Checks = *child.(*FKChecksExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *DeleteExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *DeleteExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *DeleteExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *DeleteExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *DeleteExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *DeleteExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *DeleteExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *DeleteExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *DeleteExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *DeleteExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *DeleteExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type deleteGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first DeleteExpr
+	best  bestProps
+}
+
+var _ exprGroup = &deleteGroup{}
+
+func (g *deleteGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *deleteGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *deleteGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *deleteGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// FKChecksExpr is a list of foreign key check queries, to be run after the main
+// query.
+type FKChecksExpr []FKChecksItem
+
+var EmptyFKChecksExpr = FKChecksExpr{}
+
+var _ opt.ScalarExpr = &FKChecksExpr{}
+
+func (e *FKChecksExpr) ID() opt.ScalarID {
+	panic(errors.AssertionFailedf("lists have no id"))
+}
+
+func (e *FKChecksExpr) Op() opt.Operator {
+	return opt.FKChecksOp
+}
+
+func (e *FKChecksExpr) ChildCount() int {
+	return len(*e)
+}
+
+func (e *FKChecksExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
+}
+
+func (e *FKChecksExpr) Private() interface{} {
+	return nil
+}
+
+func (e *FKChecksExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FKChecksExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*FKChecksItem)
+}
+
+func (e *FKChecksExpr) DataType() *types.T {
+	return types.Any
+}
+
+// FKChecksItem is a foreign key check query, to be run after the main query.
+// An execution error will be generated if the query returns any results.
+type FKChecksItem struct {
+	Check RelExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &FKChecksItem{}
+
+func (e *FKChecksItem) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *FKChecksItem) Op() opt.Operator {
+	return opt.FKChecksItemOp
+}
+
+func (e *FKChecksItem) ChildCount() int {
+	return 1
+}
+
+func (e *FKChecksItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Check
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *FKChecksItem) Private() interface{} {
+	return nil
+}
+
+func (e *FKChecksItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *FKChecksItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Check = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *FKChecksItem) DataType() *types.T {
+	return e.Typ
+}
+
 // ScanExpr returns a result set containing every row in a table by scanning one of
 // the table's indexes according to its ordering. The ScanPrivate field
 // identifies the table and index to scan, as well as the subset of columns to
@@ -4869,266 +5615,6 @@ func (g *max1RowGroup) firstExpr() RelExpr {
 
 func (g *max1RowGroup) bestProps() *bestProps {
 	return &g.best
-}
-
-// ExplainExpr returns information about the execution plan of the "input"
-// expression.
-type ExplainExpr struct {
-	Input RelExpr
-	ExplainPrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &ExplainExpr{}
-
-func (e *ExplainExpr) Op() opt.Operator {
-	return opt.ExplainOp
-}
-
-func (e *ExplainExpr) ChildCount() int {
-	return 1
-}
-
-func (e *ExplainExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Input
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *ExplainExpr) Private() interface{} {
-	return &e.ExplainPrivate
-}
-
-func (e *ExplainExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *ExplainExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Input = child.(RelExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *ExplainExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *ExplainExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *ExplainExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *ExplainExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *ExplainExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *ExplainExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *ExplainExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *ExplainExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *ExplainExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *ExplainExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *ExplainExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type explainGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first ExplainExpr
-	best  bestProps
-}
-
-var _ exprGroup = &explainGroup{}
-
-func (g *explainGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *explainGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *explainGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *explainGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-type ExplainPrivate struct {
-	// Options contains settings that control the output of the explain statement.
-	Options tree.ExplainOptions
-
-	// ColList stores the column IDs for the explain columns.
-	ColList opt.ColList
-
-	// Props stores the required physical properties for the enclosed expression.
-	Props *physical.Required
-
-	// StmtType stores the type of the statement we are explaining.
-	StmtType tree.StatementType
-}
-
-// ShowTraceForSessionExpr returns the current session traces.
-type ShowTraceForSessionExpr struct {
-	ShowTracePrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &ShowTraceForSessionExpr{}
-
-func (e *ShowTraceForSessionExpr) Op() opt.Operator {
-	return opt.ShowTraceForSessionOp
-}
-
-func (e *ShowTraceForSessionExpr) ChildCount() int {
-	return 0
-}
-
-func (e *ShowTraceForSessionExpr) Child(nth int) opt.Expr {
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *ShowTraceForSessionExpr) Private() interface{} {
-	return &e.ShowTracePrivate
-}
-
-func (e *ShowTraceForSessionExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *ShowTraceForSessionExpr) SetChild(nth int, child opt.Expr) {
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *ShowTraceForSessionExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *ShowTraceForSessionExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *ShowTraceForSessionExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *ShowTraceForSessionExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *ShowTraceForSessionExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *ShowTraceForSessionExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *ShowTraceForSessionExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *ShowTraceForSessionExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *ShowTraceForSessionExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *ShowTraceForSessionExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *ShowTraceForSessionExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type showTraceForSessionGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first ShowTraceForSessionExpr
-	best  bestProps
-}
-
-var _ exprGroup = &showTraceForSessionGroup{}
-
-func (g *showTraceForSessionGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *showTraceForSessionGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *showTraceForSessionGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *showTraceForSessionGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-type ShowTracePrivate struct {
-	TraceType tree.ShowTraceType
-
-	// Compact indicates that we output a smaller set of columns; set
-	// when SHOW COMPACT [KV] TRACE is used.
-	Compact bool
-
-	// ColList stores the column IDs for the SHOW TRACE columns.
-	ColList opt.ColList
 }
 
 // OrdinalityExpr adds a column to each row in its input containing a unique,
@@ -12339,752 +12825,6 @@ func (e *ScalarListExpr) DataType() *types.T {
 	return types.Any
 }
 
-// InsertExpr evaluates a relational input expression, and inserts values from it
-// into a target table. The input may be an arbitrarily complex expression:
-//
-//   INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
-//
-// It can also be a simple VALUES clause:
-//
-//   INSERT INTO ab VALUES (1, 2)
-//
-// It may also return rows, which can be further composed:
-//
-//   SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
-//
-// The Insert operator is capable of inserting values into computed columns and
-// mutation columns, which are not writable (or even visible in the case of
-// mutation columns) by SQL users.
-type InsertExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
-	MutationPrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &InsertExpr{}
-
-func (e *InsertExpr) Op() opt.Operator {
-	return opt.InsertOp
-}
-
-func (e *InsertExpr) ChildCount() int {
-	return 2
-}
-
-func (e *InsertExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Input
-	case 1:
-		return &e.Checks
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *InsertExpr) Private() interface{} {
-	return &e.MutationPrivate
-}
-
-func (e *InsertExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *InsertExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Input = child.(RelExpr)
-		return
-	case 1:
-		e.Checks = *child.(*FKChecksExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *InsertExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *InsertExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *InsertExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *InsertExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *InsertExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *InsertExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *InsertExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *InsertExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *InsertExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *InsertExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *InsertExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type insertGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first InsertExpr
-	best  bestProps
-}
-
-var _ exprGroup = &insertGroup{}
-
-func (g *insertGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *insertGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *insertGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *insertGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-type MutationPrivate struct {
-	// Table identifies the table which is being mutated. It is an id that can be
-	// passed to the Metadata.Table method in order to fetch cat.Table metadata.
-	Table opt.TableID
-
-	// InsertCols are columns from the Input expression that will be inserted into
-	// the target table. They must be a subset of the Input expression's output
-	// columns. The count and order of columns corresponds to the count and order
-	// of the target table's columns, including in-progress schema mutation
-	// columns. If any column ID is zero, then that column will not be part of
-	// the insert operation (e.g. delete-only mutation column). Column values are
-	// read from the input columns and are then inserted into the corresponding
-	// table columns. For example:
-	//
-	//   INSERT INTO ab VALUES (1, 2)
-	//
-	// If there is a delete-only mutation column "c", then InsertCols would contain
-	// [a_colid, b_colid, 0].
-	InsertCols opt.ColList
-
-	// FetchCols are columns from the Input expression that will be fetched from
-	// the target table. They must be a subset of the Input expression's output
-	// columns. The count and order of columns corresponds to the count and order
-	// of the target table's columns, including in-progress schema mutation
-	// columns. If any column ID is zero, then that column will not take part in
-	// the update operation (e.g. columns in unreferenced column family).
-	//
-	// Fetch columns are referenced by update, computed, and constraint
-	// expressions. They're also needed to formulate the final key/value pairs;
-	// updating even one column in a family requires the entire value to be
-	// reformulated. For example:
-	//
-	//   CREATE TABLE abcd (
-	//     a INT PRIMARY KEY, b INT, c INT, d INT, e INT,
-	//     FAMILY (a, b), FAMILY (c, d), FAMILY (e))
-	//   UPDATE ab SET c=c+1
-	//
-	// The (a, c, d) columns need to be fetched from the store in order to satisfy
-	// the UPDATE query. The "a" column is needed because it's in the primary key.
-	// The "c" column is needed because its value is used as part of computing an
-	// updated value, and the "d" column is needed because it's in the same family
-	// as "c". Taking all this into account, FetchCols would contain this list:
-	// [a_colid, 0, c_colid, d_colid, 0].
-	FetchCols opt.ColList
-
-	// UpdateCols are columns from the Input expression that contain updated values
-	// for columns of the target table. They must be a subset of the Input
-	// expression's output columns. The count and order of columns corresponds to
-	// the count and order of the target table's columns, including in-progress
-	// schema mutation columns. If any column ID is zero, then that column will not
-	// take part in the update operation (e.g. columns that are not updated).
-	// Updated column values are read from the input columns and are then inserted
-	// into the corresponding table columns. For example:
-	//
-	//   CREATE TABLE abc (a INT PRIMARY KEY, b INT, c INT AS (b+1) AS STORED)
-	//   UPDATE abc SET b=1
-	//
-	// Since column "b" is updated, and "c" is a computed column dependent on "b",
-	// then UpdateCols would contain [0, b_colid, c_colid].
-	UpdateCols opt.ColList
-
-	// CheckCols are columns from the Input expression containing the results of
-	// evaluating the check constraints from the target table. Evaluating a check
-	// check constraint expression produces a boolean value which is projected as
-	// a column and then checked by the mutation operator. Check columns must be
-	// a subset of the Input expression's output columns. The count and order of
-	// columns corresponds to the count and order of the target table's Check
-	// collection (see the opt.Table.CheckCount and opt.Table.Check methods). If
-	// any column ID is zero, then that check will not be performed (i.e. because
-	// it's been statically proved to be true). For example:
-	//
-	//   CREATE TABLE abc (a INT CHECK (a > 0), b INT, c INT CHECK (c <> 0))
-	//   UPDATE abc SET a=1, b=b+1
-	//
-	// Since the check constraint for column "a" can be statically proven to be
-	// true, CheckCols would contain [0, b_colid].
-	CheckCols opt.ColList
-
-	// CanaryCol is used only with the Upsert operator. It identifies the column
-	// that the execution engine uses to decide whether to insert or to update.
-	// If the canary column value is null for a particular input row, then a new
-	// row is inserted into the table. Otherwise, the existing row is updated.
-	// While CanaryCol is 0 for all non-Upsert operators, it is also 0 for the
-	// "blind" Upsert case in which a "Put" KV operator inserts a new row or
-	// overwrites an existing row.
-	CanaryCol opt.ColumnID
-
-	// ReturnCols are the set of columns returned by the mutation operator when
-	// the RETURNING clause has been specified. By default, the return columns
-	// include all columns in the table, including hidden columns, but not
-	// including any columns that are undergoing mutation (being added or dropped
-	// as part of online schema change). If no RETURNING clause was specified,
-	// then ReturnCols is nil.
-	ReturnCols opt.ColList
-}
-
-// UpdateExpr evaluates a relational input expression that fetches existing rows from
-// a target table and computes new values for one or more columns. Arbitrary
-// subsets of rows can be selected from the target table and processed in order,
-// as with this example:
-//
-//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
-//
-// The Update operator will also update any computed columns, including mutation
-// columns that are computed.
-type UpdateExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
-	MutationPrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &UpdateExpr{}
-
-func (e *UpdateExpr) Op() opt.Operator {
-	return opt.UpdateOp
-}
-
-func (e *UpdateExpr) ChildCount() int {
-	return 2
-}
-
-func (e *UpdateExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Input
-	case 1:
-		return &e.Checks
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *UpdateExpr) Private() interface{} {
-	return &e.MutationPrivate
-}
-
-func (e *UpdateExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *UpdateExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Input = child.(RelExpr)
-		return
-	case 1:
-		e.Checks = *child.(*FKChecksExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *UpdateExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *UpdateExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *UpdateExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *UpdateExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *UpdateExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *UpdateExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *UpdateExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *UpdateExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *UpdateExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *UpdateExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *UpdateExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type updateGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first UpdateExpr
-	best  bestProps
-}
-
-var _ exprGroup = &updateGroup{}
-
-func (g *updateGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *updateGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *updateGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *updateGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-// UpsertExpr evaluates a relational input expression that tries to insert a new row
-// into a target table. If a conflicting row already exists, then Upsert will
-// instead update the existing row. The Upsert operator is used for all of these
-// syntactic variants:
-//
-//   INSERT..ON CONFLICT DO UPDATE
-//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
-//
-//   INSERT..ON CONFLICT DO NOTHING
-//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
-//
-//   UPSERT
-//     UPSERT INTO abc VALUES (1, 2, 3)
-//
-// The Update operator will also insert/update any computed columns, including
-// mutation columns that are computed.
-type UpsertExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
-	MutationPrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &UpsertExpr{}
-
-func (e *UpsertExpr) Op() opt.Operator {
-	return opt.UpsertOp
-}
-
-func (e *UpsertExpr) ChildCount() int {
-	return 2
-}
-
-func (e *UpsertExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Input
-	case 1:
-		return &e.Checks
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *UpsertExpr) Private() interface{} {
-	return &e.MutationPrivate
-}
-
-func (e *UpsertExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *UpsertExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Input = child.(RelExpr)
-		return
-	case 1:
-		e.Checks = *child.(*FKChecksExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *UpsertExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *UpsertExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *UpsertExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *UpsertExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *UpsertExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *UpsertExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *UpsertExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *UpsertExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *UpsertExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *UpsertExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *UpsertExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type upsertGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first UpsertExpr
-	best  bestProps
-}
-
-var _ exprGroup = &upsertGroup{}
-
-func (g *upsertGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *upsertGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *upsertGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *upsertGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-// DeleteExpr is an operator used to delete all rows that are selected by a
-// relational input expression:
-//
-//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
-//
-type DeleteExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
-	MutationPrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &DeleteExpr{}
-
-func (e *DeleteExpr) Op() opt.Operator {
-	return opt.DeleteOp
-}
-
-func (e *DeleteExpr) ChildCount() int {
-	return 2
-}
-
-func (e *DeleteExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Input
-	case 1:
-		return &e.Checks
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *DeleteExpr) Private() interface{} {
-	return &e.MutationPrivate
-}
-
-func (e *DeleteExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *DeleteExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Input = child.(RelExpr)
-		return
-	case 1:
-		e.Checks = *child.(*FKChecksExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *DeleteExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *DeleteExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *DeleteExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *DeleteExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *DeleteExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *DeleteExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *DeleteExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *DeleteExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *DeleteExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *DeleteExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *DeleteExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type deleteGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first DeleteExpr
-	best  bestProps
-}
-
-var _ exprGroup = &deleteGroup{}
-
-func (g *deleteGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *deleteGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *deleteGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *deleteGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-// FKChecksExpr is a list of foreign key check queries, to be run after the main
-// query.
-type FKChecksExpr []FKChecksItem
-
-var EmptyFKChecksExpr = FKChecksExpr{}
-
-var _ opt.ScalarExpr = &FKChecksExpr{}
-
-func (e *FKChecksExpr) ID() opt.ScalarID {
-	panic(errors.AssertionFailedf("lists have no id"))
-}
-
-func (e *FKChecksExpr) Op() opt.Operator {
-	return opt.FKChecksOp
-}
-
-func (e *FKChecksExpr) ChildCount() int {
-	return len(*e)
-}
-
-func (e *FKChecksExpr) Child(nth int) opt.Expr {
-	return &(*e)[nth]
-}
-
-func (e *FKChecksExpr) Private() interface{} {
-	return nil
-}
-
-func (e *FKChecksExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *FKChecksExpr) SetChild(nth int, child opt.Expr) {
-	(*e)[nth] = *child.(*FKChecksItem)
-}
-
-func (e *FKChecksExpr) DataType() *types.T {
-	return types.Any
-}
-
-// FKChecksItem is a foreign key check query, to be run after the main query.
-// An execution error will be generated if the query returns any results.
-type FKChecksItem struct {
-	Check RelExpr
-
-	Typ *types.T
-	id  opt.ScalarID
-}
-
-var _ opt.ScalarExpr = &FKChecksItem{}
-
-func (e *FKChecksItem) ID() opt.ScalarID {
-	return e.id
-}
-
-func (e *FKChecksItem) Op() opt.Operator {
-	return opt.FKChecksItemOp
-}
-
-func (e *FKChecksItem) ChildCount() int {
-	return 1
-}
-
-func (e *FKChecksItem) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Check
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *FKChecksItem) Private() interface{} {
-	return nil
-}
-
-func (e *FKChecksItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *FKChecksItem) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Check = child.(RelExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *FKChecksItem) DataType() *types.T {
-	return e.Typ
-}
-
 // CreateTableExpr represents a CREATE TABLE statement.
 type CreateTableExpr struct {
 	// Input is only used if the AS clause was used in the CREATE TABLE
@@ -13220,6 +12960,354 @@ type CreateTablePrivate struct {
 
 	// Syntax is the CREATE TABLE AST node.
 	Syntax *tree.CreateTable
+}
+
+// ExplainExpr returns information about the execution plan of the "input"
+// expression.
+type ExplainExpr struct {
+	Input RelExpr
+	ExplainPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ExplainExpr{}
+
+func (e *ExplainExpr) Op() opt.Operator {
+	return opt.ExplainOp
+}
+
+func (e *ExplainExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ExplainExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ExplainExpr) Private() interface{} {
+	return &e.ExplainPrivate
+}
+
+func (e *ExplainExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ExplainExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ExplainExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ExplainExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ExplainExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ExplainExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ExplainExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ExplainExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *ExplainExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ExplainExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ExplainExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ExplainExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ExplainExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type explainGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ExplainExpr
+	best  bestProps
+}
+
+var _ exprGroup = &explainGroup{}
+
+func (g *explainGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *explainGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *explainGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *explainGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ExplainPrivate struct {
+	// Options contains settings that control the output of the explain statement.
+	Options tree.ExplainOptions
+
+	// ColList stores the column IDs for the explain columns.
+	ColList opt.ColList
+
+	// Props stores the required physical properties for the enclosed expression.
+	Props *physical.Required
+
+	// StmtType stores the type of the statement we are explaining.
+	StmtType tree.StatementType
+}
+
+// ShowTraceForSessionExpr returns the current session traces.
+type ShowTraceForSessionExpr struct {
+	ShowTracePrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ShowTraceForSessionExpr{}
+
+func (e *ShowTraceForSessionExpr) Op() opt.Operator {
+	return opt.ShowTraceForSessionOp
+}
+
+func (e *ShowTraceForSessionExpr) ChildCount() int {
+	return 0
+}
+
+func (e *ShowTraceForSessionExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ShowTraceForSessionExpr) Private() interface{} {
+	return &e.ShowTracePrivate
+}
+
+func (e *ShowTraceForSessionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ShowTraceForSessionExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ShowTraceForSessionExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ShowTraceForSessionExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ShowTraceForSessionExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ShowTraceForSessionExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ShowTraceForSessionExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ShowTraceForSessionExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *ShowTraceForSessionExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ShowTraceForSessionExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ShowTraceForSessionExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ShowTraceForSessionExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ShowTraceForSessionExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type showTraceForSessionGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ShowTraceForSessionExpr
+	best  bestProps
+}
+
+var _ exprGroup = &showTraceForSessionGroup{}
+
+func (g *showTraceForSessionGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *showTraceForSessionGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *showTraceForSessionGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *showTraceForSessionGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ShowTracePrivate struct {
+	TraceType tree.ShowTraceType
+
+	// Compact indicates that we output a smaller set of columns; set
+	// when SHOW COMPACT [KV] TRACE is used.
+	Compact bool
+
+	// ColList stores the column IDs for the SHOW TRACE columns.
+	ColList opt.ColList
+}
+
+func (m *Memo) MemoizeInsert(
+	input RelExpr,
+	checks FKChecksExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(insertGroup{}))
+	grp := &insertGroup{mem: m, first: InsertExpr{
+		Input:           input,
+		Checks:          checks,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternInsert(e)
+	if interned == e {
+		m.logPropsBuilder.buildInsertProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeUpdate(
+	input RelExpr,
+	checks FKChecksExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(updateGroup{}))
+	grp := &updateGroup{mem: m, first: UpdateExpr{
+		Input:           input,
+		Checks:          checks,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUpdate(e)
+	if interned == e {
+		m.logPropsBuilder.buildUpdateProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeUpsert(
+	input RelExpr,
+	checks FKChecksExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(upsertGroup{}))
+	grp := &upsertGroup{mem: m, first: UpsertExpr{
+		Input:           input,
+		Checks:          checks,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUpsert(e)
+	if interned == e {
+		m.logPropsBuilder.buildUpsertProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeDelete(
+	input RelExpr,
+	checks FKChecksExpr,
+	mutationPrivate *MutationPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(deleteGroup{}))
+	grp := &deleteGroup{mem: m, first: DeleteExpr{
+		Input:           input,
+		Checks:          checks,
+		MutationPrivate: *mutationPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternDelete(e)
+	if interned == e {
+		m.logPropsBuilder.buildDeleteProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
 }
 
 func (m *Memo) MemoizeScan(
@@ -13966,44 +14054,6 @@ func (m *Memo) MemoizeMax1Row(
 	interned := m.interner.InternMax1Row(e)
 	if interned == e {
 		m.logPropsBuilder.buildMax1RowProps(e, &grp.rel)
-		m.memEstimate += size
-		m.checkExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
-func (m *Memo) MemoizeExplain(
-	input RelExpr,
-	explainPrivate *ExplainPrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(explainGroup{}))
-	grp := &explainGroup{mem: m, first: ExplainExpr{
-		Input:          input,
-		ExplainPrivate: *explainPrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternExplain(e)
-	if interned == e {
-		m.logPropsBuilder.buildExplainProps(e, &grp.rel)
-		m.memEstimate += size
-		m.checkExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
-func (m *Memo) MemoizeShowTraceForSession(
-	showTracePrivate *ShowTracePrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(showTraceForSessionGroup{}))
-	grp := &showTraceForSessionGroup{mem: m, first: ShowTraceForSessionExpr{
-		ShowTracePrivate: *showTracePrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternShowTraceForSession(e)
-	if interned == e {
-		m.logPropsBuilder.buildShowTraceForSessionProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -15911,94 +15961,6 @@ func (m *Memo) MemoizeNthValue(
 	return interned
 }
 
-func (m *Memo) MemoizeInsert(
-	input RelExpr,
-	checks FKChecksExpr,
-	mutationPrivate *MutationPrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(insertGroup{}))
-	grp := &insertGroup{mem: m, first: InsertExpr{
-		Input:           input,
-		Checks:          checks,
-		MutationPrivate: *mutationPrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternInsert(e)
-	if interned == e {
-		m.logPropsBuilder.buildInsertProps(e, &grp.rel)
-		m.memEstimate += size
-		m.checkExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
-func (m *Memo) MemoizeUpdate(
-	input RelExpr,
-	checks FKChecksExpr,
-	mutationPrivate *MutationPrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(updateGroup{}))
-	grp := &updateGroup{mem: m, first: UpdateExpr{
-		Input:           input,
-		Checks:          checks,
-		MutationPrivate: *mutationPrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternUpdate(e)
-	if interned == e {
-		m.logPropsBuilder.buildUpdateProps(e, &grp.rel)
-		m.memEstimate += size
-		m.checkExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
-func (m *Memo) MemoizeUpsert(
-	input RelExpr,
-	checks FKChecksExpr,
-	mutationPrivate *MutationPrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(upsertGroup{}))
-	grp := &upsertGroup{mem: m, first: UpsertExpr{
-		Input:           input,
-		Checks:          checks,
-		MutationPrivate: *mutationPrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternUpsert(e)
-	if interned == e {
-		m.logPropsBuilder.buildUpsertProps(e, &grp.rel)
-		m.memEstimate += size
-		m.checkExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
-func (m *Memo) MemoizeDelete(
-	input RelExpr,
-	checks FKChecksExpr,
-	mutationPrivate *MutationPrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(deleteGroup{}))
-	grp := &deleteGroup{mem: m, first: DeleteExpr{
-		Input:           input,
-		Checks:          checks,
-		MutationPrivate: *mutationPrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternDelete(e)
-	if interned == e {
-		m.logPropsBuilder.buildDeleteProps(e, &grp.rel)
-		m.memEstimate += size
-		m.checkExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
 func (m *Memo) MemoizeCreateTable(
 	input RelExpr,
 	createTablePrivate *CreateTablePrivate,
@@ -16017,6 +15979,100 @@ func (m *Memo) MemoizeCreateTable(
 		m.checkExpr(e)
 	}
 	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeExplain(
+	input RelExpr,
+	explainPrivate *ExplainPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(explainGroup{}))
+	grp := &explainGroup{mem: m, first: ExplainExpr{
+		Input:          input,
+		ExplainPrivate: *explainPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternExplain(e)
+	if interned == e {
+		m.logPropsBuilder.buildExplainProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeShowTraceForSession(
+	showTracePrivate *ShowTracePrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(showTraceForSessionGroup{}))
+	grp := &showTraceForSessionGroup{mem: m, first: ShowTraceForSessionExpr{
+		ShowTracePrivate: *showTracePrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternShowTraceForSession(e)
+	if interned == e {
+		m.logPropsBuilder.buildShowTraceForSessionProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
+	const size = int64(unsafe.Sizeof(InsertExpr{}))
+	interned := m.interner.InternInsert(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
+	const size = int64(unsafe.Sizeof(UpdateExpr{}))
+	interned := m.interner.InternUpdate(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddUpsertToGroup(e *UpsertExpr, grp RelExpr) *UpsertExpr {
+	const size = int64(unsafe.Sizeof(UpsertExpr{}))
+	interned := m.interner.InternUpsert(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddDeleteToGroup(e *DeleteExpr, grp RelExpr) *DeleteExpr {
+	const size = int64(unsafe.Sizeof(DeleteExpr{}))
+	interned := m.interner.InternDelete(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
 }
 
 func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
@@ -16495,34 +16551,6 @@ func (m *Memo) AddMax1RowToGroup(e *Max1RowExpr, grp RelExpr) *Max1RowExpr {
 	return interned
 }
 
-func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
-	const size = int64(unsafe.Sizeof(ExplainExpr{}))
-	interned := m.interner.InternExplain(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.checkExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
-func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp RelExpr) *ShowTraceForSessionExpr {
-	const size = int64(unsafe.Sizeof(ShowTraceForSessionExpr{}))
-	interned := m.interner.InternShowTraceForSession(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.checkExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
 func (m *Memo) AddOrdinalityToGroup(e *OrdinalityExpr, grp RelExpr) *OrdinalityExpr {
 	const size = int64(unsafe.Sizeof(OrdinalityExpr{}))
 	interned := m.interner.InternOrdinality(e)
@@ -16579,62 +16607,6 @@ func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
 	return interned
 }
 
-func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
-	const size = int64(unsafe.Sizeof(InsertExpr{}))
-	interned := m.interner.InternInsert(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.checkExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
-func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
-	const size = int64(unsafe.Sizeof(UpdateExpr{}))
-	interned := m.interner.InternUpdate(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.checkExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
-func (m *Memo) AddUpsertToGroup(e *UpsertExpr, grp RelExpr) *UpsertExpr {
-	const size = int64(unsafe.Sizeof(UpsertExpr{}))
-	interned := m.interner.InternUpsert(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.checkExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
-func (m *Memo) AddDeleteToGroup(e *DeleteExpr, grp RelExpr) *DeleteExpr {
-	const size = int64(unsafe.Sizeof(DeleteExpr{}))
-	interned := m.interner.InternDelete(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.checkExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
 func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTableExpr {
 	const size = int64(unsafe.Sizeof(CreateTableExpr{}))
 	interned := m.interner.InternCreateTable(e)
@@ -16649,8 +16621,48 @@ func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTab
 	return interned
 }
 
+func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
+	const size = int64(unsafe.Sizeof(ExplainExpr{}))
+	interned := m.interner.InternExplain(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp RelExpr) *ShowTraceForSessionExpr {
+	const size = int64(unsafe.Sizeof(ShowTraceForSessionExpr{}))
+	interned := m.interner.InternShowTraceForSession(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
+	case *InsertExpr:
+		return in.InternInsert(t)
+	case *UpdateExpr:
+		return in.InternUpdate(t)
+	case *UpsertExpr:
+		return in.InternUpsert(t)
+	case *DeleteExpr:
+		return in.InternDelete(t)
+	case *FKChecksExpr:
+		return in.InternFKChecks(t)
+	case *FKChecksItem:
+		return in.InternFKChecksItem(t)
 	case *ScanExpr:
 		return in.InternScan(t)
 	case *VirtualScanExpr:
@@ -16719,10 +16731,6 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternOffset(t)
 	case *Max1RowExpr:
 		return in.InternMax1Row(t)
-	case *ExplainExpr:
-		return in.InternExplain(t)
-	case *ShowTraceForSessionExpr:
-		return in.InternShowTraceForSession(t)
 	case *OrdinalityExpr:
 		return in.InternOrdinality(t)
 	case *ProjectSetExpr:
@@ -16967,23 +16975,187 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternNthValue(t)
 	case *ScalarListExpr:
 		return in.InternScalarList(t)
-	case *InsertExpr:
-		return in.InternInsert(t)
-	case *UpdateExpr:
-		return in.InternUpdate(t)
-	case *UpsertExpr:
-		return in.InternUpsert(t)
-	case *DeleteExpr:
-		return in.InternDelete(t)
-	case *FKChecksExpr:
-		return in.InternFKChecks(t)
-	case *FKChecksItem:
-		return in.InternFKChecksItem(t)
 	case *CreateTableExpr:
 		return in.InternCreateTable(t)
+	case *ExplainExpr:
+		return in.InternExplain(t)
+	case *ShowTraceForSessionExpr:
+		return in.InternShowTraceForSession(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
+}
+
+func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.InsertOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
+	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashColList(val.ReturnCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*InsertExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UpdateOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
+	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashColList(val.ReturnCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UpdateExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UpsertOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
+	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashColList(val.ReturnCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UpsertExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.DeleteOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashColList(val.InsertCols)
+	in.hasher.HashColList(val.FetchCols)
+	in.hasher.HashColList(val.UpdateCols)
+	in.hasher.HashColList(val.CheckCols)
+	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashColList(val.ReturnCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*DeleteExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFKChecks(val *FKChecksExpr) *FKChecksExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FKChecksOp)
+	in.hasher.HashFKChecksExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FKChecksExpr); ok {
+			if in.hasher.IsFKChecksExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternFKChecksItem(val *FKChecksItem) *FKChecksItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.FKChecksItemOp)
+	in.hasher.HashRelExpr(val.Check)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*FKChecksItem); ok {
+			if in.hasher.IsRelExprEqual(val.Check, existing.Check) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
 }
 
 func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
@@ -17813,54 +17985,6 @@ func (in *interner) InternMax1Row(val *Max1RowExpr) *Max1RowExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*Max1RowExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.ExplainOp)
-	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashExplainOptions(val.Options)
-	in.hasher.HashColList(val.ColList)
-	in.hasher.HashPhysProps(val.Props)
-	in.hasher.HashStatementType(val.StmtType)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*ExplainExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsExplainOptionsEqual(val.Options, existing.Options) &&
-				in.hasher.IsColListEqual(val.ColList, existing.ColList) &&
-				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
-				in.hasher.IsStatementTypeEqual(val.StmtType, existing.StmtType) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternShowTraceForSession(val *ShowTraceForSessionExpr) *ShowTraceForSessionExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.ShowTraceForSessionOp)
-	in.hasher.HashShowTraceType(val.TraceType)
-	in.hasher.HashBool(val.Compact)
-	in.hasher.HashColList(val.ColList)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*ShowTraceForSessionExpr); ok {
-			if in.hasher.IsShowTraceTypeEqual(val.TraceType, existing.TraceType) &&
-				in.hasher.IsBoolEqual(val.Compact, existing.Compact) &&
-				in.hasher.IsColListEqual(val.ColList, existing.ColList) {
 				return existing
 			}
 		}
@@ -20244,178 +20368,6 @@ func (in *interner) InternScalarList(val *ScalarListExpr) *ScalarListExpr {
 	return val
 }
 
-func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.InsertOp)
-	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
-	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashColList(val.ReturnCols)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*InsertExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
-				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.UpdateOp)
-	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
-	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashColList(val.ReturnCols)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*UpdateExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
-				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.UpsertOp)
-	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
-	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashColList(val.ReturnCols)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*UpsertExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
-				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.DeleteOp)
-	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
-	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColumnID(val.CanaryCol)
-	in.hasher.HashColList(val.ReturnCols)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*DeleteExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
-				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternFKChecks(val *FKChecksExpr) *FKChecksExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.FKChecksOp)
-	in.hasher.HashFKChecksExpr(*val)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*FKChecksExpr); ok {
-			if in.hasher.IsFKChecksExprEqual(*val, *existing) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternFKChecksItem(val *FKChecksItem) *FKChecksItem {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.FKChecksItemOp)
-	in.hasher.HashRelExpr(val.Check)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*FKChecksItem); ok {
-			if in.hasher.IsRelExprEqual(val.Check, existing.Check) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
 func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CreateTableOp)
@@ -20440,8 +20392,64 @@ func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 	return val
 }
 
+func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ExplainOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashExplainOptions(val.Options)
+	in.hasher.HashColList(val.ColList)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashStatementType(val.StmtType)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ExplainExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsExplainOptionsEqual(val.Options, existing.Options) &&
+				in.hasher.IsColListEqual(val.ColList, existing.ColList) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsStatementTypeEqual(val.StmtType, existing.StmtType) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternShowTraceForSession(val *ShowTraceForSessionExpr) *ShowTraceForSessionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ShowTraceForSessionOp)
+	in.hasher.HashShowTraceType(val.TraceType)
+	in.hasher.HashBool(val.Compact)
+	in.hasher.HashColList(val.ColList)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ShowTraceForSessionExpr); ok {
+			if in.hasher.IsShowTraceTypeEqual(val.TraceType, existing.TraceType) &&
+				in.hasher.IsBoolEqual(val.Compact, existing.Compact) &&
+				in.hasher.IsColListEqual(val.ColList, existing.ColList) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
+	case *InsertExpr:
+		b.buildInsertProps(t, rel)
+	case *UpdateExpr:
+		b.buildUpdateProps(t, rel)
+	case *UpsertExpr:
+		b.buildUpsertProps(t, rel)
+	case *DeleteExpr:
+		b.buildDeleteProps(t, rel)
 	case *ScanExpr:
 		b.buildScanProps(t, rel)
 	case *VirtualScanExpr:
@@ -20510,10 +20518,6 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildOffsetProps(t, rel)
 	case *Max1RowExpr:
 		b.buildMax1RowProps(t, rel)
-	case *ExplainExpr:
-		b.buildExplainProps(t, rel)
-	case *ShowTraceForSessionExpr:
-		b.buildShowTraceForSessionProps(t, rel)
 	case *OrdinalityExpr:
 		b.buildOrdinalityProps(t, rel)
 	case *ProjectSetExpr:
@@ -20522,16 +20526,12 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildWindowProps(t, rel)
 	case *FakeRelExpr:
 		b.buildFakeRelProps(t, rel)
-	case *InsertExpr:
-		b.buildInsertProps(t, rel)
-	case *UpdateExpr:
-		b.buildUpdateProps(t, rel)
-	case *UpsertExpr:
-		b.buildUpsertProps(t, rel)
-	case *DeleteExpr:
-		b.buildDeleteProps(t, rel)
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
+	case *ExplainExpr:
+		b.buildExplainProps(t, rel)
+	case *ShowTraceForSessionExpr:
+		b.buildShowTraceForSessionProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}

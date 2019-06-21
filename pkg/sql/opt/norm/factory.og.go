@@ -11,6 +11,218 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
+// ConstructInsert constructs an expression for the Insert operator.
+// Insert evaluates a relational input expression, and inserts values from it
+// into a target table. The input may be an arbitrarily complex expression:
+//
+//   INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
+//
+// It can also be a simple VALUES clause:
+//
+//   INSERT INTO ab VALUES (1, 2)
+//
+// It may also return rows, which can be further composed:
+//
+//   SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
+//
+// The Insert operator is capable of inserting values into computed columns and
+// mutation columns, which are not writable (or even visible in the case of
+// mutation columns) by SQL users.
+func (_f *Factory) ConstructInsert(
+	input memo.RelExpr,
+	checks memo.FKChecksExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructInsert(
+					_f.funcs.PruneCols(input, needed),
+					checks,
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeInsert(input, checks, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructUpdate constructs an expression for the Update operator.
+// Update evaluates a relational input expression that fetches existing rows from
+// a target table and computes new values for one or more columns. Arbitrary
+// subsets of rows can be selected from the target table and processed in order,
+// as with this example:
+//
+//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
+//
+// The Update operator will also update any computed columns, including mutation
+// columns that are computed.
+func (_f *Factory) ConstructUpdate(
+	input memo.RelExpr,
+	checks memo.FKChecksExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	// [PruneMutationFetchCols]
+	{
+		needed := _f.funcs.NeededMutationFetchCols(opt.UpdateOp, mutationPrivate)
+		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
+				_expr := _f.ConstructUpdate(
+					input,
+					checks,
+					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructUpdate(
+					_f.funcs.PruneCols(input, needed),
+					checks,
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeUpdate(input, checks, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructUpsert constructs an expression for the Upsert operator.
+// Upsert evaluates a relational input expression that tries to insert a new row
+// into a target table. If a conflicting row already exists, then Upsert will
+// instead update the existing row. The Upsert operator is used for all of these
+// syntactic variants:
+//
+//   INSERT..ON CONFLICT DO UPDATE
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
+//
+//   INSERT..ON CONFLICT DO NOTHING
+//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
+//
+//   UPSERT
+//     UPSERT INTO abc VALUES (1, 2, 3)
+//
+// The Update operator will also insert/update any computed columns, including
+// mutation columns that are computed.
+func (_f *Factory) ConstructUpsert(
+	input memo.RelExpr,
+	checks memo.FKChecksExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	// [PruneMutationFetchCols]
+	{
+		needed := _f.funcs.NeededMutationFetchCols(opt.UpsertOp, mutationPrivate)
+		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
+				_expr := _f.ConstructUpsert(
+					input,
+					checks,
+					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructUpsert(
+					_f.funcs.PruneCols(input, needed),
+					checks,
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeUpsert(input, checks, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructDelete constructs an expression for the Delete operator.
+// Delete is an operator used to delete all rows that are selected by a
+// relational input expression:
+//
+//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
+//
+func (_f *Factory) ConstructDelete(
+	input memo.RelExpr,
+	checks memo.FKChecksExpr,
+	mutationPrivate *memo.MutationPrivate,
+) memo.RelExpr {
+	// [PruneMutationFetchCols]
+	{
+		needed := _f.funcs.NeededMutationFetchCols(opt.DeleteOp, mutationPrivate)
+		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
+				_expr := _f.ConstructDelete(
+					input,
+					checks,
+					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneMutationInputCols]
+	{
+		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
+				_expr := _f.ConstructDelete(
+					_f.funcs.PruneCols(input, needed),
+					checks,
+					mutationPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeDelete(input, checks, mutationPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructScan constructs an expression for the Scan operator.
 // Scan returns a result set containing every row in a table by scanning one of
 // the table's indexes according to its ordering. The ScanPrivate field
@@ -8144,59 +8356,6 @@ func (_f *Factory) ConstructMax1Row(
 	return _f.onConstructRelational(e)
 }
 
-// ConstructExplain constructs an expression for the Explain operator.
-// Explain returns information about the execution plan of the "input"
-// expression.
-func (_f *Factory) ConstructExplain(
-	input memo.RelExpr,
-	explainPrivate *memo.ExplainPrivate,
-) memo.RelExpr {
-	// [SimplifyExplainOrdering]
-	{
-		if _f.funcs.CanSimplifyExplainOrdering(input, explainPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyExplainOrdering) {
-				_expr := _f.ConstructExplain(
-					input,
-					_f.funcs.SimplifyExplainOrdering(input, explainPrivate),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyExplainOrdering, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	// [PruneExplainCols]
-	{
-		needed := _f.funcs.NeededExplainCols(explainPrivate)
-		if _f.funcs.CanPruneCols(input, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneExplainCols) {
-				_expr := _f.ConstructExplain(
-					_f.funcs.PruneCols(input, needed),
-					explainPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneExplainCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	e := _f.mem.MemoizeExplain(input, explainPrivate)
-	return _f.onConstructRelational(e)
-}
-
-// ConstructShowTraceForSession constructs an expression for the ShowTraceForSession operator.
-// ShowTraceForSession returns the current session traces.
-func (_f *Factory) ConstructShowTraceForSession(
-	showTracePrivate *memo.ShowTracePrivate,
-) memo.RelExpr {
-	e := _f.mem.MemoizeShowTraceForSession(showTracePrivate)
-	return _f.onConstructRelational(e)
-}
-
 // ConstructOrdinality constructs an expression for the Ordinality operator.
 // Ordinality adds a column to each row in its input containing a unique,
 // increasing number.
@@ -14186,218 +14345,6 @@ func (_f *Factory) ConstructNthValue(
 	return _f.onConstructScalar(e)
 }
 
-// ConstructInsert constructs an expression for the Insert operator.
-// Insert evaluates a relational input expression, and inserts values from it
-// into a target table. The input may be an arbitrarily complex expression:
-//
-//   INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
-//
-// It can also be a simple VALUES clause:
-//
-//   INSERT INTO ab VALUES (1, 2)
-//
-// It may also return rows, which can be further composed:
-//
-//   SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
-//
-// The Insert operator is capable of inserting values into computed columns and
-// mutation columns, which are not writable (or even visible in the case of
-// mutation columns) by SQL users.
-func (_f *Factory) ConstructInsert(
-	input memo.RelExpr,
-	checks memo.FKChecksExpr,
-	mutationPrivate *memo.MutationPrivate,
-) memo.RelExpr {
-	// [PruneMutationInputCols]
-	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
-		if _f.funcs.CanPruneCols(input, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
-				_expr := _f.ConstructInsert(
-					_f.funcs.PruneCols(input, needed),
-					checks,
-					mutationPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	e := _f.mem.MemoizeInsert(input, checks, mutationPrivate)
-	return _f.onConstructRelational(e)
-}
-
-// ConstructUpdate constructs an expression for the Update operator.
-// Update evaluates a relational input expression that fetches existing rows from
-// a target table and computes new values for one or more columns. Arbitrary
-// subsets of rows can be selected from the target table and processed in order,
-// as with this example:
-//
-//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
-//
-// The Update operator will also update any computed columns, including mutation
-// columns that are computed.
-func (_f *Factory) ConstructUpdate(
-	input memo.RelExpr,
-	checks memo.FKChecksExpr,
-	mutationPrivate *memo.MutationPrivate,
-) memo.RelExpr {
-	// [PruneMutationFetchCols]
-	{
-		needed := _f.funcs.NeededMutationFetchCols(opt.UpdateOp, mutationPrivate)
-		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
-				_expr := _f.ConstructUpdate(
-					input,
-					checks,
-					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	// [PruneMutationInputCols]
-	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
-		if _f.funcs.CanPruneCols(input, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
-				_expr := _f.ConstructUpdate(
-					_f.funcs.PruneCols(input, needed),
-					checks,
-					mutationPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	e := _f.mem.MemoizeUpdate(input, checks, mutationPrivate)
-	return _f.onConstructRelational(e)
-}
-
-// ConstructUpsert constructs an expression for the Upsert operator.
-// Upsert evaluates a relational input expression that tries to insert a new row
-// into a target table. If a conflicting row already exists, then Upsert will
-// instead update the existing row. The Upsert operator is used for all of these
-// syntactic variants:
-//
-//   INSERT..ON CONFLICT DO UPDATE
-//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
-//
-//   INSERT..ON CONFLICT DO NOTHING
-//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
-//
-//   UPSERT
-//     UPSERT INTO abc VALUES (1, 2, 3)
-//
-// The Update operator will also insert/update any computed columns, including
-// mutation columns that are computed.
-func (_f *Factory) ConstructUpsert(
-	input memo.RelExpr,
-	checks memo.FKChecksExpr,
-	mutationPrivate *memo.MutationPrivate,
-) memo.RelExpr {
-	// [PruneMutationFetchCols]
-	{
-		needed := _f.funcs.NeededMutationFetchCols(opt.UpsertOp, mutationPrivate)
-		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
-				_expr := _f.ConstructUpsert(
-					input,
-					checks,
-					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	// [PruneMutationInputCols]
-	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
-		if _f.funcs.CanPruneCols(input, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
-				_expr := _f.ConstructUpsert(
-					_f.funcs.PruneCols(input, needed),
-					checks,
-					mutationPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	e := _f.mem.MemoizeUpsert(input, checks, mutationPrivate)
-	return _f.onConstructRelational(e)
-}
-
-// ConstructDelete constructs an expression for the Delete operator.
-// Delete is an operator used to delete all rows that are selected by a
-// relational input expression:
-//
-//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
-//
-func (_f *Factory) ConstructDelete(
-	input memo.RelExpr,
-	checks memo.FKChecksExpr,
-	mutationPrivate *memo.MutationPrivate,
-) memo.RelExpr {
-	// [PruneMutationFetchCols]
-	{
-		needed := _f.funcs.NeededMutationFetchCols(opt.DeleteOp, mutationPrivate)
-		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
-				_expr := _f.ConstructDelete(
-					input,
-					checks,
-					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationFetchCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	// [PruneMutationInputCols]
-	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
-		if _f.funcs.CanPruneCols(input, needed) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
-				_expr := _f.ConstructDelete(
-					_f.funcs.PruneCols(input, needed),
-					checks,
-					mutationPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.PruneMutationInputCols, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
-	e := _f.mem.MemoizeDelete(input, checks, mutationPrivate)
-	return _f.onConstructRelational(e)
-}
-
 // ConstructCreateTable constructs an expression for the CreateTable operator.
 // CreateTable represents a CREATE TABLE statement.
 func (_f *Factory) ConstructCreateTable(
@@ -14405,6 +14352,59 @@ func (_f *Factory) ConstructCreateTable(
 	createTablePrivate *memo.CreateTablePrivate,
 ) memo.RelExpr {
 	e := _f.mem.MemoizeCreateTable(input, createTablePrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructExplain constructs an expression for the Explain operator.
+// Explain returns information about the execution plan of the "input"
+// expression.
+func (_f *Factory) ConstructExplain(
+	input memo.RelExpr,
+	explainPrivate *memo.ExplainPrivate,
+) memo.RelExpr {
+	// [SimplifyExplainOrdering]
+	{
+		if _f.funcs.CanSimplifyExplainOrdering(input, explainPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyExplainOrdering) {
+				_expr := _f.ConstructExplain(
+					input,
+					_f.funcs.SimplifyExplainOrdering(input, explainPrivate),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyExplainOrdering, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneExplainCols]
+	{
+		needed := _f.funcs.NeededExplainCols(explainPrivate)
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneExplainCols) {
+				_expr := _f.ConstructExplain(
+					_f.funcs.PruneCols(input, needed),
+					explainPrivate,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneExplainCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeExplain(input, explainPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructShowTraceForSession constructs an expression for the ShowTraceForSession operator.
+// ShowTraceForSession returns the current session traces.
+func (_f *Factory) ConstructShowTraceForSession(
+	showTracePrivate *memo.ShowTracePrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeShowTraceForSession(showTracePrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14431,6 +14431,44 @@ func (_f *Factory) ConstructCreateTable(
 // rather than bottom.
 func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	switch t := e.(type) {
+	case *memo.InsertExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructInsert(input, checks, &t.MutationPrivate)
+		}
+		return t
+
+	case *memo.UpdateExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructUpdate(input, checks, &t.MutationPrivate)
+		}
+		return t
+
+	case *memo.UpsertExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructUpsert(input, checks, &t.MutationPrivate)
+		}
+		return t
+
+	case *memo.DeleteExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
+		if input != t.Input || checksChanged {
+			return f.ConstructDelete(input, checks, &t.MutationPrivate)
+		}
+		return t
+
+	case *memo.FKChecksExpr:
+		if after, changed := f.replaceFKChecksExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
 	case *memo.ScanExpr:
 		return t
 
@@ -14695,16 +14733,6 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		if input != t.Input {
 			return f.ConstructMax1Row(input)
 		}
-		return t
-
-	case *memo.ExplainExpr:
-		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructExplain(input, &t.ExplainPrivate)
-		}
-		return t
-
-	case *memo.ShowTraceForSessionExpr:
 		return t
 
 	case *memo.OrdinalityExpr:
@@ -15526,44 +15554,6 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
-	case *memo.InsertExpr:
-		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructInsert(input, checks, &t.MutationPrivate)
-		}
-		return t
-
-	case *memo.UpdateExpr:
-		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructUpdate(input, checks, &t.MutationPrivate)
-		}
-		return t
-
-	case *memo.UpsertExpr:
-		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructUpsert(input, checks, &t.MutationPrivate)
-		}
-		return t
-
-	case *memo.DeleteExpr:
-		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructDelete(input, checks, &t.MutationPrivate)
-		}
-		return t
-
-	case *memo.FKChecksExpr:
-		if after, changed := f.replaceFKChecksExpr(*t, replace); changed {
-			return &after
-		}
-		return t
-
 	case *memo.CreateTableExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -15571,8 +15561,39 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ExplainExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructExplain(input, &t.ExplainPrivate)
+		}
+		return t
+
+	case *memo.ShowTraceForSessionExpr:
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
+}
+
+func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFunc) (_ memo.FKChecksExpr, changed bool) {
+	var newList []memo.FKChecksItem
+	for i := range list {
+		before := list[i].Check
+		after := replace(before).(memo.RelExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.FKChecksItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Check = after
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
 }
 
 func (f *Factory) replaceProjectionsExpr(list memo.ProjectionsExpr, replace ReplaceFunc) (_ memo.ProjectionsExpr, changed bool) {
@@ -15706,33 +15727,40 @@ func (f *Factory) replaceScalarListExpr(list memo.ScalarListExpr, replace Replac
 	return newList, true
 }
 
-func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFunc) (_ memo.FKChecksExpr, changed bool) {
-	var newList []memo.FKChecksItem
-	for i := range list {
-		before := list[i].Check
-		after := replace(before).(memo.RelExpr)
-		if before != after {
-			if newList == nil {
-				newList = make([]memo.FKChecksItem, len(list))
-				copy(newList, list[:i])
-			}
-			newList[i].Check = after
-		} else if newList != nil {
-			newList[i] = list[i]
-		}
-	}
-	if newList == nil {
-		return list, false
-	}
-	return newList, true
-}
-
 // CopyAndReplaceDefault performs the default traversal and cloning behavior
 // for the CopyAndReplace method. It constructs a copy of the given source
 // operator using children copied (and potentially remapped) by the given replace
 // function. See comments for CopyAndReplace for more details.
 func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
 	switch t := src.(type) {
+	case *memo.InsertExpr:
+		return f.ConstructInsert(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			&t.MutationPrivate,
+		)
+
+	case *memo.UpdateExpr:
+		return f.ConstructUpdate(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			&t.MutationPrivate,
+		)
+
+	case *memo.UpsertExpr:
+		return f.ConstructUpsert(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			&t.MutationPrivate,
+		)
+
+	case *memo.DeleteExpr:
+		return f.ConstructDelete(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			&t.MutationPrivate,
+		)
+
 	case *memo.ScanExpr:
 		return f.mem.MemoizeScan(&t.ScanPrivate)
 
@@ -15965,15 +15993,6 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		return f.ConstructMax1Row(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 		)
-
-	case *memo.ExplainExpr:
-		return f.ConstructExplain(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			&t.ExplainPrivate,
-		)
-
-	case *memo.ShowTraceForSessionExpr:
-		return f.mem.MemoizeShowTraceForSession(&t.ShowTracePrivate)
 
 	case *memo.OrdinalityExpr:
 		return f.ConstructOrdinality(
@@ -16577,42 +16596,31 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Nth, replace).(opt.ScalarExpr),
 		)
 
-	case *memo.InsertExpr:
-		return f.ConstructInsert(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
-			&t.MutationPrivate,
-		)
-
-	case *memo.UpdateExpr:
-		return f.ConstructUpdate(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
-			&t.MutationPrivate,
-		)
-
-	case *memo.UpsertExpr:
-		return f.ConstructUpsert(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
-			&t.MutationPrivate,
-		)
-
-	case *memo.DeleteExpr:
-		return f.ConstructDelete(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
-			&t.MutationPrivate,
-		)
-
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			&t.CreateTablePrivate,
 		)
 
+	case *memo.ExplainExpr:
+		return f.ConstructExplain(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.ExplainPrivate,
+		)
+
+	case *memo.ShowTraceForSessionExpr:
+		return f.mem.MemoizeShowTraceForSession(&t.ShowTracePrivate)
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
+}
+
+func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, replace ReplaceFunc) (dst memo.FKChecksExpr) {
+	dst = make(memo.FKChecksExpr, len(src))
+	for i := range src {
+		dst[i].Check = f.invokeReplace(src[i].Check, replace).(memo.RelExpr)
+	}
+	return dst
 }
 
 func (f *Factory) copyAndReplaceDefaultProjectionsExpr(src memo.ProjectionsExpr, replace ReplaceFunc) (dst memo.ProjectionsExpr) {
@@ -16668,14 +16676,6 @@ func (f *Factory) copyAndReplaceDefaultScalarListExpr(src memo.ScalarListExpr, r
 	return dst
 }
 
-func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, replace ReplaceFunc) (dst memo.FKChecksExpr) {
-	dst = make(memo.FKChecksExpr, len(src))
-	for i := range src {
-		dst[i].Check = f.invokeReplace(src[i].Check, replace).(memo.RelExpr)
-	}
-	return dst
-}
-
 // invokeReplace wraps the user-provided replace function. See comments for
 // CopyAndReplace for more details.
 func (f *Factory) invokeReplace(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
@@ -16687,6 +16687,30 @@ func (f *Factory) invokeReplace(src opt.Expr, replace ReplaceFunc) (dst opt.Expr
 
 func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Expr {
 	switch op {
+	case opt.InsertOp:
+		return f.ConstructInsert(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
+		)
+	case opt.UpdateOp:
+		return f.ConstructUpdate(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
+		)
+	case opt.UpsertOp:
+		return f.ConstructUpsert(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
+		)
+	case opt.DeleteOp:
+		return f.ConstructDelete(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FKChecksExpr),
+			args[2].(*memo.MutationPrivate),
+		)
 	case opt.ScanOp:
 		return f.ConstructScan(
 			args[0].(*memo.ScanPrivate),
@@ -16891,15 +16915,6 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.Max1RowOp:
 		return f.ConstructMax1Row(
 			args[0].(memo.RelExpr),
-		)
-	case opt.ExplainOp:
-		return f.ConstructExplain(
-			args[0].(memo.RelExpr),
-			args[1].(*memo.ExplainPrivate),
-		)
-	case opt.ShowTraceForSessionOp:
-		return f.ConstructShowTraceForSession(
-			args[0].(*memo.ShowTracePrivate),
 		)
 	case opt.OrdinalityOp:
 		return f.ConstructOrdinality(
@@ -17404,34 +17419,19 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
-	case opt.InsertOp:
-		return f.ConstructInsert(
-			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
-		)
-	case opt.UpdateOp:
-		return f.ConstructUpdate(
-			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
-		)
-	case opt.UpsertOp:
-		return f.ConstructUpsert(
-			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
-		)
-	case opt.DeleteOp:
-		return f.ConstructDelete(
-			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
-		)
 	case opt.CreateTableOp:
 		return f.ConstructCreateTable(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.CreateTablePrivate),
+		)
+	case opt.ExplainOp:
+		return f.ConstructExplain(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.ExplainPrivate),
+		)
+	case opt.ShowTraceForSessionOp:
+		return f.ConstructShowTraceForSession(
+			args[0].(*memo.ShowTracePrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

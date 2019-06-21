@@ -1101,6 +1101,23 @@ func IsRelationalOp(e Expr) bool {
 	return false
 }
 
+var MutationOperators = [...]Operator{
+	CreateTableOp,
+	DeleteOp,
+	InsertOp,
+	UpdateOp,
+	UpsertOp,
+}
+
+func IsMutationOp(e Expr) bool {
+	switch e.Op() {
+	case CreateTableOp, DeleteOp, InsertOp, UpdateOp,
+		UpsertOp:
+		return true
+	}
+	return false
+}
+
 var PrivateOperators = [...]Operator{
 	ColPrivateOp,
 	CreateTablePrivateOp,
@@ -1134,132 +1151,6 @@ func IsPrivateOp(e Expr) bool {
 		MergeJoinPrivateOp, MutationPrivateOp, OrdinalityPrivateOp, ScanPrivateOp, SequenceSelectPrivateOp,
 		SetPrivateOp, ShowTracePrivateOp, SubqueryPrivateOp, ValuesPrivateOp, VirtualScanPrivateOp,
 		WindowPrivateOp, WindowsItemPrivateOp, ZigzagJoinPrivateOp, ZipItemPrivateOp:
-		return true
-	}
-	return false
-}
-
-var JoinOperators = [...]Operator{
-	AntiJoinOp,
-	AntiJoinApplyOp,
-	FullJoinOp,
-	FullJoinApplyOp,
-	InnerJoinOp,
-	InnerJoinApplyOp,
-	LeftJoinOp,
-	LeftJoinApplyOp,
-	RightJoinOp,
-	RightJoinApplyOp,
-	SemiJoinOp,
-	SemiJoinApplyOp,
-}
-
-func IsJoinOp(e Expr) bool {
-	switch e.Op() {
-	case AntiJoinOp, AntiJoinApplyOp, FullJoinOp, FullJoinApplyOp,
-		InnerJoinOp, InnerJoinApplyOp, LeftJoinOp, LeftJoinApplyOp, RightJoinOp,
-		RightJoinApplyOp, SemiJoinOp, SemiJoinApplyOp:
-		return true
-	}
-	return false
-}
-
-var JoinNonApplyOperators = [...]Operator{
-	AntiJoinOp,
-	FullJoinOp,
-	InnerJoinOp,
-	LeftJoinOp,
-	RightJoinOp,
-	SemiJoinOp,
-}
-
-func IsJoinNonApplyOp(e Expr) bool {
-	switch e.Op() {
-	case AntiJoinOp, FullJoinOp, InnerJoinOp, LeftJoinOp,
-		RightJoinOp, SemiJoinOp:
-		return true
-	}
-	return false
-}
-
-var TelemetryOperators = [...]Operator{
-	AntiJoinOp,
-	AntiJoinApplyOp,
-	DistinctOnOp,
-	FullJoinOp,
-	FullJoinApplyOp,
-	GroupByOp,
-	InnerJoinOp,
-	InnerJoinApplyOp,
-	LeftJoinOp,
-	LeftJoinApplyOp,
-	LookupJoinOp,
-	MergeJoinOp,
-	ProjectSetOp,
-	RightJoinOp,
-	RightJoinApplyOp,
-	ScalarGroupByOp,
-	SemiJoinOp,
-	SemiJoinApplyOp,
-	ZigzagJoinOp,
-}
-
-func IsTelemetryOp(e Expr) bool {
-	switch e.Op() {
-	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, FullJoinOp,
-		FullJoinApplyOp, GroupByOp, InnerJoinOp, InnerJoinApplyOp, LeftJoinOp,
-		LeftJoinApplyOp, LookupJoinOp, MergeJoinOp, ProjectSetOp, RightJoinOp,
-		RightJoinApplyOp, ScalarGroupByOp, SemiJoinOp, SemiJoinApplyOp, ZigzagJoinOp:
-		return true
-	}
-	return false
-}
-
-var JoinApplyOperators = [...]Operator{
-	AntiJoinApplyOp,
-	FullJoinApplyOp,
-	InnerJoinApplyOp,
-	LeftJoinApplyOp,
-	RightJoinApplyOp,
-	SemiJoinApplyOp,
-}
-
-func IsJoinApplyOp(e Expr) bool {
-	switch e.Op() {
-	case AntiJoinApplyOp, FullJoinApplyOp, InnerJoinApplyOp, LeftJoinApplyOp,
-		RightJoinApplyOp, SemiJoinApplyOp:
-		return true
-	}
-	return false
-}
-
-var GroupingOperators = [...]Operator{
-	DistinctOnOp,
-	GroupByOp,
-	ScalarGroupByOp,
-}
-
-func IsGroupingOp(e Expr) bool {
-	switch e.Op() {
-	case DistinctOnOp, GroupByOp, ScalarGroupByOp:
-		return true
-	}
-	return false
-}
-
-var SetOperators = [...]Operator{
-	ExceptOp,
-	ExceptAllOp,
-	IntersectOp,
-	IntersectAllOp,
-	UnionOp,
-	UnionAllOp,
-}
-
-func IsSetOp(e Expr) bool {
-	switch e.Op() {
-	case ExceptOp, ExceptAllOp, IntersectOp, IntersectAllOp,
-		UnionOp, UnionAllOp:
 		return true
 	}
 	return false
@@ -1420,41 +1311,6 @@ func IsScalarOp(e Expr) bool {
 	return false
 }
 
-var ConstValueOperators = [...]Operator{
-	ConstOp,
-	FalseOp,
-	NullOp,
-	TrueOp,
-}
-
-func IsConstValueOp(e Expr) bool {
-	switch e.Op() {
-	case ConstOp, FalseOp, NullOp, TrueOp:
-		return true
-	}
-	return false
-}
-
-var BooleanOperators = [...]Operator{
-	AndOp,
-	FalseOp,
-	FiltersOp,
-	FiltersItemOp,
-	NotOp,
-	OrOp,
-	RangeOp,
-	TrueOp,
-}
-
-func IsBooleanOp(e Expr) bool {
-	switch e.Op() {
-	case AndOp, FalseOp, FiltersOp, FiltersItemOp,
-		NotOp, OrOp, RangeOp, TrueOp:
-		return true
-	}
-	return false
-}
-
 var ListOperators = [...]Operator{
 	AggregationsOp,
 	FKChecksOp,
@@ -1487,6 +1343,167 @@ func IsListItemOp(e Expr) bool {
 	switch e.Op() {
 	case AggregationsItemOp, FKChecksItemOp, FiltersItemOp, ProjectionsItemOp,
 		WindowsItemOp, ZipItemOp:
+		return true
+	}
+	return false
+}
+
+var JoinOperators = [...]Operator{
+	AntiJoinOp,
+	AntiJoinApplyOp,
+	FullJoinOp,
+	FullJoinApplyOp,
+	InnerJoinOp,
+	InnerJoinApplyOp,
+	LeftJoinOp,
+	LeftJoinApplyOp,
+	RightJoinOp,
+	RightJoinApplyOp,
+	SemiJoinOp,
+	SemiJoinApplyOp,
+}
+
+func IsJoinOp(e Expr) bool {
+	switch e.Op() {
+	case AntiJoinOp, AntiJoinApplyOp, FullJoinOp, FullJoinApplyOp,
+		InnerJoinOp, InnerJoinApplyOp, LeftJoinOp, LeftJoinApplyOp, RightJoinOp,
+		RightJoinApplyOp, SemiJoinOp, SemiJoinApplyOp:
+		return true
+	}
+	return false
+}
+
+var JoinNonApplyOperators = [...]Operator{
+	AntiJoinOp,
+	FullJoinOp,
+	InnerJoinOp,
+	LeftJoinOp,
+	RightJoinOp,
+	SemiJoinOp,
+}
+
+func IsJoinNonApplyOp(e Expr) bool {
+	switch e.Op() {
+	case AntiJoinOp, FullJoinOp, InnerJoinOp, LeftJoinOp,
+		RightJoinOp, SemiJoinOp:
+		return true
+	}
+	return false
+}
+
+var TelemetryOperators = [...]Operator{
+	AntiJoinOp,
+	AntiJoinApplyOp,
+	DistinctOnOp,
+	FullJoinOp,
+	FullJoinApplyOp,
+	GroupByOp,
+	InnerJoinOp,
+	InnerJoinApplyOp,
+	LeftJoinOp,
+	LeftJoinApplyOp,
+	LookupJoinOp,
+	MergeJoinOp,
+	ProjectSetOp,
+	RightJoinOp,
+	RightJoinApplyOp,
+	ScalarGroupByOp,
+	SemiJoinOp,
+	SemiJoinApplyOp,
+	ZigzagJoinOp,
+}
+
+func IsTelemetryOp(e Expr) bool {
+	switch e.Op() {
+	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, FullJoinOp,
+		FullJoinApplyOp, GroupByOp, InnerJoinOp, InnerJoinApplyOp, LeftJoinOp,
+		LeftJoinApplyOp, LookupJoinOp, MergeJoinOp, ProjectSetOp, RightJoinOp,
+		RightJoinApplyOp, ScalarGroupByOp, SemiJoinOp, SemiJoinApplyOp, ZigzagJoinOp:
+		return true
+	}
+	return false
+}
+
+var JoinApplyOperators = [...]Operator{
+	AntiJoinApplyOp,
+	FullJoinApplyOp,
+	InnerJoinApplyOp,
+	LeftJoinApplyOp,
+	RightJoinApplyOp,
+	SemiJoinApplyOp,
+}
+
+func IsJoinApplyOp(e Expr) bool {
+	switch e.Op() {
+	case AntiJoinApplyOp, FullJoinApplyOp, InnerJoinApplyOp, LeftJoinApplyOp,
+		RightJoinApplyOp, SemiJoinApplyOp:
+		return true
+	}
+	return false
+}
+
+var GroupingOperators = [...]Operator{
+	DistinctOnOp,
+	GroupByOp,
+	ScalarGroupByOp,
+}
+
+func IsGroupingOp(e Expr) bool {
+	switch e.Op() {
+	case DistinctOnOp, GroupByOp, ScalarGroupByOp:
+		return true
+	}
+	return false
+}
+
+var SetOperators = [...]Operator{
+	ExceptOp,
+	ExceptAllOp,
+	IntersectOp,
+	IntersectAllOp,
+	UnionOp,
+	UnionAllOp,
+}
+
+func IsSetOp(e Expr) bool {
+	switch e.Op() {
+	case ExceptOp, ExceptAllOp, IntersectOp, IntersectAllOp,
+		UnionOp, UnionAllOp:
+		return true
+	}
+	return false
+}
+
+var ConstValueOperators = [...]Operator{
+	ConstOp,
+	FalseOp,
+	NullOp,
+	TrueOp,
+}
+
+func IsConstValueOp(e Expr) bool {
+	switch e.Op() {
+	case ConstOp, FalseOp, NullOp, TrueOp:
+		return true
+	}
+	return false
+}
+
+var BooleanOperators = [...]Operator{
+	AndOp,
+	FalseOp,
+	FiltersOp,
+	FiltersItemOp,
+	NotOp,
+	OrOp,
+	RangeOp,
+	TrueOp,
+}
+
+func IsBooleanOp(e Expr) bool {
+	switch e.Op() {
+	case AndOp, FalseOp, FiltersOp, FiltersItemOp,
+		NotOp, OrOp, RangeOp, TrueOp:
 		return true
 	}
 	return false
@@ -1631,23 +1648,6 @@ func IsWindowOp(e Expr) bool {
 	case CumeDistOp, DenseRankOp, FirstValueOp, LagOp,
 		LastValueOp, LeadOp, NthValueOp, NtileOp, PercentRankOp,
 		RankOp, RowNumberOp:
-		return true
-	}
-	return false
-}
-
-var MutationOperators = [...]Operator{
-	CreateTableOp,
-	DeleteOp,
-	InsertOp,
-	UpdateOp,
-	UpsertOp,
-}
-
-func IsMutationOp(e Expr) bool {
-	switch e.Op() {
-	case CreateTableOp, DeleteOp, InsertOp, UpdateOp,
-		UpsertOp:
 		return true
 	}
 	return false
