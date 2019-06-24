@@ -16,288 +16,182 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 )
 
-func (m *memColumn) Append(vec Vec, colType types.T, toLength uint64, fromLength uint16) {
-	switch colType {
+func (m *memColumn) Append(args AppendArgs) {
+	switch args.ColType {
 	case types.Bool:
-		m.col = append(m.Bool()[:toLength], vec.Bool()[:fromLength]...)
-	case types.Bytes:
-		m.col = append(m.Bytes()[:toLength], vec.Bytes()[:fromLength]...)
-	case types.Decimal:
-		m.col = append(m.Decimal()[:toLength], vec.Decimal()[:fromLength]...)
-	case types.Int8:
-		m.col = append(m.Int8()[:toLength], vec.Int8()[:fromLength]...)
-	case types.Int16:
-		m.col = append(m.Int16()[:toLength], vec.Int16()[:fromLength]...)
-	case types.Int32:
-		m.col = append(m.Int32()[:toLength], vec.Int32()[:fromLength]...)
-	case types.Int64:
-		m.col = append(m.Int64()[:toLength], vec.Int64()[:fromLength]...)
-	case types.Float32:
-		m.col = append(m.Float32()[:toLength], vec.Float32()[:fromLength]...)
-	case types.Float64:
-		m.col = append(m.Float64()[:toLength], vec.Float64()[:fromLength]...)
-	default:
-		panic(fmt.Sprintf("unhandled type %d", colType))
-	}
-
-	if fromLength > 0 {
-		m.nulls.Extend(vec.Nulls(), toLength, 0 /* srcStartIdx */, fromLength)
-	}
-}
-
-func (m *memColumn) AppendSlice(
-	vec Vec, colType types.T, destStartIdx uint64, srcStartIdx uint16, srcEndIdx uint16,
-) {
-	batchSize := srcEndIdx - srcStartIdx
-	outputLen := destStartIdx + uint64(batchSize)
-
-	switch colType {
-	case types.Bool:
-		if outputLen > uint64(len(m.Bool())) {
-			m.col = append(m.Bool()[:destStartIdx], vec.Bool()[srcStartIdx:srcEndIdx]...)
+		fromCol := args.Src.Bool()
+		toCol := m.Bool()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
-			copy(m.Bool()[destStartIdx:], vec.Bool()[srcStartIdx:srcEndIdx])
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]bool, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-	case types.Bytes:
-		if outputLen > uint64(len(m.Bytes())) {
-			m.col = append(m.Bytes()[:destStartIdx], vec.Bytes()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Bytes()[destStartIdx:], vec.Bytes()[srcStartIdx:srcEndIdx])
-		}
-	case types.Decimal:
-		if outputLen > uint64(len(m.Decimal())) {
-			m.col = append(m.Decimal()[:destStartIdx], vec.Decimal()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Decimal()[destStartIdx:], vec.Decimal()[srcStartIdx:srcEndIdx])
-		}
-	case types.Int8:
-		if outputLen > uint64(len(m.Int8())) {
-			m.col = append(m.Int8()[:destStartIdx], vec.Int8()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Int8()[destStartIdx:], vec.Int8()[srcStartIdx:srcEndIdx])
-		}
-	case types.Int16:
-		if outputLen > uint64(len(m.Int16())) {
-			m.col = append(m.Int16()[:destStartIdx], vec.Int16()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Int16()[destStartIdx:], vec.Int16()[srcStartIdx:srcEndIdx])
-		}
-	case types.Int32:
-		if outputLen > uint64(len(m.Int32())) {
-			m.col = append(m.Int32()[:destStartIdx], vec.Int32()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Int32()[destStartIdx:], vec.Int32()[srcStartIdx:srcEndIdx])
-		}
-	case types.Int64:
-		if outputLen > uint64(len(m.Int64())) {
-			m.col = append(m.Int64()[:destStartIdx], vec.Int64()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Int64()[destStartIdx:], vec.Int64()[srcStartIdx:srcEndIdx])
-		}
-	case types.Float32:
-		if outputLen > uint64(len(m.Float32())) {
-			m.col = append(m.Float32()[:destStartIdx], vec.Float32()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Float32()[destStartIdx:], vec.Float32()[srcStartIdx:srcEndIdx])
-		}
-	case types.Float64:
-		if outputLen > uint64(len(m.Float64())) {
-			m.col = append(m.Float64()[:destStartIdx], vec.Float64()[srcStartIdx:srcEndIdx]...)
-		} else {
-			copy(m.Float64()[destStartIdx:], vec.Float64()[srcStartIdx:srcEndIdx])
-		}
-	default:
-		panic(fmt.Sprintf("unhandled type %d", colType))
-	}
-
-	m.nulls.Extend(vec.Nulls(), destStartIdx, srcStartIdx, batchSize)
-}
-
-func (m *memColumn) AppendWithSel(
-	vec Vec, sel []uint16, batchSize uint16, colType types.T, toLength uint64,
-) {
-	switch colType {
-	case types.Bool:
-		toCol := append(m.Bool()[:toLength], make([]bool, batchSize)...)
-		fromCol := vec.Bool()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
-		}
-
 		m.col = toCol
 	case types.Bytes:
-		toCol := append(m.Bytes()[:toLength], make([][]byte, batchSize)...)
-		fromCol := vec.Bytes()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Bytes()
+		toCol := m.Bytes()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([][]byte, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Decimal:
-		toCol := append(m.Decimal()[:toLength], make([]apd.Decimal, batchSize)...)
-		fromCol := vec.Decimal()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Decimal()
+		toCol := m.Decimal()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]apd.Decimal, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Int8:
-		toCol := append(m.Int8()[:toLength], make([]int8, batchSize)...)
-		fromCol := vec.Int8()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Int8()
+		toCol := m.Int8()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]int8, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Int16:
-		toCol := append(m.Int16()[:toLength], make([]int16, batchSize)...)
-		fromCol := vec.Int16()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Int16()
+		toCol := m.Int16()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]int16, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Int32:
-		toCol := append(m.Int32()[:toLength], make([]int32, batchSize)...)
-		fromCol := vec.Int32()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Int32()
+		toCol := m.Int32()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]int32, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Int64:
-		toCol := append(m.Int64()[:toLength], make([]int64, batchSize)...)
-		fromCol := vec.Int64()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Int64()
+		toCol := m.Int64()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]int64, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Float32:
-		toCol := append(m.Float32()[:toLength], make([]float32, batchSize)...)
-		fromCol := vec.Float32()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Float32()
+		toCol := m.Float32()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]float32, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	case types.Float64:
-		toCol := append(m.Float64()[:toLength], make([]float64, batchSize)...)
-		fromCol := vec.Float64()
-
-		for i := uint16(0); i < batchSize; i++ {
-			toCol[uint64(i)+toLength] = fromCol[sel[i]]
+		fromCol := args.Src.Float64()
+		toCol := m.Float64()
+		numToAppend := args.SrcEndIdx - args.SrcStartIdx
+		if args.Sel == nil {
+			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			appendVals := make([]float64, len(sel))
+			for i, selIdx := range sel {
+				appendVals[i] = fromCol[selIdx]
+			}
+			toCol = append(toCol[:args.DestIdx], appendVals...)
+			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
+			// SrcEndIdx instead of numToAppend.
+			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
-
 		m.col = toCol
 	default:
-		panic(fmt.Sprintf("unhandled type %d", colType))
+		panic(fmt.Sprintf("unhandled type %s", args.ColType))
 	}
-
-	if batchSize > 0 {
-		m.nulls.ExtendWithSel(vec.Nulls(), toLength, 0 /* srcStartIdx */, batchSize, sel)
-	}
-}
-
-func (m *memColumn) AppendSliceWithSel(
-	vec Vec, colType types.T, destStartIdx uint64, srcStartIdx uint16, srcEndIdx uint16, sel []uint16,
-) {
-	batchSize := srcEndIdx - srcStartIdx
-	switch colType {
-	case types.Bool:
-		toCol := append(m.Bool()[:destStartIdx], make([]bool, batchSize)...)
-		fromCol := vec.Bool()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Bytes:
-		toCol := append(m.Bytes()[:destStartIdx], make([][]byte, batchSize)...)
-		fromCol := vec.Bytes()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Decimal:
-		toCol := append(m.Decimal()[:destStartIdx], make([]apd.Decimal, batchSize)...)
-		fromCol := vec.Decimal()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Int8:
-		toCol := append(m.Int8()[:destStartIdx], make([]int8, batchSize)...)
-		fromCol := vec.Int8()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Int16:
-		toCol := append(m.Int16()[:destStartIdx], make([]int16, batchSize)...)
-		fromCol := vec.Int16()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Int32:
-		toCol := append(m.Int32()[:destStartIdx], make([]int32, batchSize)...)
-		fromCol := vec.Int32()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Int64:
-		toCol := append(m.Int64()[:destStartIdx], make([]int64, batchSize)...)
-		fromCol := vec.Int64()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Float32:
-		toCol := append(m.Float32()[:destStartIdx], make([]float32, batchSize)...)
-		fromCol := vec.Float32()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	case types.Float64:
-		toCol := append(m.Float64()[:destStartIdx], make([]float64, batchSize)...)
-		fromCol := vec.Float64()
-
-		for i := 0; i < int(batchSize); i++ {
-			toCol[uint64(i)+destStartIdx] = fromCol[sel[i+int(srcStartIdx)]]
-		}
-
-		m.col = toCol
-	default:
-		panic(fmt.Sprintf("unhandled type %d", colType))
-	}
-
-	m.nulls.ExtendWithSel(vec.Nulls(), destStartIdx, srcStartIdx, batchSize, sel)
 }
 
 func (m *memColumn) Copy(src Vec, srcStartIdx, srcEndIdx uint64, typ types.T) {
@@ -312,11 +206,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Bytes:
 		copy(m.Bytes()[destStartIdx:], src.Bytes()[srcStartIdx:srcEndIdx])
@@ -324,11 +229,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Decimal:
 		copy(m.Decimal()[destStartIdx:], src.Decimal()[srcStartIdx:srcEndIdx])
@@ -336,11 +252,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Int8:
 		copy(m.Int8()[destStartIdx:], src.Int8()[srcStartIdx:srcEndIdx])
@@ -348,11 +275,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Int16:
 		copy(m.Int16()[destStartIdx:], src.Int16()[srcStartIdx:srcEndIdx])
@@ -360,11 +298,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Int32:
 		copy(m.Int32()[destStartIdx:], src.Int32()[srcStartIdx:srcEndIdx])
@@ -372,11 +321,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Int64:
 		copy(m.Int64()[destStartIdx:], src.Int64()[srcStartIdx:srcEndIdx])
@@ -384,11 +344,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Float32:
 		copy(m.Float32()[destStartIdx:], src.Float32()[srcStartIdx:srcEndIdx])
@@ -396,11 +367,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	case types.Float64:
 		copy(m.Float64()[destStartIdx:], src.Float64()[srcStartIdx:srcEndIdx])
@@ -408,11 +390,22 @@ func (m *memColumn) CopyAt(src Vec, destStartIdx, srcStartIdx, srcEndIdx uint64,
 		// allocate a new bitmap.
 		srcBitmap := src.Nulls().NullBitmap()
 		m.nulls.nulls = make([]byte, len(srcBitmap))
-		if src.HasNulls() {
+		m.nulls.UnsetNulls()
+		if !src.HasNulls() {
+			return
+		}
+		if destStartIdx == 0 {
 			m.nulls.hasNulls = true
 			copy(m.nulls.nulls, srcBitmap)
 		} else {
-			m.nulls.UnsetNulls()
+			// The above strategy to just copy will not work. Fall back to a loop.
+			// TODO(asubiotto): This can be improved as well.
+			srcNulls := src.Nulls()
+			for curDestIdx, curSrcIdx := destStartIdx, srcStartIdx; curSrcIdx < srcEndIdx; curDestIdx, curSrcIdx = curDestIdx+1, curSrcIdx+1 {
+				if srcNulls.NullAt64(curSrcIdx) {
+					m.nulls.SetNull64(curDestIdx)
+				}
+			}
 		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", typ))
