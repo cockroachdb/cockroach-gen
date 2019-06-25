@@ -12211,8 +12211,7 @@ type WindowsItemPrivate struct {
 // RankExpr computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
 type RankExpr struct {
-	Typ *types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &RankExpr{}
@@ -12248,14 +12247,13 @@ func (e *RankExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *RankExpr) DataType() *types.T {
-	return e.Typ
+	return types.Int
 }
 
 // RowNumberExpr computes the position of a row relative to an ordering, with
 // same-valued rows having ties broken arbitrarily.
 type RowNumberExpr struct {
-	Typ *types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &RowNumberExpr{}
@@ -12291,13 +12289,12 @@ func (e *RowNumberExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *RowNumberExpr) DataType() *types.T {
-	return e.Typ
+	return types.Int
 }
 
 // DenseRankExpr is like Rank, but without gaps. Instead of 1, 1, 3, it gives 1, 1, 2.
 type DenseRankExpr struct {
-	Typ *types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &DenseRankExpr{}
@@ -12333,13 +12330,12 @@ func (e *DenseRankExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *DenseRankExpr) DataType() *types.T {
-	return e.Typ
+	return types.Int
 }
 
 // PercentRankExpr is (rank - 1) / (total rows - 1).
 type PercentRankExpr struct {
-	Typ *types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &PercentRankExpr{}
@@ -12375,14 +12371,13 @@ func (e *PercentRankExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *PercentRankExpr) DataType() *types.T {
-	return e.Typ
+	return types.Float
 }
 
 // CumeDistExpr is the relative rank of the current row:
 // (number of rows preceding or peer with current row) / (total rows)
 type CumeDistExpr struct {
-	Typ *types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &CumeDistExpr{}
@@ -12418,7 +12413,7 @@ func (e *CumeDistExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *CumeDistExpr) DataType() *types.T {
-	return e.Typ
+	return types.Float
 }
 
 // NtileExpr builds a histogram with the specified number of buckets and evaluates
@@ -12426,8 +12421,7 @@ func (e *CumeDistExpr) DataType() *types.T {
 type NtileExpr struct {
 	NumBuckets opt.ScalarExpr
 
-	Typ *types.T
-	id  opt.ScalarID
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &NtileExpr{}
@@ -12472,7 +12466,7 @@ func (e *NtileExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *NtileExpr) DataType() *types.T {
-	return e.Typ
+	return types.Int
 }
 
 // LagExpr returns Value evaluated at the row Offset rows before this one. If no
@@ -15857,7 +15851,6 @@ func (m *Memo) MemoizeNtile(
 		NumBuckets: numBuckets,
 		id:         m.NextID(),
 	}
-	e.Typ = InferType(m, e)
 	interned := m.interner.InternNtile(e)
 	if interned == e {
 		m.memEstimate += size

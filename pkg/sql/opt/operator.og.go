@@ -1474,6 +1474,59 @@ func IsSetOp(e Expr) bool {
 	return false
 }
 
+var BoolOperators = [...]Operator{
+	AndOp,
+	AnyOp,
+	AnyScalarOp,
+	ContainsOp,
+	EqOp,
+	ExistsOp,
+	FalseOp,
+	FiltersOp,
+	FiltersItemOp,
+	GeOp,
+	GtOp,
+	ILikeOp,
+	InOp,
+	IsOp,
+	IsNotOp,
+	JsonAllExistsOp,
+	JsonExistsOp,
+	JsonSomeExistsOp,
+	LeOp,
+	LikeOp,
+	LtOp,
+	NeOp,
+	NotOp,
+	NotILikeOp,
+	NotInOp,
+	NotLikeOp,
+	NotRegIMatchOp,
+	NotRegMatchOp,
+	NotSimilarToOp,
+	OrOp,
+	RangeOp,
+	RegIMatchOp,
+	RegMatchOp,
+	SimilarToOp,
+	TrueOp,
+}
+
+func IsBoolOp(e Expr) bool {
+	switch e.Op() {
+	case AndOp, AnyOp, AnyScalarOp, ContainsOp,
+		EqOp, ExistsOp, FalseOp, FiltersOp, FiltersItemOp,
+		GeOp, GtOp, ILikeOp, InOp, IsOp,
+		IsNotOp, JsonAllExistsOp, JsonExistsOp, JsonSomeExistsOp, LeOp,
+		LikeOp, LtOp, NeOp, NotOp, NotILikeOp,
+		NotInOp, NotLikeOp, NotRegIMatchOp, NotRegMatchOp, NotSimilarToOp,
+		OrOp, RangeOp, RegIMatchOp, RegMatchOp, SimilarToOp,
+		TrueOp:
+		return true
+	}
+	return false
+}
+
 var ConstValueOperators = [...]Operator{
 	ConstOp,
 	FalseOp,
@@ -1484,26 +1537,6 @@ var ConstValueOperators = [...]Operator{
 func IsConstValueOp(e Expr) bool {
 	switch e.Op() {
 	case ConstOp, FalseOp, NullOp, TrueOp:
-		return true
-	}
-	return false
-}
-
-var BooleanOperators = [...]Operator{
-	AndOp,
-	FalseOp,
-	FiltersOp,
-	FiltersItemOp,
-	NotOp,
-	OrOp,
-	RangeOp,
-	TrueOp,
-}
-
-func IsBooleanOp(e Expr) bool {
-	switch e.Op() {
-	case AndOp, FalseOp, FiltersOp, FiltersItemOp,
-		NotOp, OrOp, RangeOp, TrueOp:
 		return true
 	}
 	return false
@@ -1629,6 +1662,23 @@ func IsAggregateOp(e Expr) bool {
 	return false
 }
 
+var IntOperators = [...]Operator{
+	CountRowsOp,
+	DenseRankOp,
+	NtileOp,
+	RankOp,
+	RowNumberOp,
+}
+
+func IsIntOp(e Expr) bool {
+	switch e.Op() {
+	case CountRowsOp, DenseRankOp, NtileOp, RankOp,
+		RowNumberOp:
+		return true
+	}
+	return false
+}
+
 var WindowOperators = [...]Operator{
 	CumeDistOp,
 	DenseRankOp,
@@ -1648,6 +1698,19 @@ func IsWindowOp(e Expr) bool {
 	case CumeDistOp, DenseRankOp, FirstValueOp, LagOp,
 		LastValueOp, LeadOp, NthValueOp, NtileOp, PercentRankOp,
 		RankOp, RowNumberOp:
+		return true
+	}
+	return false
+}
+
+var FloatOperators = [...]Operator{
+	CumeDistOp,
+	PercentRankOp,
+}
+
+func IsFloatOp(e Expr) bool {
+	switch e.Op() {
+	case CumeDistOp, PercentRankOp:
 		return true
 	}
 	return false
