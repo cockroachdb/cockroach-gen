@@ -113,9 +113,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -219,9 +219,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -325,9 +325,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -431,9 +431,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -537,9 +537,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -643,9 +643,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -749,9 +749,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -855,9 +855,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -961,9 +961,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1073,9 +1073,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1179,9 +1179,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1285,9 +1285,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1391,9 +1391,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1497,9 +1497,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1603,9 +1603,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1709,9 +1709,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1815,9 +1815,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -1921,9 +1921,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2027,9 +2027,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2125,9 +2125,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2223,9 +2223,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2321,9 +2321,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2419,9 +2419,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2517,9 +2517,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2615,9 +2615,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2713,9 +2713,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2811,9 +2811,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -2915,9 +2915,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3013,9 +3013,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3111,9 +3111,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3209,9 +3209,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3307,9 +3307,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3405,9 +3405,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3503,9 +3503,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3601,9 +3601,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3699,9 +3699,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3807,9 +3807,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -3905,9 +3905,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4003,9 +4003,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4101,9 +4101,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4199,9 +4199,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4297,9 +4297,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4395,9 +4395,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4493,9 +4493,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4591,9 +4591,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4695,9 +4695,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4793,9 +4793,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4891,9 +4891,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -4989,9 +4989,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5087,9 +5087,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5185,9 +5185,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5283,9 +5283,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5381,9 +5381,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5479,9 +5479,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5577,9 +5577,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5667,9 +5667,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5757,9 +5757,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5847,9 +5847,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -5937,9 +5937,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6027,9 +6027,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6117,9 +6117,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6207,9 +6207,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6297,9 +6297,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6393,9 +6393,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6483,9 +6483,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6573,9 +6573,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6663,9 +6663,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6753,9 +6753,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6843,9 +6843,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -6933,9 +6933,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7023,9 +7023,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7113,9 +7113,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7243,9 +7243,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7349,9 +7349,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7455,9 +7455,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7561,9 +7561,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7667,9 +7667,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7773,9 +7773,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7879,9 +7879,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -7985,9 +7985,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8091,9 +8091,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8203,9 +8203,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8309,9 +8309,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8415,9 +8415,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8521,9 +8521,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8627,9 +8627,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8733,9 +8733,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8839,9 +8839,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -8945,9 +8945,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9051,9 +9051,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9157,9 +9157,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9255,9 +9255,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9353,9 +9353,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9451,9 +9451,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9549,9 +9549,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9647,9 +9647,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9745,9 +9745,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9843,9 +9843,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -9941,9 +9941,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10045,9 +10045,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10143,9 +10143,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10241,9 +10241,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10339,9 +10339,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10437,9 +10437,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10535,9 +10535,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10633,9 +10633,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10731,9 +10731,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10829,9 +10829,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -10937,9 +10937,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11035,9 +11035,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11133,9 +11133,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11231,9 +11231,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11329,9 +11329,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11427,9 +11427,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11525,9 +11525,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11623,9 +11623,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11721,9 +11721,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11825,9 +11825,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -11923,9 +11923,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12021,9 +12021,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12119,9 +12119,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12217,9 +12217,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12315,9 +12315,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12413,9 +12413,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12511,9 +12511,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12609,9 +12609,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12707,9 +12707,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12797,9 +12797,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12887,9 +12887,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -12977,9 +12977,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13067,9 +13067,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13157,9 +13157,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13247,9 +13247,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13337,9 +13337,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13427,9 +13427,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13523,9 +13523,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13613,9 +13613,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13703,9 +13703,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13793,9 +13793,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13883,9 +13883,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -13973,9 +13973,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14063,9 +14063,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14153,9 +14153,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14243,9 +14243,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14373,9 +14373,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14479,9 +14479,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14585,9 +14585,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14691,9 +14691,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14797,9 +14797,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -14903,9 +14903,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15009,9 +15009,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15115,9 +15115,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15221,9 +15221,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15333,9 +15333,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15439,9 +15439,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15545,9 +15545,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15651,9 +15651,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15757,9 +15757,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15863,9 +15863,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -15969,9 +15969,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16075,9 +16075,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16181,9 +16181,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16287,9 +16287,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16385,9 +16385,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16483,9 +16483,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16581,9 +16581,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16679,9 +16679,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16777,9 +16777,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16875,9 +16875,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -16973,9 +16973,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17071,9 +17071,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17175,9 +17175,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17273,9 +17273,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17371,9 +17371,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17469,9 +17469,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17567,9 +17567,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17665,9 +17665,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17763,9 +17763,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17861,9 +17861,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -17959,9 +17959,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18067,9 +18067,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18165,9 +18165,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18263,9 +18263,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18361,9 +18361,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18459,9 +18459,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18557,9 +18557,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18655,9 +18655,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18753,9 +18753,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18851,9 +18851,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -18955,9 +18955,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19053,9 +19053,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19151,9 +19151,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19249,9 +19249,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19347,9 +19347,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19445,9 +19445,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19543,9 +19543,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19641,9 +19641,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19739,9 +19739,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19837,9 +19837,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -19927,9 +19927,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20017,9 +20017,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20107,9 +20107,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20197,9 +20197,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20287,9 +20287,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20377,9 +20377,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20467,9 +20467,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20557,9 +20557,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20653,9 +20653,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20743,9 +20743,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20833,9 +20833,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -20923,9 +20923,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21013,9 +21013,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21103,9 +21103,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21193,9 +21193,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21283,9 +21283,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21373,9 +21373,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21503,9 +21503,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21609,9 +21609,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21715,9 +21715,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21821,9 +21821,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -21927,9 +21927,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22033,9 +22033,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22139,9 +22139,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22245,9 +22245,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22351,9 +22351,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22463,9 +22463,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22569,9 +22569,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22675,9 +22675,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22781,9 +22781,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22887,9 +22887,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -22993,9 +22993,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23099,9 +23099,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23205,9 +23205,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23311,9 +23311,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23417,9 +23417,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23515,9 +23515,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23613,9 +23613,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23711,9 +23711,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23809,9 +23809,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -23907,9 +23907,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24005,9 +24005,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24103,9 +24103,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24201,9 +24201,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24305,9 +24305,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24403,9 +24403,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24501,9 +24501,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24599,9 +24599,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24697,9 +24697,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24795,9 +24795,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24893,9 +24893,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -24991,9 +24991,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25089,9 +25089,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25197,9 +25197,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25295,9 +25295,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25393,9 +25393,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25491,9 +25491,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25589,9 +25589,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25687,9 +25687,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25785,9 +25785,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25883,9 +25883,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -25981,9 +25981,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26085,9 +26085,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26183,9 +26183,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26281,9 +26281,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26379,9 +26379,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26477,9 +26477,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26575,9 +26575,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26673,9 +26673,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26771,9 +26771,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26869,9 +26869,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -26967,9 +26967,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27057,9 +27057,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27147,9 +27147,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27237,9 +27237,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27327,9 +27327,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27417,9 +27417,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27507,9 +27507,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27597,9 +27597,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27687,9 +27687,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27783,9 +27783,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27873,9 +27873,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -27963,9 +27963,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28053,9 +28053,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28143,9 +28143,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28233,9 +28233,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28323,9 +28323,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28413,9 +28413,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28503,9 +28503,9 @@ EqLoop:
 
 									// Last equality column and either group is incomplete. Save state and have it handled in the next iteration.
 									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lGroup, &o.proberState.lGroupEndIdx)
+										o.saveGroupToState(beginLIdx, lGroupLength, o.proberState.lBatch, lSel, &o.left, o.proberState.lBufferedGroup, &o.proberState.lGroupEndIdx, &o.proberState.needToResetLeftBufferedGroup)
 										o.proberState.lIdx = lGroupLength + beginLIdx
-										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rGroup, &o.proberState.rGroupEndIdx)
+										o.saveGroupToState(beginRIdx, rGroupLength, o.proberState.rBatch, rSel, &o.right, o.proberState.rBufferedGroup, &o.proberState.rGroupEndIdx, &o.proberState.needToResetRightBufferedGroup)
 										o.proberState.rIdx = rGroupLength + beginRIdx
 
 										o.groups.finishedCol()
@@ -28601,7 +28601,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28651,7 +28652,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28701,7 +28703,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28751,7 +28754,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28801,7 +28805,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28851,7 +28856,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28901,7 +28907,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -28951,7 +28958,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29001,7 +29009,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29057,7 +29066,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29103,7 +29113,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29149,7 +29160,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29195,7 +29207,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29241,7 +29254,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29287,7 +29301,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29333,7 +29348,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29379,7 +29395,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -29425,7 +29442,8 @@ LeftColLoop:
 						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 							// Repeat each row numRepeats times.
 							srcStartIdx = o.builderState.left.curSrcStartIdx
-							val = srcCol[sel[srcStartIdx]]
+							srcStartIdx = int(sel[srcStartIdx])
+							val = srcCol[srcStartIdx]
 
 							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 							toAppend := repeatsLeft
@@ -30404,7 +30422,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30451,7 +30469,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30498,7 +30516,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30545,7 +30563,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30592,7 +30610,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30639,7 +30657,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30686,7 +30704,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30733,7 +30751,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
@@ -30780,7 +30798,7 @@ RightColLoop:
 								toAppend = outputBatchSize - outStartIdx
 							}
 
-							out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
+							out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
 
 							// Optimization in the case that group length is 1, use assign instead of copy.
 							if toAppend == 1 {
