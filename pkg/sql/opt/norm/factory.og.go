@@ -15586,6 +15586,11 @@ func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFun
 				copy(newList, list[:i])
 			}
 			newList[i].Check = after
+			newList[i].OriginTable = list[i].OriginTable
+			newList[i].ReferencedTable = list[i].ReferencedTable
+			newList[i].FKOutbound = list[i].FKOutbound
+			newList[i].FKOrdinal = list[i].FKOrdinal
+			newList[i].KeyCols = list[i].KeyCols
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -16619,6 +16624,11 @@ func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, repla
 	dst = make(memo.FKChecksExpr, len(src))
 	for i := range src {
 		dst[i].Check = f.invokeReplace(src[i].Check, replace).(memo.RelExpr)
+		dst[i].OriginTable = src[i].OriginTable
+		dst[i].ReferencedTable = src[i].ReferencedTable
+		dst[i].FKOutbound = src[i].FKOutbound
+		dst[i].FKOrdinal = src[i].FKOrdinal
+		dst[i].KeyCols = src[i].KeyCols
 	}
 	return dst
 }

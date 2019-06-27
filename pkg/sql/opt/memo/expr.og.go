@@ -796,6 +796,7 @@ func (e *FKChecksExpr) DataType() *types.T {
 // An execution error will be generated if the query returns any results.
 type FKChecksItem struct {
 	Check RelExpr
+	FKChecksItemPrivate
 
 	Typ *types.T
 	id  opt.ScalarID
@@ -824,7 +825,7 @@ func (e *FKChecksItem) Child(nth int) opt.Expr {
 }
 
 func (e *FKChecksItem) Private() interface{} {
-	return nil
+	return &e.FKChecksItemPrivate
 }
 
 func (e *FKChecksItem) String() string {
@@ -844,6 +845,25 @@ func (e *FKChecksItem) SetChild(nth int, child opt.Expr) {
 
 func (e *FKChecksItem) DataType() *types.T {
 	return e.Typ
+}
+
+type FKChecksItemPrivate struct {
+	OriginTable     opt.TableID
+	ReferencedTable opt.TableID
+
+	// If FKOutbound is true: this item checks that a new value in the origin
+	// table has a valid reference. The FK constraint is
+	// OutboundForeignKey(FKOrdinal) on the origin table.
+	//
+	// If FKOutbound is false: this item checks that a removed value from the
+	// referenced table doesn't orphan references to it from the origin table.
+	// The FK constraint is InboundForeignKey(FKOrdinal) on the referenced table.
+	FKOutbound bool
+	FKOrdinal  int
+
+	// KeyCols are the columns in the Check query that form the value tuple shown
+	// in the error message.
+	KeyCols opt.ColList
 }
 
 // ScanExpr returns a result set containing every row in a table by scanning one of
@@ -17137,11 +17157,21 @@ func (in *interner) InternFKChecksItem(val *FKChecksItem) *FKChecksItem {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.FKChecksItemOp)
 	in.hasher.HashRelExpr(val.Check)
+	in.hasher.HashTableID(val.OriginTable)
+	in.hasher.HashTableID(val.ReferencedTable)
+	in.hasher.HashBool(val.FKOutbound)
+	in.hasher.HashInt(val.FKOrdinal)
+	in.hasher.HashColList(val.KeyCols)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FKChecksItem); ok {
-			if in.hasher.IsRelExprEqual(val.Check, existing.Check) {
+			if in.hasher.IsRelExprEqual(val.Check, existing.Check) &&
+				in.hasher.IsTableIDEqual(val.OriginTable, existing.OriginTable) &&
+				in.hasher.IsTableIDEqual(val.ReferencedTable, existing.ReferencedTable) &&
+				in.hasher.IsBoolEqual(val.FKOutbound, existing.FKOutbound) &&
+				in.hasher.IsIntEqual(val.FKOrdinal, existing.FKOrdinal) &&
+				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) {
 				return existing
 			}
 		}
