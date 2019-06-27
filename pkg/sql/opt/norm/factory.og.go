@@ -8256,6 +8256,36 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [PushLimitIntoWindow]
+	{
+		_window, _ := input.(*memo.WindowExpr)
+		if _window != nil {
+			input := _window.Input
+			fns := _window.Windows
+			if _f.funcs.AllArePrefixSafe(fns) {
+				private := &_window.WindowPrivate
+				newOrdering := _f.funcs.MakeSegmentedOrdering(input, _f.funcs.WindowPartition(private), _f.funcs.WindowOrdering(private), ordering)
+				if _f.funcs.OrderingSucceeded(newOrdering) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoWindow) {
+						_expr := _f.ConstructWindow(
+							_f.ConstructLimit(
+								input,
+								limit,
+								_f.funcs.DerefOrderingChoice(newOrdering),
+							),
+							fns,
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushLimitIntoWindow, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeLimit(input, limit, ordering)
 	return _f.onConstructRelational(e)
 }
