@@ -13236,6 +13236,132 @@ type ShowTracePrivate struct {
 	ColList opt.ColList
 }
 
+// OpaqueRelExpr is an opaque relational operator which is planned outside of the
+// optimizer. The operator contains an opaque metadata which is passed to the
+// exec factory.
+//
+// This is used for statements that are not directly supported by the optimizer,
+// and which don't use the result of other relational expressions (in other
+// words, they are a "leaf" operator).
+//
+// OpaqueRel can produce data and can be used as a data source as part of a
+// larger enclosing query.
+type OpaqueRelExpr struct {
+	OpaqueRelPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &OpaqueRelExpr{}
+
+func (e *OpaqueRelExpr) Op() opt.Operator {
+	return opt.OpaqueRelOp
+}
+
+func (e *OpaqueRelExpr) ChildCount() int {
+	return 0
+}
+
+func (e *OpaqueRelExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OpaqueRelExpr) Private() interface{} {
+	return &e.OpaqueRelPrivate
+}
+
+func (e *OpaqueRelExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *OpaqueRelExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OpaqueRelExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *OpaqueRelExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *OpaqueRelExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *OpaqueRelExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *OpaqueRelExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *OpaqueRelExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *OpaqueRelExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *OpaqueRelExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *OpaqueRelExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *OpaqueRelExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *OpaqueRelExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type opaqueRelGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first OpaqueRelExpr
+	best  bestProps
+}
+
+var _ exprGroup = &opaqueRelGroup{}
+
+func (g *opaqueRelGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *opaqueRelGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *opaqueRelGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *opaqueRelGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type OpaqueRelPrivate struct {
+	Columns  opt.ColList
+	Metadata opt.OpaqueMetadata
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	checks FKChecksExpr,
@@ -16032,6 +16158,24 @@ func (m *Memo) MemoizeShowTraceForSession(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeOpaqueRel(
+	opaqueRelPrivate *OpaqueRelPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(opaqueRelGroup{}))
+	grp := &opaqueRelGroup{mem: m, first: OpaqueRelExpr{
+		OpaqueRelPrivate: *opaqueRelPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternOpaqueRel(e)
+	if interned == e {
+		m.logPropsBuilder.buildOpaqueRelProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -16662,6 +16806,20 @@ func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp Rel
 	return interned
 }
 
+func (m *Memo) AddOpaqueRelToGroup(e *OpaqueRelExpr, grp RelExpr) *OpaqueRelExpr {
+	const size = int64(unsafe.Sizeof(OpaqueRelExpr{}))
+	interned := m.interner.InternOpaqueRel(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -16994,6 +17152,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternExplain(t)
 	case *ShowTraceForSessionExpr:
 		return in.InternShowTraceForSession(t)
+	case *OpaqueRelExpr:
+		return in.InternOpaqueRel(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -20463,6 +20623,26 @@ func (in *interner) InternShowTraceForSession(val *ShowTraceForSessionExpr) *Sho
 	return val
 }
 
+func (in *interner) InternOpaqueRel(val *OpaqueRelExpr) *OpaqueRelExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.OpaqueRelOp)
+	in.hasher.HashColList(val.Columns)
+	in.hasher.HashOpaqueMetadata(val.Metadata)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*OpaqueRelExpr); ok {
+			if in.hasher.IsColListEqual(val.Columns, existing.Columns) &&
+				in.hasher.IsOpaqueMetadataEqual(val.Metadata, existing.Metadata) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -20555,6 +20735,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildExplainProps(t, rel)
 	case *ShowTraceForSessionExpr:
 		b.buildShowTraceForSessionProps(t, rel)
+	case *OpaqueRelExpr:
+		b.buildOpaqueRelProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}

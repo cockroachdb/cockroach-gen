@@ -14438,6 +14438,24 @@ func (_f *Factory) ConstructShowTraceForSession(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructOpaqueRel constructs an expression for the OpaqueRel operator.
+// OpaqueRel is an opaque relational operator which is planned outside of the
+// optimizer. The operator contains an opaque metadata which is passed to the
+// exec factory.
+//
+// This is used for statements that are not directly supported by the optimizer,
+// and which don't use the result of other relational expressions (in other
+// words, they are a "leaf" operator).
+//
+// OpaqueRel can produce data and can be used as a data source as part of a
+// larger enclosing query.
+func (_f *Factory) ConstructOpaqueRel(
+	opaqueRelPrivate *memo.OpaqueRelPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeOpaqueRel(opaqueRelPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -15601,6 +15619,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.ShowTraceForSessionExpr:
 		return t
 
+	case *memo.OpaqueRelExpr:
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
@@ -16646,6 +16667,9 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.ShowTraceForSessionExpr:
 		return f.mem.MemoizeShowTraceForSession(&t.ShowTracePrivate)
 
+	case *memo.OpaqueRelExpr:
+		return f.mem.MemoizeOpaqueRel(&t.OpaqueRelPrivate)
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
@@ -17472,6 +17496,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ShowTraceForSessionOp:
 		return f.ConstructShowTraceForSession(
 			args[0].(*memo.ShowTracePrivate),
+		)
+	case opt.OpaqueRelOp:
+		return f.ConstructOpaqueRel(
+			args[0].(*memo.OpaqueRelPrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))
