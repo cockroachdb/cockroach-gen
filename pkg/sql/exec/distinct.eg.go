@@ -152,7 +152,8 @@ func newPartitioner(t types.T) (partitioner, error) {
 // sortedDistinctBoolOp runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctBoolOp struct {
 	input Operator
 
@@ -169,7 +170,8 @@ type sortedDistinctBoolOp struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal bool
+	lastVal     bool
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctBoolOp{}
@@ -180,6 +182,7 @@ func (p *sortedDistinctBoolOp) Init() {
 
 func (p *sortedDistinctBoolOp) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -191,56 +194,98 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Bool()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Bool()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = tree.CompareBools(v, lastVal) != 0
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = tree.CompareBools(v, lastVal) != 0
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = tree.CompareBools(v, lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = tree.CompareBools(v, lastVal) != 0
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = tree.CompareBools(v, lastVal) != 0
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = tree.CompareBools(v, lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -252,25 +297,50 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 type partitionerBool struct{}
 
 func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Bool()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal bool
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = tree.CompareBools(v, lastVal) != 0
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Bool()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = tree.CompareBools(v, lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = tree.CompareBools(v, lastVal) != 0
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctBytesOp runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctBytesOp struct {
 	input Operator
 
@@ -287,7 +357,8 @@ type sortedDistinctBytesOp struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal []byte
+	lastVal     []byte
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctBytesOp{}
@@ -298,6 +369,7 @@ func (p *sortedDistinctBytesOp) Init() {
 
 func (p *sortedDistinctBytesOp) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -309,56 +381,98 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Bytes()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Bytes()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = bytes.Compare(v, lastVal) != 0
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = bytes.Compare(v, lastVal) != 0
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = bytes.Compare(v, lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = bytes.Compare(v, lastVal) != 0
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = bytes.Compare(v, lastVal) != 0
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = bytes.Compare(v, lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -370,25 +484,50 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 type partitionerBytes struct{}
 
 func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Bytes()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal []byte
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = bytes.Compare(v, lastVal) != 0
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Bytes()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = bytes.Compare(v, lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = bytes.Compare(v, lastVal) != 0
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctDecimalOp runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctDecimalOp struct {
 	input Operator
 
@@ -405,7 +544,8 @@ type sortedDistinctDecimalOp struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal apd.Decimal
+	lastVal     apd.Decimal
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctDecimalOp{}
@@ -416,6 +556,7 @@ func (p *sortedDistinctDecimalOp) Init() {
 
 func (p *sortedDistinctDecimalOp) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -427,56 +568,98 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Decimal()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Decimal()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = tree.CompareDecimals(&v, &lastVal) != 0
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = tree.CompareDecimals(&v, &lastVal) != 0
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = tree.CompareDecimals(&v, &lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = tree.CompareDecimals(&v, &lastVal) != 0
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = tree.CompareDecimals(&v, &lastVal) != 0
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = tree.CompareDecimals(&v, &lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -488,25 +671,50 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 type partitionerDecimal struct{}
 
 func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Decimal()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal apd.Decimal
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = tree.CompareDecimals(&v, &lastVal) != 0
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Decimal()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = tree.CompareDecimals(&v, &lastVal) != 0
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = tree.CompareDecimals(&v, &lastVal) != 0
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctInt8Op runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctInt8Op struct {
 	input Operator
 
@@ -523,7 +731,8 @@ type sortedDistinctInt8Op struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal int8
+	lastVal     int8
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctInt8Op{}
@@ -534,6 +743,7 @@ func (p *sortedDistinctInt8Op) Init() {
 
 func (p *sortedDistinctInt8Op) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -545,56 +755,98 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Int8()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Int8()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -606,25 +858,50 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt8 struct{}
 
 func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Int8()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal int8
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = v != lastVal
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Int8()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = v != lastVal
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctInt16Op runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctInt16Op struct {
 	input Operator
 
@@ -641,7 +918,8 @@ type sortedDistinctInt16Op struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal int16
+	lastVal     int16
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctInt16Op{}
@@ -652,6 +930,7 @@ func (p *sortedDistinctInt16Op) Init() {
 
 func (p *sortedDistinctInt16Op) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -663,56 +942,98 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Int16()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Int16()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -724,25 +1045,50 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt16 struct{}
 
 func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Int16()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal int16
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = v != lastVal
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Int16()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = v != lastVal
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctInt32Op runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctInt32Op struct {
 	input Operator
 
@@ -759,7 +1105,8 @@ type sortedDistinctInt32Op struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal int32
+	lastVal     int32
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctInt32Op{}
@@ -770,6 +1117,7 @@ func (p *sortedDistinctInt32Op) Init() {
 
 func (p *sortedDistinctInt32Op) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -781,56 +1129,98 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Int32()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Int32()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -842,25 +1232,50 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt32 struct{}
 
 func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Int32()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal int32
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = v != lastVal
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Int32()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = v != lastVal
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctInt64Op runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctInt64Op struct {
 	input Operator
 
@@ -877,7 +1292,8 @@ type sortedDistinctInt64Op struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal int64
+	lastVal     int64
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctInt64Op{}
@@ -888,6 +1304,7 @@ func (p *sortedDistinctInt64Op) Init() {
 
 func (p *sortedDistinctInt64Op) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -899,56 +1316,98 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Int64()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Int64()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -960,25 +1419,50 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt64 struct{}
 
 func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Int64()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal int64
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = v != lastVal
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Int64()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = v != lastVal
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctFloat32Op runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctFloat32Op struct {
 	input Operator
 
@@ -995,7 +1479,8 @@ type sortedDistinctFloat32Op struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal float32
+	lastVal     float32
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctFloat32Op{}
@@ -1006,6 +1491,7 @@ func (p *sortedDistinctFloat32Op) Init() {
 
 func (p *sortedDistinctFloat32Op) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -1017,56 +1503,98 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Float32()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Float32()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -1078,25 +1606,50 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 type partitionerFloat32 struct{}
 
 func (p partitionerFloat32) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Float32()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal float32
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = v != lastVal
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Float32()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = v != lastVal
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
 
 // sortedDistinctFloat64Op runs a distinct on the column in sortedDistinctCol,
 // writing true to the resultant bool column for every value that differs from
 // the previous one.
-
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
 type sortedDistinctFloat64Op struct {
 	input Operator
 
@@ -1113,7 +1666,8 @@ type sortedDistinctFloat64Op struct {
 
 	// lastVal is the last value seen by the operator, so that the distincting
 	// still works across batch boundaries.
-	lastVal float64
+	lastVal     float64
+	lastValNull bool
 }
 
 var _ Operator = &sortedDistinctFloat64Op{}
@@ -1124,6 +1678,7 @@ func (p *sortedDistinctFloat64Op) Init() {
 
 func (p *sortedDistinctFloat64Op) reset() {
 	p.foundFirstRow = false
+	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
 		resetter.reset()
 	}
@@ -1135,56 +1690,98 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	outputCol := p.outputCol
-	col := batch.ColVec(p.sortedDistinctCol).Float64()
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.HasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Float64()
 
 	// We always output the first row.
 	lastVal := p.lastVal
+	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	startIdx := uint16(0)
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
 	if !p.foundFirstRow {
-		if sel != nil {
-			lastVal = col[sel[0]]
-			outputCol[sel[0]] = true
-		} else {
-			lastVal = col[0]
-			outputCol[0] = true
-		}
-		startIdx = 1
+		outputCol[firstIdx] = true
 		p.foundFirstRow = true
-		if batch.Length() == 1 {
-			p.lastVal = lastVal
-			return batch
-		}
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
 	}
 
 	n := batch.Length()
 	if sel != nil {
 		// Bounds check elimination.
-		sel = sel[startIdx:n]
-		for _, i := range sel {
+		sel = sel[:n]
+		if nulls != nil {
+			for _, i := range sel {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, i := range sel {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[startIdx:n]
-		outputCol = outputCol[startIdx:n]
+		col = col[:n]
+		outputCol = outputCol[:n]
 		_ = outputCol[len(col)-1]
-		for i := range col {
+		if nulls != nil {
+			for i := range col {
 
-			v := col[i]
-			var unique bool
-			unique = v != lastVal
-			outputCol[i] = outputCol[i] || unique
-			lastVal = v
+				null := nulls.NullAt(uint16(i))
+				v := col[i]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[i] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+					unique = v != lastVal
+					outputCol[i] = outputCol[i] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for i := range col {
+
+				v := col[i]
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+				lastVal = v
+			}
 		}
 	}
 
 	p.lastVal = lastVal
+	p.lastValNull = lastValNull
 
 	return batch
 }
@@ -1196,17 +1793,41 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 type partitionerFloat64 struct{}
 
 func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
-	col := colVec.Float64()
-	lastVal := col[0]
-	outputCol[0] = true
-	outputCol = outputCol[1:n]
-	col = col[1:n]
-	for i := range col {
+	var lastVal float64
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.HasNulls() {
+		nulls = colVec.Nulls()
+	}
 
-		v := col[i]
-		var unique bool
-		unique = v != lastVal
-		outputCol[i] = outputCol[i] || unique
-		lastVal = v
+	col := colVec.Float64()[:n]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for i := range col {
+
+			null := nulls.NullAt(uint16(i))
+			v := col[i]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[i] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+				unique = v != lastVal
+				outputCol[i] = outputCol[i] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for i := range col {
+
+			v := col[i]
+			var unique bool
+			unique = v != lastVal
+			outputCol[i] = outputCol[i] || unique
+			lastVal = v
+		}
 	}
 }
