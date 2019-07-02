@@ -13362,6 +13362,157 @@ type OpaqueRelPrivate struct {
 	Metadata opt.OpaqueMetadata
 }
 
+// AlterTableSplitExpr represents an `ALTER TABLE/INDEX .. SPLIT AT ..` statement.
+type AlterTableSplitExpr struct {
+	// The input expression provides values for the index columns (or a prefix of
+	// them).
+	Input RelExpr
+
+	// Expiration is a string scalar that indicates a timestamp after which the
+	// ranges are eligible for automatic merging (or Null if there is no
+	// expiration).
+	Expiration opt.ScalarExpr
+	AlterTableSplitPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AlterTableSplitExpr{}
+
+func (e *AlterTableSplitExpr) Op() opt.Operator {
+	return opt.AlterTableSplitOp
+}
+
+func (e *AlterTableSplitExpr) ChildCount() int {
+	return 2
+}
+
+func (e *AlterTableSplitExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.Expiration
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableSplitExpr) Private() interface{} {
+	return &e.AlterTableSplitPrivate
+}
+
+func (e *AlterTableSplitExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AlterTableSplitExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Expiration = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableSplitExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AlterTableSplitExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AlterTableSplitExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AlterTableSplitExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AlterTableSplitExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *AlterTableSplitExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *AlterTableSplitExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *AlterTableSplitExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AlterTableSplitExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *AlterTableSplitExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AlterTableSplitExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type alterTableSplitGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first AlterTableSplitExpr
+	best  bestProps
+}
+
+var _ exprGroup = &alterTableSplitGroup{}
+
+func (g *alterTableSplitGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *alterTableSplitGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *alterTableSplitGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *alterTableSplitGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type AlterTableSplitPrivate struct {
+	// Table identifies the table to alter. It is an id that can be passed to
+	// the Metadata.Table method in order to fetch cat.Table metadata.
+	Table opt.TableID
+
+	// Index identifies the index to scan (whether primary or secondary). It
+	// can be passed to the cat.Table.Index(i int) method in order to fetch the
+	// cat.Index metadata.
+	Index int
+
+	// Props stores the required physical properties for the enclosed expression.
+	Props *physical.Required
+
+	// Columns stores the column IDs for the statement result columns.
+	Columns opt.ColList
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	checks FKChecksExpr,
@@ -16176,6 +16327,28 @@ func (m *Memo) MemoizeOpaqueRel(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeAlterTableSplit(
+	input RelExpr,
+	expiration opt.ScalarExpr,
+	alterTableSplitPrivate *AlterTableSplitPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(alterTableSplitGroup{}))
+	grp := &alterTableSplitGroup{mem: m, first: AlterTableSplitExpr{
+		Input:                  input,
+		Expiration:             expiration,
+		AlterTableSplitPrivate: *alterTableSplitPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAlterTableSplit(e)
+	if interned == e {
+		m.logPropsBuilder.buildAlterTableSplitProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -16820,6 +16993,20 @@ func (m *Memo) AddOpaqueRelToGroup(e *OpaqueRelExpr, grp RelExpr) *OpaqueRelExpr
 	return interned
 }
 
+func (m *Memo) AddAlterTableSplitToGroup(e *AlterTableSplitExpr, grp RelExpr) *AlterTableSplitExpr {
+	const size = int64(unsafe.Sizeof(AlterTableSplitExpr{}))
+	interned := m.interner.InternAlterTableSplit(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -17154,6 +17341,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternShowTraceForSession(t)
 	case *OpaqueRelExpr:
 		return in.InternOpaqueRel(t)
+	case *AlterTableSplitExpr:
+		return in.InternAlterTableSplit(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -20643,6 +20832,34 @@ func (in *interner) InternOpaqueRel(val *OpaqueRelExpr) *OpaqueRelExpr {
 	return val
 }
 
+func (in *interner) InternAlterTableSplit(val *AlterTableSplitExpr) *AlterTableSplitExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AlterTableSplitOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Expiration)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.Index)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashColList(val.Columns)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AlterTableSplitExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Expiration, existing.Expiration) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -20737,6 +20954,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildShowTraceForSessionProps(t, rel)
 	case *OpaqueRelExpr:
 		b.buildOpaqueRelProps(t, rel)
+	case *AlterTableSplitExpr:
+		b.buildAlterTableSplitProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}

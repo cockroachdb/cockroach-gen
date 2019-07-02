@@ -14456,6 +14456,17 @@ func (_f *Factory) ConstructOpaqueRel(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructAlterTableSplit constructs an expression for the AlterTableSplit operator.
+// AlterTableSplit represents an `ALTER TABLE/INDEX .. SPLIT AT ..` statement.
+func (_f *Factory) ConstructAlterTableSplit(
+	input memo.RelExpr,
+	expiration opt.ScalarExpr,
+	alterTableSplitPrivate *memo.AlterTableSplitPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeAlterTableSplit(input, expiration, alterTableSplitPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -15622,6 +15633,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.OpaqueRelExpr:
 		return t
 
+	case *memo.AlterTableSplitExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		expiration := replace(t.Expiration).(opt.ScalarExpr)
+		if input != t.Input || expiration != t.Expiration {
+			return f.ConstructAlterTableSplit(input, expiration, &t.AlterTableSplitPrivate)
+		}
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
@@ -16670,6 +16689,13 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.OpaqueRelExpr:
 		return f.mem.MemoizeOpaqueRel(&t.OpaqueRelPrivate)
 
+	case *memo.AlterTableSplitExpr:
+		return f.ConstructAlterTableSplit(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Expiration, replace).(opt.ScalarExpr),
+			&t.AlterTableSplitPrivate,
+		)
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
@@ -17500,6 +17526,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.OpaqueRelOp:
 		return f.ConstructOpaqueRel(
 			args[0].(*memo.OpaqueRelPrivate),
+		)
+	case opt.AlterTableSplitOp:
+		return f.ConstructAlterTableSplit(
+			args[0].(memo.RelExpr),
+			args[1].(opt.ScalarExpr),
+			args[2].(*memo.AlterTableSplitPrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

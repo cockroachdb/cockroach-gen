@@ -40,6 +40,11 @@ const (
 	// the grouping operator.
 	AggregationsItemOp
 
+	// AlterTableSplit represents an `ALTER TABLE/INDEX .. SPLIT AT ..` statement.
+	AlterTableSplitOp
+
+	AlterTableSplitPrivateOp
+
 	// And is the boolean conjunction operator that evalutes to true only if both of
 	// its conditions evaluate to true.
 	AndOp
@@ -1032,13 +1037,13 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownagg-distinctagg-filteraggregationsaggregations-itemandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggarray-flattenavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowscreate-tablecreate-table-privatecume-distdeletedense-rankdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatef-k-checksf-k-checks-itemf-k-checks-item-privatefake-relfake-rel-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfirst-valuefloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeif-errinindex-joinindex-join-privateindirectioninner-joininner-join-applyinsertintersectintersect-allisis-notjoin-privatejson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftlaglast-valueleleadleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultmutation-privatenenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonth-valuentilenulloffsetopaque-relopaque-rel-privateorordinalityordinality-privatepercent-rankplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftrangerankreg-i-matchreg-matchright-joinright-join-applyrow-numberscalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applysequence-selectsequence-select-privateset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devstring-aggsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprupdateupsertvaluesvalues-privatevariablevariancevirtual-scanvirtual-scan-privatewhenwindowwindow-from-offsetwindow-privatewindow-to-offsetwindowswindows-itemwindows-item-privatexor-aggzigzag-joinzigzag-join-privatezipzip-itemzip-item-private"
+const opNames = "unknownagg-distinctagg-filteraggregationsaggregations-itemalter-table-splitalter-table-split-privateandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggarray-flattenavgbitandbitorbitxorbool-andbool-orcasecastcoalescecol-privatecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontainscountcount-rowscreate-tablecreate-table-privatecume-distdeletedense-rankdistinct-ondiveqexceptexcept-allexistsexplainexplain-privatef-k-checksf-k-checks-itemf-k-checks-item-privatefake-relfake-rel-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfirst-valuefloor-divfull-joinfull-join-applyfunctionfunction-privategegroup-bygrouping-privategti-likeif-errinindex-joinindex-join-privateindirectioninner-joininner-join-applyinsertintersectintersect-allisis-notjoin-privatejson-aggjson-all-existsjson-existsjson-some-existsjsonb-aggl-shiftlaglast-valueleleadleft-joinleft-join-applylikelimitlookup-joinlookup-join-privateltmaxmax1-rowmerge-joinmerge-join-privateminminusmodmultmutation-privatenenotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonth-valuentilenulloffsetopaque-relopaque-rel-privateorordinalityordinality-privatepercent-rankplaceholderpluspowprojectproject-setprojectionsprojections-itemr-shiftrangerankreg-i-matchreg-matchright-joinright-join-applyrow-numberscalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applysequence-selectsequence-select-privateset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devstring-aggsubquerysubquery-privatesumsum-inttruetupleunary-complementunary-minusunionunion-allunsupported-exprupdateupsertvaluesvalues-privatevariablevariancevirtual-scanvirtual-scan-privatewhenwindowwindow-from-offsetwindow-privatewindow-to-offsetwindowswindows-itemwindows-item-privatexor-aggzigzag-joinzigzag-join-privatezipzip-itemzip-item-private"
 
-var opNameIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 61, 70, 85, 88, 104, 114, 119, 128, 141, 144, 150, 155, 161, 169, 176, 180, 184, 192, 203, 210, 223, 229, 239, 244, 253, 271, 279, 284, 294, 306, 326, 335, 341, 351, 362, 365, 367, 373, 383, 389, 396, 411, 421, 436, 459, 467, 483, 488, 498, 513, 522, 536, 543, 555, 564, 575, 584, 593, 608, 616, 632, 634, 642, 658, 660, 666, 672, 674, 684, 702, 713, 723, 739, 745, 754, 767, 769, 775, 787, 795, 810, 821, 837, 846, 853, 856, 866, 868, 872, 881, 896, 900, 905, 916, 935, 937, 940, 948, 958, 976, 979, 984, 987, 991, 1007, 1009, 1012, 1022, 1028, 1036, 1051, 1064, 1078, 1087, 1092, 1096, 1102, 1112, 1130, 1132, 1142, 1160, 1172, 1183, 1187, 1190, 1197, 1208, 1219, 1235, 1242, 1247, 1251, 1262, 1271, 1281, 1297, 1307, 1322, 1333, 1337, 1349, 1355, 1364, 1379, 1394, 1417, 1428, 1450, 1468, 1478, 1482, 1490, 1497, 1507, 1515, 1531, 1534, 1541, 1545, 1550, 1566, 1577, 1582, 1591, 1607, 1613, 1619, 1625, 1639, 1647, 1655, 1667, 1687, 1691, 1697, 1715, 1729, 1745, 1752, 1764, 1784, 1791, 1802, 1821, 1824, 1832, 1848}
+var opNameIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 75, 100, 103, 112, 127, 130, 146, 156, 161, 170, 183, 186, 192, 197, 203, 211, 218, 222, 226, 234, 245, 252, 265, 271, 281, 286, 295, 313, 321, 326, 336, 348, 368, 377, 383, 393, 404, 407, 409, 415, 425, 431, 438, 453, 463, 478, 501, 509, 525, 530, 540, 555, 564, 578, 585, 597, 606, 617, 626, 635, 650, 658, 674, 676, 684, 700, 702, 708, 714, 716, 726, 744, 755, 765, 781, 787, 796, 809, 811, 817, 829, 837, 852, 863, 879, 888, 895, 898, 908, 910, 914, 923, 938, 942, 947, 958, 977, 979, 982, 990, 1000, 1018, 1021, 1026, 1029, 1033, 1049, 1051, 1054, 1064, 1070, 1078, 1093, 1106, 1120, 1129, 1134, 1138, 1144, 1154, 1172, 1174, 1184, 1202, 1214, 1225, 1229, 1232, 1239, 1250, 1261, 1277, 1284, 1289, 1293, 1304, 1313, 1323, 1339, 1349, 1364, 1375, 1379, 1391, 1397, 1406, 1421, 1436, 1459, 1470, 1492, 1510, 1520, 1524, 1532, 1539, 1549, 1557, 1573, 1576, 1583, 1587, 1592, 1608, 1619, 1624, 1633, 1649, 1655, 1661, 1667, 1681, 1689, 1697, 1709, 1729, 1733, 1739, 1757, 1771, 1787, 1794, 1806, 1826, 1833, 1844, 1863, 1866, 1874, 1890}
 
-const opSyntaxTags = "UNKNOWNAGG DISTINCTAGG FILTERAGGREGATIONSAGGREGATIONS ITEMANDANTI JOINANTI JOIN APPLYANYANY NOT NULL AGGANY SCALARARRAYARRAY AGGARRAY FLATTENAVGBITANDBITORBITXORBOOL ANDBOOL ORCASECASTCOALESCECOL PRIVATECOLLATECOLUMN ACCESSCONCATCONCAT AGGCONSTCONST AGGCONST NOT NULL AGGCONTAINSCOUNTCOUNT ROWSCREATE TABLECREATE TABLE PRIVATECUME DISTDELETEDENSE RANKDISTINCT ONDIVEQEXCEPTEXCEPT ALLEXISTSEXPLAINEXPLAIN PRIVATEF K CHECKSF K CHECKS ITEMF K CHECKS ITEM PRIVATEFAKE RELFAKE REL PRIVATEFALSEFETCH TEXTFETCH TEXT PATHFETCH VALFETCH VAL PATHFILTERSFILTERS ITEMFIRST AGGFIRST VALUEFLOOR DIVFULL JOINFULL JOIN APPLYFUNCTIONFUNCTION PRIVATEGEGROUP BYGROUPING PRIVATEGTI LIKEIF ERRININDEX JOININDEX JOIN PRIVATEINDIRECTIONINNER JOININNER JOIN APPLYINSERTINTERSECTINTERSECT ALLISIS NOTJOIN PRIVATEJSON AGGJSON ALL EXISTSJSON EXISTSJSON SOME EXISTSJSONB AGGL SHIFTLAGLAST VALUELELEADLEFT JOINLEFT JOIN APPLYLIKELIMITLOOKUP JOINLOOKUP JOIN PRIVATELTMAXMAX1 ROWMERGE JOINMERGE JOIN PRIVATEMINMINUSMODMULTMUTATION PRIVATENENOTNOT I LIKENOT INNOT LIKENOT REG I MATCHNOT REG MATCHNOT SIMILAR TONTH VALUENTILENULLOFFSETOPAQUE RELOPAQUE REL PRIVATEORORDINALITYORDINALITY PRIVATEPERCENT RANKPLACEHOLDERPLUSPOWPROJECTPROJECT SETPROJECTIONSPROJECTIONS ITEMR SHIFTRANGERANKREG I MATCHREG MATCHRIGHT JOINRIGHT JOIN APPLYROW NUMBERSCALAR GROUP BYSCALAR LISTSCANSCAN PRIVATESELECTSEMI JOINSEMI JOIN APPLYSEQUENCE SELECTSEQUENCE SELECT PRIVATESET PRIVATESHOW TRACE FOR SESSIONSHOW TRACE PRIVATESIMILAR TOSORTSQR DIFFSTD DEVSTRING AGGSUBQUERYSUBQUERY PRIVATESUMSUM INTTRUETUPLEUNARY COMPLEMENTUNARY MINUSUNIONUNION ALLUNSUPPORTED EXPRUPDATEUPSERTVALUESVALUES PRIVATEVARIABLEVARIANCEVIRTUAL SCANVIRTUAL SCAN PRIVATEWHENWINDOWWINDOW FROM OFFSETWINDOW PRIVATEWINDOW TO OFFSETWINDOWSWINDOWS ITEMWINDOWS ITEM PRIVATEXOR AGGZIGZAG JOINZIGZAG JOIN PRIVATEZIPZIP ITEMZIP ITEM PRIVATE"
+const opSyntaxTags = "UNKNOWNAGG DISTINCTAGG FILTERAGGREGATIONSAGGREGATIONS ITEMALTER TABLE SPLITALTER TABLE SPLIT PRIVATEANDANTI JOINANTI JOIN APPLYANYANY NOT NULL AGGANY SCALARARRAYARRAY AGGARRAY FLATTENAVGBITANDBITORBITXORBOOL ANDBOOL ORCASECASTCOALESCECOL PRIVATECOLLATECOLUMN ACCESSCONCATCONCAT AGGCONSTCONST AGGCONST NOT NULL AGGCONTAINSCOUNTCOUNT ROWSCREATE TABLECREATE TABLE PRIVATECUME DISTDELETEDENSE RANKDISTINCT ONDIVEQEXCEPTEXCEPT ALLEXISTSEXPLAINEXPLAIN PRIVATEF K CHECKSF K CHECKS ITEMF K CHECKS ITEM PRIVATEFAKE RELFAKE REL PRIVATEFALSEFETCH TEXTFETCH TEXT PATHFETCH VALFETCH VAL PATHFILTERSFILTERS ITEMFIRST AGGFIRST VALUEFLOOR DIVFULL JOINFULL JOIN APPLYFUNCTIONFUNCTION PRIVATEGEGROUP BYGROUPING PRIVATEGTI LIKEIF ERRININDEX JOININDEX JOIN PRIVATEINDIRECTIONINNER JOININNER JOIN APPLYINSERTINTERSECTINTERSECT ALLISIS NOTJOIN PRIVATEJSON AGGJSON ALL EXISTSJSON EXISTSJSON SOME EXISTSJSONB AGGL SHIFTLAGLAST VALUELELEADLEFT JOINLEFT JOIN APPLYLIKELIMITLOOKUP JOINLOOKUP JOIN PRIVATELTMAXMAX1 ROWMERGE JOINMERGE JOIN PRIVATEMINMINUSMODMULTMUTATION PRIVATENENOTNOT I LIKENOT INNOT LIKENOT REG I MATCHNOT REG MATCHNOT SIMILAR TONTH VALUENTILENULLOFFSETOPAQUE RELOPAQUE REL PRIVATEORORDINALITYORDINALITY PRIVATEPERCENT RANKPLACEHOLDERPLUSPOWPROJECTPROJECT SETPROJECTIONSPROJECTIONS ITEMR SHIFTRANGERANKREG I MATCHREG MATCHRIGHT JOINRIGHT JOIN APPLYROW NUMBERSCALAR GROUP BYSCALAR LISTSCANSCAN PRIVATESELECTSEMI JOINSEMI JOIN APPLYSEQUENCE SELECTSEQUENCE SELECT PRIVATESET PRIVATESHOW TRACE FOR SESSIONSHOW TRACE PRIVATESIMILAR TOSORTSQR DIFFSTD DEVSTRING AGGSUBQUERYSUBQUERY PRIVATESUMSUM INTTRUETUPLEUNARY COMPLEMENTUNARY MINUSUNIONUNION ALLUNSUPPORTED EXPRUPDATEUPSERTVALUESVALUES PRIVATEVARIABLEVARIANCEVIRTUAL SCANVIRTUAL SCAN PRIVATEWHENWINDOWWINDOW FROM OFFSETWINDOW PRIVATEWINDOW TO OFFSETWINDOWSWINDOWS ITEMWINDOWS ITEM PRIVATEXOR AGGZIGZAG JOINZIGZAG JOIN PRIVATEZIPZIP ITEMZIP ITEM PRIVATE"
 
-var opSyntaxTagIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 61, 70, 85, 88, 104, 114, 119, 128, 141, 144, 150, 155, 161, 169, 176, 180, 184, 192, 203, 210, 223, 229, 239, 244, 253, 271, 279, 284, 294, 306, 326, 335, 341, 351, 362, 365, 367, 373, 383, 389, 396, 411, 421, 436, 459, 467, 483, 488, 498, 513, 522, 536, 543, 555, 564, 575, 584, 593, 608, 616, 632, 634, 642, 658, 660, 666, 672, 674, 684, 702, 713, 723, 739, 745, 754, 767, 769, 775, 787, 795, 810, 821, 837, 846, 853, 856, 866, 868, 872, 881, 896, 900, 905, 916, 935, 937, 940, 948, 958, 976, 979, 984, 987, 991, 1007, 1009, 1012, 1022, 1028, 1036, 1051, 1064, 1078, 1087, 1092, 1096, 1102, 1112, 1130, 1132, 1142, 1160, 1172, 1183, 1187, 1190, 1197, 1208, 1219, 1235, 1242, 1247, 1251, 1262, 1271, 1281, 1297, 1307, 1322, 1333, 1337, 1349, 1355, 1364, 1379, 1394, 1417, 1428, 1450, 1468, 1478, 1482, 1490, 1497, 1507, 1515, 1531, 1534, 1541, 1545, 1550, 1566, 1577, 1582, 1591, 1607, 1613, 1619, 1625, 1639, 1647, 1655, 1667, 1687, 1691, 1697, 1715, 1729, 1745, 1752, 1764, 1784, 1791, 1802, 1821, 1824, 1832, 1848}
+var opSyntaxTagIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 75, 100, 103, 112, 127, 130, 146, 156, 161, 170, 183, 186, 192, 197, 203, 211, 218, 222, 226, 234, 245, 252, 265, 271, 281, 286, 295, 313, 321, 326, 336, 348, 368, 377, 383, 393, 404, 407, 409, 415, 425, 431, 438, 453, 463, 478, 501, 509, 525, 530, 540, 555, 564, 578, 585, 597, 606, 617, 626, 635, 650, 658, 674, 676, 684, 700, 702, 708, 714, 716, 726, 744, 755, 765, 781, 787, 796, 809, 811, 817, 829, 837, 852, 863, 879, 888, 895, 898, 908, 910, 914, 923, 938, 942, 947, 958, 977, 979, 982, 990, 1000, 1018, 1021, 1026, 1029, 1033, 1049, 1051, 1054, 1064, 1070, 1078, 1093, 1106, 1120, 1129, 1134, 1138, 1144, 1154, 1172, 1174, 1184, 1202, 1214, 1225, 1229, 1232, 1239, 1250, 1261, 1277, 1284, 1289, 1293, 1304, 1313, 1323, 1339, 1349, 1364, 1375, 1379, 1391, 1397, 1406, 1421, 1436, 1459, 1470, 1492, 1510, 1520, 1524, 1532, 1539, 1549, 1557, 1573, 1576, 1583, 1587, 1592, 1608, 1619, 1624, 1633, 1649, 1655, 1661, 1667, 1681, 1689, 1697, 1709, 1729, 1733, 1739, 1757, 1771, 1787, 1794, 1806, 1826, 1833, 1844, 1863, 1866, 1874, 1890}
 
 var EnforcerOperators = [...]Operator{
 	SortOp,
@@ -1053,6 +1058,7 @@ func IsEnforcerOp(e Expr) bool {
 }
 
 var RelationalOperators = [...]Operator{
+	AlterTableSplitOp,
 	AntiJoinOp,
 	AntiJoinApplyOp,
 	CreateTableOp,
@@ -1103,16 +1109,16 @@ var RelationalOperators = [...]Operator{
 
 func IsRelationalOp(e Expr) bool {
 	switch e.Op() {
-	case AntiJoinOp, AntiJoinApplyOp, CreateTableOp, DeleteOp,
-		DistinctOnOp, ExceptOp, ExceptAllOp, ExplainOp, FakeRelOp,
-		FullJoinOp, FullJoinApplyOp, GroupByOp, IndexJoinOp, InnerJoinOp,
-		InnerJoinApplyOp, InsertOp, IntersectOp, IntersectAllOp, LeftJoinOp,
-		LeftJoinApplyOp, LimitOp, LookupJoinOp, Max1RowOp, MergeJoinOp,
-		OffsetOp, OpaqueRelOp, OrdinalityOp, ProjectOp, ProjectSetOp,
-		RightJoinOp, RightJoinApplyOp, ScalarGroupByOp, ScanOp, SelectOp,
-		SemiJoinOp, SemiJoinApplyOp, SequenceSelectOp, ShowTraceForSessionOp, UnionOp,
-		UnionAllOp, UpdateOp, UpsertOp, ValuesOp, VirtualScanOp,
-		WindowOp, ZigzagJoinOp:
+	case AlterTableSplitOp, AntiJoinOp, AntiJoinApplyOp, CreateTableOp,
+		DeleteOp, DistinctOnOp, ExceptOp, ExceptAllOp, ExplainOp,
+		FakeRelOp, FullJoinOp, FullJoinApplyOp, GroupByOp, IndexJoinOp,
+		InnerJoinOp, InnerJoinApplyOp, InsertOp, IntersectOp, IntersectAllOp,
+		LeftJoinOp, LeftJoinApplyOp, LimitOp, LookupJoinOp, Max1RowOp,
+		MergeJoinOp, OffsetOp, OpaqueRelOp, OrdinalityOp, ProjectOp,
+		ProjectSetOp, RightJoinOp, RightJoinApplyOp, ScalarGroupByOp, ScanOp,
+		SelectOp, SemiJoinOp, SemiJoinApplyOp, SequenceSelectOp, ShowTraceForSessionOp,
+		UnionOp, UnionAllOp, UpdateOp, UpsertOp, ValuesOp,
+		VirtualScanOp, WindowOp, ZigzagJoinOp:
 		return true
 	}
 	return false
@@ -1137,6 +1143,7 @@ func IsMutationOp(e Expr) bool {
 }
 
 var PrivateOperators = [...]Operator{
+	AlterTableSplitPrivateOp,
 	ColPrivateOp,
 	CreateTablePrivateOp,
 	ExplainPrivateOp,
@@ -1166,12 +1173,12 @@ var PrivateOperators = [...]Operator{
 
 func IsPrivateOp(e Expr) bool {
 	switch e.Op() {
-	case ColPrivateOp, CreateTablePrivateOp, ExplainPrivateOp, FKChecksItemPrivateOp,
-		FakeRelPrivateOp, FunctionPrivateOp, GroupingPrivateOp, IndexJoinPrivateOp, JoinPrivateOp,
-		LookupJoinPrivateOp, MergeJoinPrivateOp, MutationPrivateOp, OpaqueRelPrivateOp, OrdinalityPrivateOp,
-		ScanPrivateOp, SequenceSelectPrivateOp, SetPrivateOp, ShowTracePrivateOp, SubqueryPrivateOp,
-		ValuesPrivateOp, VirtualScanPrivateOp, WindowPrivateOp, WindowsItemPrivateOp, ZigzagJoinPrivateOp,
-		ZipItemPrivateOp:
+	case AlterTableSplitPrivateOp, ColPrivateOp, CreateTablePrivateOp, ExplainPrivateOp,
+		FKChecksItemPrivateOp, FakeRelPrivateOp, FunctionPrivateOp, GroupingPrivateOp, IndexJoinPrivateOp,
+		JoinPrivateOp, LookupJoinPrivateOp, MergeJoinPrivateOp, MutationPrivateOp, OpaqueRelPrivateOp,
+		OrdinalityPrivateOp, ScanPrivateOp, SequenceSelectPrivateOp, SetPrivateOp, ShowTracePrivateOp,
+		SubqueryPrivateOp, ValuesPrivateOp, VirtualScanPrivateOp, WindowPrivateOp, WindowsItemPrivateOp,
+		ZigzagJoinPrivateOp, ZipItemPrivateOp:
 		return true
 	}
 	return false
@@ -1738,13 +1745,14 @@ func IsFloatOp(e Expr) bool {
 }
 
 var DDLOperators = [...]Operator{
+	AlterTableSplitOp,
 	CreateTableOp,
 	OpaqueRelOp,
 }
 
 func IsDDLOp(e Expr) bool {
 	switch e.Op() {
-	case CreateTableOp, OpaqueRelOp:
+	case AlterTableSplitOp, CreateTableOp, OpaqueRelOp:
 		return true
 	}
 	return false
