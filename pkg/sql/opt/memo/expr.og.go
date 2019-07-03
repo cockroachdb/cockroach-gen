@@ -19,8 +19,16 @@ import (
 // either ascending or descending order. See the Ordering field in the
 // PhysicalProps struct.
 type SortExpr struct {
-	Input RelExpr
-	best  bestProps
+	// InputOrdering specifies the ordering that the sort requires
+	// from its input. It allows the optimizer and DistSQL to plan
+	// the sort using the segmented/chunk sort strategy.
+	//
+	// For a regular sort, this is empty. If it is not empty, this
+	// is a segmented sort where the input is already sorted on the
+	// specified prefix of columns.
+	InputOrdering physical.OrderingChoice
+	Input         RelExpr
+	best          bestProps
 }
 
 func (e *SortExpr) Op() opt.Operator {
