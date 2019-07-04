@@ -14467,6 +14467,36 @@ func (_f *Factory) ConstructAlterTableSplit(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructAlterTableUnsplit constructs an expression for the AlterTableUnsplit operator.
+// AlterTableUnsplit represents an `ALTER TABLE/INDEX .. UNSPLIT AT ..`
+// statement.
+func (_f *Factory) ConstructAlterTableUnsplit(
+	input memo.RelExpr,
+	alterTableSplitPrivate *memo.AlterTableSplitPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeAlterTableUnsplit(input, alterTableSplitPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructAlterTableUnsplitAll constructs an expression for the AlterTableUnsplitAll operator.
+// AlterTableUnsplit represents an `ALTER TABLE/INDEX .. UNSPLIT ALL` statement.
+func (_f *Factory) ConstructAlterTableUnsplitAll(
+	alterTableSplitPrivate *memo.AlterTableSplitPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeAlterTableUnsplitAll(alterTableSplitPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructAlterTableRelocate constructs an expression for the AlterTableRelocate operator.
+// AlterTableRelocate represents an `ALTER TABLE/INDEX .. SPLIT AT ..` statement.
+func (_f *Factory) ConstructAlterTableRelocate(
+	input memo.RelExpr,
+	alterTableRelocatePrivate *memo.AlterTableRelocatePrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeAlterTableRelocate(input, alterTableRelocatePrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -15641,6 +15671,23 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.AlterTableUnsplitExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructAlterTableUnsplit(input, &t.AlterTableSplitPrivate)
+		}
+		return t
+
+	case *memo.AlterTableUnsplitAllExpr:
+		return t
+
+	case *memo.AlterTableRelocateExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructAlterTableRelocate(input, &t.AlterTableRelocatePrivate)
+		}
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
@@ -16696,6 +16743,21 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.AlterTableSplitPrivate,
 		)
 
+	case *memo.AlterTableUnsplitExpr:
+		return f.ConstructAlterTableUnsplit(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.AlterTableSplitPrivate,
+		)
+
+	case *memo.AlterTableUnsplitAllExpr:
+		return f.mem.MemoizeAlterTableUnsplitAll(&t.AlterTableSplitPrivate)
+
+	case *memo.AlterTableRelocateExpr:
+		return f.ConstructAlterTableRelocate(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.AlterTableRelocatePrivate,
+		)
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
@@ -17532,6 +17594,20 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(memo.RelExpr),
 			args[1].(opt.ScalarExpr),
 			args[2].(*memo.AlterTableSplitPrivate),
+		)
+	case opt.AlterTableUnsplitOp:
+		return f.ConstructAlterTableUnsplit(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.AlterTableSplitPrivate),
+		)
+	case opt.AlterTableUnsplitAllOp:
+		return f.ConstructAlterTableUnsplitAll(
+			args[0].(*memo.AlterTableSplitPrivate),
+		)
+	case opt.AlterTableRelocateOp:
+		return f.ConstructAlterTableRelocate(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.AlterTableRelocatePrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

@@ -13521,6 +13521,370 @@ type AlterTableSplitPrivate struct {
 	Columns opt.ColList
 }
 
+// AlterTableUnsplitExpr represents an `ALTER TABLE/INDEX .. UNSPLIT AT ..`
+// statement.
+type AlterTableUnsplitExpr struct {
+	Input RelExpr
+	AlterTableSplitPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AlterTableUnsplitExpr{}
+
+func (e *AlterTableUnsplitExpr) Op() opt.Operator {
+	return opt.AlterTableUnsplitOp
+}
+
+func (e *AlterTableUnsplitExpr) ChildCount() int {
+	return 1
+}
+
+func (e *AlterTableUnsplitExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableUnsplitExpr) Private() interface{} {
+	return &e.AlterTableSplitPrivate
+}
+
+func (e *AlterTableUnsplitExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AlterTableUnsplitExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableUnsplitExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AlterTableUnsplitExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AlterTableUnsplitExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AlterTableUnsplitExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AlterTableUnsplitExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *AlterTableUnsplitExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *AlterTableUnsplitExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *AlterTableUnsplitExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AlterTableUnsplitExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *AlterTableUnsplitExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AlterTableUnsplitExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type alterTableUnsplitGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first AlterTableUnsplitExpr
+	best  bestProps
+}
+
+var _ exprGroup = &alterTableUnsplitGroup{}
+
+func (g *alterTableUnsplitGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *alterTableUnsplitGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *alterTableUnsplitGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *alterTableUnsplitGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// AlterTableUnsplit represents an `ALTER TABLE/INDEX .. UNSPLIT ALL` statement.
+type AlterTableUnsplitAllExpr struct {
+	AlterTableSplitPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AlterTableUnsplitAllExpr{}
+
+func (e *AlterTableUnsplitAllExpr) Op() opt.Operator {
+	return opt.AlterTableUnsplitAllOp
+}
+
+func (e *AlterTableUnsplitAllExpr) ChildCount() int {
+	return 0
+}
+
+func (e *AlterTableUnsplitAllExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableUnsplitAllExpr) Private() interface{} {
+	return &e.AlterTableSplitPrivate
+}
+
+func (e *AlterTableUnsplitAllExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AlterTableUnsplitAllExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableUnsplitAllExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AlterTableUnsplitAllExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AlterTableUnsplitAllExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AlterTableUnsplitAllExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AlterTableUnsplitAllExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *AlterTableUnsplitAllExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *AlterTableUnsplitAllExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *AlterTableUnsplitAllExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AlterTableUnsplitAllExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *AlterTableUnsplitAllExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AlterTableUnsplitAllExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type alterTableUnsplitAllGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first AlterTableUnsplitAllExpr
+	best  bestProps
+}
+
+var _ exprGroup = &alterTableUnsplitAllGroup{}
+
+func (g *alterTableUnsplitAllGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *alterTableUnsplitAllGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *alterTableUnsplitAllGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *alterTableUnsplitAllGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// AlterTableRelocateExpr represents an `ALTER TABLE/INDEX .. SPLIT AT ..` statement.
+type AlterTableRelocateExpr struct {
+	// The input expression provides values for the index columns (or a prefix of
+	// them).
+	Input RelExpr
+	AlterTableRelocatePrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AlterTableRelocateExpr{}
+
+func (e *AlterTableRelocateExpr) Op() opt.Operator {
+	return opt.AlterTableRelocateOp
+}
+
+func (e *AlterTableRelocateExpr) ChildCount() int {
+	return 1
+}
+
+func (e *AlterTableRelocateExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableRelocateExpr) Private() interface{} {
+	return &e.AlterTableRelocatePrivate
+}
+
+func (e *AlterTableRelocateExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AlterTableRelocateExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterTableRelocateExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AlterTableRelocateExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AlterTableRelocateExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AlterTableRelocateExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AlterTableRelocateExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *AlterTableRelocateExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *AlterTableRelocateExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *AlterTableRelocateExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AlterTableRelocateExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *AlterTableRelocateExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AlterTableRelocateExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type alterTableRelocateGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first AlterTableRelocateExpr
+	best  bestProps
+}
+
+var _ exprGroup = &alterTableRelocateGroup{}
+
+func (g *alterTableRelocateGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *alterTableRelocateGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *alterTableRelocateGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *alterTableRelocateGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type AlterTableRelocatePrivate struct {
+	RelocateLease bool
+	AlterTableSplitPrivate
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	checks FKChecksExpr,
@@ -16357,6 +16721,64 @@ func (m *Memo) MemoizeAlterTableSplit(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeAlterTableUnsplit(
+	input RelExpr,
+	alterTableSplitPrivate *AlterTableSplitPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(alterTableUnsplitGroup{}))
+	grp := &alterTableUnsplitGroup{mem: m, first: AlterTableUnsplitExpr{
+		Input:                  input,
+		AlterTableSplitPrivate: *alterTableSplitPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAlterTableUnsplit(e)
+	if interned == e {
+		m.logPropsBuilder.buildAlterTableUnsplitProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeAlterTableUnsplitAll(
+	alterTableSplitPrivate *AlterTableSplitPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(alterTableUnsplitAllGroup{}))
+	grp := &alterTableUnsplitAllGroup{mem: m, first: AlterTableUnsplitAllExpr{
+		AlterTableSplitPrivate: *alterTableSplitPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAlterTableUnsplitAll(e)
+	if interned == e {
+		m.logPropsBuilder.buildAlterTableUnsplitAllProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeAlterTableRelocate(
+	input RelExpr,
+	alterTableRelocatePrivate *AlterTableRelocatePrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(alterTableRelocateGroup{}))
+	grp := &alterTableRelocateGroup{mem: m, first: AlterTableRelocateExpr{
+		Input:                     input,
+		AlterTableRelocatePrivate: *alterTableRelocatePrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAlterTableRelocate(e)
+	if interned == e {
+		m.logPropsBuilder.buildAlterTableRelocateProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -17015,6 +17437,48 @@ func (m *Memo) AddAlterTableSplitToGroup(e *AlterTableSplitExpr, grp RelExpr) *A
 	return interned
 }
 
+func (m *Memo) AddAlterTableUnsplitToGroup(e *AlterTableUnsplitExpr, grp RelExpr) *AlterTableUnsplitExpr {
+	const size = int64(unsafe.Sizeof(AlterTableUnsplitExpr{}))
+	interned := m.interner.InternAlterTableUnsplit(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddAlterTableUnsplitAllToGroup(e *AlterTableUnsplitAllExpr, grp RelExpr) *AlterTableUnsplitAllExpr {
+	const size = int64(unsafe.Sizeof(AlterTableUnsplitAllExpr{}))
+	interned := m.interner.InternAlterTableUnsplitAll(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddAlterTableRelocateToGroup(e *AlterTableRelocateExpr, grp RelExpr) *AlterTableRelocateExpr {
+	const size = int64(unsafe.Sizeof(AlterTableRelocateExpr{}))
+	interned := m.interner.InternAlterTableRelocate(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -17351,6 +17815,12 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternOpaqueRel(t)
 	case *AlterTableSplitExpr:
 		return in.InternAlterTableSplit(t)
+	case *AlterTableUnsplitExpr:
+		return in.InternAlterTableUnsplit(t)
+	case *AlterTableUnsplitAllExpr:
+		return in.InternAlterTableUnsplitAll(t)
+	case *AlterTableRelocateExpr:
+		return in.InternAlterTableRelocate(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -20868,6 +21338,84 @@ func (in *interner) InternAlterTableSplit(val *AlterTableSplitExpr) *AlterTableS
 	return val
 }
 
+func (in *interner) InternAlterTableUnsplit(val *AlterTableUnsplitExpr) *AlterTableUnsplitExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AlterTableUnsplitOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.Index)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashColList(val.Columns)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AlterTableUnsplitExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAlterTableUnsplitAll(val *AlterTableUnsplitAllExpr) *AlterTableUnsplitAllExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AlterTableUnsplitAllOp)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.Index)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashColList(val.Columns)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AlterTableUnsplitAllExpr); ok {
+			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *AlterTableRelocateExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AlterTableRelocateOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashBool(val.RelocateLease)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.Index)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashColList(val.Columns)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AlterTableRelocateExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsBoolEqual(val.RelocateLease, existing.RelocateLease) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -20964,6 +21512,12 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildOpaqueRelProps(t, rel)
 	case *AlterTableSplitExpr:
 		b.buildAlterTableSplitProps(t, rel)
+	case *AlterTableUnsplitExpr:
+		b.buildAlterTableUnsplitProps(t, rel)
+	case *AlterTableUnsplitAllExpr:
+		b.buildAlterTableUnsplitAllProps(t, rel)
+	case *AlterTableRelocateExpr:
+		b.buildAlterTableRelocateProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}
