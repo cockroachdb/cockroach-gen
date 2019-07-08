@@ -31,6 +31,124 @@ const (
 	siNull
 )
 
+func GetInProjectionOperator(
+	ct *semtypes.T, input Operator, colIdx int, resultIdx int, datumTuple *tree.DTuple, negate bool,
+) (Operator, error) {
+	var err error
+	switch t := conv.FromColumnType(ct); t {
+	case types.Bool:
+		obj := &projectInOpBool{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Bytes:
+		obj := &projectInOpBytes{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Decimal:
+		obj := &projectInOpDecimal{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Int8:
+		obj := &projectInOpInt8{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt8(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Int16:
+		obj := &projectInOpInt16{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Int32:
+		obj := &projectInOpInt32{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Int64:
+		obj := &projectInOpInt64{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Float32:
+		obj := &projectInOpFloat32{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat32(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case types.Float64:
+		obj := &projectInOpFloat64{
+			input:     input,
+			colIdx:    colIdx,
+			outputIdx: resultIdx,
+			negate:    negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	default:
+		return nil, errors.Errorf("unhandled type: %s", t)
+	}
+}
+
 func GetInOperator(
 	ct *semtypes.T, input Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
 ) (Operator, error) {
@@ -148,6 +266,15 @@ type selectInOpBool struct {
 	negate    bool
 }
 
+type projectInOpBool struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
+	filterRow []bool
+	hasNulls  bool
+	negate    bool
+}
+
 func fillDatumRowBool(ct *semtypes.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
 	conv := conv.GetDatumToPhysicalFn(ct)
 	var result []bool
@@ -167,15 +294,15 @@ func fillDatumRowBool(ct *semtypes.T, datumTuple *tree.DTuple) ([]bool, bool, er
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpBool) cmpInBool(target bool) comparisonResult {
-	for i := range si.filterRow {
+func cmpInBool(target bool, filterRow []bool, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = tree.CompareBools(target, si.filterRow[i]) == 0
+		cmp = tree.CompareBools(target, filterRow[i]) == 0
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -184,6 +311,10 @@ func (si *selectInOpBool) cmpInBool(target bool) comparisonResult {
 
 func (si *selectInOpBool) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpBool) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
@@ -208,7 +339,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInBool(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInBool(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -218,7 +349,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInBool(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInBool(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -228,7 +359,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInBool(col[i]) == compVal {
+					if cmpInBool(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -238,7 +369,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInBool(col[i]) == compVal {
+					if cmpInBool(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -253,9 +384,99 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Bool()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInBool(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInBool(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInBool(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInBool(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpBytes struct {
 	input     Operator
 	colIdx    int
+	filterRow [][]byte
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpBytes struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow [][]byte
 	hasNulls  bool
 	negate    bool
@@ -280,15 +501,15 @@ func fillDatumRowBytes(ct *semtypes.T, datumTuple *tree.DTuple) ([][]byte, bool,
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpBytes) cmpInBytes(target []byte) comparisonResult {
-	for i := range si.filterRow {
+func cmpInBytes(target []byte, filterRow [][]byte, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = bytes.Compare(target, si.filterRow[i]) == 0
+		cmp = bytes.Compare(target, filterRow[i]) == 0
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -297,6 +518,10 @@ func (si *selectInOpBytes) cmpInBytes(target []byte) comparisonResult {
 
 func (si *selectInOpBytes) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpBytes) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
@@ -321,7 +546,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInBytes(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInBytes(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -331,7 +556,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInBytes(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInBytes(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -341,7 +566,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInBytes(col[i]) == compVal {
+					if cmpInBytes(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -351,7 +576,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInBytes(col[i]) == compVal {
+					if cmpInBytes(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -366,9 +591,99 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Bytes()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInBytes(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInBytes(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInBytes(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInBytes(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpDecimal struct {
 	input     Operator
 	colIdx    int
+	filterRow []apd.Decimal
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpDecimal struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []apd.Decimal
 	hasNulls  bool
 	negate    bool
@@ -393,15 +708,15 @@ func fillDatumRowDecimal(ct *semtypes.T, datumTuple *tree.DTuple) ([]apd.Decimal
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpDecimal) cmpInDecimal(target apd.Decimal) comparisonResult {
-	for i := range si.filterRow {
+func cmpInDecimal(target apd.Decimal, filterRow []apd.Decimal, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = tree.CompareDecimals(&target, &si.filterRow[i]) == 0
+		cmp = tree.CompareDecimals(&target, &filterRow[i]) == 0
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -410,6 +725,10 @@ func (si *selectInOpDecimal) cmpInDecimal(target apd.Decimal) comparisonResult {
 
 func (si *selectInOpDecimal) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpDecimal) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
@@ -434,7 +753,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInDecimal(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInDecimal(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -444,7 +763,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInDecimal(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInDecimal(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -454,7 +773,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInDecimal(col[i]) == compVal {
+					if cmpInDecimal(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -464,7 +783,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInDecimal(col[i]) == compVal {
+					if cmpInDecimal(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -479,9 +798,99 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Decimal()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInDecimal(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInDecimal(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInDecimal(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInDecimal(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpInt8 struct {
 	input     Operator
 	colIdx    int
+	filterRow []int8
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpInt8 struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []int8
 	hasNulls  bool
 	negate    bool
@@ -506,15 +915,15 @@ func fillDatumRowInt8(ct *semtypes.T, datumTuple *tree.DTuple) ([]int8, bool, er
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpInt8) cmpInInt8(target int8) comparisonResult {
-	for i := range si.filterRow {
+func cmpInInt8(target int8, filterRow []int8, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = target == si.filterRow[i]
+		cmp = target == filterRow[i]
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -523,6 +932,10 @@ func (si *selectInOpInt8) cmpInInt8(target int8) comparisonResult {
 
 func (si *selectInOpInt8) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpInt8) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
@@ -547,7 +960,7 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt8(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt8(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -557,7 +970,7 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt8(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt8(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -567,7 +980,7 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInInt8(col[i]) == compVal {
+					if cmpInInt8(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -577,7 +990,7 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInInt8(col[i]) == compVal {
+					if cmpInInt8(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -592,9 +1005,99 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpInt8) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Int8()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt8(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt8(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInInt8(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInInt8(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpInt16 struct {
 	input     Operator
 	colIdx    int
+	filterRow []int16
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpInt16 struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []int16
 	hasNulls  bool
 	negate    bool
@@ -619,15 +1122,15 @@ func fillDatumRowInt16(ct *semtypes.T, datumTuple *tree.DTuple) ([]int16, bool, 
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpInt16) cmpInInt16(target int16) comparisonResult {
-	for i := range si.filterRow {
+func cmpInInt16(target int16, filterRow []int16, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = target == si.filterRow[i]
+		cmp = target == filterRow[i]
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -636,6 +1139,10 @@ func (si *selectInOpInt16) cmpInInt16(target int16) comparisonResult {
 
 func (si *selectInOpInt16) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpInt16) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
@@ -660,7 +1167,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt16(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt16(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -670,7 +1177,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt16(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt16(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -680,7 +1187,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInInt16(col[i]) == compVal {
+					if cmpInInt16(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -690,7 +1197,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInInt16(col[i]) == compVal {
+					if cmpInInt16(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -705,9 +1212,99 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Int16()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt16(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt16(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInInt16(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInInt16(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpInt32 struct {
 	input     Operator
 	colIdx    int
+	filterRow []int32
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpInt32 struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []int32
 	hasNulls  bool
 	negate    bool
@@ -732,15 +1329,15 @@ func fillDatumRowInt32(ct *semtypes.T, datumTuple *tree.DTuple) ([]int32, bool, 
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpInt32) cmpInInt32(target int32) comparisonResult {
-	for i := range si.filterRow {
+func cmpInInt32(target int32, filterRow []int32, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = target == si.filterRow[i]
+		cmp = target == filterRow[i]
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -749,6 +1346,10 @@ func (si *selectInOpInt32) cmpInInt32(target int32) comparisonResult {
 
 func (si *selectInOpInt32) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpInt32) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
@@ -773,7 +1374,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt32(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -783,7 +1384,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt32(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -793,7 +1394,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInInt32(col[i]) == compVal {
+					if cmpInInt32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -803,7 +1404,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInInt32(col[i]) == compVal {
+					if cmpInInt32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -818,9 +1419,99 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Int32()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt32(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt32(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInInt32(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInInt32(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpInt64 struct {
 	input     Operator
 	colIdx    int
+	filterRow []int64
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpInt64 struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []int64
 	hasNulls  bool
 	negate    bool
@@ -845,15 +1536,15 @@ func fillDatumRowInt64(ct *semtypes.T, datumTuple *tree.DTuple) ([]int64, bool, 
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpInt64) cmpInInt64(target int64) comparisonResult {
-	for i := range si.filterRow {
+func cmpInInt64(target int64, filterRow []int64, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = target == si.filterRow[i]
+		cmp = target == filterRow[i]
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -862,6 +1553,10 @@ func (si *selectInOpInt64) cmpInInt64(target int64) comparisonResult {
 
 func (si *selectInOpInt64) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpInt64) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
@@ -886,7 +1581,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt64(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -896,7 +1591,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInInt64(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInInt64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -906,7 +1601,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInInt64(col[i]) == compVal {
+					if cmpInInt64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -916,7 +1611,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInInt64(col[i]) == compVal {
+					if cmpInInt64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -931,9 +1626,99 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Int64()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt64(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInInt64(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInInt64(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInInt64(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpFloat32 struct {
 	input     Operator
 	colIdx    int
+	filterRow []float32
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpFloat32 struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []float32
 	hasNulls  bool
 	negate    bool
@@ -958,15 +1743,15 @@ func fillDatumRowFloat32(ct *semtypes.T, datumTuple *tree.DTuple) ([]float32, bo
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpFloat32) cmpInFloat32(target float32) comparisonResult {
-	for i := range si.filterRow {
+func cmpInFloat32(target float32, filterRow []float32, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = target == si.filterRow[i]
+		cmp = target == filterRow[i]
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -975,6 +1760,10 @@ func (si *selectInOpFloat32) cmpInFloat32(target float32) comparisonResult {
 
 func (si *selectInOpFloat32) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpFloat32) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
@@ -999,7 +1788,7 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInFloat32(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInFloat32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1009,7 +1798,7 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInFloat32(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInFloat32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1019,7 +1808,7 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInFloat32(col[i]) == compVal {
+					if cmpInFloat32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1029,7 +1818,7 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInFloat32(col[i]) == compVal {
+					if cmpInFloat32(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1044,9 +1833,99 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
+func (pi *projectInOpFloat32) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Float32()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInFloat32(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInFloat32(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInFloat32(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInFloat32(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
 type selectInOpFloat64 struct {
 	input     Operator
 	colIdx    int
+	filterRow []float64
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpFloat64 struct {
+	input     Operator
+	colIdx    int
+	outputIdx int
 	filterRow []float64
 	hasNulls  bool
 	negate    bool
@@ -1071,15 +1950,15 @@ func fillDatumRowFloat64(ct *semtypes.T, datumTuple *tree.DTuple) ([]float64, bo
 	return result, hasNulls, nil
 }
 
-func (si *selectInOpFloat64) cmpInFloat64(target float64) comparisonResult {
-	for i := range si.filterRow {
+func cmpInFloat64(target float64, filterRow []float64, hasNulls bool) comparisonResult {
+	for i := range filterRow {
 		var cmp bool
-		cmp = target == si.filterRow[i]
+		cmp = target == filterRow[i]
 		if cmp {
 			return siTrue
 		}
 	}
-	if si.hasNulls {
+	if hasNulls {
 		return siNull
 	} else {
 		return siFalse
@@ -1088,6 +1967,10 @@ func (si *selectInOpFloat64) cmpInFloat64(target float64) comparisonResult {
 
 func (si *selectInOpFloat64) Init() {
 	si.input.Init()
+}
+
+func (pi *projectInOpFloat64) Init() {
+	pi.input.Init()
 }
 
 func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
@@ -1112,7 +1995,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if !nulls.NullAt(uint16(i)) && si.cmpInFloat64(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInFloat64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1122,7 +2005,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if !nulls.NullAt(uint16(i)) && si.cmpInFloat64(col[i]) == compVal {
+					if !nulls.NullAt(uint16(i)) && cmpInFloat64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1132,7 +2015,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
-					if si.cmpInFloat64(col[i]) == compVal {
+					if cmpInFloat64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1142,7 +2025,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 				sel := batch.Selection()
 				col = col[:n]
 				for i := range col {
-					if si.cmpInFloat64(col[i]) == compVal {
+					if cmpInFloat64(col[i], si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
 						idx++
 					}
@@ -1155,4 +2038,85 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 			return batch
 		}
 	}
+}
+
+func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Float64()[:coldata.BatchSize]
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()[:coldata.BatchSize]
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.HasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInFloat64(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					cmpRes := cmpInFloat64(col[i], pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				cmpRes := cmpInFloat64(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[:n]
+			for i := range col {
+				cmpRes := cmpInFloat64(col[i], pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
 }
