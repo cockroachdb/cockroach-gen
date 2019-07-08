@@ -733,6 +733,44 @@ func (_e *explorer) exploreSemiJoin(
 		}
 	}
 
+	// [GenerateLookupJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						on := _root.On
+						private := &_root.JoinPrivate
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoins) {
+							var _last memo.RelExpr
+							if _e.o.appliedRule != nil {
+								_last = memo.LastGroupMember(_root)
+							}
+							_e.funcs.GenerateLookupJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private)
+							if _e.o.appliedRule != nil {
+								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
@@ -758,6 +796,44 @@ func (_e *explorer) exploreAntiJoin(
 				_e.funcs.GenerateMergeJoins(_root, opt.AntiJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
+				}
+			}
+		}
+	}
+
+	// [GenerateLookupJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						on := _root.On
+						private := &_root.JoinPrivate
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoins) {
+							var _last memo.RelExpr
+							if _e.o.appliedRule != nil {
+								_last = memo.LastGroupMember(_root)
+							}
+							_e.funcs.GenerateLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private)
+							if _e.o.appliedRule != nil {
+								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
+							}
+						}
+					}
 				}
 			}
 		}
