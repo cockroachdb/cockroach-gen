@@ -27,7 +27,7 @@ type rankInitFields struct {
 	partitionColIdx int
 }
 
-type rankDense_false_HasPartition_false_Op struct {
+type rankNoPartitionOp struct {
 	rankInitFields
 
 	// rank indicates which rank should be assigned to the next tuple.
@@ -38,9 +38,9 @@ type rankDense_false_HasPartition_false_Op struct {
 	rankIncrement int64
 }
 
-var _ exec.Operator = &rankDense_false_HasPartition_false_Op{}
+var _ exec.Operator = &rankNoPartitionOp{}
 
-func (r *rankDense_false_HasPartition_false_Op) Init() {
+func (r *rankNoPartitionOp) Init() {
 	r.input.Init()
 	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
@@ -49,7 +49,7 @@ func (r *rankDense_false_HasPartition_false_Op) Init() {
 	r.rankIncrement = 1
 }
 
-func (r *rankDense_false_HasPartition_false_Op) Next(ctx context.Context) coldata.Batch {
+func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
@@ -89,7 +89,7 @@ func (r *rankDense_false_HasPartition_false_Op) Next(ctx context.Context) coldat
 	return batch
 }
 
-type rankDense_false_HasPartition_true_Op struct {
+type rankWithPartitionOp struct {
 	rankInitFields
 
 	// rank indicates which rank should be assigned to the next tuple.
@@ -100,9 +100,9 @@ type rankDense_false_HasPartition_true_Op struct {
 	rankIncrement int64
 }
 
-var _ exec.Operator = &rankDense_false_HasPartition_true_Op{}
+var _ exec.Operator = &rankWithPartitionOp{}
 
-func (r *rankDense_false_HasPartition_true_Op) Init() {
+func (r *rankWithPartitionOp) Init() {
 	r.input.Init()
 	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
@@ -111,7 +111,7 @@ func (r *rankDense_false_HasPartition_true_Op) Init() {
 	r.rankIncrement = 1
 }
 
-func (r *rankDense_false_HasPartition_true_Op) Next(ctx context.Context) coldata.Batch {
+func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
@@ -170,7 +170,7 @@ func (r *rankDense_false_HasPartition_true_Op) Next(ctx context.Context) coldata
 	return batch
 }
 
-type rankDense_true_HasPartition_false_Op struct {
+type denseRankNoPartitionOp struct {
 	rankInitFields
 
 	// rank indicates which rank should be assigned to the next tuple.
@@ -181,9 +181,9 @@ type rankDense_true_HasPartition_false_Op struct {
 	rankIncrement int64
 }
 
-var _ exec.Operator = &rankDense_true_HasPartition_false_Op{}
+var _ exec.Operator = &denseRankNoPartitionOp{}
 
-func (r *rankDense_true_HasPartition_false_Op) Init() {
+func (r *denseRankNoPartitionOp) Init() {
 	r.input.Init()
 	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
@@ -192,7 +192,7 @@ func (r *rankDense_true_HasPartition_false_Op) Init() {
 	r.rankIncrement = 1
 }
 
-func (r *rankDense_true_HasPartition_false_Op) Next(ctx context.Context) coldata.Batch {
+func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
@@ -230,7 +230,7 @@ func (r *rankDense_true_HasPartition_false_Op) Next(ctx context.Context) coldata
 	return batch
 }
 
-type rankDense_true_HasPartition_true_Op struct {
+type denseRankWithPartitionOp struct {
 	rankInitFields
 
 	// rank indicates which rank should be assigned to the next tuple.
@@ -241,9 +241,9 @@ type rankDense_true_HasPartition_true_Op struct {
 	rankIncrement int64
 }
 
-var _ exec.Operator = &rankDense_true_HasPartition_true_Op{}
+var _ exec.Operator = &denseRankWithPartitionOp{}
 
-func (r *rankDense_true_HasPartition_true_Op) Init() {
+func (r *denseRankWithPartitionOp) Init() {
 	r.input.Init()
 	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
@@ -252,7 +252,7 @@ func (r *rankDense_true_HasPartition_true_Op) Init() {
 	r.rankIncrement = 1
 }
 
-func (r *rankDense_true_HasPartition_true_Op) Next(ctx context.Context) coldata.Batch {
+func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch

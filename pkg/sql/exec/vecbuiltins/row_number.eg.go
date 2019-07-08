@@ -10,12 +10,57 @@
 package vecbuiltins
 
 import (
+	"context"
+
+	"github.com/cockroachdb/cockroach/pkg/sql/exec"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 )
 
-func (r *rowNumberOp) nextBodyWithPartition(batch coldata.Batch) {
+type rowNumberNoPartitionOp struct {
+	rowNumberBase
+}
 
+var _ exec.Operator = &rowNumberNoPartitionOp{}
+
+func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
+	batch := r.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	if r.outputColIdx == batch.Width() {
+		batch.AppendCol(types.Int64)
+	} else if r.outputColIdx > batch.Width() {
+		panic("unexpected: column outputColIdx is neither present nor the next to be appended")
+	}
+	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()
+	sel := batch.Selection()
+	if sel != nil {
+		for i := uint16(0); i < batch.Length(); i++ {
+			r.rowNumber++
+			rowNumberCol[sel[i]] = r.rowNumber
+		}
+	} else {
+		for i := uint16(0); i < batch.Length(); i++ {
+			r.rowNumber++
+			rowNumberCol[i] = r.rowNumber
+		}
+	}
+	return batch
+}
+
+type rowNumberWithPartitionOp struct {
+	rowNumberBase
+}
+
+var _ exec.Operator = &rowNumberWithPartitionOp{}
+
+func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
+	batch := r.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
 	if r.partitionColIdx == batch.Width() {
 		batch.AppendCol(types.Bool)
 	} else if r.partitionColIdx > batch.Width() {
@@ -35,38 +80,17 @@ func (r *rowNumberOp) nextBodyWithPartition(batch coldata.Batch) {
 			if partitionCol[sel[i]] {
 				r.rowNumber = 1
 			}
-			rowNumberCol[sel[i]] = r.rowNumber
 			r.rowNumber++
+			rowNumberCol[sel[i]] = r.rowNumber
 		}
 	} else {
 		for i := uint16(0); i < batch.Length(); i++ {
 			if partitionCol[i] {
-				r.rowNumber = 1
+				r.rowNumber = 0
 			}
+			r.rowNumber++
 			rowNumberCol[i] = r.rowNumber
-			r.rowNumber++
 		}
 	}
-}
-
-func (r *rowNumberOp) nextBodyNoPartition(batch coldata.Batch) {
-
-	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(types.Int64)
-	} else if r.outputColIdx > batch.Width() {
-		panic("unexpected: column outputColIdx is neither present nor the next to be appended")
-	}
-	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()
-	sel := batch.Selection()
-	if sel != nil {
-		for i := uint16(0); i < batch.Length(); i++ {
-			rowNumberCol[sel[i]] = r.rowNumber
-			r.rowNumber++
-		}
-	} else {
-		for i := uint16(0); i < batch.Length(); i++ {
-			rowNumberCol[i] = r.rowNumber
-			r.rowNumber++
-		}
-	}
+	return batch
 }
