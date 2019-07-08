@@ -46,6 +46,15 @@ func (c *BoolVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
+func (c *BoolVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
+}
+
 type BytesVecComparator struct {
 	vecs  [][][]byte
 	nulls []*coldata.Nulls
@@ -73,6 +82,15 @@ func (c *BytesVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
+func (c *BytesVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
+}
+
 type DecimalVecComparator struct {
 	vecs  [][]apd.Decimal
 	nulls []*coldata.Nulls
@@ -98,6 +116,15 @@ func (c *DecimalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 func (c *DecimalVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.vecs[idx] = vec.Decimal()
 	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *DecimalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
 }
 
 type Int8VecComparator struct {
@@ -133,6 +160,15 @@ func (c *Int8VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
+func (c *Int8VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
+}
+
 type Int16VecComparator struct {
 	vecs  [][]int16
 	nulls []*coldata.Nulls
@@ -164,6 +200,15 @@ func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 func (c *Int16VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.vecs[idx] = vec.Int16()
 	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *Int16VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
 }
 
 type Int32VecComparator struct {
@@ -199,6 +244,15 @@ func (c *Int32VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
+func (c *Int32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
+}
+
 type Int64VecComparator struct {
 	vecs  [][]int64
 	nulls []*coldata.Nulls
@@ -230,6 +284,15 @@ func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 func (c *Int64VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.vecs[idx] = vec.Int64()
 	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *Int64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
 }
 
 type Float32VecComparator struct {
@@ -265,6 +328,15 @@ func (c *Float32VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
+func (c *Float32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
+}
+
 type Float64VecComparator struct {
 	vecs  [][]float64
 	nulls []*coldata.Nulls
@@ -296,6 +368,15 @@ func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 func (c *Float64VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.vecs[idx] = vec.Float64()
 	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *Float64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].HasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+	}
 }
 
 func GetVecComparator(t types.T, numVecs int) vecComparator {
