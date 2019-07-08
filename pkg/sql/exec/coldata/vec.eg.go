@@ -209,7 +209,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -233,7 +233,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -253,7 +253,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -274,7 +274,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -291,7 +291,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -315,7 +315,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -335,7 +335,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -356,7 +356,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -373,7 +373,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -397,7 +397,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -417,7 +417,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -438,7 +438,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -455,7 +455,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -479,7 +479,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -499,7 +499,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -520,7 +520,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -537,7 +537,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -561,7 +561,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -581,7 +581,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -602,7 +602,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -619,7 +619,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -643,7 +643,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -663,7 +663,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -684,7 +684,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -701,7 +701,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -725,7 +725,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -745,7 +745,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -766,7 +766,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -783,7 +783,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -807,7 +807,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -827,7 +827,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -848,7 +848,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()
@@ -865,7 +865,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			sel := args.Sel64
 			// TODO(asubiotto): Template this and the uint16 case below.
 			if args.Nils != nil {
-				if args.Src.HasNulls() {
+				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					toColSliced := toCol[args.DestIdx:]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -889,7 +889,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				return
 			}
 			// No Nils.
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -909,7 +909,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
-			if args.Src.HasNulls() {
+			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
 				toColSliced := toCol[args.DestIdx:]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -930,7 +930,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 		}
 		// No Sel or Sel64.
 		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
-		if args.Src.HasNulls() {
+		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
 			srcNulls := args.Src.Nulls()

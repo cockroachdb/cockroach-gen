@@ -284,8 +284,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -341,7 +341,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -395,8 +395,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -452,7 +452,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -514,8 +514,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -571,7 +571,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -625,8 +625,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -682,7 +682,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -744,8 +744,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -801,7 +801,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -855,8 +855,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -912,7 +912,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -974,8 +974,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1031,7 +1031,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1085,8 +1085,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1142,7 +1142,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1204,8 +1204,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1261,7 +1261,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1315,8 +1315,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1372,7 +1372,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1434,8 +1434,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1491,7 +1491,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1545,8 +1545,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1602,7 +1602,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1664,8 +1664,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1721,7 +1721,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1775,8 +1775,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1832,7 +1832,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1894,8 +1894,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -1951,7 +1951,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -2005,8 +2005,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -2062,7 +2062,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -2124,8 +2124,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 
 		if sel != nil {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -2181,7 +2181,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -2235,8 +2235,8 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 			}
 		} else {
 
-			if probeVec.HasNulls() {
-				if buildVec.HasNulls() {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
@@ -2292,7 +2292,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 					}
 				}
 			} else {
-				if buildVec.HasNulls() {
+				if buildVec.MaybeHasNulls() {
 
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.

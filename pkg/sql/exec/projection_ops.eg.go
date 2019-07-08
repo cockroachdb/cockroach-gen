@@ -48,7 +48,7 @@ func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col[i], p.constArg) == 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -92,7 +92,7 @@ func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(p.constArg, col[i]) == 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -139,7 +139,7 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col1[i], col2[i]) == 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -182,7 +182,7 @@ func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col[i], p.constArg) != 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -226,7 +226,7 @@ func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(p.constArg, col[i]) != 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -273,7 +273,7 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col1[i], col2[i]) != 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -316,7 +316,7 @@ func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col[i], p.constArg) < 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -360,7 +360,7 @@ func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(p.constArg, col[i]) < 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -407,7 +407,7 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col1[i], col2[i]) < 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -450,7 +450,7 @@ func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col[i], p.constArg) <= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -494,7 +494,7 @@ func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(p.constArg, col[i]) <= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -541,7 +541,7 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col1[i], col2[i]) <= 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -584,7 +584,7 @@ func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col[i], p.constArg) > 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -628,7 +628,7 @@ func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(p.constArg, col[i]) > 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -675,7 +675,7 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col1[i], col2[i]) > 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -718,7 +718,7 @@ func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col[i], p.constArg) >= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -762,7 +762,7 @@ func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(p.constArg, col[i]) >= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -809,7 +809,7 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareBools(col1[i], col2[i]) >= 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -852,7 +852,7 @@ func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col[i], p.constArg) == 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -896,7 +896,7 @@ func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(p.constArg, col[i]) == 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -943,7 +943,7 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col1[i], col2[i]) == 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -986,7 +986,7 @@ func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col[i], p.constArg) != 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1030,7 +1030,7 @@ func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(p.constArg, col[i]) != 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1077,7 +1077,7 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col1[i], col2[i]) != 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1120,7 +1120,7 @@ func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col[i], p.constArg) < 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1164,7 +1164,7 @@ func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(p.constArg, col[i]) < 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1211,7 +1211,7 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col1[i], col2[i]) < 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1254,7 +1254,7 @@ func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col[i], p.constArg) <= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1298,7 +1298,7 @@ func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(p.constArg, col[i]) <= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1345,7 +1345,7 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col1[i], col2[i]) <= 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1388,7 +1388,7 @@ func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col[i], p.constArg) > 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1432,7 +1432,7 @@ func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(p.constArg, col[i]) > 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1479,7 +1479,7 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col1[i], col2[i]) > 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1522,7 +1522,7 @@ func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col[i], p.constArg) >= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1566,7 +1566,7 @@ func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(p.constArg, col[i]) >= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1613,7 +1613,7 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = bytes.Compare(col1[i], col2[i]) >= 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1660,7 +1660,7 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1708,7 +1708,7 @@ func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1759,7 +1759,7 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1806,7 +1806,7 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1854,7 +1854,7 @@ func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -1905,7 +1905,7 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -1952,7 +1952,7 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2000,7 +2000,7 @@ func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2051,7 +2051,7 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2098,7 +2098,7 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2146,7 +2146,7 @@ func (p projDivDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2197,7 +2197,7 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2240,7 +2240,7 @@ func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) == 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2284,7 +2284,7 @@ func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&p.constArg, &col[i]) == 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2331,7 +2331,7 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) == 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2374,7 +2374,7 @@ func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) != 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2418,7 +2418,7 @@ func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&p.constArg, &col[i]) != 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2465,7 +2465,7 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) != 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2508,7 +2508,7 @@ func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) < 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2552,7 +2552,7 @@ func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&p.constArg, &col[i]) < 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2599,7 +2599,7 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) < 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2642,7 +2642,7 @@ func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) <= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2686,7 +2686,7 @@ func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&p.constArg, &col[i]) <= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2733,7 +2733,7 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) <= 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2776,7 +2776,7 @@ func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) > 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2820,7 +2820,7 @@ func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&p.constArg, &col[i]) > 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2867,7 +2867,7 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) > 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -2910,7 +2910,7 @@ func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col[i], &p.constArg) >= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -2954,7 +2954,7 @@ func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&p.constArg, &col[i]) >= 0
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3001,7 +3001,7 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = tree.CompareDecimals(&col1[i], &col2[i]) >= 0
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3044,7 +3044,7 @@ func (p projPlusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] + p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3088,7 +3088,7 @@ func (p projPlusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg + col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3135,7 +3135,7 @@ func (p projPlusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] + col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3178,7 +3178,7 @@ func (p projMinusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] - p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3222,7 +3222,7 @@ func (p projMinusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg - col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3269,7 +3269,7 @@ func (p projMinusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] - col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3312,7 +3312,7 @@ func (p projMultInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] * p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3356,7 +3356,7 @@ func (p projMultInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg * col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3403,7 +3403,7 @@ func (p projMultInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] * col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3446,7 +3446,7 @@ func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] / p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3490,7 +3490,7 @@ func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg / col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3537,7 +3537,7 @@ func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] / col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3580,7 +3580,7 @@ func (p projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] == p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3624,7 +3624,7 @@ func (p projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg == col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3671,7 +3671,7 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] == col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3714,7 +3714,7 @@ func (p projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] != p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3758,7 +3758,7 @@ func (p projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg != col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3805,7 +3805,7 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] != col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3848,7 +3848,7 @@ func (p projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] < p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3892,7 +3892,7 @@ func (p projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg < col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -3939,7 +3939,7 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] < col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -3982,7 +3982,7 @@ func (p projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] <= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4026,7 +4026,7 @@ func (p projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg <= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4073,7 +4073,7 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] <= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4116,7 +4116,7 @@ func (p projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] > p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4160,7 +4160,7 @@ func (p projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg > col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4207,7 +4207,7 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] > col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4250,7 +4250,7 @@ func (p projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] >= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4294,7 +4294,7 @@ func (p projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg >= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4341,7 +4341,7 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] >= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4384,7 +4384,7 @@ func (p projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] + p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4428,7 +4428,7 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg + col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4475,7 +4475,7 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] + col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4518,7 +4518,7 @@ func (p projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] - p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4562,7 +4562,7 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg - col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4609,7 +4609,7 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] - col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4652,7 +4652,7 @@ func (p projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] * p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4696,7 +4696,7 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg * col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4743,7 +4743,7 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] * col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4786,7 +4786,7 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] / p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4830,7 +4830,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg / col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4877,7 +4877,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] / col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -4920,7 +4920,7 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] == p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -4964,7 +4964,7 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg == col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5011,7 +5011,7 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] == col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5054,7 +5054,7 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] != p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5098,7 +5098,7 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg != col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5145,7 +5145,7 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] != col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5188,7 +5188,7 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] < p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5232,7 +5232,7 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg < col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5279,7 +5279,7 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] < col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5322,7 +5322,7 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] <= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5366,7 +5366,7 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg <= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5413,7 +5413,7 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] <= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5456,7 +5456,7 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] > p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5500,7 +5500,7 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg > col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5547,7 +5547,7 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] > col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5590,7 +5590,7 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] >= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5634,7 +5634,7 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg >= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5681,7 +5681,7 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] >= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5724,7 +5724,7 @@ func (p projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] + p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5768,7 +5768,7 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg + col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5815,7 +5815,7 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] + col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5858,7 +5858,7 @@ func (p projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] - p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5902,7 +5902,7 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg - col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -5949,7 +5949,7 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] - col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -5992,7 +5992,7 @@ func (p projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] * p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6036,7 +6036,7 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg * col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6083,7 +6083,7 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] * col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6126,7 +6126,7 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] / p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6170,7 +6170,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg / col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6217,7 +6217,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] / col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6260,7 +6260,7 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] == p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6304,7 +6304,7 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg == col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6351,7 +6351,7 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] == col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6394,7 +6394,7 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] != p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6438,7 +6438,7 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg != col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6485,7 +6485,7 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] != col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6528,7 +6528,7 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] < p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6572,7 +6572,7 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg < col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6619,7 +6619,7 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] < col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6662,7 +6662,7 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] <= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6706,7 +6706,7 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg <= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6753,7 +6753,7 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] <= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6796,7 +6796,7 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] > p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6840,7 +6840,7 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg > col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6887,7 +6887,7 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] > col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -6930,7 +6930,7 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] >= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -6974,7 +6974,7 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg >= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7021,7 +7021,7 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] >= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7064,7 +7064,7 @@ func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] + p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7108,7 +7108,7 @@ func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg + col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7155,7 +7155,7 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] + col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7198,7 +7198,7 @@ func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] - p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7242,7 +7242,7 @@ func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg - col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7289,7 +7289,7 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] - col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7332,7 +7332,7 @@ func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] * p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7376,7 +7376,7 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg * col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7423,7 +7423,7 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] * col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7466,7 +7466,7 @@ func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] / p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7510,7 +7510,7 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg / col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7557,7 +7557,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] / col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7600,7 +7600,7 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] == p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7644,7 +7644,7 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg == col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7691,7 +7691,7 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] == col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7734,7 +7734,7 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] != p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7778,7 +7778,7 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg != col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7825,7 +7825,7 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] != col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -7868,7 +7868,7 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] < p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7912,7 +7912,7 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg < col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -7959,7 +7959,7 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] < col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8002,7 +8002,7 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] <= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8046,7 +8046,7 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg <= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8093,7 +8093,7 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] <= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8136,7 +8136,7 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] > p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8180,7 +8180,7 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg > col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8227,7 +8227,7 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] > col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8270,7 +8270,7 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] >= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8314,7 +8314,7 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg >= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8361,7 +8361,7 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] >= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8404,7 +8404,7 @@ func (p projPlusFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] + p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8448,7 +8448,7 @@ func (p projPlusFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg + col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8495,7 +8495,7 @@ func (p projPlusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] + col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8538,7 +8538,7 @@ func (p projMinusFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch 
 			projCol[i] = col[i] - p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8582,7 +8582,7 @@ func (p projMinusFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch 
 			projCol[i] = p.constArg - col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8629,7 +8629,7 @@ func (p projMinusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] - col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8672,7 +8672,7 @@ func (p projMultFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] * p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8716,7 +8716,7 @@ func (p projMultFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg * col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8763,7 +8763,7 @@ func (p projMultFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] * col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8806,7 +8806,7 @@ func (p projDivFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] / p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8850,7 +8850,7 @@ func (p projDivFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg / col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8897,7 +8897,7 @@ func (p projDivFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] / col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -8940,7 +8940,7 @@ func (p projEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] == p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -8984,7 +8984,7 @@ func (p projEQFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg == col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9031,7 +9031,7 @@ func (p projEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] == col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9074,7 +9074,7 @@ func (p projNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] != p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9118,7 +9118,7 @@ func (p projNEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg != col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9165,7 +9165,7 @@ func (p projNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] != col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9208,7 +9208,7 @@ func (p projLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] < p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9252,7 +9252,7 @@ func (p projLTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg < col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9299,7 +9299,7 @@ func (p projLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] < col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9342,7 +9342,7 @@ func (p projLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] <= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9386,7 +9386,7 @@ func (p projLEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg <= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9433,7 +9433,7 @@ func (p projLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] <= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9476,7 +9476,7 @@ func (p projGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] > p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9520,7 +9520,7 @@ func (p projGTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg > col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9567,7 +9567,7 @@ func (p projGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] > col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9610,7 +9610,7 @@ func (p projGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] >= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9654,7 +9654,7 @@ func (p projGEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg >= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9701,7 +9701,7 @@ func (p projGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] >= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9744,7 +9744,7 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] + p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9788,7 +9788,7 @@ func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg + col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9835,7 +9835,7 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] + col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -9878,7 +9878,7 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 			projCol[i] = col[i] - p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9922,7 +9922,7 @@ func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch 
 			projCol[i] = p.constArg - col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -9969,7 +9969,7 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] - col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10012,7 +10012,7 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] * p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10056,7 +10056,7 @@ func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg * col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10103,7 +10103,7 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] * col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10146,7 +10146,7 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] / p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10190,7 +10190,7 @@ func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg / col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10237,7 +10237,7 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] / col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10280,7 +10280,7 @@ func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] == p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10324,7 +10324,7 @@ func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg == col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10371,7 +10371,7 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] == col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10414,7 +10414,7 @@ func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] != p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10458,7 +10458,7 @@ func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg != col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10505,7 +10505,7 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] != col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10548,7 +10548,7 @@ func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] < p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10592,7 +10592,7 @@ func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg < col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10639,7 +10639,7 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] < col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10682,7 +10682,7 @@ func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] <= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10726,7 +10726,7 @@ func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg <= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10773,7 +10773,7 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] <= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10816,7 +10816,7 @@ func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] > p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10860,7 +10860,7 @@ func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg > col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10907,7 +10907,7 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] > col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch
@@ -10950,7 +10950,7 @@ func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col[i] >= p.constArg
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -10994,7 +10994,7 @@ func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = p.constArg >= col[i]
 		}
 	}
-	if vec.Nulls().HasNulls() {
+	if vec.Nulls().MaybeHasNulls() {
 		nulls := vec.Nulls().Copy()
 		projVec.SetNulls(&nulls)
 	}
@@ -11041,7 +11041,7 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			projCol[i] = col1[i] >= col2[i]
 		}
 	}
-	if vec1.Nulls().HasNulls() || vec2.Nulls().HasNulls() {
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
 		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
 	}
 	return batch

@@ -29,8 +29,8 @@ EqLoop:
 		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
 		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
 		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
-		if lVec.HasNulls() {
-			if rVec.HasNulls() {
+		if lVec.MaybeHasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -5712,7 +5712,7 @@ EqLoop:
 				}
 			}
 		} else {
-			if rVec.HasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -10904,8 +10904,8 @@ EqLoop:
 		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
 		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
 		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
-		if lVec.HasNulls() {
-			if rVec.HasNulls() {
+		if lVec.MaybeHasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -16587,7 +16587,7 @@ EqLoop:
 				}
 			}
 		} else {
-			if rVec.HasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -21779,8 +21779,8 @@ EqLoop:
 		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
 		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
 		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
-		if lVec.HasNulls() {
-			if rVec.HasNulls() {
+		if lVec.MaybeHasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -27462,7 +27462,7 @@ EqLoop:
 				}
 			}
 		} else {
-			if rVec.HasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -32654,8 +32654,8 @@ EqLoop:
 		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
 		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
 		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
-		if lVec.HasNulls() {
-			if rVec.HasNulls() {
+		if lVec.MaybeHasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -38337,7 +38337,7 @@ EqLoop:
 				}
 			}
 		} else {
-			if rVec.HasNulls() {
+			if rVec.MaybeHasNulls() {
 				if o.left.directions[eqColIdx] == distsqlpb.Ordering_Column_ASC {
 
 					switch colType {
@@ -43561,7 +43561,7 @@ LeftColLoop:
 		colType := input.sourceTypes[colIdx]
 
 		if sel != nil {
-			if src.HasNulls() {
+			if src.MaybeHasNulls() {
 
 				switch colType {
 				case types.Bool:
@@ -44574,7 +44574,7 @@ LeftColLoop:
 				}
 			}
 		} else {
-			if src.HasNulls() {
+			if src.MaybeHasNulls() {
 
 				switch colType {
 				case types.Bool:
@@ -45614,7 +45614,7 @@ RightColLoop:
 		colType := input.sourceTypes[colIdx]
 
 		if sel != nil {
-			if src.HasNulls() {
+			if src.MaybeHasNulls() {
 
 				switch colType {
 				case types.Bool:
@@ -46573,7 +46573,7 @@ RightColLoop:
 				}
 			}
 		} else {
-			if src.HasNulls() {
+			if src.MaybeHasNulls() {
 
 				switch colType {
 				case types.Bool:
@@ -47538,13 +47538,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal bool
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Bool()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Bool()[rowIdx]
@@ -47569,13 +47569,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal []byte
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Bytes()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Bytes()[rowIdx]
@@ -47600,13 +47600,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal apd.Decimal
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Decimal()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Decimal()[rowIdx]
@@ -47631,13 +47631,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal int8
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int8()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int8()[rowIdx]
@@ -47662,13 +47662,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal int16
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int16()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int16()[rowIdx]
@@ -47693,13 +47693,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal int32
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int32()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int32()[rowIdx]
@@ -47724,13 +47724,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal int64
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int64()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Int64()[rowIdx]
@@ -47755,13 +47755,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal float32
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Float32()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Float32()[rowIdx]
@@ -47786,13 +47786,13 @@ func (o *mergeJoinOp) isBufferedGroupFinished(
 			var curVal float64
 			if sel != nil {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(sel[rowIdx])) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Float64()[sel[rowIdx]]
 			} else {
 				// TODO (georgeutsin): Potentially update this logic for non INNER joins.
-				if batch.ColVec(int(colIdx)).HasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(uint64(rowIdx)) {
 					return true
 				}
 				curVal = batch.ColVec(int(colIdx)).Float64()[rowIdx]

@@ -28,7 +28,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -111,7 +111,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -194,7 +194,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -277,7 +277,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -360,7 +360,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -443,7 +443,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {

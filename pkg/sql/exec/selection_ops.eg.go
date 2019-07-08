@@ -33,7 +33,7 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -119,7 +119,7 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -204,7 +204,7 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -290,7 +290,7 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -375,7 +375,7 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -461,7 +461,7 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -546,7 +546,7 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -632,7 +632,7 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -717,7 +717,7 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -803,7 +803,7 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -888,7 +888,7 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bool()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -974,7 +974,7 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -1059,7 +1059,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -1145,7 +1145,7 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -1230,7 +1230,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -1316,7 +1316,7 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -1401,7 +1401,7 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -1487,7 +1487,7 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -1572,7 +1572,7 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -1658,7 +1658,7 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -1743,7 +1743,7 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -1829,7 +1829,7 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -1914,7 +1914,7 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Bytes()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -2000,7 +2000,7 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -2085,7 +2085,7 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -2171,7 +2171,7 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -2256,7 +2256,7 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -2342,7 +2342,7 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -2427,7 +2427,7 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -2513,7 +2513,7 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -2598,7 +2598,7 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -2684,7 +2684,7 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -2769,7 +2769,7 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -2855,7 +2855,7 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -2940,7 +2940,7 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Decimal()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -3026,7 +3026,7 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -3111,7 +3111,7 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -3197,7 +3197,7 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -3282,7 +3282,7 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -3368,7 +3368,7 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -3453,7 +3453,7 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -3539,7 +3539,7 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -3624,7 +3624,7 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -3710,7 +3710,7 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -3795,7 +3795,7 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -3881,7 +3881,7 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -3966,7 +3966,7 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int8()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -4052,7 +4052,7 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -4137,7 +4137,7 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -4223,7 +4223,7 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -4308,7 +4308,7 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -4394,7 +4394,7 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -4479,7 +4479,7 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -4565,7 +4565,7 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -4650,7 +4650,7 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -4736,7 +4736,7 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -4821,7 +4821,7 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -4907,7 +4907,7 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -4992,7 +4992,7 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int16()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -5078,7 +5078,7 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -5163,7 +5163,7 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -5249,7 +5249,7 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -5334,7 +5334,7 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -5420,7 +5420,7 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -5505,7 +5505,7 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -5591,7 +5591,7 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -5676,7 +5676,7 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -5762,7 +5762,7 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -5847,7 +5847,7 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -5933,7 +5933,7 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -6018,7 +6018,7 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -6104,7 +6104,7 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -6189,7 +6189,7 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -6275,7 +6275,7 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -6360,7 +6360,7 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -6446,7 +6446,7 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -6531,7 +6531,7 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -6617,7 +6617,7 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -6702,7 +6702,7 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -6788,7 +6788,7 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -6873,7 +6873,7 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -6959,7 +6959,7 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -7044,7 +7044,7 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Int64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -7130,7 +7130,7 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -7215,7 +7215,7 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -7301,7 +7301,7 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -7386,7 +7386,7 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -7472,7 +7472,7 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -7557,7 +7557,7 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -7643,7 +7643,7 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -7728,7 +7728,7 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -7814,7 +7814,7 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -7899,7 +7899,7 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -7985,7 +7985,7 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -8070,7 +8070,7 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float32()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -8156,7 +8156,7 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -8241,7 +8241,7 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -8327,7 +8327,7 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -8412,7 +8412,7 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -8498,7 +8498,7 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -8583,7 +8583,7 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -8669,7 +8669,7 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -8754,7 +8754,7 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -8840,7 +8840,7 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -8925,7 +8925,7 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -9011,7 +9011,7 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {
@@ -9096,7 +9096,7 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		col := vec.Float64()[:coldata.BatchSize]
 		var idx uint16
 		n := batch.Length()
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 
 			if sel := batch.Selection(); sel != nil {
@@ -9182,7 +9182,7 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 
 		var idx uint16
-		if vec1.HasNulls() || vec2.HasNulls() {
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
 			nulls := vec1.Nulls().Or(vec2.Nulls())
 
 			if sel := batch.Selection(); sel != nil {

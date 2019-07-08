@@ -334,7 +334,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -408,7 +408,7 @@ func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -541,7 +541,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -615,7 +615,7 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -748,7 +748,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -822,7 +822,7 @@ func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -955,7 +955,7 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -1029,7 +1029,7 @@ func (pi *projectInOpInt8) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -1162,7 +1162,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -1236,7 +1236,7 @@ func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -1369,7 +1369,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -1443,7 +1443,7 @@ func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -1576,7 +1576,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -1650,7 +1650,7 @@ func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -1783,7 +1783,7 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -1857,7 +1857,7 @@ func (pi *projectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
@@ -1990,7 +1990,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 			compVal = siFalse
 		}
 
-		if vec.HasNulls() {
+		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
@@ -2064,7 +2064,7 @@ func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 		cmpVal = siFalse
 	}
 
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]

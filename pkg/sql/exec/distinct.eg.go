@@ -196,7 +196,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Bool()
@@ -300,7 +300,7 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint6
 	var lastVal bool
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -383,7 +383,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Bytes()
@@ -487,7 +487,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 	var lastVal []byte
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -570,7 +570,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Decimal()
@@ -674,7 +674,7 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 	var lastVal apd.Decimal
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -757,7 +757,7 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Int8()
@@ -861,7 +861,7 @@ func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint6
 	var lastVal int8
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -944,7 +944,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Int16()
@@ -1048,7 +1048,7 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 	var lastVal int16
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -1131,7 +1131,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Int32()
@@ -1235,7 +1235,7 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 	var lastVal int32
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -1318,7 +1318,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Int64()
@@ -1422,7 +1422,7 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 	var lastVal int64
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -1505,7 +1505,7 @@ func (p *sortedDistinctFloat32Op) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Float32()
@@ -1609,7 +1609,7 @@ func (p partitionerFloat32) partition(colVec coldata.Vec, outputCol []bool, n ui
 	var lastVal float32
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
@@ -1692,7 +1692,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 	outputCol := p.outputCol
 	vec := batch.ColVec(p.sortedDistinctCol)
 	var nulls *coldata.Nulls
-	if vec.HasNulls() {
+	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
 	}
 	col := vec.Float64()
@@ -1796,7 +1796,7 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n ui
 	var lastVal float64
 	var lastValNull bool
 	var nulls *coldata.Nulls
-	if colVec.HasNulls() {
+	if colVec.MaybeHasNulls() {
 		nulls = colVec.Nulls()
 	}
 
