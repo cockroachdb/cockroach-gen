@@ -8239,6 +8239,51 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [PushLimitIntoOffset]
+	{
+		_offset, _ := input.(*memo.OffsetExpr)
+		if _offset != nil {
+			input := _offset.Input
+			_const, _ := _offset.Offset.(*memo.ConstExpr)
+			if _const != nil {
+				offset := _const.Value
+				if _f.funcs.IsPositiveLimit(offset) {
+					offsetOrdering := _offset.Ordering
+					_const2, _ := limit.(*memo.ConstExpr)
+					if _const2 != nil {
+						limit := _const2.Value
+						if _f.funcs.IsPositiveLimit(limit) {
+							limitOrdering := ordering
+							if _f.funcs.IsSameOrdering(offsetOrdering, limitOrdering) {
+								if _f.funcs.CanAddConstInts(limit, offset) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoOffset) {
+										_expr := _f.ConstructOffset(
+											_f.ConstructLimit(
+												input,
+												_f.ConstructConst(
+													_f.funcs.AddConstInts(offset, limit),
+												),
+												limitOrdering,
+											),
+											_f.ConstructConst(
+												offset,
+											),
+											offsetOrdering,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.PushLimitIntoOffset, nil, _expr)
+										}
+										return _expr
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [SimplifyLimitOrdering]
 	{
 		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {

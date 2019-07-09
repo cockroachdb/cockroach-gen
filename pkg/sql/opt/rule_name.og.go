@@ -116,6 +116,7 @@ const (
 	EliminateOffset
 	PushLimitIntoProject
 	PushOffsetIntoProject
+	PushLimitIntoOffset
 	EliminateMax1Row
 	FoldPlusZero
 	FoldZeroPlus
