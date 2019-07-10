@@ -43,23 +43,28 @@ func newAnyNotNullAgg(t types.T) (aggregateFunc, error) {
 
 // anyNotNullBoolAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullBoolAgg struct {
-	done   bool
-	groups []bool
-	vec    []bool
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []bool
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Bool()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullBoolAgg) Reset() {
+	copy(a.vec, zeroBoolColumn)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullBoolAgg) CurrentOutputIndex() int {
@@ -69,6 +74,8 @@ func (a *anyNotNullBoolAgg) CurrentOutputIndex() int {
 func (a *anyNotNullBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroBoolColumn)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -78,25 +85,117 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Bool(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Bool(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -104,23 +203,28 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullBytesAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullBytesAgg struct {
-	done   bool
-	groups []bool
-	vec    [][]byte
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         [][]byte
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Bytes()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullBytesAgg) Reset() {
+	copy(a.vec, zeroBytesColumn)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullBytesAgg) CurrentOutputIndex() int {
@@ -130,6 +234,8 @@ func (a *anyNotNullBytesAgg) CurrentOutputIndex() int {
 func (a *anyNotNullBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroBytesColumn)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -139,25 +245,117 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Bytes(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Bytes(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -165,23 +363,28 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullDecimalAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullDecimalAgg struct {
-	done   bool
-	groups []bool
-	vec    []apd.Decimal
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []apd.Decimal
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Decimal()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullDecimalAgg) Reset() {
+	copy(a.vec, zeroDecimalColumn)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullDecimalAgg) CurrentOutputIndex() int {
@@ -191,6 +394,8 @@ func (a *anyNotNullDecimalAgg) CurrentOutputIndex() int {
 func (a *anyNotNullDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroDecimalColumn)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -200,25 +405,117 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Decimal(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Decimal(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -226,23 +523,28 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullInt8Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullInt8Agg struct {
-	done   bool
-	groups []bool
-	vec    []int8
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []int8
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullInt8Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int8()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullInt8Agg) Reset() {
+	copy(a.vec, zeroInt8Column)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullInt8Agg) CurrentOutputIndex() int {
@@ -252,6 +554,8 @@ func (a *anyNotNullInt8Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt8Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroInt8Column)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -261,25 +565,117 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int8(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int8(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -287,23 +683,28 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullInt16Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullInt16Agg struct {
-	done   bool
-	groups []bool
-	vec    []int16
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []int16
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int16()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullInt16Agg) Reset() {
+	copy(a.vec, zeroInt16Column)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullInt16Agg) CurrentOutputIndex() int {
@@ -313,6 +714,8 @@ func (a *anyNotNullInt16Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroInt16Column)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -322,25 +725,117 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int16(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int16(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -348,23 +843,28 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullInt32Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullInt32Agg struct {
-	done   bool
-	groups []bool
-	vec    []int32
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []int32
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int32()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullInt32Agg) Reset() {
+	copy(a.vec, zeroInt32Column)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullInt32Agg) CurrentOutputIndex() int {
@@ -374,6 +874,8 @@ func (a *anyNotNullInt32Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroInt32Column)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -383,25 +885,117 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int32(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int32(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -409,23 +1003,28 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullInt64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullInt64Agg struct {
-	done   bool
-	groups []bool
-	vec    []int64
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []int64
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Int64()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullInt64Agg) Reset() {
+	copy(a.vec, zeroInt64Column)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullInt64Agg) CurrentOutputIndex() int {
@@ -435,6 +1034,8 @@ func (a *anyNotNullInt64Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroInt64Column)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -444,25 +1045,117 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int64(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int64(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -470,23 +1163,28 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullFloat32Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullFloat32Agg struct {
-	done   bool
-	groups []bool
-	vec    []float32
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []float32
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullFloat32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Float32()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullFloat32Agg) Reset() {
+	copy(a.vec, zeroFloat32Column)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullFloat32Agg) CurrentOutputIndex() int {
@@ -496,6 +1194,8 @@ func (a *anyNotNullFloat32Agg) CurrentOutputIndex() int {
 func (a *anyNotNullFloat32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroFloat32Column)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -505,25 +1205,117 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Float32(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Float32(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -531,23 +1323,28 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 
 // anyNotNullFloat64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
-// TODO(jordan): this needs to have null handling when it's added!
 type anyNotNullFloat64Agg struct {
-	done   bool
-	groups []bool
-	vec    []float64
-	curIdx int
+	done                        bool
+	groups                      []bool
+	vec                         []float64
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
 }
 
 func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
 	a.vec = vec.Float64()
+	a.nulls = vec.Nulls()
 	a.Reset()
 }
 
 func (a *anyNotNullFloat64Agg) Reset() {
+	copy(a.vec, zeroFloat64Column)
 	a.curIdx = -1
 	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
 }
 
 func (a *anyNotNullFloat64Agg) CurrentOutputIndex() int {
@@ -557,6 +1354,8 @@ func (a *anyNotNullFloat64Agg) CurrentOutputIndex() int {
 func (a *anyNotNullFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
+		copy(a.vec[idx+1:], zeroFloat64Column)
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -566,25 +1365,117 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null. If a.curIdx is negative, it means the input
+		// has zero rows, and there should be no output at all.
+		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
 		a.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Float64(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Float64(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			if a.groups[i] {
-				a.curIdx++
-				a.vec[a.curIdx] = col[i]
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					a.vec[a.curIdx] = col[i]
+					a.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
