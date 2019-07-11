@@ -44,8 +44,16 @@ type sumDecimalAgg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg apd.Decimal
 		// vec points to the output vector we are updating.
 		vec []apd.Decimal
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -54,12 +62,16 @@ var _ aggregateFunc = &sumDecimalAgg{}
 func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Decimal()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumDecimalAgg) Reset() {
 	copy(a.scratch.vec, zeroDecimalColumn)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -71,6 +83,7 @@ func (a *sumDecimalAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroDecimalColumn)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -80,34 +93,150 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Decimal(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Decimal(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					if _, err := tree.DecimalCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
+						panic(err)
+					}
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			if _, err := tree.DecimalCtx.Add(&a.scratch.vec[a.scratch.curIdx], &a.scratch.vec[a.scratch.curIdx], &col[i]); err != nil {
-				panic(err)
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					if _, err := tree.DecimalCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
+						panic(err)
+					}
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					if _, err := tree.DecimalCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
+						panic(err)
+					}
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			if _, err := tree.DecimalCtx.Add(&a.scratch.vec[a.scratch.curIdx], &a.scratch.vec[a.scratch.curIdx], &col[i]); err != nil {
-				panic(err)
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					if _, err := tree.DecimalCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
+						panic(err)
+					}
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
 		}
 	}
@@ -119,8 +248,16 @@ type sumInt8Agg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg int8
 		// vec points to the output vector we are updating.
 		vec []int8
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -129,12 +266,16 @@ var _ aggregateFunc = &sumInt8Agg{}
 func (a *sumInt8Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int8()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumInt8Agg) Reset() {
 	copy(a.scratch.vec, zeroInt8Column)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -146,6 +287,7 @@ func (a *sumInt8Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroInt8Column)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -155,31 +297,143 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int8(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int8(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
 }
@@ -190,8 +444,16 @@ type sumInt16Agg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg int16
 		// vec points to the output vector we are updating.
 		vec []int16
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -200,12 +462,16 @@ var _ aggregateFunc = &sumInt16Agg{}
 func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int16()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumInt16Agg) Reset() {
 	copy(a.scratch.vec, zeroInt16Column)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -217,6 +483,7 @@ func (a *sumInt16Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroInt16Column)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -226,31 +493,143 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int16(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int16(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
 }
@@ -261,8 +640,16 @@ type sumInt32Agg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg int32
 		// vec points to the output vector we are updating.
 		vec []int32
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -271,12 +658,16 @@ var _ aggregateFunc = &sumInt32Agg{}
 func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int32()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumInt32Agg) Reset() {
 	copy(a.scratch.vec, zeroInt32Column)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -288,6 +679,7 @@ func (a *sumInt32Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroInt32Column)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -297,31 +689,143 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int32(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int32(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
 }
@@ -332,8 +836,16 @@ type sumInt64Agg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg int64
 		// vec points to the output vector we are updating.
 		vec []int64
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -342,12 +854,16 @@ var _ aggregateFunc = &sumInt64Agg{}
 func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int64()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumInt64Agg) Reset() {
 	copy(a.scratch.vec, zeroInt64Column)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -359,6 +875,7 @@ func (a *sumInt64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroInt64Column)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -368,31 +885,143 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Int64(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int64(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
 }
@@ -403,8 +1032,16 @@ type sumFloat32Agg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg float32
 		// vec points to the output vector we are updating.
 		vec []float32
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -413,12 +1050,16 @@ var _ aggregateFunc = &sumFloat32Agg{}
 func (a *sumFloat32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float32()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumFloat32Agg) Reset() {
 	copy(a.scratch.vec, zeroFloat32Column)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -430,6 +1071,7 @@ func (a *sumFloat32Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroFloat32Column)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -439,31 +1081,143 @@ func (a *sumFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Float32(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Float32(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
 }
@@ -474,8 +1228,16 @@ type sumFloat64Agg struct {
 	groups  []bool
 	scratch struct {
 		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg float64
 		// vec points to the output vector we are updating.
 		vec []float64
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
 	}
 }
 
@@ -484,12 +1246,16 @@ var _ aggregateFunc = &sumFloat64Agg{}
 func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float64()
+	a.scratch.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *sumFloat64Agg) Reset() {
 	copy(a.scratch.vec, zeroFloat64Column)
+	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
 	a.done = false
 }
 
@@ -501,6 +1267,7 @@ func (a *sumFloat64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		copy(a.scratch.vec[idx+1:], zeroFloat64Column)
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
 
@@ -510,31 +1277,143 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value.
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
+		// and there should be no output at all.
+		if a.scratch.curIdx >= 0 {
+			if !a.scratch.foundNonNullForCurrentGroup {
+				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			}
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
 		a.scratch.curIdx++
 		a.done = true
 		return
 	}
-	col, sel := b.ColVec(int(inputIdxs[0])).Float64(), b.Selection()
-	if sel != nil {
-		sel = sel[:inputLen]
-		for _, i := range sel {
-			x := 0
-			if a.groups[i] {
-				x = 1
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Float64(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	} else {
-		col = col[:inputLen]
-		for i := range col {
-			x := 0
-			if a.groups[i] {
-				x = 1
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
 			}
-			a.scratch.curIdx += x
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.vec[a.scratch.curIdx] + col[i]
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						}
+						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+					}
+					a.scratch.curIdx++
+
+					// The next element of vec is guaranteed  to be initialized to the zero
+					// value. We can't use zero<no value>Column here because this is outside of
+					// the earlier template block.
+					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg + col[i]
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
 }
