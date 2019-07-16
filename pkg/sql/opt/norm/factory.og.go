@@ -1490,6 +1490,35 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PruneMutationReturnCols]
+	{
+		if input.Op() == opt.InsertOp || input.Op() == opt.UpdateOp || input.Op() == opt.UpsertOp || input.Op() == opt.DeleteOp {
+			innerInput := input.Child(0).(memo.RelExpr)
+			checks := *input.Child(1).(*memo.FKChecksExpr)
+			mutationPrivate := input.Private().(*memo.MutationPrivate)
+			needed := _f.funcs.UnionCols3(_f.funcs.PrimaryKeyCols(_f.funcs.MutationTable(mutationPrivate)), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneMutationReturnCols(mutationPrivate, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationReturnCols) {
+					checks := checks
+					_expr := _f.ConstructProject(
+						_f.DynamicConstruct(
+							input.Op(),
+							innerInput,
+							&checks,
+							_f.funcs.PruneMutationReturnCols(mutationPrivate, needed),
+						).(memo.RelExpr),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneMutationReturnCols, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [HoistProjectSubquery]
 	{
 		for i := range projections {

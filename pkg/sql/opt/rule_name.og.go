@@ -151,6 +151,7 @@ const (
 	PruneWindowInputCols
 	PruneMutationFetchCols
 	PruneMutationInputCols
+	PruneMutationReturnCols
 	RejectNullsLeftJoin
 	RejectNullsRightJoin
 	RejectNullsGroupBy
