@@ -25,7 +25,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -108,7 +108,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -191,7 +191,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -274,7 +274,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -357,7 +357,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -440,7 +440,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {

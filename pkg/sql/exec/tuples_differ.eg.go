@@ -77,14 +77,14 @@ func tuplesDiffer(
 		aCol := aColVec.Float32()
 		bCol := bColVec.Float32()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		unique = compareFloats(float64(aCol[aTupleIdx]), float64(bCol[bTupleIdx])) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Float64:
 		aCol := aColVec.Float64()
 		bCol := bColVec.Float64()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		unique = compareFloats(float64(aCol[aTupleIdx]), float64(bCol[bTupleIdx])) != 0
 		*differ = *differ || unique
 		return nil
 	default:

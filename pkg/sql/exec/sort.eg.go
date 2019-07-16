@@ -1279,7 +1279,7 @@ func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortFloat32AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] < s.sortCol[j]
+	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) < 0
 	return lt
 }
 
@@ -1358,7 +1358,7 @@ func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortFloat32DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] > s.sortCol[j]
+	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) > 0
 	return lt
 }
 
@@ -1437,7 +1437,7 @@ func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortFloat64AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] < s.sortCol[j]
+	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) < 0
 	return lt
 }
 
@@ -1516,7 +1516,7 @@ func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortFloat64DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] > s.sortCol[j]
+	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) > 0
 	return lt
 }
 

@@ -1675,7 +1675,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -1711,7 +1711,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -1749,7 +1749,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -1785,7 +1785,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -1894,7 +1894,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -1930,7 +1930,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -1968,7 +1968,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -2004,7 +2004,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3671,7 +3671,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3707,7 +3707,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3745,7 +3745,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3781,7 +3781,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3890,7 +3890,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3926,7 +3926,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -3964,7 +3964,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}
@@ -4000,7 +4000,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = col[i]
 						}

@@ -325,7 +325,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 
@@ -395,10 +395,10 @@ func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Bool()[:coldata.BatchSize]
+	col := vec.Bool()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -532,7 +532,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 
@@ -602,10 +602,10 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Bytes()[:coldata.BatchSize]
+	col := vec.Bytes()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -739,7 +739,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 
@@ -809,10 +809,10 @@ func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Decimal()[:coldata.BatchSize]
+	col := vec.Decimal()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -946,7 +946,7 @@ func (si *selectInOpInt8) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 
@@ -1016,10 +1016,10 @@ func (pi *projectInOpInt8) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Int8()[:coldata.BatchSize]
+	col := vec.Int8()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -1153,7 +1153,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 
@@ -1223,10 +1223,10 @@ func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Int16()[:coldata.BatchSize]
+	col := vec.Int16()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -1360,7 +1360,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 
@@ -1430,10 +1430,10 @@ func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Int32()[:coldata.BatchSize]
+	col := vec.Int32()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -1567,7 +1567,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 
@@ -1637,10 +1637,10 @@ func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Int64()[:coldata.BatchSize]
+	col := vec.Int64()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -1746,7 +1746,7 @@ func fillDatumRowFloat32(ct *semtypes.T, datumTuple *tree.DTuple) ([]float32, bo
 func cmpInFloat32(target float32, filterRow []float32, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = target == filterRow[i]
+		cmp = compareFloats(float64(target), float64(filterRow[i])) == 0
 		if cmp {
 			return siTrue
 		}
@@ -1774,7 +1774,7 @@ func (si *selectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 
@@ -1844,10 +1844,10 @@ func (pi *projectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Float32()[:coldata.BatchSize]
+	col := vec.Float32()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()
@@ -1953,7 +1953,7 @@ func fillDatumRowFloat64(ct *semtypes.T, datumTuple *tree.DTuple) ([]float64, bo
 func cmpInFloat64(target float64, filterRow []float64, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = target == filterRow[i]
+		cmp = compareFloats(float64(target), float64(filterRow[i])) == 0
 		if cmp {
 			return siTrue
 		}
@@ -1981,7 +1981,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(si.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 
@@ -2051,10 +2051,10 @@ func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	}
 
 	vec := batch.ColVec(pi.colIdx)
-	col := vec.Float64()[:coldata.BatchSize]
+	col := vec.Float64()
 
 	projVec := batch.ColVec(pi.outputIdx)
-	projCol := projVec.Bool()[:coldata.BatchSize]
+	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
 
 	n := batch.Length()

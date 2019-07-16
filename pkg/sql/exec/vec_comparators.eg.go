@@ -313,13 +313,7 @@ func (c *Float32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	left := c.vecs[vecIdx1][valIdx1]
 	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
-	if left < right {
-		cmp = -1
-	} else if left > right {
-		cmp = 1
-	} else {
-		cmp = 0
-	}
+	cmp = compareFloats(float64(left), float64(right))
 	return cmp
 }
 
@@ -355,13 +349,7 @@ func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	left := c.vecs[vecIdx1][valIdx1]
 	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
-	if left < right {
-		cmp = -1
-	} else if left > right {
-		cmp = 1
-	} else {
-		cmp = 0
-	}
+	cmp = compareFloats(float64(left), float64(right))
 	return cmp
 }
 

@@ -30,7 +30,7 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -114,8 +114,8 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bool()[:coldata.BatchSize]
-		col2 := vec2.Bool()[:coldata.BatchSize]
+		col1 := vec1.Bool()
+		col2 := vec2.Bool()
 		n := batch.Length()
 
 		var idx uint16
@@ -201,7 +201,7 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -285,8 +285,8 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bool()[:coldata.BatchSize]
-		col2 := vec2.Bool()[:coldata.BatchSize]
+		col1 := vec1.Bool()
+		col2 := vec2.Bool()
 		n := batch.Length()
 
 		var idx uint16
@@ -372,7 +372,7 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -456,8 +456,8 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bool()[:coldata.BatchSize]
-		col2 := vec2.Bool()[:coldata.BatchSize]
+		col1 := vec1.Bool()
+		col2 := vec2.Bool()
 		n := batch.Length()
 
 		var idx uint16
@@ -543,7 +543,7 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -627,8 +627,8 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bool()[:coldata.BatchSize]
-		col2 := vec2.Bool()[:coldata.BatchSize]
+		col1 := vec1.Bool()
+		col2 := vec2.Bool()
 		n := batch.Length()
 
 		var idx uint16
@@ -714,7 +714,7 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -798,8 +798,8 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bool()[:coldata.BatchSize]
-		col2 := vec2.Bool()[:coldata.BatchSize]
+		col1 := vec1.Bool()
+		col2 := vec2.Bool()
 		n := batch.Length()
 
 		var idx uint16
@@ -885,7 +885,7 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bool()[:coldata.BatchSize]
+		col := vec.Bool()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -969,8 +969,8 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bool()[:coldata.BatchSize]
-		col2 := vec2.Bool()[:coldata.BatchSize]
+		col1 := vec1.Bool()
+		col2 := vec2.Bool()
 		n := batch.Length()
 
 		var idx uint16
@@ -1056,7 +1056,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -1140,8 +1140,8 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bytes()[:coldata.BatchSize]
-		col2 := vec2.Bytes()[:coldata.BatchSize]
+		col1 := vec1.Bytes()
+		col2 := vec2.Bytes()
 		n := batch.Length()
 
 		var idx uint16
@@ -1227,7 +1227,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -1311,8 +1311,8 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bytes()[:coldata.BatchSize]
-		col2 := vec2.Bytes()[:coldata.BatchSize]
+		col1 := vec1.Bytes()
+		col2 := vec2.Bytes()
 		n := batch.Length()
 
 		var idx uint16
@@ -1398,7 +1398,7 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -1482,8 +1482,8 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bytes()[:coldata.BatchSize]
-		col2 := vec2.Bytes()[:coldata.BatchSize]
+		col1 := vec1.Bytes()
+		col2 := vec2.Bytes()
 		n := batch.Length()
 
 		var idx uint16
@@ -1569,7 +1569,7 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -1653,8 +1653,8 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bytes()[:coldata.BatchSize]
-		col2 := vec2.Bytes()[:coldata.BatchSize]
+		col1 := vec1.Bytes()
+		col2 := vec2.Bytes()
 		n := batch.Length()
 
 		var idx uint16
@@ -1740,7 +1740,7 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -1824,8 +1824,8 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bytes()[:coldata.BatchSize]
-		col2 := vec2.Bytes()[:coldata.BatchSize]
+		col1 := vec1.Bytes()
+		col2 := vec2.Bytes()
 		n := batch.Length()
 
 		var idx uint16
@@ -1911,7 +1911,7 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Bytes()[:coldata.BatchSize]
+		col := vec.Bytes()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -1995,8 +1995,8 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Bytes()[:coldata.BatchSize]
-		col2 := vec2.Bytes()[:coldata.BatchSize]
+		col1 := vec1.Bytes()
+		col2 := vec2.Bytes()
 		n := batch.Length()
 
 		var idx uint16
@@ -2082,7 +2082,7 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -2166,8 +2166,8 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Decimal()[:coldata.BatchSize]
-		col2 := vec2.Decimal()[:coldata.BatchSize]
+		col1 := vec1.Decimal()
+		col2 := vec2.Decimal()
 		n := batch.Length()
 
 		var idx uint16
@@ -2253,7 +2253,7 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -2337,8 +2337,8 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Decimal()[:coldata.BatchSize]
-		col2 := vec2.Decimal()[:coldata.BatchSize]
+		col1 := vec1.Decimal()
+		col2 := vec2.Decimal()
 		n := batch.Length()
 
 		var idx uint16
@@ -2424,7 +2424,7 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -2508,8 +2508,8 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Decimal()[:coldata.BatchSize]
-		col2 := vec2.Decimal()[:coldata.BatchSize]
+		col1 := vec1.Decimal()
+		col2 := vec2.Decimal()
 		n := batch.Length()
 
 		var idx uint16
@@ -2595,7 +2595,7 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -2679,8 +2679,8 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Decimal()[:coldata.BatchSize]
-		col2 := vec2.Decimal()[:coldata.BatchSize]
+		col1 := vec1.Decimal()
+		col2 := vec2.Decimal()
 		n := batch.Length()
 
 		var idx uint16
@@ -2766,7 +2766,7 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -2850,8 +2850,8 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Decimal()[:coldata.BatchSize]
-		col2 := vec2.Decimal()[:coldata.BatchSize]
+		col1 := vec1.Decimal()
+		col2 := vec2.Decimal()
 		n := batch.Length()
 
 		var idx uint16
@@ -2937,7 +2937,7 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Decimal()[:coldata.BatchSize]
+		col := vec.Decimal()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -3021,8 +3021,8 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Decimal()[:coldata.BatchSize]
-		col2 := vec2.Decimal()[:coldata.BatchSize]
+		col1 := vec1.Decimal()
+		col2 := vec2.Decimal()
 		n := batch.Length()
 
 		var idx uint16
@@ -3108,7 +3108,7 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -3192,8 +3192,8 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int8()[:coldata.BatchSize]
-		col2 := vec2.Int8()[:coldata.BatchSize]
+		col1 := vec1.Int8()
+		col2 := vec2.Int8()
 		n := batch.Length()
 
 		var idx uint16
@@ -3279,7 +3279,7 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -3363,8 +3363,8 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int8()[:coldata.BatchSize]
-		col2 := vec2.Int8()[:coldata.BatchSize]
+		col1 := vec1.Int8()
+		col2 := vec2.Int8()
 		n := batch.Length()
 
 		var idx uint16
@@ -3450,7 +3450,7 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -3534,8 +3534,8 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int8()[:coldata.BatchSize]
-		col2 := vec2.Int8()[:coldata.BatchSize]
+		col1 := vec1.Int8()
+		col2 := vec2.Int8()
 		n := batch.Length()
 
 		var idx uint16
@@ -3621,7 +3621,7 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -3705,8 +3705,8 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int8()[:coldata.BatchSize]
-		col2 := vec2.Int8()[:coldata.BatchSize]
+		col1 := vec1.Int8()
+		col2 := vec2.Int8()
 		n := batch.Length()
 
 		var idx uint16
@@ -3792,7 +3792,7 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -3876,8 +3876,8 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int8()[:coldata.BatchSize]
-		col2 := vec2.Int8()[:coldata.BatchSize]
+		col1 := vec1.Int8()
+		col2 := vec2.Int8()
 		n := batch.Length()
 
 		var idx uint16
@@ -3963,7 +3963,7 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int8()[:coldata.BatchSize]
+		col := vec.Int8()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -4047,8 +4047,8 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int8()[:coldata.BatchSize]
-		col2 := vec2.Int8()[:coldata.BatchSize]
+		col1 := vec1.Int8()
+		col2 := vec2.Int8()
 		n := batch.Length()
 
 		var idx uint16
@@ -4134,7 +4134,7 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -4218,8 +4218,8 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int16()[:coldata.BatchSize]
-		col2 := vec2.Int16()[:coldata.BatchSize]
+		col1 := vec1.Int16()
+		col2 := vec2.Int16()
 		n := batch.Length()
 
 		var idx uint16
@@ -4305,7 +4305,7 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -4389,8 +4389,8 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int16()[:coldata.BatchSize]
-		col2 := vec2.Int16()[:coldata.BatchSize]
+		col1 := vec1.Int16()
+		col2 := vec2.Int16()
 		n := batch.Length()
 
 		var idx uint16
@@ -4476,7 +4476,7 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -4560,8 +4560,8 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int16()[:coldata.BatchSize]
-		col2 := vec2.Int16()[:coldata.BatchSize]
+		col1 := vec1.Int16()
+		col2 := vec2.Int16()
 		n := batch.Length()
 
 		var idx uint16
@@ -4647,7 +4647,7 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -4731,8 +4731,8 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int16()[:coldata.BatchSize]
-		col2 := vec2.Int16()[:coldata.BatchSize]
+		col1 := vec1.Int16()
+		col2 := vec2.Int16()
 		n := batch.Length()
 
 		var idx uint16
@@ -4818,7 +4818,7 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -4902,8 +4902,8 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int16()[:coldata.BatchSize]
-		col2 := vec2.Int16()[:coldata.BatchSize]
+		col1 := vec1.Int16()
+		col2 := vec2.Int16()
 		n := batch.Length()
 
 		var idx uint16
@@ -4989,7 +4989,7 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int16()[:coldata.BatchSize]
+		col := vec.Int16()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -5073,8 +5073,8 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int16()[:coldata.BatchSize]
-		col2 := vec2.Int16()[:coldata.BatchSize]
+		col1 := vec1.Int16()
+		col2 := vec2.Int16()
 		n := batch.Length()
 
 		var idx uint16
@@ -5160,7 +5160,7 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -5244,8 +5244,8 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int32()[:coldata.BatchSize]
-		col2 := vec2.Int32()[:coldata.BatchSize]
+		col1 := vec1.Int32()
+		col2 := vec2.Int32()
 		n := batch.Length()
 
 		var idx uint16
@@ -5331,7 +5331,7 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -5415,8 +5415,8 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int32()[:coldata.BatchSize]
-		col2 := vec2.Int32()[:coldata.BatchSize]
+		col1 := vec1.Int32()
+		col2 := vec2.Int32()
 		n := batch.Length()
 
 		var idx uint16
@@ -5502,7 +5502,7 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -5586,8 +5586,8 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int32()[:coldata.BatchSize]
-		col2 := vec2.Int32()[:coldata.BatchSize]
+		col1 := vec1.Int32()
+		col2 := vec2.Int32()
 		n := batch.Length()
 
 		var idx uint16
@@ -5673,7 +5673,7 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -5757,8 +5757,8 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int32()[:coldata.BatchSize]
-		col2 := vec2.Int32()[:coldata.BatchSize]
+		col1 := vec1.Int32()
+		col2 := vec2.Int32()
 		n := batch.Length()
 
 		var idx uint16
@@ -5844,7 +5844,7 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -5928,8 +5928,8 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int32()[:coldata.BatchSize]
-		col2 := vec2.Int32()[:coldata.BatchSize]
+		col1 := vec1.Int32()
+		col2 := vec2.Int32()
 		n := batch.Length()
 
 		var idx uint16
@@ -6015,7 +6015,7 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int32()[:coldata.BatchSize]
+		col := vec.Int32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -6099,8 +6099,8 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int32()[:coldata.BatchSize]
-		col2 := vec2.Int32()[:coldata.BatchSize]
+		col1 := vec1.Int32()
+		col2 := vec2.Int32()
 		n := batch.Length()
 
 		var idx uint16
@@ -6186,7 +6186,7 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -6270,8 +6270,8 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int64()[:coldata.BatchSize]
-		col2 := vec2.Int64()[:coldata.BatchSize]
+		col1 := vec1.Int64()
+		col2 := vec2.Int64()
 		n := batch.Length()
 
 		var idx uint16
@@ -6357,7 +6357,7 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -6441,8 +6441,8 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int64()[:coldata.BatchSize]
-		col2 := vec2.Int64()[:coldata.BatchSize]
+		col1 := vec1.Int64()
+		col2 := vec2.Int64()
 		n := batch.Length()
 
 		var idx uint16
@@ -6528,7 +6528,7 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -6612,8 +6612,8 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int64()[:coldata.BatchSize]
-		col2 := vec2.Int64()[:coldata.BatchSize]
+		col1 := vec1.Int64()
+		col2 := vec2.Int64()
 		n := batch.Length()
 
 		var idx uint16
@@ -6699,7 +6699,7 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -6783,8 +6783,8 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int64()[:coldata.BatchSize]
-		col2 := vec2.Int64()[:coldata.BatchSize]
+		col1 := vec1.Int64()
+		col2 := vec2.Int64()
 		n := batch.Length()
 
 		var idx uint16
@@ -6870,7 +6870,7 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -6954,8 +6954,8 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int64()[:coldata.BatchSize]
-		col2 := vec2.Int64()[:coldata.BatchSize]
+		col1 := vec1.Int64()
+		col2 := vec2.Int64()
 		n := batch.Length()
 
 		var idx uint16
@@ -7041,7 +7041,7 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Int64()[:coldata.BatchSize]
+		col := vec.Int64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -7125,8 +7125,8 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Int64()[:coldata.BatchSize]
-		col2 := vec2.Int64()[:coldata.BatchSize]
+		col1 := vec1.Int64()
+		col2 := vec2.Int64()
 		n := batch.Length()
 
 		var idx uint16
@@ -7212,7 +7212,7 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -7222,7 +7222,7 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7234,7 +7234,7 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7248,7 +7248,7 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7260,7 +7260,7 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7296,8 +7296,8 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float32()[:coldata.BatchSize]
-		col2 := vec2.Float32()[:coldata.BatchSize]
+		col1 := vec1.Float32()
+		col2 := vec2.Float32()
 		n := batch.Length()
 
 		var idx uint16
@@ -7308,7 +7308,7 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7321,7 +7321,7 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7335,7 +7335,7 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7348,7 +7348,7 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7383,7 +7383,7 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -7393,7 +7393,7 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7405,7 +7405,7 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7419,7 +7419,7 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7431,7 +7431,7 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7467,8 +7467,8 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float32()[:coldata.BatchSize]
-		col2 := vec2.Float32()[:coldata.BatchSize]
+		col1 := vec1.Float32()
+		col2 := vec2.Float32()
 		n := batch.Length()
 
 		var idx uint16
@@ -7479,7 +7479,7 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7492,7 +7492,7 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7506,7 +7506,7 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7519,7 +7519,7 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7554,7 +7554,7 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -7564,7 +7564,7 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7576,7 +7576,7 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7590,7 +7590,7 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7602,7 +7602,7 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7638,8 +7638,8 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float32()[:coldata.BatchSize]
-		col2 := vec2.Float32()[:coldata.BatchSize]
+		col1 := vec1.Float32()
+		col2 := vec2.Float32()
 		n := batch.Length()
 
 		var idx uint16
@@ -7650,7 +7650,7 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7663,7 +7663,7 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7677,7 +7677,7 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7690,7 +7690,7 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7725,7 +7725,7 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -7735,7 +7735,7 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7747,7 +7747,7 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7761,7 +7761,7 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7773,7 +7773,7 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7809,8 +7809,8 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float32()[:coldata.BatchSize]
-		col2 := vec2.Float32()[:coldata.BatchSize]
+		col1 := vec1.Float32()
+		col2 := vec2.Float32()
 		n := batch.Length()
 
 		var idx uint16
@@ -7821,7 +7821,7 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7834,7 +7834,7 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7848,7 +7848,7 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7861,7 +7861,7 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7896,7 +7896,7 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -7906,7 +7906,7 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7918,7 +7918,7 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7932,7 +7932,7 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7944,7 +7944,7 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7980,8 +7980,8 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float32()[:coldata.BatchSize]
-		col2 := vec2.Float32()[:coldata.BatchSize]
+		col1 := vec1.Float32()
+		col2 := vec2.Float32()
 		n := batch.Length()
 
 		var idx uint16
@@ -7992,7 +7992,7 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8005,7 +8005,7 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8019,7 +8019,7 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8032,7 +8032,7 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8067,7 +8067,7 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float32()[:coldata.BatchSize]
+		col := vec.Float32()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -8077,7 +8077,7 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8089,7 +8089,7 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8103,7 +8103,7 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8115,7 +8115,7 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8151,8 +8151,8 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float32()[:coldata.BatchSize]
-		col2 := vec2.Float32()[:coldata.BatchSize]
+		col1 := vec1.Float32()
+		col2 := vec2.Float32()
 		n := batch.Length()
 
 		var idx uint16
@@ -8163,7 +8163,7 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8176,7 +8176,7 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8190,7 +8190,7 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8203,7 +8203,7 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8238,7 +8238,7 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -8248,7 +8248,7 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8260,7 +8260,7 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8274,7 +8274,7 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8286,7 +8286,7 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] == p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8322,8 +8322,8 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float64()[:coldata.BatchSize]
-		col2 := vec2.Float64()[:coldata.BatchSize]
+		col1 := vec1.Float64()
+		col2 := vec2.Float64()
 		n := batch.Length()
 
 		var idx uint16
@@ -8334,7 +8334,7 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8347,7 +8347,7 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8361,7 +8361,7 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8374,7 +8374,7 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] == col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8409,7 +8409,7 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -8419,7 +8419,7 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8431,7 +8431,7 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8445,7 +8445,7 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8457,7 +8457,7 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] != p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8493,8 +8493,8 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float64()[:coldata.BatchSize]
-		col2 := vec2.Float64()[:coldata.BatchSize]
+		col1 := vec1.Float64()
+		col2 := vec2.Float64()
 		n := batch.Length()
 
 		var idx uint16
@@ -8505,7 +8505,7 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8518,7 +8518,7 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8532,7 +8532,7 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8545,7 +8545,7 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] != col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8580,7 +8580,7 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -8590,7 +8590,7 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8602,7 +8602,7 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8616,7 +8616,7 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8628,7 +8628,7 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] < p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8664,8 +8664,8 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float64()[:coldata.BatchSize]
-		col2 := vec2.Float64()[:coldata.BatchSize]
+		col1 := vec1.Float64()
+		col2 := vec2.Float64()
 		n := batch.Length()
 
 		var idx uint16
@@ -8676,7 +8676,7 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8689,7 +8689,7 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8703,7 +8703,7 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8716,7 +8716,7 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] < col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8751,7 +8751,7 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -8761,7 +8761,7 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8773,7 +8773,7 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8787,7 +8787,7 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8799,7 +8799,7 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] <= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8835,8 +8835,8 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float64()[:coldata.BatchSize]
-		col2 := vec2.Float64()[:coldata.BatchSize]
+		col1 := vec1.Float64()
+		col2 := vec2.Float64()
 		n := batch.Length()
 
 		var idx uint16
@@ -8847,7 +8847,7 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8860,7 +8860,7 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8874,7 +8874,7 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8887,7 +8887,7 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] <= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8922,7 +8922,7 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -8932,7 +8932,7 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8944,7 +8944,7 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8958,7 +8958,7 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8970,7 +8970,7 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] > p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9006,8 +9006,8 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float64()[:coldata.BatchSize]
-		col2 := vec2.Float64()[:coldata.BatchSize]
+		col1 := vec1.Float64()
+		col2 := vec2.Float64()
 		n := batch.Length()
 
 		var idx uint16
@@ -9018,7 +9018,7 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9031,7 +9031,7 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9045,7 +9045,7 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9058,7 +9058,7 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] > col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9093,7 +9093,7 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		}
 
 		vec := batch.ColVec(p.colIdx)
-		col := vec.Float64()[:coldata.BatchSize]
+		col := vec.Float64()
 		var idx uint16
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
@@ -9103,7 +9103,7 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9115,7 +9115,7 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9129,7 +9129,7 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9141,7 +9141,7 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				col = col[:n]
 				for i := range col {
 					var cmp bool
-					cmp = col[i] >= p.constArg
+					cmp = compareFloats(float64(col[i]), float64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9177,8 +9177,8 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 		vec1 := batch.ColVec(p.col1Idx)
 		vec2 := batch.ColVec(p.col2Idx)
-		col1 := vec1.Float64()[:coldata.BatchSize]
-		col2 := vec2.Float64()[:coldata.BatchSize]
+		col1 := vec1.Float64()
+		col2 := vec2.Float64()
 		n := batch.Length()
 
 		var idx uint16
@@ -9189,7 +9189,7 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9202,7 +9202,7 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9216,7 +9216,7 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9229,7 +9229,7 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				col2 = col2[:len(col1)]
 				for i := range col1 {
 					var cmp bool
-					cmp = col1[i] >= col2[i]
+					cmp = compareFloats(float64(col1[i]), float64(col2[i])) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
