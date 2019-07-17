@@ -275,6 +275,12 @@ type projectInOpBool struct {
 	negate    bool
 }
 
+var _ StaticMemoryOperator = &projectInOpBool{}
+
+func (p *projectInOpBool) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
 func fillDatumRowBool(ct *semtypes.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
 	conv := conv.GetDatumToPhysicalFn(ct)
 	var result []bool
@@ -480,6 +486,12 @@ type projectInOpBytes struct {
 	filterRow [][]byte
 	hasNulls  bool
 	negate    bool
+}
+
+var _ StaticMemoryOperator = &projectInOpBytes{}
+
+func (p *projectInOpBytes) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
 }
 
 func fillDatumRowBytes(ct *semtypes.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
@@ -689,6 +701,12 @@ type projectInOpDecimal struct {
 	negate    bool
 }
 
+var _ StaticMemoryOperator = &projectInOpDecimal{}
+
+func (p *projectInOpDecimal) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
 func fillDatumRowDecimal(ct *semtypes.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
 	conv := conv.GetDatumToPhysicalFn(ct)
 	var result []apd.Decimal
@@ -894,6 +912,12 @@ type projectInOpInt8 struct {
 	filterRow []int8
 	hasNulls  bool
 	negate    bool
+}
+
+var _ StaticMemoryOperator = &projectInOpInt8{}
+
+func (p *projectInOpInt8) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
 }
 
 func fillDatumRowInt8(ct *semtypes.T, datumTuple *tree.DTuple) ([]int8, bool, error) {
@@ -1103,6 +1127,12 @@ type projectInOpInt16 struct {
 	negate    bool
 }
 
+var _ StaticMemoryOperator = &projectInOpInt16{}
+
+func (p *projectInOpInt16) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
 func fillDatumRowInt16(ct *semtypes.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
 	conv := conv.GetDatumToPhysicalFn(ct)
 	var result []int16
@@ -1308,6 +1338,12 @@ type projectInOpInt32 struct {
 	filterRow []int32
 	hasNulls  bool
 	negate    bool
+}
+
+var _ StaticMemoryOperator = &projectInOpInt32{}
+
+func (p *projectInOpInt32) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
 }
 
 func fillDatumRowInt32(ct *semtypes.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
@@ -1517,6 +1553,12 @@ type projectInOpInt64 struct {
 	negate    bool
 }
 
+var _ StaticMemoryOperator = &projectInOpInt64{}
+
+func (p *projectInOpInt64) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
 func fillDatumRowInt64(ct *semtypes.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
 	conv := conv.GetDatumToPhysicalFn(ct)
 	var result []int64
@@ -1724,6 +1766,12 @@ type projectInOpFloat32 struct {
 	negate    bool
 }
 
+var _ StaticMemoryOperator = &projectInOpFloat32{}
+
+func (p *projectInOpFloat32) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
 func fillDatumRowFloat32(ct *semtypes.T, datumTuple *tree.DTuple) ([]float32, bool, error) {
 	conv := conv.GetDatumToPhysicalFn(ct)
 	var result []float32
@@ -1929,6 +1977,12 @@ type projectInOpFloat64 struct {
 	filterRow []float64
 	hasNulls  bool
 	negate    bool
+}
+
+var _ StaticMemoryOperator = &projectInOpFloat64{}
+
+func (p *projectInOpFloat64) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
 }
 
 func fillDatumRowFloat64(ct *semtypes.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
