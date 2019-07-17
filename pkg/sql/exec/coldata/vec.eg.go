@@ -1033,3 +1033,29 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
 }
+
+// Helper to set the value in a Vec when the type is unknown.
+func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType types.T) {
+	switch colType {
+	case types.Bool:
+		v.Bool()[rowIdx] = elem.(bool)
+	case types.Bytes:
+		v.Bytes()[rowIdx] = elem.([]byte)
+	case types.Decimal:
+		v.Decimal()[rowIdx] = elem.(apd.Decimal)
+	case types.Int8:
+		v.Int8()[rowIdx] = elem.(int8)
+	case types.Int16:
+		v.Int16()[rowIdx] = elem.(int16)
+	case types.Int32:
+		v.Int32()[rowIdx] = elem.(int32)
+	case types.Int64:
+		v.Int64()[rowIdx] = elem.(int64)
+	case types.Float32:
+		v.Float32()[rowIdx] = elem.(float32)
+	case types.Float64:
+		v.Float64()[rowIdx] = elem.(float64)
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+}
