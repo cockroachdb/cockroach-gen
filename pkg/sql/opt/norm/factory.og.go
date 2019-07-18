@@ -8623,6 +8623,29 @@ func (_f *Factory) ConstructWindow(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructWith constructs an expression for the With operator.
+// With executes Binding, making its results available to Input. Within Input,
+// Binding may be referenced by a WithScan expression containing the ID of this
+// With.
+func (_f *Factory) ConstructWith(
+	binding memo.RelExpr,
+	input memo.RelExpr,
+	withPrivate *memo.WithPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeWith(binding, input, withPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructWithScan constructs an expression for the WithScan operator.
+// WithScan returns the results present in the With expression referenced
+// by ID.
+func (_f *Factory) ConstructWithScan(
+	withScanPrivate *memo.WithScanPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeWithScan(withScanPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructFakeRel constructs an expression for the FakeRel operator.
 // FakeRel is a mock relational operator used for testing; its logical properties
 // are pre-determined and stored in the private. It can be used as the child of
@@ -14921,6 +14944,17 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.WithExpr:
+		binding := replace(t.Binding).(memo.RelExpr)
+		input := replace(t.Input).(memo.RelExpr)
+		if binding != t.Binding || input != t.Input {
+			return f.ConstructWith(binding, input, &t.WithPrivate)
+		}
+		return t
+
+	case *memo.WithScanExpr:
+		return t
+
 	case *memo.FakeRelExpr:
 		return t
 
@@ -16209,6 +16243,16 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.WindowPrivate,
 		)
 
+	case *memo.WithExpr:
+		return f.ConstructWith(
+			f.invokeReplace(t.Binding, replace).(memo.RelExpr),
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.WithPrivate,
+		)
+
+	case *memo.WithScanExpr:
+		return f.mem.MemoizeWithScan(&t.WithScanPrivate)
+
 	case *memo.FakeRelExpr:
 		return f.mem.MemoizeFakeRel(&t.FakeRelPrivate)
 
@@ -17157,6 +17201,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.WindowsExpr),
 			args[2].(*memo.WindowPrivate),
+		)
+	case opt.WithOp:
+		return f.ConstructWith(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.WithPrivate),
+		)
+	case opt.WithScanOp:
+		return f.ConstructWithScan(
+			args[0].(*memo.WithScanPrivate),
 		)
 	case opt.FakeRelOp:
 		return f.ConstructFakeRel(

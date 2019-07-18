@@ -31,7 +31,7 @@ func EncDatumRowsToColVec(
 ) error {
 
 	switch columnType.Family() {
-	case semtypes.OidFamily:
+	case semtypes.DateFamily:
 
 		col := vec.Int64()
 		datumToPhysicalFn := conv.GetDatumToPhysicalFn(columnType)
@@ -53,9 +53,9 @@ func EncDatumRowsToColVec(
 				col[i] = v.(int64)
 			}
 		}
-	case semtypes.StringFamily:
+	case semtypes.OidFamily:
 
-		col := vec.Bytes()
+		col := vec.Int64()
 		datumToPhysicalFn := conv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -72,7 +72,7 @@ func EncDatumRowsToColVec(
 				if err != nil {
 					return err
 				}
-				col[i] = v.([]byte)
+				col[i] = v.(int64)
 			}
 		}
 	case semtypes.FloatFamily:
@@ -146,9 +146,9 @@ func EncDatumRowsToColVec(
 				col[i] = v.([]byte)
 			}
 		}
-	case semtypes.DateFamily:
+	case semtypes.StringFamily:
 
-		col := vec.Int64()
+		col := vec.Bytes()
 		datumToPhysicalFn := conv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -165,12 +165,12 @@ func EncDatumRowsToColVec(
 				if err != nil {
 					return err
 				}
-				col[i] = v.(int64)
+				col[i] = v.([]byte)
 			}
 		}
-	case semtypes.BoolFamily:
+	case semtypes.DecimalFamily:
 
-		col := vec.Bool()
+		col := vec.Decimal()
 		datumToPhysicalFn := conv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -187,7 +187,7 @@ func EncDatumRowsToColVec(
 				if err != nil {
 					return err
 				}
-				col[i] = v.(bool)
+				col[i] = v.(apd.Decimal)
 			}
 		}
 	case semtypes.IntFamily:
@@ -261,9 +261,9 @@ func EncDatumRowsToColVec(
 		default:
 			panic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
 		}
-	case semtypes.DecimalFamily:
+	case semtypes.BoolFamily:
 
-		col := vec.Decimal()
+		col := vec.Bool()
 		datumToPhysicalFn := conv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -280,7 +280,7 @@ func EncDatumRowsToColVec(
 				if err != nil {
 					return err
 				}
-				col[i] = v.(apd.Decimal)
+				col[i] = v.(bool)
 			}
 		}
 	default:

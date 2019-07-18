@@ -6067,6 +6067,283 @@ type WindowPrivate struct {
 	Ordering physical.OrderingChoice
 }
 
+// WithExpr executes Binding, making its results available to Input. Within Input,
+// Binding may be referenced by a WithScan expression containing the ID of this
+// With.
+type WithExpr struct {
+	Binding RelExpr
+	Input   RelExpr
+	WithPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &WithExpr{}
+
+func (e *WithExpr) Op() opt.Operator {
+	return opt.WithOp
+}
+
+func (e *WithExpr) ChildCount() int {
+	return 2
+}
+
+func (e *WithExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Binding
+	case 1:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *WithExpr) Private() interface{} {
+	return &e.WithPrivate
+}
+
+func (e *WithExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WithExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Binding = child.(RelExpr)
+		return
+	case 1:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *WithExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *WithExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *WithExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *WithExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *WithExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *WithExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *WithExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *WithExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *WithExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *WithExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *WithExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type withGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first WithExpr
+	best  bestProps
+}
+
+var _ exprGroup = &withGroup{}
+
+func (g *withGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *withGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *withGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *withGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type WithPrivate struct {
+	ID opt.WithID
+
+	// OriginalExpr contains the original Subquery expression if it's a SELECT
+	// so that we can display it in the EXPLAIN plan.
+	OriginalExpr *tree.Subquery
+
+	// Name is used to identify the with for debugging purposes.
+	Name string
+}
+
+// WithScanExpr returns the results present in the With expression referenced
+// by ID.
+type WithScanExpr struct {
+	WithScanPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &WithScanExpr{}
+
+func (e *WithScanExpr) Op() opt.Operator {
+	return opt.WithScanOp
+}
+
+func (e *WithScanExpr) ChildCount() int {
+	return 0
+}
+
+func (e *WithScanExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *WithScanExpr) Private() interface{} {
+	return &e.WithScanPrivate
+}
+
+func (e *WithScanExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *WithScanExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *WithScanExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *WithScanExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *WithScanExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *WithScanExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *WithScanExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *WithScanExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *WithScanExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *WithScanExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *WithScanExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *WithScanExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *WithScanExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type withScanGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first WithScanExpr
+	best  bestProps
+}
+
+var _ exprGroup = &withScanGroup{}
+
+func (g *withScanGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *withScanGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *withScanGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *withScanGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type WithScanPrivate struct {
+	ID opt.WithID
+
+	// Name is used to identify the with being referenced for debugging purposes.
+	Name string
+
+	// InCols are the columns output by the expression referenced by this
+	// expression. They correspond elementwise to the columns listed in OutCols.
+	// Every WithScanPrivate with the same WithID should have the same set of
+	// InCols, being the OutputCols of the binding for the referenced With.
+	// TODO(justin): this should be relaxed eventually so that we can prune
+	// these.
+	InCols opt.ColList
+
+	// OutCols contains a list of columns which correspond elementwise to the
+	// columns in InCols, which are the IDs output by the referenced With
+	// expression. WithScan cannot reuse the column IDs used in the original With
+	// expression, since multiple WithScans referencing the same With can occur in
+	// the same tree, so we maintain a mapping from the columns returned from
+	// the referenced expression to the referencing expression.
+	OutCols opt.ColList
+}
+
 // FakeRelExpr is a mock relational operator used for testing; its logical properties
 // are pre-determined and stored in the private. It can be used as the child of
 // an operator for which we are calculating properties or statistics.
@@ -14785,6 +15062,46 @@ func (m *Memo) MemoizeWindow(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeWith(
+	binding RelExpr,
+	input RelExpr,
+	withPrivate *WithPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(withGroup{}))
+	grp := &withGroup{mem: m, first: WithExpr{
+		Binding:     binding,
+		Input:       input,
+		WithPrivate: *withPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternWith(e)
+	if interned == e {
+		m.logPropsBuilder.buildWithProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeWithScan(
+	withScanPrivate *WithScanPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(withScanGroup{}))
+	grp := &withScanGroup{mem: m, first: WithScanExpr{
+		WithScanPrivate: *withScanPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternWithScan(e)
+	if interned == e {
+		m.logPropsBuilder.buildWithScanProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeFakeRel(
 	fakeRelPrivate *FakeRelPrivate,
 ) RelExpr {
@@ -17353,6 +17670,34 @@ func (m *Memo) AddWindowToGroup(e *WindowExpr, grp RelExpr) *WindowExpr {
 	return interned
 }
 
+func (m *Memo) AddWithToGroup(e *WithExpr, grp RelExpr) *WithExpr {
+	const size = int64(unsafe.Sizeof(WithExpr{}))
+	interned := m.interner.InternWith(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddWithScanToGroup(e *WithScanExpr, grp RelExpr) *WithScanExpr {
+	const size = int64(unsafe.Sizeof(WithScanExpr{}))
+	interned := m.interner.InternWithScan(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
 	const size = int64(unsafe.Sizeof(FakeRelExpr{}))
 	interned := m.interner.InternFakeRel(e)
@@ -17567,6 +17912,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternProjectSet(t)
 	case *WindowExpr:
 		return in.InternWindow(t)
+	case *WithExpr:
+		return in.InternWith(t)
+	case *WithScanExpr:
+		return in.InternWithScan(t)
 	case *FakeRelExpr:
 		return in.InternFakeRel(t)
 	case *SubqueryExpr:
@@ -18901,6 +19250,56 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 				in.hasher.IsWindowsExprEqual(val.Windows, existing.Windows) &&
 				in.hasher.IsColSetEqual(val.Partition, existing.Partition) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWith(val *WithExpr) *WithExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WithOp)
+	in.hasher.HashRelExpr(val.Binding)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashWithID(val.ID)
+	in.hasher.HashPointer(unsafe.Pointer(val.OriginalExpr))
+	in.hasher.HashString(val.Name)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WithExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Binding, existing.Binding) &&
+				in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
+				in.hasher.IsStringEqual(val.Name, existing.Name) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.WithScanOp)
+	in.hasher.HashWithID(val.ID)
+	in.hasher.HashString(val.Name)
+	in.hasher.HashColList(val.InCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*WithScanExpr); ok {
+			if in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
+				in.hasher.IsStringEqual(val.Name, existing.Name) &&
+				in.hasher.IsColListEqual(val.InCols, existing.InCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
 				return existing
 			}
 		}
@@ -21500,6 +21899,10 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildProjectSetProps(t, rel)
 	case *WindowExpr:
 		b.buildWindowProps(t, rel)
+	case *WithExpr:
+		b.buildWithProps(t, rel)
+	case *WithScanExpr:
+		b.buildWithScanProps(t, rel)
 	case *FakeRelExpr:
 		b.buildFakeRelProps(t, rel)
 	case *CreateTableExpr:
