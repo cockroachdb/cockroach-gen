@@ -14594,6 +14594,36 @@ func (_f *Factory) ConstructAlterTableRelocate(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructControlJobs constructs an expression for the ControlJobs operator.
+// ControlJobs represents a `PAUSE/CANCEL/RESUME JOBS` statement.
+func (_f *Factory) ConstructControlJobs(
+	input memo.RelExpr,
+	controlJobsPrivate *memo.ControlJobsPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeControlJobs(input, controlJobsPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructCancelQueries constructs an expression for the CancelQueries operator.
+// CancelQueries represents a `CANCEL QUERIES` statement.
+func (_f *Factory) ConstructCancelQueries(
+	input memo.RelExpr,
+	cancelPrivate *memo.CancelPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeCancelQueries(input, cancelPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructCancelSessions constructs an expression for the CancelSessions operator.
+// CancelSessions represents a `CANCEL SESSIONS` statement.
+func (_f *Factory) ConstructCancelSessions(
+	input memo.RelExpr,
+	cancelPrivate *memo.CancelPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeCancelSessions(input, cancelPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -15796,6 +15826,27 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ControlJobsExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructControlJobs(input, &t.ControlJobsPrivate)
+		}
+		return t
+
+	case *memo.CancelQueriesExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructCancelQueries(input, &t.CancelPrivate)
+		}
+		return t
+
+	case *memo.CancelSessionsExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructCancelSessions(input, &t.CancelPrivate)
+		}
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
@@ -16876,6 +16927,24 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.AlterTableRelocatePrivate,
 		)
 
+	case *memo.ControlJobsExpr:
+		return f.ConstructControlJobs(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.ControlJobsPrivate,
+		)
+
+	case *memo.CancelQueriesExpr:
+		return f.ConstructCancelQueries(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.CancelPrivate,
+		)
+
+	case *memo.CancelSessionsExpr:
+		return f.ConstructCancelSessions(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.CancelPrivate,
+		)
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
@@ -17736,6 +17805,21 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructAlterTableRelocate(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.AlterTableRelocatePrivate),
+		)
+	case opt.ControlJobsOp:
+		return f.ConstructControlJobs(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.ControlJobsPrivate),
+		)
+	case opt.CancelQueriesOp:
+		return f.ConstructCancelQueries(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.CancelPrivate),
+		)
+	case opt.CancelSessionsOp:
+		return f.ConstructCancelSessions(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.CancelPrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

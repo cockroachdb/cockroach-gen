@@ -13791,7 +13791,7 @@ type AlterTableSplitPrivate struct {
 	// cat.Index metadata.
 	Index int
 
-	// Props stores the required physical properties for the enclosed expression.
+	// Props stores the required physical properties for the input expression.
 	Props *physical.Required
 
 	// Columns stores the column IDs for the statement result columns.
@@ -14160,6 +14160,391 @@ func (g *alterTableRelocateGroup) bestProps() *bestProps {
 type AlterTableRelocatePrivate struct {
 	RelocateLease bool
 	AlterTableSplitPrivate
+}
+
+// ControlJobsExpr represents a `PAUSE/CANCEL/RESUME JOBS` statement.
+type ControlJobsExpr struct {
+	// The input expression returns job IDs (as integers).
+	Input RelExpr
+	ControlJobsPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ControlJobsExpr{}
+
+func (e *ControlJobsExpr) Op() opt.Operator {
+	return opt.ControlJobsOp
+}
+
+func (e *ControlJobsExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ControlJobsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ControlJobsExpr) Private() interface{} {
+	return &e.ControlJobsPrivate
+}
+
+func (e *ControlJobsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ControlJobsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ControlJobsExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ControlJobsExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ControlJobsExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ControlJobsExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ControlJobsExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ControlJobsExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *ControlJobsExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ControlJobsExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ControlJobsExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ControlJobsExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ControlJobsExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type controlJobsGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ControlJobsExpr
+	best  bestProps
+}
+
+var _ exprGroup = &controlJobsGroup{}
+
+func (g *controlJobsGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *controlJobsGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *controlJobsGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *controlJobsGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ControlJobsPrivate struct {
+	// Props stores the required physical properties for the input
+	// expression.
+	Props   *physical.Required
+	Command tree.JobCommand
+}
+
+// CancelQueriesExpr represents a `CANCEL QUERIES` statement.
+type CancelQueriesExpr struct {
+	// The input expression returns query IDs (as strings).
+	Input RelExpr
+	CancelPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &CancelQueriesExpr{}
+
+func (e *CancelQueriesExpr) Op() opt.Operator {
+	return opt.CancelQueriesOp
+}
+
+func (e *CancelQueriesExpr) ChildCount() int {
+	return 1
+}
+
+func (e *CancelQueriesExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CancelQueriesExpr) Private() interface{} {
+	return &e.CancelPrivate
+}
+
+func (e *CancelQueriesExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CancelQueriesExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CancelQueriesExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *CancelQueriesExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *CancelQueriesExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *CancelQueriesExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *CancelQueriesExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *CancelQueriesExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *CancelQueriesExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *CancelQueriesExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *CancelQueriesExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *CancelQueriesExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *CancelQueriesExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type cancelQueriesGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first CancelQueriesExpr
+	best  bestProps
+}
+
+var _ exprGroup = &cancelQueriesGroup{}
+
+func (g *cancelQueriesGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *cancelQueriesGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *cancelQueriesGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *cancelQueriesGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type CancelPrivate struct {
+	// Props stores the required physical properties for the input
+	// expression.
+	Props *physical.Required
+
+	// IfExists is set if we should tolerate IDs that don't exist.
+	IfExists bool
+}
+
+// CancelSessionsExpr represents a `CANCEL SESSIONS` statement.
+type CancelSessionsExpr struct {
+	// The input expression returns session IDs (as strings).
+	Input RelExpr
+	CancelPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &CancelSessionsExpr{}
+
+func (e *CancelSessionsExpr) Op() opt.Operator {
+	return opt.CancelSessionsOp
+}
+
+func (e *CancelSessionsExpr) ChildCount() int {
+	return 1
+}
+
+func (e *CancelSessionsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CancelSessionsExpr) Private() interface{} {
+	return &e.CancelPrivate
+}
+
+func (e *CancelSessionsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CancelSessionsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CancelSessionsExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *CancelSessionsExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *CancelSessionsExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *CancelSessionsExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *CancelSessionsExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *CancelSessionsExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *CancelSessionsExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *CancelSessionsExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *CancelSessionsExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *CancelSessionsExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *CancelSessionsExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type cancelSessionsGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first CancelSessionsExpr
+	best  bestProps
+}
+
+var _ exprGroup = &cancelSessionsGroup{}
+
+func (g *cancelSessionsGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *cancelSessionsGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *cancelSessionsGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *cancelSessionsGroup) bestProps() *bestProps {
+	return &g.best
 }
 
 func (m *Memo) MemoizeInsert(
@@ -17096,6 +17481,66 @@ func (m *Memo) MemoizeAlterTableRelocate(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeControlJobs(
+	input RelExpr,
+	controlJobsPrivate *ControlJobsPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(controlJobsGroup{}))
+	grp := &controlJobsGroup{mem: m, first: ControlJobsExpr{
+		Input:              input,
+		ControlJobsPrivate: *controlJobsPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternControlJobs(e)
+	if interned == e {
+		m.logPropsBuilder.buildControlJobsProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeCancelQueries(
+	input RelExpr,
+	cancelPrivate *CancelPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(cancelQueriesGroup{}))
+	grp := &cancelQueriesGroup{mem: m, first: CancelQueriesExpr{
+		Input:         input,
+		CancelPrivate: *cancelPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternCancelQueries(e)
+	if interned == e {
+		m.logPropsBuilder.buildCancelQueriesProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeCancelSessions(
+	input RelExpr,
+	cancelPrivate *CancelPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(cancelSessionsGroup{}))
+	grp := &cancelSessionsGroup{mem: m, first: CancelSessionsExpr{
+		Input:         input,
+		CancelPrivate: *cancelPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternCancelSessions(e)
+	if interned == e {
+		m.logPropsBuilder.buildCancelSessionsProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -17824,6 +18269,48 @@ func (m *Memo) AddAlterTableRelocateToGroup(e *AlterTableRelocateExpr, grp RelEx
 	return interned
 }
 
+func (m *Memo) AddControlJobsToGroup(e *ControlJobsExpr, grp RelExpr) *ControlJobsExpr {
+	const size = int64(unsafe.Sizeof(ControlJobsExpr{}))
+	interned := m.interner.InternControlJobs(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddCancelQueriesToGroup(e *CancelQueriesExpr, grp RelExpr) *CancelQueriesExpr {
+	const size = int64(unsafe.Sizeof(CancelQueriesExpr{}))
+	interned := m.interner.InternCancelQueries(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddCancelSessionsToGroup(e *CancelSessionsExpr, grp RelExpr) *CancelSessionsExpr {
+	const size = int64(unsafe.Sizeof(CancelSessionsExpr{}))
+	interned := m.interner.InternCancelSessions(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -18170,6 +18657,12 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAlterTableUnsplitAll(t)
 	case *AlterTableRelocateExpr:
 		return in.InternAlterTableRelocate(t)
+	case *ControlJobsExpr:
+		return in.InternControlJobs(t)
+	case *CancelQueriesExpr:
+		return in.InternCancelQueries(t)
+	case *CancelSessionsExpr:
+		return in.InternCancelSessions(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -21815,6 +22308,72 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 	return val
 }
 
+func (in *interner) InternControlJobs(val *ControlJobsExpr) *ControlJobsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ControlJobsOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashJobCommand(val.Command)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ControlJobsExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsJobCommandEqual(val.Command, existing.Command) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCancelQueries(val *CancelQueriesExpr) *CancelQueriesExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CancelQueriesOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashBool(val.IfExists)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CancelQueriesExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsBoolEqual(val.IfExists, existing.IfExists) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCancelSessions(val *CancelSessionsExpr) *CancelSessionsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CancelSessionsOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashBool(val.IfExists)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CancelSessionsExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsBoolEqual(val.IfExists, existing.IfExists) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -21921,6 +22480,12 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildAlterTableUnsplitAllProps(t, rel)
 	case *AlterTableRelocateExpr:
 		b.buildAlterTableRelocateProps(t, rel)
+	case *ControlJobsExpr:
+		b.buildControlJobsProps(t, rel)
+	case *CancelQueriesExpr:
+		b.buildCancelQueriesProps(t, rel)
+	case *CancelSessionsExpr:
+		b.buildCancelSessionsProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}
