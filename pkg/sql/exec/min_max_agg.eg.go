@@ -98,14 +98,11 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -263,6 +260,10 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minBoolAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minBytesAgg struct {
 	done   bool
 	groups []bool
@@ -317,14 +318,11 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -482,6 +480,10 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minBytesAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minDecimalAgg struct {
 	done   bool
 	groups []bool
@@ -536,14 +538,11 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -701,6 +700,10 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minDecimalAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minInt8Agg struct {
 	done   bool
 	groups []bool
@@ -755,14 +758,11 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -920,6 +920,10 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minInt8Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minInt16Agg struct {
 	done   bool
 	groups []bool
@@ -974,14 +978,11 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -1139,6 +1140,10 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minInt16Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minInt32Agg struct {
 	done   bool
 	groups []bool
@@ -1193,14 +1198,11 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -1358,6 +1360,10 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minInt32Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minInt64Agg struct {
 	done   bool
 	groups []bool
@@ -1412,14 +1418,11 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -1577,6 +1580,10 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minInt64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minFloat32Agg struct {
 	done   bool
 	groups []bool
@@ -1631,14 +1638,11 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -1796,6 +1800,10 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *minFloat32Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type minFloat64Agg struct {
 	done   bool
 	groups []bool
@@ -1850,14 +1858,11 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -2013,6 +2018,10 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *minFloat64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
 }
 
 func newMaxAgg(t types.T) (aggregateFunc, error) {
@@ -2094,14 +2103,11 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -2259,6 +2265,10 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxBoolAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxBytesAgg struct {
 	done   bool
 	groups []bool
@@ -2313,14 +2323,11 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -2478,6 +2485,10 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxBytesAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxDecimalAgg struct {
 	done   bool
 	groups []bool
@@ -2532,14 +2543,11 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -2697,6 +2705,10 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxDecimalAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxInt8Agg struct {
 	done   bool
 	groups []bool
@@ -2751,14 +2763,11 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -2916,6 +2925,10 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxInt8Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxInt16Agg struct {
 	done   bool
 	groups []bool
@@ -2970,14 +2983,11 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -3135,6 +3145,10 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxInt16Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxInt32Agg struct {
 	done   bool
 	groups []bool
@@ -3189,14 +3203,11 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -3354,6 +3365,10 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxInt32Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxInt64Agg struct {
 	done   bool
 	groups []bool
@@ -3408,14 +3423,11 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -3573,6 +3585,10 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxInt64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxFloat32Agg struct {
 	done   bool
 	groups []bool
@@ -3627,14 +3643,11 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -3792,6 +3805,10 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *maxFloat32Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 type maxFloat64Agg struct {
 	done   bool
 	groups []bool
@@ -3846,14 +3863,11 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.curIdx >= 0 {
-			if !a.foundNonNullForCurrentGroup {
-				a.nulls.SetNull(uint16(a.curIdx))
-			}
-			a.vec[a.curIdx] = a.curAgg
+		// be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
 		}
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -4009,4 +4023,8 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *maxFloat64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
 }

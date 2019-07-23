@@ -95,14 +95,11 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -242,6 +239,10 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumDecimalAgg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type sumInt8Agg struct {
 	done bool
 
@@ -299,14 +300,11 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -438,6 +436,10 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt8Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type sumInt16Agg struct {
 	done bool
 
@@ -495,14 +497,11 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -634,6 +633,10 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt16Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type sumInt32Agg struct {
 	done bool
 
@@ -691,14 +694,11 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -830,6 +830,10 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt32Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type sumInt64Agg struct {
 	done bool
 
@@ -887,14 +891,11 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -1026,6 +1027,10 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt64Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type sumFloat32Agg struct {
 	done bool
 
@@ -1083,14 +1088,11 @@ func (a *sumFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -1222,6 +1224,10 @@ func (a *sumFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumFloat32Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type sumFloat64Agg struct {
 	done bool
 
@@ -1279,14 +1285,11 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	if inputLen == 0 {
 		// The aggregation is finished. Flush the last value. If we haven't found
 		// any non-nulls for this group so far, the output for this group should be
-		// null. If a.scratch.curIdx is negative, it means the input has zero rows,
-		// and there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			}
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
 		}
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -1416,4 +1419,8 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *sumFloat64Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
 }

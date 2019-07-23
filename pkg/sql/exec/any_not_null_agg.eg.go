@@ -86,9 +86,8 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -201,6 +200,10 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullBoolAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullBytesAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullBytesAgg struct {
@@ -246,9 +249,8 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -361,6 +363,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullBytesAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullDecimalAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullDecimalAgg struct {
@@ -406,9 +412,8 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -521,6 +526,10 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullDecimalAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullInt8Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt8Agg struct {
@@ -566,9 +575,8 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -681,6 +689,10 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullInt8Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullInt16Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt16Agg struct {
@@ -726,9 +738,8 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -841,6 +852,10 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullInt16Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullInt32Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt32Agg struct {
@@ -886,9 +901,8 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -1001,6 +1015,10 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullInt32Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullInt64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt64Agg struct {
@@ -1046,9 +1064,8 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -1161,6 +1178,10 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullInt64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullFloat32Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullFloat32Agg struct {
@@ -1206,9 +1227,8 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -1321,6 +1341,10 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *anyNotNullFloat32Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
 // anyNotNullFloat64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullFloat64Agg struct {
@@ -1366,9 +1390,8 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	inputLen := b.Length()
 	if inputLen == 0 {
 		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null. If a.curIdx is negative, it means the input
-		// has zero rows, and there should be no output at all.
-		if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
 		a.curIdx++
@@ -1479,4 +1502,8 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *anyNotNullFloat64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
 }

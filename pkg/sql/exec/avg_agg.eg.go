@@ -90,19 +90,15 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-
 		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.scratch.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			} else {
-				a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
-				if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
-					panic(err)
-				}
+		// any non-nulls for this group so far, the output for this group should be
+		// NULL.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+			if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+				panic(err)
 			}
 		}
 		a.scratch.curIdx++
@@ -266,6 +262,10 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *avgDecimalAgg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type avgFloat32Agg struct {
 	done bool
 
@@ -326,17 +326,13 @@ func (a *avgFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-
 		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.scratch.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			} else {
-				a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float32(a.scratch.curCount)
-			}
+		// any non-nulls for this group so far, the output for this group should be
+		// NULL.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float32(a.scratch.curCount)
 		}
 		a.scratch.curIdx++
 		a.done = true
@@ -479,6 +475,10 @@ func (a *avgFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *avgFloat32Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
 type avgFloat64Agg struct {
 	done bool
 
@@ -539,17 +539,13 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
-
 		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null. If a.scratch.curIdx is negative, it means the input has zero rows, and
-		// there should be no output at all.
-		if a.scratch.curIdx >= 0 {
-			if !a.scratch.foundNonNullForCurrentGroup {
-				a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
-			} else {
-				a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
-			}
+		// any non-nulls for this group so far, the output for this group should be
+		// NULL.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
 		}
 		a.scratch.curIdx++
 		a.done = true
@@ -690,4 +686,8 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *avgFloat64Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
 }
