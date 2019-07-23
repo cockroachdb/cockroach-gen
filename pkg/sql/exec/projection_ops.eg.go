@@ -5,6 +5,7 @@ package exec
 import (
 	"bytes"
 	"context"
+	"math"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
@@ -3303,13 +3304,29 @@ func (p projPlusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3351,13 +3368,29 @@ func (p projPlusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3401,14 +3434,30 @@ func (p projPlusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -3449,13 +3498,29 @@ func (p projMinusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3497,13 +3562,29 @@ func (p projMinusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3547,14 +3628,30 @@ func (p projMinusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -3595,13 +3692,43 @@ func (p projMultInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > 10 || col[i] < -10 || p.constArg > 10 || p.constArg < -10 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > 10 || col[i] < -10 || p.constArg > 10 || p.constArg < -10 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3643,13 +3770,43 @@ func (p projMultInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > 10 || p.constArg < -10 || col[i] > 10 || col[i] < -10 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > 10 || p.constArg < -10 || col[i] > 10 || col[i] < -10 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3693,14 +3850,44 @@ func (p projMultInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > 10 || col1[i] < -10 || col2[i] > 10 || col2[i] < -10 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > 10 || col1[i] < -10 || col2[i] > 10 || col2[i] < -10 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -3741,13 +3928,35 @@ func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt8 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt8 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3789,13 +3998,35 @@ func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt8 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt8 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3839,14 +4070,36 @@ func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt8 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt8 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4763,13 +5016,29 @@ func (p projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4811,13 +5080,29 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4861,14 +5146,30 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4909,13 +5210,29 @@ func (p projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4957,13 +5274,29 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5007,14 +5340,30 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5055,13 +5404,43 @@ func (p projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > math.MaxInt8 || col[i] < math.MinInt8 || p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > math.MaxInt8 || col[i] < math.MinInt8 || p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5103,13 +5482,43 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 || col[i] > math.MaxInt8 || col[i] < math.MinInt8 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 || col[i] > math.MaxInt8 || col[i] < math.MinInt8 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5153,14 +5562,44 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > math.MaxInt8 || col1[i] < math.MinInt8 || col2[i] > math.MaxInt8 || col2[i] < math.MinInt8 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > math.MaxInt8 || col1[i] < math.MinInt8 || col2[i] > math.MaxInt8 || col2[i] < math.MinInt8 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5201,13 +5640,35 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt16 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt16 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5249,13 +5710,35 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt16 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt16 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5299,14 +5782,36 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt16 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt16 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6223,13 +6728,29 @@ func (p projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6271,13 +6792,29 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6321,14 +6858,30 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6369,13 +6922,29 @@ func (p projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6417,13 +6986,29 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6467,14 +7052,30 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6515,13 +7116,43 @@ func (p projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > math.MaxInt16 || col[i] < math.MinInt16 || p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > math.MaxInt16 || col[i] < math.MinInt16 || p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6563,13 +7194,43 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 || col[i] > math.MaxInt16 || col[i] < math.MinInt16 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 || col[i] > math.MaxInt16 || col[i] < math.MinInt16 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6613,14 +7274,44 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > math.MaxInt16 || col1[i] < math.MinInt16 || col2[i] > math.MaxInt16 || col2[i] < math.MinInt16 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > math.MaxInt16 || col1[i] < math.MinInt16 || col2[i] > math.MaxInt16 || col2[i] < math.MinInt16 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6661,13 +7352,35 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt32 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt32 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6709,13 +7422,35 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt32 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt32 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6759,14 +7494,36 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt32 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt32 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7683,13 +8440,29 @@ func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] + p.constArg
+
+			{
+				result := col[i] + p.constArg
+				if (result < col[i]) != (p.constArg < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7731,13 +8504,29 @@ func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg + col[i]
+
+			{
+				result := p.constArg + col[i]
+				if (result < p.constArg) != (col[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7781,14 +8570,30 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] + col2[i]
+
+			{
+				result := col1[i] + col2[i]
+				if (result < col1[i]) != (col2[i] < 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7829,13 +8634,29 @@ func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] - p.constArg
+
+			{
+				result := col[i] - p.constArg
+				if (result < col[i]) != (p.constArg > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7877,13 +8698,29 @@ func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg - col[i]
+
+			{
+				result := p.constArg - col[i]
+				if (result < p.constArg) != (col[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7927,14 +8764,30 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] - col2[i]
+
+			{
+				result := col1[i] - col2[i]
+				if (result < col1[i]) != (col2[i] > 0) {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7975,13 +8828,43 @@ func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > math.MaxInt32 || col[i] < math.MinInt32 || p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] * p.constArg
+
+			{
+				result := col[i] * p.constArg
+				if col[i] > math.MaxInt32 || col[i] < math.MinInt32 || p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 {
+					if col[i] != 0 && p.constArg != 0 {
+						sameSign := (col[i] < 0) == (p.constArg < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/p.constArg != col[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8023,13 +8906,43 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 || col[i] > math.MaxInt32 || col[i] < math.MinInt32 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg * col[i]
+
+			{
+				result := p.constArg * col[i]
+				if p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 || col[i] > math.MaxInt32 || col[i] < math.MinInt32 {
+					if p.constArg != 0 && col[i] != 0 {
+						sameSign := (p.constArg < 0) == (col[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col[i] != p.constArg {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8073,14 +8986,44 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > math.MaxInt32 || col1[i] < math.MinInt32 || col2[i] > math.MaxInt32 || col2[i] < math.MinInt32 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] * col2[i]
+
+			{
+				result := col1[i] * col2[i]
+				if col1[i] > math.MaxInt32 || col1[i] < math.MinInt32 || col2[i] > math.MaxInt32 || col2[i] < math.MinInt32 {
+					if col1[i] != 0 && col2[i] != 0 {
+						sameSign := (col1[i] < 0) == (col2[i] < 0)
+						if (result < 0) == sameSign {
+							panic(tree.ErrIntOutOfRange)
+						} else if result/col2[i] != col1[i] {
+							panic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8121,13 +9064,35 @@ func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt64 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = col[i] / p.constArg
+
+			{
+				if p.constArg == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col[i] / p.constArg
+				if col[i] == math.MinInt64 && p.constArg == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8169,13 +9134,35 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt64 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col = col[:n]
 		_ = projCol[len(col)-1]
 		for i := range col {
-			projCol[i] = p.constArg / col[i]
+
+			{
+				if col[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := p.constArg / col[i]
+				if p.constArg == math.MinInt64 && col[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8219,14 +9206,36 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt64 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	} else {
 		col1 = col1[:n]
 		_ = projCol[len(col1)-1]
 		_ = col2[len(col1)-1]
 		for i := range col1 {
-			projCol[i] = col1[i] / col2[i]
+
+			{
+				if col2[i] == 0 {
+					panic(tree.ErrDivByZero)
+				}
+				result := col1[i] / col2[i]
+				if col1[i] == math.MinInt64 && col2[i] == -1 {
+					panic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {

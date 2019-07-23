@@ -338,7 +338,15 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -368,7 +376,15 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -399,7 +415,15 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -428,7 +452,15 @@ func (a *sumInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -535,7 +567,15 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -565,7 +605,15 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -596,7 +644,15 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -625,7 +681,15 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -732,7 +796,15 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -762,7 +834,15 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -793,7 +873,15 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -822,7 +910,15 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -929,7 +1025,15 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -959,7 +1063,15 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -990,7 +1102,15 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1019,7 +1139,15 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curAgg = a.scratch.curAgg + col[i]
+
+					{
+						result := a.scratch.curAgg + col[i]
+						if (result < a.scratch.curAgg) != (col[i] < 0) {
+							panic(tree.ErrIntOutOfRange)
+						}
+						a.scratch.curAgg = result
+					}
+
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
 			}
