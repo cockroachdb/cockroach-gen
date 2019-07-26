@@ -51,7 +51,7 @@ func (e *SortExpr) Private() interface{} {
 }
 
 func (e *SortExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -158,7 +158,7 @@ func (e *InsertExpr) Private() interface{} {
 }
 
 func (e *InsertExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -395,7 +395,7 @@ func (e *UpdateExpr) Private() interface{} {
 }
 
 func (e *UpdateExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -538,7 +538,7 @@ func (e *UpsertExpr) Private() interface{} {
 }
 
 func (e *UpsertExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -670,7 +670,7 @@ func (e *DeleteExpr) Private() interface{} {
 }
 
 func (e *DeleteExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -792,7 +792,7 @@ func (e *FKChecksExpr) Private() interface{} {
 }
 
 func (e *FKChecksExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -842,7 +842,7 @@ func (e *FKChecksItem) Private() interface{} {
 }
 
 func (e *FKChecksItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -913,7 +913,7 @@ func (e *ScanExpr) Private() interface{} {
 }
 
 func (e *ScanExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1065,7 +1065,7 @@ func (e *VirtualScanExpr) Private() interface{} {
 }
 
 func (e *VirtualScanExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1192,7 +1192,7 @@ func (e *SequenceSelectExpr) Private() interface{} {
 }
 
 func (e *SequenceSelectExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1325,7 +1325,7 @@ func (e *ValuesExpr) Private() interface{} {
 }
 
 func (e *ValuesExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1463,7 +1463,7 @@ func (e *SelectExpr) Private() interface{} {
 }
 
 func (e *SelectExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1597,7 +1597,7 @@ func (e *ProjectExpr) Private() interface{} {
 }
 
 func (e *ProjectExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1732,7 +1732,7 @@ func (e *InnerJoinExpr) Private() interface{} {
 }
 
 func (e *InnerJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1865,7 +1865,7 @@ func (e *LeftJoinExpr) Private() interface{} {
 }
 
 func (e *LeftJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -1998,7 +1998,7 @@ func (e *RightJoinExpr) Private() interface{} {
 }
 
 func (e *RightJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -2131,7 +2131,7 @@ func (e *FullJoinExpr) Private() interface{} {
 }
 
 func (e *FullJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -2264,7 +2264,7 @@ func (e *SemiJoinExpr) Private() interface{} {
 }
 
 func (e *SemiJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -2397,7 +2397,7 @@ func (e *AntiJoinExpr) Private() interface{} {
 }
 
 func (e *AntiJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -2538,7 +2538,7 @@ func (e *IndexJoinExpr) Private() interface{} {
 }
 
 func (e *IndexJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -2674,7 +2674,7 @@ func (e *LookupJoinExpr) Private() interface{} {
 }
 
 func (e *LookupJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -2845,7 +2845,7 @@ func (e *MergeJoinExpr) Private() interface{} {
 }
 
 func (e *MergeJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3003,7 +3003,7 @@ func (e *ZigzagJoinExpr) Private() interface{} {
 }
 
 func (e *ZigzagJoinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3176,7 +3176,7 @@ func (e *InnerJoinApplyExpr) Private() interface{} {
 }
 
 func (e *InnerJoinApplyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3309,7 +3309,7 @@ func (e *LeftJoinApplyExpr) Private() interface{} {
 }
 
 func (e *LeftJoinApplyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3442,7 +3442,7 @@ func (e *RightJoinApplyExpr) Private() interface{} {
 }
 
 func (e *RightJoinApplyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3575,7 +3575,7 @@ func (e *FullJoinApplyExpr) Private() interface{} {
 }
 
 func (e *FullJoinApplyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3708,7 +3708,7 @@ func (e *SemiJoinApplyExpr) Private() interface{} {
 }
 
 func (e *SemiJoinApplyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3841,7 +3841,7 @@ func (e *AntiJoinApplyExpr) Private() interface{} {
 }
 
 func (e *AntiJoinApplyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -3989,7 +3989,7 @@ func (e *GroupByExpr) Private() interface{} {
 }
 
 func (e *GroupByExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -4151,7 +4151,7 @@ func (e *ScalarGroupByExpr) Private() interface{} {
 }
 
 func (e *ScalarGroupByExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -4312,7 +4312,7 @@ func (e *DistinctOnExpr) Private() interface{} {
 }
 
 func (e *DistinctOnExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -4444,7 +4444,7 @@ func (e *UnionExpr) Private() interface{} {
 }
 
 func (e *UnionExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -4606,7 +4606,7 @@ func (e *IntersectExpr) Private() interface{} {
 }
 
 func (e *IntersectExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -4738,7 +4738,7 @@ func (e *ExceptExpr) Private() interface{} {
 }
 
 func (e *ExceptExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -4882,7 +4882,7 @@ func (e *UnionAllExpr) Private() interface{} {
 }
 
 func (e *UnionAllExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5028,7 +5028,7 @@ func (e *IntersectAllExpr) Private() interface{} {
 }
 
 func (e *IntersectAllExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5173,7 +5173,7 @@ func (e *ExceptAllExpr) Private() interface{} {
 }
 
 func (e *ExceptAllExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5305,7 +5305,7 @@ func (e *LimitExpr) Private() interface{} {
 }
 
 func (e *LimitExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5434,7 +5434,7 @@ func (e *OffsetExpr) Private() interface{} {
 }
 
 func (e *OffsetExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5560,7 +5560,7 @@ func (e *Max1RowExpr) Private() interface{} {
 }
 
 func (e *Max1RowExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5683,7 +5683,7 @@ func (e *OrdinalityExpr) Private() interface{} {
 }
 
 func (e *OrdinalityExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5829,7 +5829,7 @@ func (e *ProjectSetExpr) Private() interface{} {
 }
 
 func (e *ProjectSetExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -5969,7 +5969,7 @@ func (e *WindowExpr) Private() interface{} {
 }
 
 func (e *WindowExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6109,7 +6109,7 @@ func (e *WithExpr) Private() interface{} {
 }
 
 func (e *WithExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6241,7 +6241,7 @@ func (e *WithScanExpr) Private() interface{} {
 }
 
 func (e *WithScanExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6378,7 +6378,7 @@ func (e *FakeRelExpr) Private() interface{} {
 }
 
 func (e *FakeRelExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6519,7 +6519,7 @@ func (e *SubqueryExpr) Private() interface{} {
 }
 
 func (e *SubqueryExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6615,7 +6615,7 @@ func (e *AnyExpr) Private() interface{} {
 }
 
 func (e *AnyExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6672,7 +6672,7 @@ func (e *ExistsExpr) Private() interface{} {
 }
 
 func (e *ExistsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6722,7 +6722,7 @@ func (e *VariableExpr) Private() interface{} {
 }
 
 func (e *VariableExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6767,7 +6767,7 @@ func (e *ConstExpr) Private() interface{} {
 }
 
 func (e *ConstExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6825,7 +6825,7 @@ func (e *NullExpr) Private() interface{} {
 }
 
 func (e *NullExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6868,7 +6868,7 @@ func (e *TrueExpr) Private() interface{} {
 }
 
 func (e *TrueExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6911,7 +6911,7 @@ func (e *FalseExpr) Private() interface{} {
 }
 
 func (e *FalseExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -6954,7 +6954,7 @@ func (e *PlaceholderExpr) Private() interface{} {
 }
 
 func (e *PlaceholderExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7001,7 +7001,7 @@ func (e *TupleExpr) Private() interface{} {
 }
 
 func (e *TupleExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7050,7 +7050,7 @@ func (e *ProjectionsExpr) Private() interface{} {
 }
 
 func (e *ProjectionsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7111,7 +7111,7 @@ func (e *ProjectionsItem) Private() interface{} {
 }
 
 func (e *ProjectionsItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7179,7 +7179,7 @@ func (e *AggregationsExpr) Private() interface{} {
 }
 
 func (e *AggregationsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7242,7 +7242,7 @@ func (e *AggregationsItem) Private() interface{} {
 }
 
 func (e *AggregationsItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7299,7 +7299,7 @@ func (e *FiltersExpr) Private() interface{} {
 }
 
 func (e *FiltersExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7351,7 +7351,7 @@ func (e *FiltersItem) Private() interface{} {
 }
 
 func (e *FiltersItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7426,7 +7426,7 @@ func (e *ZipExpr) Private() interface{} {
 }
 
 func (e *ZipExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7476,7 +7476,7 @@ func (e *ZipItem) Private() interface{} {
 }
 
 func (e *ZipItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7551,7 +7551,7 @@ func (e *AndExpr) Private() interface{} {
 }
 
 func (e *AndExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7610,7 +7610,7 @@ func (e *OrExpr) Private() interface{} {
 }
 
 func (e *OrExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7672,7 +7672,7 @@ func (e *RangeExpr) Private() interface{} {
 }
 
 func (e *RangeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7725,7 +7725,7 @@ func (e *NotExpr) Private() interface{} {
 }
 
 func (e *NotExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7779,7 +7779,7 @@ func (e *EqExpr) Private() interface{} {
 }
 
 func (e *EqExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7836,7 +7836,7 @@ func (e *LtExpr) Private() interface{} {
 }
 
 func (e *LtExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7893,7 +7893,7 @@ func (e *GtExpr) Private() interface{} {
 }
 
 func (e *GtExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -7950,7 +7950,7 @@ func (e *LeExpr) Private() interface{} {
 }
 
 func (e *LeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8007,7 +8007,7 @@ func (e *GeExpr) Private() interface{} {
 }
 
 func (e *GeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8064,7 +8064,7 @@ func (e *NeExpr) Private() interface{} {
 }
 
 func (e *NeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8121,7 +8121,7 @@ func (e *InExpr) Private() interface{} {
 }
 
 func (e *InExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8178,7 +8178,7 @@ func (e *NotInExpr) Private() interface{} {
 }
 
 func (e *NotInExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8235,7 +8235,7 @@ func (e *LikeExpr) Private() interface{} {
 }
 
 func (e *LikeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8292,7 +8292,7 @@ func (e *NotLikeExpr) Private() interface{} {
 }
 
 func (e *NotLikeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8349,7 +8349,7 @@ func (e *ILikeExpr) Private() interface{} {
 }
 
 func (e *ILikeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8406,7 +8406,7 @@ func (e *NotILikeExpr) Private() interface{} {
 }
 
 func (e *NotILikeExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8463,7 +8463,7 @@ func (e *SimilarToExpr) Private() interface{} {
 }
 
 func (e *SimilarToExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8520,7 +8520,7 @@ func (e *NotSimilarToExpr) Private() interface{} {
 }
 
 func (e *NotSimilarToExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8577,7 +8577,7 @@ func (e *RegMatchExpr) Private() interface{} {
 }
 
 func (e *RegMatchExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8634,7 +8634,7 @@ func (e *NotRegMatchExpr) Private() interface{} {
 }
 
 func (e *NotRegMatchExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8691,7 +8691,7 @@ func (e *RegIMatchExpr) Private() interface{} {
 }
 
 func (e *RegIMatchExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8748,7 +8748,7 @@ func (e *NotRegIMatchExpr) Private() interface{} {
 }
 
 func (e *NotRegIMatchExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8805,7 +8805,7 @@ func (e *IsExpr) Private() interface{} {
 }
 
 func (e *IsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8862,7 +8862,7 @@ func (e *IsNotExpr) Private() interface{} {
 }
 
 func (e *IsNotExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8919,7 +8919,7 @@ func (e *ContainsExpr) Private() interface{} {
 }
 
 func (e *ContainsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -8976,7 +8976,7 @@ func (e *JsonExistsExpr) Private() interface{} {
 }
 
 func (e *JsonExistsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9033,7 +9033,7 @@ func (e *JsonAllExistsExpr) Private() interface{} {
 }
 
 func (e *JsonAllExistsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9090,7 +9090,7 @@ func (e *JsonSomeExistsExpr) Private() interface{} {
 }
 
 func (e *JsonSomeExistsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9150,7 +9150,7 @@ func (e *AnyScalarExpr) Private() interface{} {
 }
 
 func (e *AnyScalarExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9208,7 +9208,7 @@ func (e *BitandExpr) Private() interface{} {
 }
 
 func (e *BitandExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9266,7 +9266,7 @@ func (e *BitorExpr) Private() interface{} {
 }
 
 func (e *BitorExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9324,7 +9324,7 @@ func (e *BitxorExpr) Private() interface{} {
 }
 
 func (e *BitxorExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9382,7 +9382,7 @@ func (e *PlusExpr) Private() interface{} {
 }
 
 func (e *PlusExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9440,7 +9440,7 @@ func (e *MinusExpr) Private() interface{} {
 }
 
 func (e *MinusExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9498,7 +9498,7 @@ func (e *MultExpr) Private() interface{} {
 }
 
 func (e *MultExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9556,7 +9556,7 @@ func (e *DivExpr) Private() interface{} {
 }
 
 func (e *DivExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9614,7 +9614,7 @@ func (e *FloorDivExpr) Private() interface{} {
 }
 
 func (e *FloorDivExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9672,7 +9672,7 @@ func (e *ModExpr) Private() interface{} {
 }
 
 func (e *ModExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9730,7 +9730,7 @@ func (e *PowExpr) Private() interface{} {
 }
 
 func (e *PowExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9788,7 +9788,7 @@ func (e *ConcatExpr) Private() interface{} {
 }
 
 func (e *ConcatExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9846,7 +9846,7 @@ func (e *LShiftExpr) Private() interface{} {
 }
 
 func (e *LShiftExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9904,7 +9904,7 @@ func (e *RShiftExpr) Private() interface{} {
 }
 
 func (e *RShiftExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -9962,7 +9962,7 @@ func (e *FetchValExpr) Private() interface{} {
 }
 
 func (e *FetchValExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10020,7 +10020,7 @@ func (e *FetchTextExpr) Private() interface{} {
 }
 
 func (e *FetchTextExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10078,7 +10078,7 @@ func (e *FetchValPathExpr) Private() interface{} {
 }
 
 func (e *FetchValPathExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10136,7 +10136,7 @@ func (e *FetchTextPathExpr) Private() interface{} {
 }
 
 func (e *FetchTextPathExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10191,7 +10191,7 @@ func (e *UnaryMinusExpr) Private() interface{} {
 }
 
 func (e *UnaryMinusExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10243,7 +10243,7 @@ func (e *UnaryComplementExpr) Private() interface{} {
 }
 
 func (e *UnaryComplementExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10304,7 +10304,7 @@ func (e *CastExpr) Private() interface{} {
 }
 
 func (e *CastExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10379,7 +10379,7 @@ func (e *IfErrExpr) Private() interface{} {
 }
 
 func (e *IfErrExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10462,7 +10462,7 @@ func (e *CaseExpr) Private() interface{} {
 }
 
 func (e *CaseExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10526,7 +10526,7 @@ func (e *WhenExpr) Private() interface{} {
 }
 
 func (e *WhenExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10582,7 +10582,7 @@ func (e *ArrayExpr) Private() interface{} {
 }
 
 func (e *ArrayExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10640,7 +10640,7 @@ func (e *IndirectionExpr) Private() interface{} {
 }
 
 func (e *IndirectionExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10700,7 +10700,7 @@ func (e *ArrayFlattenExpr) Private() interface{} {
 }
 
 func (e *ArrayFlattenExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10755,7 +10755,7 @@ func (e *FunctionExpr) Private() interface{} {
 }
 
 func (e *FunctionExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10821,7 +10821,7 @@ func (e *CollateExpr) Private() interface{} {
 }
 
 func (e *CollateExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10873,7 +10873,7 @@ func (e *CoalesceExpr) Private() interface{} {
 }
 
 func (e *CoalesceExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10929,7 +10929,7 @@ func (e *ColumnAccessExpr) Private() interface{} {
 }
 
 func (e *ColumnAccessExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -10979,7 +10979,7 @@ func (e *UnsupportedExprExpr) Private() interface{} {
 }
 
 func (e *UnsupportedExprExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11026,7 +11026,7 @@ func (e *ArrayAggExpr) Private() interface{} {
 }
 
 func (e *ArrayAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11078,7 +11078,7 @@ func (e *AvgExpr) Private() interface{} {
 }
 
 func (e *AvgExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11130,7 +11130,7 @@ func (e *BoolAndExpr) Private() interface{} {
 }
 
 func (e *BoolAndExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11182,7 +11182,7 @@ func (e *BoolOrExpr) Private() interface{} {
 }
 
 func (e *BoolOrExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11234,7 +11234,7 @@ func (e *ConcatAggExpr) Private() interface{} {
 }
 
 func (e *ConcatAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11286,7 +11286,7 @@ func (e *CountExpr) Private() interface{} {
 }
 
 func (e *CountExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11331,7 +11331,7 @@ func (e *CountRowsExpr) Private() interface{} {
 }
 
 func (e *CountRowsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11378,7 +11378,7 @@ func (e *MaxExpr) Private() interface{} {
 }
 
 func (e *MaxExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11430,7 +11430,7 @@ func (e *MinExpr) Private() interface{} {
 }
 
 func (e *MinExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11482,7 +11482,7 @@ func (e *SumIntExpr) Private() interface{} {
 }
 
 func (e *SumIntExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11534,7 +11534,7 @@ func (e *SumExpr) Private() interface{} {
 }
 
 func (e *SumExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11586,7 +11586,7 @@ func (e *SqrDiffExpr) Private() interface{} {
 }
 
 func (e *SqrDiffExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11638,7 +11638,7 @@ func (e *VarianceExpr) Private() interface{} {
 }
 
 func (e *VarianceExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11690,7 +11690,7 @@ func (e *StdDevExpr) Private() interface{} {
 }
 
 func (e *StdDevExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11742,7 +11742,7 @@ func (e *XorAggExpr) Private() interface{} {
 }
 
 func (e *XorAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11794,7 +11794,7 @@ func (e *JsonAggExpr) Private() interface{} {
 }
 
 func (e *JsonAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11846,7 +11846,7 @@ func (e *JsonbAggExpr) Private() interface{} {
 }
 
 func (e *JsonbAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11904,7 +11904,7 @@ func (e *StringAggExpr) Private() interface{} {
 }
 
 func (e *StringAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -11965,7 +11965,7 @@ func (e *ConstAggExpr) Private() interface{} {
 }
 
 func (e *ConstAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12025,7 +12025,7 @@ func (e *ConstNotNullAggExpr) Private() interface{} {
 }
 
 func (e *ConstNotNullAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12082,7 +12082,7 @@ func (e *AnyNotNullAggExpr) Private() interface{} {
 }
 
 func (e *AnyNotNullAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12138,7 +12138,7 @@ func (e *FirstAggExpr) Private() interface{} {
 }
 
 func (e *FirstAggExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12193,7 +12193,7 @@ func (e *AggDistinctExpr) Private() interface{} {
 }
 
 func (e *AggDistinctExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12252,7 +12252,7 @@ func (e *AggFilterExpr) Private() interface{} {
 }
 
 func (e *AggFilterExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12313,7 +12313,7 @@ func (e *WindowFromOffsetExpr) Private() interface{} {
 }
 
 func (e *WindowFromOffsetExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12374,7 +12374,7 @@ func (e *WindowToOffsetExpr) Private() interface{} {
 }
 
 func (e *WindowToOffsetExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12424,7 +12424,7 @@ func (e *WindowsExpr) Private() interface{} {
 }
 
 func (e *WindowsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12483,7 +12483,7 @@ func (e *WindowsItem) Private() interface{} {
 }
 
 func (e *WindowsItem) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12547,7 +12547,7 @@ func (e *RankExpr) Private() interface{} {
 }
 
 func (e *RankExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12589,7 +12589,7 @@ func (e *RowNumberExpr) Private() interface{} {
 }
 
 func (e *RowNumberExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12630,7 +12630,7 @@ func (e *DenseRankExpr) Private() interface{} {
 }
 
 func (e *DenseRankExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12671,7 +12671,7 @@ func (e *PercentRankExpr) Private() interface{} {
 }
 
 func (e *PercentRankExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12713,7 +12713,7 @@ func (e *CumeDistExpr) Private() interface{} {
 }
 
 func (e *CumeDistExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12761,7 +12761,7 @@ func (e *NtileExpr) Private() interface{} {
 }
 
 func (e *NtileExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12823,7 +12823,7 @@ func (e *LagExpr) Private() interface{} {
 }
 
 func (e *LagExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12891,7 +12891,7 @@ func (e *LeadExpr) Private() interface{} {
 }
 
 func (e *LeadExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -12951,7 +12951,7 @@ func (e *FirstValueExpr) Private() interface{} {
 }
 
 func (e *FirstValueExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13004,7 +13004,7 @@ func (e *LastValueExpr) Private() interface{} {
 }
 
 func (e *LastValueExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13061,7 +13061,7 @@ func (e *NthValueExpr) Private() interface{} {
 }
 
 func (e *NthValueExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13116,7 +13116,7 @@ func (e *ScalarListExpr) Private() interface{} {
 }
 
 func (e *ScalarListExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil)
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13164,7 +13164,7 @@ func (e *CreateTableExpr) Private() interface{} {
 }
 
 func (e *CreateTableExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13299,7 +13299,7 @@ func (e *ExplainExpr) Private() interface{} {
 }
 
 func (e *ExplainExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13430,7 +13430,7 @@ func (e *ShowTraceForSessionExpr) Private() interface{} {
 }
 
 func (e *ShowTraceForSessionExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13562,7 +13562,7 @@ func (e *OpaqueRelExpr) Private() interface{} {
 }
 
 func (e *OpaqueRelExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13693,7 +13693,7 @@ func (e *AlterTableSplitExpr) Private() interface{} {
 }
 
 func (e *AlterTableSplitExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13836,7 +13836,7 @@ func (e *AlterTableUnsplitExpr) Private() interface{} {
 }
 
 func (e *AlterTableUnsplitExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -13953,7 +13953,7 @@ func (e *AlterTableUnsplitAllExpr) Private() interface{} {
 }
 
 func (e *AlterTableUnsplitAllExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -14072,7 +14072,7 @@ func (e *AlterTableRelocateExpr) Private() interface{} {
 }
 
 func (e *AlterTableRelocateExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -14200,7 +14200,7 @@ func (e *ControlJobsExpr) Private() interface{} {
 }
 
 func (e *ControlJobsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -14330,7 +14330,7 @@ func (e *CancelQueriesExpr) Private() interface{} {
 }
 
 func (e *CancelQueriesExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
@@ -14462,7 +14462,7 @@ func (e *CancelSessionsExpr) Private() interface{} {
 }
 
 func (e *CancelSessionsExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo())
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
