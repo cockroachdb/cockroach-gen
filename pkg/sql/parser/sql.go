@@ -218,8 +218,8 @@ func (u *sqlSymUnion) tblExpr() tree.TableExpr {
 func (u *sqlSymUnion) tblExprs() tree.TableExprs {
 	return u.val.(tree.TableExprs)
 }
-func (u *sqlSymUnion) from() *tree.From {
-	return u.val.(*tree.From)
+func (u *sqlSymUnion) from() tree.From {
+	return u.val.(tree.From)
 }
 func (u *sqlSymUnion) int32s() []int32 {
 	return u.val.([]int32)
@@ -18029,7 +18029,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Exprs:       tree.SelectExprs{tree.StarSelectExpr()},
-				From:        &tree.From{Tables: tree.TableExprs{sqlDollar[2].union.tblExpr()}},
+				From:        tree.From{Tables: tree.TableExprs{sqlDollar[2].union.tblExpr()}},
 				TableSelect: true,
 			}
 		}
@@ -18352,7 +18352,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:6079
 		{
-			sqlVAL.union.val = &tree.From{Tables: sqlDollar[2].union.tblExprs(), AsOf: sqlDollar[3].union.asOfClause()}
+			sqlVAL.union.val = tree.From{Tables: sqlDollar[2].union.tblExprs(), AsOf: sqlDollar[3].union.asOfClause()}
 		}
 	case 1071:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
@@ -18364,7 +18364,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
 //line sql-gen.y:6084
 		{
-			sqlVAL.union.val = &tree.From{}
+			sqlVAL.union.val = tree.From{}
 		}
 	case 1073:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]

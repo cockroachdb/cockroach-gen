@@ -6,6 +6,7 @@ import (
 	"unsafe"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
@@ -1004,9 +1005,9 @@ type ScanPrivate struct {
 	Table opt.TableID
 
 	// Index identifies the index to scan (whether primary or secondary). It
-	// can be passed to the cat.Table.Index(i int) method in order to fetch the
+	// can be passed to the cat.Table.Index() method in order to fetch the
 	// cat.Index metadata.
-	Index int
+	Index cat.IndexOrdinal
 
 	// Cols specifies the set of columns that the scan operator projects. This
 	// may be a subset of the columns that the table/index contains.
@@ -2776,9 +2777,9 @@ type LookupJoinPrivate struct {
 	Table opt.TableID
 
 	// Index identifies the index to do lookups in (whether primary or secondary).
-	// It can be passed to the cat.Table.Index(i int) method in order to fetch the
+	// It can be passed to the cat.Table.Index() method in order to fetch the
 	// cat.Index metadata.
-	Index int
+	Index cat.IndexOrdinal
 
 	// KeyCols are the columns (produced by the input) used to create lookup keys.
 	// The key columns must be non-empty, and are listed in the same order as the
@@ -3100,10 +3101,10 @@ type ZigzagJoinPrivate struct {
 	RightTable opt.TableID
 
 	// LeftIndex and RightIndex identifies the index to do lookups in (whether
-	// primary or secondary). It can be passed to the cat.Table.Index(i int)
-	// method in order to fetch the cat.Index metadata.
-	LeftIndex  int
-	RightIndex int
+	// primary or secondary). It can be passed to the cat.Table.Index() method in
+	// order to fetch the cat.Index metadata.
+	LeftIndex  cat.IndexOrdinal
+	RightIndex cat.IndexOrdinal
 
 	// LeftEqCols and RightEqCols contains lists of columns on the left and
 	// right sides that are being equated. Both lists must be of equal length.
@@ -13792,9 +13793,9 @@ type AlterTableSplitPrivate struct {
 	Table opt.TableID
 
 	// Index identifies the index to scan (whether primary or secondary). It
-	// can be passed to the cat.Table.Index(i int) method in order to fetch the
+	// can be passed to the cat.Table.Index() method in order to fetch the
 	// cat.Index metadata.
-	Index int
+	Index cat.IndexOrdinal
 
 	// Props stores the required physical properties for the input expression.
 	Props *physical.Required
@@ -18867,7 +18868,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ScanOp)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashInt(val.Index)
+	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
 	in.hasher.HashScanLimit(val.HardLimit)
@@ -18877,7 +18878,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ScanExpr); ok {
 			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
@@ -19168,7 +19169,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashOperator(val.JoinType)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashInt(val.Index)
+	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColList(val.KeyCols)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashJoinFlags(val.Flags)
@@ -19180,7 +19181,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsOperatorEqual(val.JoinType, existing.JoinType) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
@@ -19233,8 +19234,8 @@ func (in *interner) InternZigzagJoin(val *ZigzagJoinExpr) *ZigzagJoinExpr {
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashTableID(val.LeftTable)
 	in.hasher.HashTableID(val.RightTable)
-	in.hasher.HashInt(val.LeftIndex)
-	in.hasher.HashInt(val.RightIndex)
+	in.hasher.HashIndexOrdinal(val.LeftIndex)
+	in.hasher.HashIndexOrdinal(val.RightIndex)
 	in.hasher.HashColList(val.LeftEqCols)
 	in.hasher.HashColList(val.RightEqCols)
 	in.hasher.HashScalarListExpr(val.FixedVals)
@@ -19248,8 +19249,8 @@ func (in *interner) InternZigzagJoin(val *ZigzagJoinExpr) *ZigzagJoinExpr {
 			if in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsTableIDEqual(val.LeftTable, existing.LeftTable) &&
 				in.hasher.IsTableIDEqual(val.RightTable, existing.RightTable) &&
-				in.hasher.IsIntEqual(val.LeftIndex, existing.LeftIndex) &&
-				in.hasher.IsIntEqual(val.RightIndex, existing.RightIndex) &&
+				in.hasher.IsIndexOrdinalEqual(val.LeftIndex, existing.LeftIndex) &&
+				in.hasher.IsIndexOrdinalEqual(val.RightIndex, existing.RightIndex) &&
 				in.hasher.IsColListEqual(val.LeftEqCols, existing.LeftEqCols) &&
 				in.hasher.IsColListEqual(val.RightEqCols, existing.RightEqCols) &&
 				in.hasher.IsScalarListExprEqual(val.FixedVals, existing.FixedVals) &&
@@ -22221,7 +22222,7 @@ func (in *interner) InternAlterTableSplit(val *AlterTableSplitExpr) *AlterTableS
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashScalarExpr(val.Expiration)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashInt(val.Index)
+	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashPhysProps(val.Props)
 	in.hasher.HashColList(val.Columns)
 
@@ -22231,7 +22232,7 @@ func (in *interner) InternAlterTableSplit(val *AlterTableSplitExpr) *AlterTableS
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Expiration, existing.Expiration) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
 				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
 				return existing
@@ -22248,7 +22249,7 @@ func (in *interner) InternAlterTableUnsplit(val *AlterTableUnsplitExpr) *AlterTa
 	in.hasher.HashOperator(opt.AlterTableUnsplitOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashInt(val.Index)
+	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashPhysProps(val.Props)
 	in.hasher.HashColList(val.Columns)
 
@@ -22257,7 +22258,7 @@ func (in *interner) InternAlterTableUnsplit(val *AlterTableUnsplitExpr) *AlterTa
 		if existing, ok := in.cache.Item().(*AlterTableUnsplitExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
 				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
 				return existing
@@ -22273,7 +22274,7 @@ func (in *interner) InternAlterTableUnsplitAll(val *AlterTableUnsplitAllExpr) *A
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.AlterTableUnsplitAllOp)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashInt(val.Index)
+	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashPhysProps(val.Props)
 	in.hasher.HashColList(val.Columns)
 
@@ -22281,7 +22282,7 @@ func (in *interner) InternAlterTableUnsplitAll(val *AlterTableUnsplitAllExpr) *A
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AlterTableUnsplitAllExpr); ok {
 			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
 				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
 				return existing
@@ -22299,7 +22300,7 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashBool(val.RelocateLease)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashInt(val.Index)
+	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashPhysProps(val.Props)
 	in.hasher.HashColList(val.Columns)
 
@@ -22309,7 +22310,7 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsBoolEqual(val.RelocateLease, existing.RelocateLease) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsIntEqual(val.Index, existing.Index) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
 				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
 				return existing
