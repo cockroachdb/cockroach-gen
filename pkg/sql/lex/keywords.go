@@ -105,7 +105,6 @@ var KeywordsCategories = map[string]string{
 	"experimental":              "U",
 	"experimental_audit":        "U",
 	"experimental_fingerprints": "U",
-	"experimental_ranges":       "U",
 	"experimental_relocate":     "U",
 	"experimental_replica":      "U",
 	"expiration":                "U",
@@ -341,7 +340,6 @@ var KeywordsCategories = map[string]string{
 	"temp":                      "U",
 	"template":                  "U",
 	"temporary":                 "U",
-	"testing_ranges":            "U",
 	"testing_relocate":          "U",
 	"text":                      "U",
 	"then":                      "R",
@@ -502,7 +500,6 @@ var KeywordNames = []string{
 	"experimental",
 	"experimental_audit",
 	"experimental_fingerprints",
-	"experimental_ranges",
 	"experimental_relocate",
 	"experimental_replica",
 	"expiration",
@@ -738,7 +735,6 @@ var KeywordNames = []string{
 	"temp",
 	"template",
 	"temporary",
-	"testing_ranges",
 	"testing_relocate",
 	"text",
 	"then",
@@ -1006,8 +1002,6 @@ func GetKeywordID(k string) int32 {
 		return EXPERIMENTAL_AUDIT
 	case "experimental_fingerprints":
 		return EXPERIMENTAL_FINGERPRINTS
-	case "experimental_ranges":
-		return EXPERIMENTAL_RANGES
 	case "experimental_relocate":
 		return EXPERIMENTAL_RELOCATE
 	case "experimental_replica":
@@ -1478,8 +1472,6 @@ func GetKeywordID(k string) int32 {
 		return TEMPLATE
 	case "temporary":
 		return TEMPORARY
-	case "testing_ranges":
-		return TESTING_RANGES
 	case "testing_relocate":
 		return TESTING_RELOCATE
 	case "text":
