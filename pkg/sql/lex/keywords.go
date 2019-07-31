@@ -245,6 +245,7 @@ var KeywordsCategories = map[string]string{
 	"parent":                    "U",
 	"partial":                   "U",
 	"partition":                 "U",
+	"partitions":                "U",
 	"password":                  "U",
 	"pause":                     "U",
 	"physical":                  "U",
@@ -640,6 +641,7 @@ var KeywordNames = []string{
 	"parent",
 	"partial",
 	"partition",
+	"partitions",
 	"password",
 	"pause",
 	"physical",
@@ -1282,6 +1284,8 @@ func GetKeywordID(k string) int32 {
 		return PARTIAL
 	case "partition":
 		return PARTITION
+	case "partitions":
+		return PARTITIONS
 	case "password":
 		return PASSWORD
 	case "pause":

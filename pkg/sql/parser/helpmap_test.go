@@ -74,6 +74,7 @@ var expectedHelpStrings = []string{
 	"SHOW HISTOGRAM",
 	"SHOW INDEXES",
 	"SHOW JOBS",
+	"SHOW PARTITIONS",
 	"SHOW QUERIES",
 	"SHOW RANGES",
 	"SHOW ROLES",
