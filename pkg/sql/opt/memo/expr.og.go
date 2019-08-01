@@ -13266,6 +13266,134 @@ type CreateTablePrivate struct {
 	Syntax *tree.CreateTable
 }
 
+type CreateViewExpr struct {
+	CreateViewPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &CreateViewExpr{}
+
+func (e *CreateViewExpr) Op() opt.Operator {
+	return opt.CreateViewOp
+}
+
+func (e *CreateViewExpr) ChildCount() int {
+	return 0
+}
+
+func (e *CreateViewExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CreateViewExpr) Private() interface{} {
+	return &e.CreateViewPrivate
+}
+
+func (e *CreateViewExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CreateViewExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CreateViewExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *CreateViewExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *CreateViewExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *CreateViewExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *CreateViewExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *CreateViewExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *CreateViewExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *CreateViewExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *CreateViewExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *CreateViewExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *CreateViewExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type createViewGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first CreateViewExpr
+	best  bestProps
+}
+
+var _ exprGroup = &createViewGroup{}
+
+func (g *createViewGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *createViewGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *createViewGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *createViewGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type CreateViewPrivate struct {
+	// Schema is the ID of the catalog schema into which the new table goes.
+	Schema   opt.SchemaID
+	ViewName string
+
+	// ViewQuery contains the query for the view; data sources are always fully
+	// qualified.
+	ViewQuery string
+
+	// Columns that correspond to the output of the view query, with the names
+	// they will have as part of the view.
+	Columns physical.Presentation
+
+	// Deps contains the data source dependencies of the view.
+	Deps opt.ViewDeps
+}
+
 // ExplainExpr returns information about the execution plan of the "input"
 // expression.
 type ExplainExpr struct {
@@ -17350,6 +17478,24 @@ func (m *Memo) MemoizeCreateTable(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeCreateView(
+	createViewPrivate *CreateViewPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(createViewGroup{}))
+	grp := &createViewGroup{mem: m, first: CreateViewExpr{
+		CreateViewPrivate: *createViewPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternCreateView(e)
+	if interned == e {
+		m.logPropsBuilder.buildCreateViewProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeExplain(
 	input RelExpr,
 	explainPrivate *ExplainPrivate,
@@ -18176,6 +18322,20 @@ func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTab
 	return interned
 }
 
+func (m *Memo) AddCreateViewToGroup(e *CreateViewExpr, grp RelExpr) *CreateViewExpr {
+	const size = int64(unsafe.Sizeof(CreateViewExpr{}))
+	interned := m.interner.InternCreateView(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
 	const size = int64(unsafe.Sizeof(ExplainExpr{}))
 	interned := m.interner.InternExplain(e)
@@ -18648,6 +18808,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternScalarList(t)
 	case *CreateTableExpr:
 		return in.InternCreateTable(t)
+	case *CreateViewExpr:
+		return in.InternCreateView(t)
 	case *ExplainExpr:
 		return in.InternExplain(t)
 	case *ShowTraceForSessionExpr:
@@ -22149,6 +22311,32 @@ func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 	return val
 }
 
+func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CreateViewOp)
+	in.hasher.HashSchemaID(val.Schema)
+	in.hasher.HashString(val.ViewName)
+	in.hasher.HashString(val.ViewQuery)
+	in.hasher.HashPresentation(val.Columns)
+	in.hasher.HashViewDeps(val.Deps)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CreateViewExpr); ok {
+			if in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
+				in.hasher.IsStringEqual(val.ViewName, existing.ViewName) &&
+				in.hasher.IsStringEqual(val.ViewQuery, existing.ViewQuery) &&
+				in.hasher.IsPresentationEqual(val.Columns, existing.Columns) &&
+				in.hasher.IsViewDepsEqual(val.Deps, existing.Deps) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ExplainOp)
@@ -22481,6 +22669,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildFakeRelProps(t, rel)
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
+	case *CreateViewExpr:
+		b.buildCreateViewProps(t, rel)
 	case *ExplainExpr:
 		b.buildExplainProps(t, rel)
 	case *ShowTraceForSessionExpr:

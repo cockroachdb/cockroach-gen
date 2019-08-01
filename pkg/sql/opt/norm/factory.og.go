@@ -14482,6 +14482,14 @@ func (_f *Factory) ConstructCreateTable(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructCreateView constructs an expression for the CreateView operator.
+func (_f *Factory) ConstructCreateView(
+	createViewPrivate *memo.CreateViewPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeCreateView(createViewPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructExplain constructs an expression for the Explain operator.
 // Explain returns information about the execution plan of the "input"
 // expression.
@@ -15788,6 +15796,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.CreateViewExpr:
+		return t
+
 	case *memo.ExplainExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -16893,6 +16904,9 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.CreateTablePrivate,
 		)
 
+	case *memo.CreateViewExpr:
+		return f.mem.MemoizeCreateView(&t.CreateViewPrivate)
+
 	case *memo.ExplainExpr:
 		return f.ConstructExplain(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -17772,6 +17786,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructCreateTable(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.CreateTablePrivate),
+		)
+	case opt.CreateViewOp:
+		return f.ConstructCreateView(
+			args[0].(*memo.CreateViewPrivate),
 		)
 	case opt.ExplainOp:
 		return f.ConstructExplain(
