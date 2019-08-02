@@ -13775,6 +13775,232 @@ func (g *opaqueRelGroup) bestProps() *bestProps {
 	return &g.best
 }
 
+// OpaqueMutationExpr is a variant of OpaqueRel for operators that can mutate data as
+// part of the transaction.
+type OpaqueMutationExpr struct {
+	OpaqueRelPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &OpaqueMutationExpr{}
+
+func (e *OpaqueMutationExpr) Op() opt.Operator {
+	return opt.OpaqueMutationOp
+}
+
+func (e *OpaqueMutationExpr) ChildCount() int {
+	return 0
+}
+
+func (e *OpaqueMutationExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OpaqueMutationExpr) Private() interface{} {
+	return &e.OpaqueRelPrivate
+}
+
+func (e *OpaqueMutationExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *OpaqueMutationExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OpaqueMutationExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *OpaqueMutationExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *OpaqueMutationExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *OpaqueMutationExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *OpaqueMutationExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *OpaqueMutationExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *OpaqueMutationExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *OpaqueMutationExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *OpaqueMutationExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *OpaqueMutationExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *OpaqueMutationExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type opaqueMutationGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first OpaqueMutationExpr
+	best  bestProps
+}
+
+var _ exprGroup = &opaqueMutationGroup{}
+
+func (g *opaqueMutationGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *opaqueMutationGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *opaqueMutationGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *opaqueMutationGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// OpaqueMutation is a variant of OpaqueRel for operators that cause a schema
+// change and cannot be executed following a mutation in the same transaction.
+type OpaqueDDLExpr struct {
+	OpaqueRelPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &OpaqueDDLExpr{}
+
+func (e *OpaqueDDLExpr) Op() opt.Operator {
+	return opt.OpaqueDDLOp
+}
+
+func (e *OpaqueDDLExpr) ChildCount() int {
+	return 0
+}
+
+func (e *OpaqueDDLExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OpaqueDDLExpr) Private() interface{} {
+	return &e.OpaqueRelPrivate
+}
+
+func (e *OpaqueDDLExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *OpaqueDDLExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OpaqueDDLExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *OpaqueDDLExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *OpaqueDDLExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *OpaqueDDLExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *OpaqueDDLExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *OpaqueDDLExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *OpaqueDDLExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *OpaqueDDLExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *OpaqueDDLExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *OpaqueDDLExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *OpaqueDDLExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type opaqueDDLGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first OpaqueDDLExpr
+	best  bestProps
+}
+
+var _ exprGroup = &opaqueDDLGroup{}
+
+func (g *opaqueDDLGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *opaqueDDLGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *opaqueDDLGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *opaqueDDLGroup) bestProps() *bestProps {
+	return &g.best
+}
+
 type OpaqueRelPrivate struct {
 	Columns  opt.ColList
 	Metadata opt.OpaqueMetadata
@@ -17552,6 +17778,42 @@ func (m *Memo) MemoizeOpaqueRel(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeOpaqueMutation(
+	opaqueRelPrivate *OpaqueRelPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(opaqueMutationGroup{}))
+	grp := &opaqueMutationGroup{mem: m, first: OpaqueMutationExpr{
+		OpaqueRelPrivate: *opaqueRelPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternOpaqueMutation(e)
+	if interned == e {
+		m.logPropsBuilder.buildOpaqueMutationProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeOpaqueDDL(
+	opaqueRelPrivate *OpaqueRelPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(opaqueDDLGroup{}))
+	grp := &opaqueDDLGroup{mem: m, first: OpaqueDDLExpr{
+		OpaqueRelPrivate: *opaqueRelPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternOpaqueDDL(e)
+	if interned == e {
+		m.logPropsBuilder.buildOpaqueDDLProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeAlterTableSplit(
 	input RelExpr,
 	expiration opt.ScalarExpr,
@@ -18378,6 +18640,34 @@ func (m *Memo) AddOpaqueRelToGroup(e *OpaqueRelExpr, grp RelExpr) *OpaqueRelExpr
 	return interned
 }
 
+func (m *Memo) AddOpaqueMutationToGroup(e *OpaqueMutationExpr, grp RelExpr) *OpaqueMutationExpr {
+	const size = int64(unsafe.Sizeof(OpaqueMutationExpr{}))
+	interned := m.interner.InternOpaqueMutation(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddOpaqueDDLToGroup(e *OpaqueDDLExpr, grp RelExpr) *OpaqueDDLExpr {
+	const size = int64(unsafe.Sizeof(OpaqueDDLExpr{}))
+	interned := m.interner.InternOpaqueDDL(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddAlterTableSplitToGroup(e *AlterTableSplitExpr, grp RelExpr) *AlterTableSplitExpr {
 	const size = int64(unsafe.Sizeof(AlterTableSplitExpr{}))
 	interned := m.interner.InternAlterTableSplit(e)
@@ -18816,6 +19106,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternShowTraceForSession(t)
 	case *OpaqueRelExpr:
 		return in.InternOpaqueRel(t)
+	case *OpaqueMutationExpr:
+		return in.InternOpaqueMutation(t)
+	case *OpaqueDDLExpr:
+		return in.InternOpaqueDDL(t)
 	case *AlterTableSplitExpr:
 		return in.InternAlterTableSplit(t)
 	case *AlterTableUnsplitExpr:
@@ -22405,6 +22699,46 @@ func (in *interner) InternOpaqueRel(val *OpaqueRelExpr) *OpaqueRelExpr {
 	return val
 }
 
+func (in *interner) InternOpaqueMutation(val *OpaqueMutationExpr) *OpaqueMutationExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.OpaqueMutationOp)
+	in.hasher.HashColList(val.Columns)
+	in.hasher.HashOpaqueMetadata(val.Metadata)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*OpaqueMutationExpr); ok {
+			if in.hasher.IsColListEqual(val.Columns, existing.Columns) &&
+				in.hasher.IsOpaqueMetadataEqual(val.Metadata, existing.Metadata) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternOpaqueDDL(val *OpaqueDDLExpr) *OpaqueDDLExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.OpaqueDDLOp)
+	in.hasher.HashColList(val.Columns)
+	in.hasher.HashOpaqueMetadata(val.Metadata)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*OpaqueDDLExpr); ok {
+			if in.hasher.IsColListEqual(val.Columns, existing.Columns) &&
+				in.hasher.IsOpaqueMetadataEqual(val.Metadata, existing.Metadata) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternAlterTableSplit(val *AlterTableSplitExpr) *AlterTableSplitExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.AlterTableSplitOp)
@@ -22677,6 +23011,10 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildShowTraceForSessionProps(t, rel)
 	case *OpaqueRelExpr:
 		b.buildOpaqueRelProps(t, rel)
+	case *OpaqueMutationExpr:
+		b.buildOpaqueMutationProps(t, rel)
+	case *OpaqueDDLExpr:
+		b.buildOpaqueDDLProps(t, rel)
 	case *AlterTableSplitExpr:
 		b.buildAlterTableSplitProps(t, rel)
 	case *AlterTableUnsplitExpr:

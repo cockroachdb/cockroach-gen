@@ -14561,6 +14561,26 @@ func (_f *Factory) ConstructOpaqueRel(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructOpaqueMutation constructs an expression for the OpaqueMutation operator.
+// OpaqueMutation is a variant of OpaqueRel for operators that can mutate data as
+// part of the transaction.
+func (_f *Factory) ConstructOpaqueMutation(
+	opaqueRelPrivate *memo.OpaqueRelPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeOpaqueMutation(opaqueRelPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructOpaqueDDL constructs an expression for the OpaqueDDL operator.
+// OpaqueMutation is a variant of OpaqueRel for operators that cause a schema
+// change and cannot be executed following a mutation in the same transaction.
+func (_f *Factory) ConstructOpaqueDDL(
+	opaqueRelPrivate *memo.OpaqueRelPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeOpaqueDDL(opaqueRelPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructAlterTableSplit constructs an expression for the AlterTableSplit operator.
 // AlterTableSplit represents an `ALTER TABLE/INDEX .. SPLIT AT ..` statement.
 func (_f *Factory) ConstructAlterTableSplit(
@@ -15812,6 +15832,12 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.OpaqueRelExpr:
 		return t
 
+	case *memo.OpaqueMutationExpr:
+		return t
+
+	case *memo.OpaqueDDLExpr:
+		return t
+
 	case *memo.AlterTableSplitExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		expiration := replace(t.Expiration).(opt.ScalarExpr)
@@ -16919,6 +16945,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.OpaqueRelExpr:
 		return f.mem.MemoizeOpaqueRel(&t.OpaqueRelPrivate)
 
+	case *memo.OpaqueMutationExpr:
+		return f.mem.MemoizeOpaqueMutation(&t.OpaqueRelPrivate)
+
+	case *memo.OpaqueDDLExpr:
+		return f.mem.MemoizeOpaqueDDL(&t.OpaqueRelPrivate)
+
 	case *memo.AlterTableSplitExpr:
 		return f.ConstructAlterTableSplit(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -17802,6 +17834,14 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.OpaqueRelOp:
 		return f.ConstructOpaqueRel(
+			args[0].(*memo.OpaqueRelPrivate),
+		)
+	case opt.OpaqueMutationOp:
+		return f.ConstructOpaqueMutation(
+			args[0].(*memo.OpaqueRelPrivate),
+		)
+	case opt.OpaqueDDLOp:
+		return f.ConstructOpaqueDDL(
 			args[0].(*memo.OpaqueRelPrivate),
 		)
 	case opt.AlterTableSplitOp:
