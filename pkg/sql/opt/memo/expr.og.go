@@ -13262,7 +13262,8 @@ type CreateTablePrivate struct {
 	// defined when the AS clause was used in the CREATE TABLE statement.
 	InputCols physical.Presentation
 
-	// Syntax is the CREATE TABLE AST node.
+	// Syntax is the CREATE TABLE AST node. All data sources inside AsSource are
+	// fully qualified.
 	Syntax *tree.CreateTable
 }
 
