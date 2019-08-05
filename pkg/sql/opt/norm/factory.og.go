@@ -13858,6 +13858,18 @@ func (_f *Factory) ConstructCancelSessions(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructExport constructs an expression for the Export operator.
+// Export represents an `EXPORT` statement.
+func (_f *Factory) ConstructExport(
+	input memo.RelExpr,
+	fileName opt.ScalarExpr,
+	options memo.KVOptionsExpr,
+	exportPrivate *memo.ExportPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeExport(input, fileName, options, exportPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -14991,6 +15003,12 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.KVOptionsExpr:
+		if after, changed := f.replaceKVOptionsExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
 	case *memo.ScalarListExpr:
 		if after, changed := f.replaceScalarListExpr(*t, replace); changed {
 			return &after
@@ -15069,6 +15087,15 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
 			return f.ConstructCancelSessions(input, &t.CancelPrivate)
+		}
+		return t
+
+	case *memo.ExportExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		fileName := replace(t.FileName).(opt.ScalarExpr)
+		options, optionsChanged := f.replaceKVOptionsExpr(t.Options, replace)
+		if input != t.Input || fileName != t.FileName || optionsChanged {
+			return f.ConstructExport(input, fileName, options, &t.ExportPrivate)
 		}
 		return t
 
@@ -15202,6 +15229,28 @@ func (f *Factory) replaceWindowsExpr(list memo.WindowsExpr, replace ReplaceFunc)
 			newList[i].Function = after
 			newList[i].Frame = list[i].Frame
 			newList[i].Col = list[i].Col
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
+func (f *Factory) replaceKVOptionsExpr(list memo.KVOptionsExpr, replace ReplaceFunc) (_ memo.KVOptionsExpr, changed bool) {
+	var newList []memo.KVOptionsItem
+	for i := range list {
+		before := list[i].Value
+		after := replace(before).(opt.ScalarExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.KVOptionsItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i].Value = after
+			newList[i].Key = list[i].Key
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -16163,6 +16212,14 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.CancelPrivate,
 		)
 
+	case *memo.ExportExpr:
+		return f.ConstructExport(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.FileName, replace).(opt.ScalarExpr),
+			f.copyAndReplaceDefaultKVOptionsExpr(t.Options, replace),
+			&t.ExportPrivate,
+		)
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
@@ -16221,6 +16278,15 @@ func (f *Factory) copyAndReplaceDefaultWindowsExpr(src memo.WindowsExpr, replace
 		dst[i].Function = f.invokeReplace(src[i].Function, replace).(opt.ScalarExpr)
 		dst[i].Frame = src[i].Frame
 		dst[i].Col = src[i].Col
+	}
+	return dst
+}
+
+func (f *Factory) copyAndReplaceDefaultKVOptionsExpr(src memo.KVOptionsExpr, replace ReplaceFunc) (dst memo.KVOptionsExpr) {
+	dst = make(memo.KVOptionsExpr, len(src))
+	for i := range src {
+		dst[i].Value = f.invokeReplace(src[i].Value, replace).(opt.ScalarExpr)
+		dst[i].Key = src[i].Key
 	}
 	return dst
 }
@@ -17036,6 +17102,13 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructCancelSessions(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.CancelPrivate),
+		)
+	case opt.ExportOp:
+		return f.ConstructExport(
+			args[0].(memo.RelExpr),
+			args[1].(opt.ScalarExpr),
+			*args[2].(*memo.KVOptionsExpr),
+			args[3].(*memo.ExportPrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

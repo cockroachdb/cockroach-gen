@@ -12823,6 +12823,104 @@ func (e *NthValueExpr) DataType() *types.T {
 	return e.Typ
 }
 
+// KVOptionsExpr is a set of KVOptionItems that specify arbitrary keys and values
+// that are used as modifiers for various statements (see tree.KVOptions). The
+// key is a constant string but the value can be a scalar expression.
+type KVOptionsExpr []KVOptionsItem
+
+var EmptyKVOptionsExpr = KVOptionsExpr{}
+
+var _ opt.ScalarExpr = &KVOptionsExpr{}
+
+func (e *KVOptionsExpr) ID() opt.ScalarID {
+	panic(errors.AssertionFailedf("lists have no id"))
+}
+
+func (e *KVOptionsExpr) Op() opt.Operator {
+	return opt.KVOptionsOp
+}
+
+func (e *KVOptionsExpr) ChildCount() int {
+	return len(*e)
+}
+
+func (e *KVOptionsExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
+}
+
+func (e *KVOptionsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *KVOptionsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *KVOptionsExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*KVOptionsItem)
+}
+
+func (e *KVOptionsExpr) DataType() *types.T {
+	return types.Any
+}
+
+// KVOptionsItem is the key and value of an option (see tree.KVOption). For keys
+// that don't have values, the value is Null.
+type KVOptionsItem struct {
+	Value opt.ScalarExpr
+	Key   string
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &KVOptionsItem{}
+
+func (e *KVOptionsItem) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *KVOptionsItem) Op() opt.Operator {
+	return opt.KVOptionsItemOp
+}
+
+func (e *KVOptionsItem) ChildCount() int {
+	return 1
+}
+
+func (e *KVOptionsItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Value
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *KVOptionsItem) Private() interface{} {
+	return &e.Key
+}
+
+func (e *KVOptionsItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *KVOptionsItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *KVOptionsItem) DataType() *types.T {
+	return e.Typ
+}
+
 // ScalarListExpr is a list expression that has scalar expression items of type
 // opt.ScalarExpr. opt.ScalarExpr is an external type that is defined outside of
 // Optgen. It is hard-coded in the code generator to be the item type for
@@ -14646,6 +14744,154 @@ func (g *cancelSessionsGroup) firstExpr() RelExpr {
 
 func (g *cancelSessionsGroup) bestProps() *bestProps {
 	return &g.best
+}
+
+// ExportExpr represents an `EXPORT` statement.
+type ExportExpr struct {
+	// Input is the relational expression for the data we are exporting.
+	Input RelExpr
+
+	// FileName is the string URI for the output file.
+	FileName opt.ScalarExpr
+	Options  KVOptionsExpr
+	ExportPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ExportExpr{}
+
+func (e *ExportExpr) Op() opt.Operator {
+	return opt.ExportOp
+}
+
+func (e *ExportExpr) ChildCount() int {
+	return 3
+}
+
+func (e *ExportExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return e.FileName
+	case 2:
+		return &e.Options
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ExportExpr) Private() interface{} {
+	return &e.ExportPrivate
+}
+
+func (e *ExportExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ExportExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.FileName = child.(opt.ScalarExpr)
+		return
+	case 2:
+		e.Options = *child.(*KVOptionsExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ExportExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ExportExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ExportExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ExportExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ExportExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ExportExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *ExportExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ExportExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ExportExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ExportExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ExportExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type exportGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ExportExpr
+	best  bestProps
+}
+
+var _ exprGroup = &exportGroup{}
+
+func (g *exportGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *exportGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *exportGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *exportGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ExportPrivate struct {
+	// FileFormat describes the requested format, e.g. "CSV".
+	FileFormat string
+
+	// Props stores the required physical properties for the input expression.
+	Props *physical.Required
+
+	// Columns stores the column IDs for the statement result columns.
+	Columns opt.ColList
 }
 
 func (m *Memo) MemoizeInsert(
@@ -17648,6 +17894,30 @@ func (m *Memo) MemoizeCancelSessions(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeExport(
+	input RelExpr,
+	fileName opt.ScalarExpr,
+	options KVOptionsExpr,
+	exportPrivate *ExportPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(exportGroup{}))
+	grp := &exportGroup{mem: m, first: ExportExpr{
+		Input:         input,
+		FileName:      fileName,
+		Options:       options,
+		ExportPrivate: *exportPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternExport(e)
+	if interned == e {
+		m.logPropsBuilder.buildExportProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -18432,6 +18702,20 @@ func (m *Memo) AddCancelSessionsToGroup(e *CancelSessionsExpr, grp RelExpr) *Can
 	return interned
 }
 
+func (m *Memo) AddExportToGroup(e *ExportExpr, grp RelExpr) *ExportExpr {
+	const size = int64(unsafe.Sizeof(ExportExpr{}))
+	interned := m.interner.InternExport(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -18756,6 +19040,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternLastValue(t)
 	case *NthValueExpr:
 		return in.InternNthValue(t)
+	case *KVOptionsExpr:
+		return in.InternKVOptions(t)
+	case *KVOptionsItem:
+		return in.InternKVOptionsItem(t)
 	case *ScalarListExpr:
 		return in.InternScalarList(t)
 	case *CreateTableExpr:
@@ -18786,6 +19074,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCancelQueries(t)
 	case *CancelSessionsExpr:
 		return in.InternCancelSessions(t)
+	case *ExportExpr:
+		return in.InternExport(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -22185,6 +22475,44 @@ func (in *interner) InternNthValue(val *NthValueExpr) *NthValueExpr {
 	return val
 }
 
+func (in *interner) InternKVOptions(val *KVOptionsExpr) *KVOptionsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.KVOptionsOp)
+	in.hasher.HashKVOptionsExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*KVOptionsExpr); ok {
+			if in.hasher.IsKVOptionsExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternKVOptionsItem(val *KVOptionsItem) *KVOptionsItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.KVOptionsItemOp)
+	in.hasher.HashScalarExpr(val.Value)
+	in.hasher.HashString(val.Key)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*KVOptionsItem); ok {
+			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) &&
+				in.hasher.IsStringEqual(val.Key, existing.Key) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternScalarList(val *ScalarListExpr) *ScalarListExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ScalarListOp)
@@ -22533,6 +22861,34 @@ func (in *interner) InternCancelSessions(val *CancelSessionsExpr) *CancelSession
 	return val
 }
 
+func (in *interner) InternExport(val *ExportExpr) *ExportExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ExportOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.FileName)
+	in.hasher.HashKVOptionsExpr(val.Options)
+	in.hasher.HashString(val.FileFormat)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashColList(val.Columns)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ExportExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.FileName, existing.FileName) &&
+				in.hasher.IsKVOptionsExprEqual(val.Options, existing.Options) &&
+				in.hasher.IsStringEqual(val.FileFormat, existing.FileFormat) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -22647,6 +23003,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildCancelQueriesProps(t, rel)
 	case *CancelSessionsExpr:
 		b.buildCancelSessionsProps(t, rel)
+	case *ExportExpr:
+		b.buildExportProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}
