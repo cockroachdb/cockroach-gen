@@ -1323,12 +1323,12 @@ UPDATE <tablename> [[AS] <name>]
 		SeeAlso: `INSERT, UPSERT, DELETE, WEBDOCS/update.html
 `,
 	},
-	//line sql.y: 5697
+	//line sql.y: 5701
 	`<SELECTCLAUSE>`: {
 		ShortDescription: `access tabular data`,
-		//line sql.y: 5698
+		//line sql.y: 5702
 		Category: hDML,
-		//line sql.y: 5699
+		//line sql.y: 5703
 		Text: `
 Select clause:
   TABLE <tablename>
@@ -1336,12 +1336,12 @@ Select clause:
   SELECT ... [ { INTERSECT | UNION | EXCEPT } [ ALL | DISTINCT ] <selectclause> ]
 `,
 	},
-	//line sql.y: 5710
+	//line sql.y: 5714
 	`SELECT`: {
 		ShortDescription: `retrieve rows from a data source and compute a result`,
-		//line sql.y: 5711
+		//line sql.y: 5715
 		Category: hDML,
-		//line sql.y: 5712
+		//line sql.y: 5716
 		Text: `
 SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        { <expr> [[AS] <name>] | [ [<dbname>.] <tablename>. ] * } [, ...]
@@ -1355,40 +1355,40 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        [ LIMIT { <expr> | ALL } ]
        [ OFFSET <expr> [ ROW | ROWS ] ]
 `,
-		//line sql.y: 5724
+		//line sql.y: 5728
 		SeeAlso: `WEBDOCS/select-clause.html
 `,
 	},
-	//line sql.y: 5799
+	//line sql.y: 5803
 	`TABLE`: {
 		ShortDescription: `select an entire table`,
-		//line sql.y: 5800
+		//line sql.y: 5804
 		Category: hDML,
-		//line sql.y: 5801
+		//line sql.y: 5805
 		Text: `TABLE <tablename>
 `,
-		//line sql.y: 5802
+		//line sql.y: 5806
 		SeeAlso: `SELECT, VALUES, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 6078
+	//line sql.y: 6082
 	`VALUES`: {
 		ShortDescription: `select a given set of values`,
-		//line sql.y: 6079
+		//line sql.y: 6083
 		Category: hDML,
-		//line sql.y: 6080
+		//line sql.y: 6084
 		Text: `VALUES ( <exprs...> ) [, ...]
 `,
-		//line sql.y: 6081
+		//line sql.y: 6085
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 6190
+	//line sql.y: 6194
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 6191
+		//line sql.y: 6195
 		Category: hDML,
-		//line sql.y: 6192
+		//line sql.y: 6196
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexflags> } ]
@@ -1412,7 +1412,7 @@ Join types:
   { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP } ]
 
 `,
-		//line sql.y: 6214
+		//line sql.y: 6218
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},

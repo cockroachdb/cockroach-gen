@@ -347,6 +347,13 @@ type MutationPrivate struct {
 	// then ReturnCols is nil.
 	ReturnCols opt.ColList
 
+	// PassthroughCols are columns that the mutation needs to passthrough from
+	// its input. It's similar to the passthrough columns in projections. This
+	// is useful for `UPDATE .. FROM` mutations where the `RETURNING` clause
+	// references columns from tables in the `FROM` clause. When this happens
+	// the update will need to pass through those refenced columns from its input.
+	PassthroughCols opt.ColList
+
 	// Mutation operators can act similarly to a With operator: they buffer their
 	// input, making it accessible to FK queries. If this is not required, WithID
 	// is zero.
@@ -19142,6 +19149,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 
 	in.cache.Start(in.hasher.hash)
@@ -19156,6 +19164,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) {
 				return existing
 			}
@@ -19178,6 +19187,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 
 	in.cache.Start(in.hasher.hash)
@@ -19192,6 +19202,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) {
 				return existing
 			}
@@ -19214,6 +19225,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 
 	in.cache.Start(in.hasher.hash)
@@ -19228,6 +19240,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) {
 				return existing
 			}
@@ -19250,6 +19263,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.HashColList(val.CheckCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 
 	in.cache.Start(in.hasher.hash)
@@ -19264,6 +19278,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) {
 				return existing
 			}
