@@ -13975,7 +13975,7 @@ sqldefault:
 //line sql-gen.y:2258
 		{
 
-			value, _ := constant.Float64Val(sqlDollar[2].union.numVal().Value)
+			value, _ := constant.Float64Val(sqlDollar[2].union.numVal().AsConstantValue())
 			if value < 0.0 || value >= 1.0 {
 				sqllex.Error("THROTTLING fraction must be between 0 and 1")
 				return 1
@@ -16813,7 +16813,7 @@ sqldefault:
 //line sql-gen.y:4692
 		{
 			n := sqlDollar[2].union.numVal()
-			n.Negative = true
+			n.SetNegative()
 			sqlVAL.union.val = n
 		}
 	case 816:
@@ -18373,7 +18373,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
 //line sql-gen.y:6031
 		{
-			sqlVAL.union.val = &tree.NumVal{Value: constant.MakeInt64(1)}
+			sqlVAL.union.val = tree.NewNumVal(constant.MakeInt64(1), "", false)
 		}
 	case 1065:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -21702,7 +21702,7 @@ sqldefault:
 //line sql-gen.y:8727
 		{
 			n := sqlDollar[2].union.numVal()
-			n.Negative = true
+			n.SetNegative()
 			sqlVAL.union.val = n
 		}
 	case 1614:
