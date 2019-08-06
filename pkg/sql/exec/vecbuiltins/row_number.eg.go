@@ -24,7 +24,7 @@ type rowNumberNoPartitionOp struct {
 var _ exec.Operator = &rowNumberNoPartitionOp{}
 
 func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
-	batch := r.input.Next(ctx)
+	batch := r.Input().Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -57,7 +57,7 @@ type rowNumberWithPartitionOp struct {
 var _ exec.Operator = &rowNumberWithPartitionOp{}
 
 func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
-	batch := r.input.Next(ctx)
+	batch := r.Input().Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}

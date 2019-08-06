@@ -11,7 +11,7 @@ import (
 )
 
 type selPrefixBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -94,7 +94,7 @@ func (p selPrefixBytesBytesConstOp) Init() {
 }
 
 type selSuffixBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -177,7 +177,7 @@ func (p selSuffixBytesBytesConstOp) Init() {
 }
 
 type selRegexpBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg *regexp.Regexp
@@ -260,7 +260,7 @@ func (p selRegexpBytesBytesConstOp) Init() {
 }
 
 type selNotPrefixBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -343,7 +343,7 @@ func (p selNotPrefixBytesBytesConstOp) Init() {
 }
 
 type selNotSuffixBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -426,7 +426,7 @@ func (p selNotSuffixBytesBytesConstOp) Init() {
 }
 
 type selNotRegexpBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg *regexp.Regexp

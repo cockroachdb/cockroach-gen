@@ -38,10 +38,10 @@ func GetInProjectionOperator(
 	switch t := conv.FromColumnType(ct); t {
 	case types.Bool:
 		obj := &projectInOpBool{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(ct, datumTuple)
 		if err != nil {
@@ -50,10 +50,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Bytes:
 		obj := &projectInOpBytes{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(ct, datumTuple)
 		if err != nil {
@@ -62,10 +62,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Decimal:
 		obj := &projectInOpDecimal{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(ct, datumTuple)
 		if err != nil {
@@ -74,10 +74,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Int8:
 		obj := &projectInOpInt8{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt8(ct, datumTuple)
 		if err != nil {
@@ -86,10 +86,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Int16:
 		obj := &projectInOpInt16{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(ct, datumTuple)
 		if err != nil {
@@ -98,10 +98,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Int32:
 		obj := &projectInOpInt32{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(ct, datumTuple)
 		if err != nil {
@@ -110,10 +110,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Int64:
 		obj := &projectInOpInt64{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(ct, datumTuple)
 		if err != nil {
@@ -122,10 +122,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Float32:
 		obj := &projectInOpFloat32{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat32(ct, datumTuple)
 		if err != nil {
@@ -134,10 +134,10 @@ func GetInProjectionOperator(
 		return obj, nil
 	case types.Float64:
 		obj := &projectInOpFloat64{
-			input:     input,
-			colIdx:    colIdx,
-			outputIdx: resultIdx,
-			negate:    negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(ct, datumTuple)
 		if err != nil {
@@ -156,9 +156,9 @@ func GetInOperator(
 	switch t := conv.FromColumnType(ct); t {
 	case types.Bool:
 		obj := &selectInOpBool{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(ct, datumTuple)
 		if err != nil {
@@ -167,9 +167,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Bytes:
 		obj := &selectInOpBytes{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(ct, datumTuple)
 		if err != nil {
@@ -178,9 +178,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Decimal:
 		obj := &selectInOpDecimal{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(ct, datumTuple)
 		if err != nil {
@@ -189,9 +189,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Int8:
 		obj := &selectInOpInt8{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt8(ct, datumTuple)
 		if err != nil {
@@ -200,9 +200,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Int16:
 		obj := &selectInOpInt16{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(ct, datumTuple)
 		if err != nil {
@@ -211,9 +211,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Int32:
 		obj := &selectInOpInt32{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(ct, datumTuple)
 		if err != nil {
@@ -222,9 +222,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Int64:
 		obj := &selectInOpInt64{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(ct, datumTuple)
 		if err != nil {
@@ -233,9 +233,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Float32:
 		obj := &selectInOpFloat32{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat32(ct, datumTuple)
 		if err != nil {
@@ -244,9 +244,9 @@ func GetInOperator(
 		return obj, nil
 	case types.Float64:
 		obj := &selectInOpFloat64{
-			input:  input,
-			colIdx: colIdx,
-			negate: negate,
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(ct, datumTuple)
 		if err != nil {
@@ -259,7 +259,7 @@ func GetInOperator(
 }
 
 type selectInOpBool struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []bool
 	hasNulls  bool
@@ -267,7 +267,7 @@ type selectInOpBool struct {
 }
 
 type projectInOpBool struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []bool
@@ -472,7 +472,7 @@ func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpBytes struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow [][]byte
 	hasNulls  bool
@@ -480,7 +480,7 @@ type selectInOpBytes struct {
 }
 
 type projectInOpBytes struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow [][]byte
@@ -685,7 +685,7 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpDecimal struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []apd.Decimal
 	hasNulls  bool
@@ -693,7 +693,7 @@ type selectInOpDecimal struct {
 }
 
 type projectInOpDecimal struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []apd.Decimal
@@ -898,7 +898,7 @@ func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpInt8 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []int8
 	hasNulls  bool
@@ -906,7 +906,7 @@ type selectInOpInt8 struct {
 }
 
 type projectInOpInt8 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []int8
@@ -1111,7 +1111,7 @@ func (pi *projectInOpInt8) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpInt16 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []int16
 	hasNulls  bool
@@ -1119,7 +1119,7 @@ type selectInOpInt16 struct {
 }
 
 type projectInOpInt16 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []int16
@@ -1324,7 +1324,7 @@ func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpInt32 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []int32
 	hasNulls  bool
@@ -1332,7 +1332,7 @@ type selectInOpInt32 struct {
 }
 
 type projectInOpInt32 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []int32
@@ -1537,7 +1537,7 @@ func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpInt64 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []int64
 	hasNulls  bool
@@ -1545,7 +1545,7 @@ type selectInOpInt64 struct {
 }
 
 type projectInOpInt64 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []int64
@@ -1750,7 +1750,7 @@ func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpFloat32 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []float32
 	hasNulls  bool
@@ -1758,7 +1758,7 @@ type selectInOpFloat32 struct {
 }
 
 type projectInOpFloat32 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []float32
@@ -1963,7 +1963,7 @@ func (pi *projectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 }
 
 type selectInOpFloat64 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	filterRow []float64
 	hasNulls  bool
@@ -1971,7 +1971,7 @@ type selectInOpFloat64 struct {
 }
 
 type projectInOpFloat64 struct {
-	input     Operator
+	OneInputNode
 	colIdx    int
 	outputIdx int
 	filterRow []float64

@@ -17,7 +17,7 @@ import (
 )
 
 type projEQBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -65,7 +65,7 @@ func (p projEQBoolBoolConstOp) Init() {
 }
 
 type projEQBoolConstBoolOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -113,7 +113,7 @@ func (p projEQBoolConstBoolOp) Init() {
 }
 
 type projEQBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -163,7 +163,7 @@ func (p projEQBoolBoolOp) Init() {
 }
 
 type projNEBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -211,7 +211,7 @@ func (p projNEBoolBoolConstOp) Init() {
 }
 
 type projNEBoolConstBoolOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -259,7 +259,7 @@ func (p projNEBoolConstBoolOp) Init() {
 }
 
 type projNEBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -309,7 +309,7 @@ func (p projNEBoolBoolOp) Init() {
 }
 
 type projLTBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -357,7 +357,7 @@ func (p projLTBoolBoolConstOp) Init() {
 }
 
 type projLTBoolConstBoolOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -405,7 +405,7 @@ func (p projLTBoolConstBoolOp) Init() {
 }
 
 type projLTBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -455,7 +455,7 @@ func (p projLTBoolBoolOp) Init() {
 }
 
 type projLEBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -503,7 +503,7 @@ func (p projLEBoolBoolConstOp) Init() {
 }
 
 type projLEBoolConstBoolOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -551,7 +551,7 @@ func (p projLEBoolConstBoolOp) Init() {
 }
 
 type projLEBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -601,7 +601,7 @@ func (p projLEBoolBoolOp) Init() {
 }
 
 type projGTBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -649,7 +649,7 @@ func (p projGTBoolBoolConstOp) Init() {
 }
 
 type projGTBoolConstBoolOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -697,7 +697,7 @@ func (p projGTBoolConstBoolOp) Init() {
 }
 
 type projGTBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -747,7 +747,7 @@ func (p projGTBoolBoolOp) Init() {
 }
 
 type projGEBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -795,7 +795,7 @@ func (p projGEBoolBoolConstOp) Init() {
 }
 
 type projGEBoolConstBoolOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -843,7 +843,7 @@ func (p projGEBoolConstBoolOp) Init() {
 }
 
 type projGEBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -893,7 +893,7 @@ func (p projGEBoolBoolOp) Init() {
 }
 
 type projEQBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -941,7 +941,7 @@ func (p projEQBytesBytesConstOp) Init() {
 }
 
 type projEQBytesConstBytesOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -989,7 +989,7 @@ func (p projEQBytesConstBytesOp) Init() {
 }
 
 type projEQBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1039,7 +1039,7 @@ func (p projEQBytesBytesOp) Init() {
 }
 
 type projNEBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1087,7 +1087,7 @@ func (p projNEBytesBytesConstOp) Init() {
 }
 
 type projNEBytesConstBytesOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1135,7 +1135,7 @@ func (p projNEBytesConstBytesOp) Init() {
 }
 
 type projNEBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1185,7 +1185,7 @@ func (p projNEBytesBytesOp) Init() {
 }
 
 type projLTBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1233,7 +1233,7 @@ func (p projLTBytesBytesConstOp) Init() {
 }
 
 type projLTBytesConstBytesOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1281,7 +1281,7 @@ func (p projLTBytesConstBytesOp) Init() {
 }
 
 type projLTBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1331,7 +1331,7 @@ func (p projLTBytesBytesOp) Init() {
 }
 
 type projLEBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1379,7 +1379,7 @@ func (p projLEBytesBytesConstOp) Init() {
 }
 
 type projLEBytesConstBytesOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1427,7 +1427,7 @@ func (p projLEBytesConstBytesOp) Init() {
 }
 
 type projLEBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1477,7 +1477,7 @@ func (p projLEBytesBytesOp) Init() {
 }
 
 type projGTBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1525,7 +1525,7 @@ func (p projGTBytesBytesConstOp) Init() {
 }
 
 type projGTBytesConstBytesOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1573,7 +1573,7 @@ func (p projGTBytesConstBytesOp) Init() {
 }
 
 type projGTBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1623,7 +1623,7 @@ func (p projGTBytesBytesOp) Init() {
 }
 
 type projGEBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1671,7 +1671,7 @@ func (p projGEBytesBytesConstOp) Init() {
 }
 
 type projGEBytesConstBytesOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1719,7 +1719,7 @@ func (p projGEBytesConstBytesOp) Init() {
 }
 
 type projGEBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1769,7 +1769,7 @@ func (p projGEBytesBytesOp) Init() {
 }
 
 type projPlusDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -1821,7 +1821,7 @@ func (p projPlusDecimalDecimalConstOp) Init() {
 }
 
 type projPlusDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -1873,7 +1873,7 @@ func (p projPlusDecimalConstDecimalOp) Init() {
 }
 
 type projPlusDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1927,7 +1927,7 @@ func (p projPlusDecimalDecimalOp) Init() {
 }
 
 type projMinusDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -1979,7 +1979,7 @@ func (p projMinusDecimalDecimalConstOp) Init() {
 }
 
 type projMinusDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2031,7 +2031,7 @@ func (p projMinusDecimalConstDecimalOp) Init() {
 }
 
 type projMinusDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2085,7 +2085,7 @@ func (p projMinusDecimalDecimalOp) Init() {
 }
 
 type projMultDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2137,7 +2137,7 @@ func (p projMultDecimalDecimalConstOp) Init() {
 }
 
 type projMultDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2189,7 +2189,7 @@ func (p projMultDecimalConstDecimalOp) Init() {
 }
 
 type projMultDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2243,7 +2243,7 @@ func (p projMultDecimalDecimalOp) Init() {
 }
 
 type projDivDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2295,7 +2295,7 @@ func (p projDivDecimalDecimalConstOp) Init() {
 }
 
 type projDivDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2347,7 +2347,7 @@ func (p projDivDecimalConstDecimalOp) Init() {
 }
 
 type projDivDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2401,7 +2401,7 @@ func (p projDivDecimalDecimalOp) Init() {
 }
 
 type projEQDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2449,7 +2449,7 @@ func (p projEQDecimalDecimalConstOp) Init() {
 }
 
 type projEQDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2497,7 +2497,7 @@ func (p projEQDecimalConstDecimalOp) Init() {
 }
 
 type projEQDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2547,7 +2547,7 @@ func (p projEQDecimalDecimalOp) Init() {
 }
 
 type projNEDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2595,7 +2595,7 @@ func (p projNEDecimalDecimalConstOp) Init() {
 }
 
 type projNEDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2643,7 +2643,7 @@ func (p projNEDecimalConstDecimalOp) Init() {
 }
 
 type projNEDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2693,7 +2693,7 @@ func (p projNEDecimalDecimalOp) Init() {
 }
 
 type projLTDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2741,7 +2741,7 @@ func (p projLTDecimalDecimalConstOp) Init() {
 }
 
 type projLTDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2789,7 +2789,7 @@ func (p projLTDecimalConstDecimalOp) Init() {
 }
 
 type projLTDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2839,7 +2839,7 @@ func (p projLTDecimalDecimalOp) Init() {
 }
 
 type projLEDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2887,7 +2887,7 @@ func (p projLEDecimalDecimalConstOp) Init() {
 }
 
 type projLEDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2935,7 +2935,7 @@ func (p projLEDecimalConstDecimalOp) Init() {
 }
 
 type projLEDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2985,7 +2985,7 @@ func (p projLEDecimalDecimalOp) Init() {
 }
 
 type projGTDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -3033,7 +3033,7 @@ func (p projGTDecimalDecimalConstOp) Init() {
 }
 
 type projGTDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -3081,7 +3081,7 @@ func (p projGTDecimalConstDecimalOp) Init() {
 }
 
 type projGTDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3131,7 +3131,7 @@ func (p projGTDecimalDecimalOp) Init() {
 }
 
 type projGEDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -3179,7 +3179,7 @@ func (p projGEDecimalDecimalConstOp) Init() {
 }
 
 type projGEDecimalConstDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -3227,7 +3227,7 @@ func (p projGEDecimalConstDecimalOp) Init() {
 }
 
 type projGEDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3277,7 +3277,7 @@ func (p projGEDecimalDecimalOp) Init() {
 }
 
 type projPlusInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3341,7 +3341,7 @@ func (p projPlusInt8Int8ConstOp) Init() {
 }
 
 type projPlusInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3405,7 +3405,7 @@ func (p projPlusInt8ConstInt8Op) Init() {
 }
 
 type projPlusInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3471,7 +3471,7 @@ func (p projPlusInt8Int8Op) Init() {
 }
 
 type projMinusInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3535,7 +3535,7 @@ func (p projMinusInt8Int8ConstOp) Init() {
 }
 
 type projMinusInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3599,7 +3599,7 @@ func (p projMinusInt8ConstInt8Op) Init() {
 }
 
 type projMinusInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3665,7 +3665,7 @@ func (p projMinusInt8Int8Op) Init() {
 }
 
 type projMultInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3743,7 +3743,7 @@ func (p projMultInt8Int8ConstOp) Init() {
 }
 
 type projMultInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3821,7 +3821,7 @@ func (p projMultInt8ConstInt8Op) Init() {
 }
 
 type projMultInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3901,7 +3901,7 @@ func (p projMultInt8Int8Op) Init() {
 }
 
 type projDivInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3971,7 +3971,7 @@ func (p projDivInt8Int8ConstOp) Init() {
 }
 
 type projDivInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4041,7 +4041,7 @@ func (p projDivInt8ConstInt8Op) Init() {
 }
 
 type projDivInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4113,7 +4113,7 @@ func (p projDivInt8Int8Op) Init() {
 }
 
 type projEQInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4161,7 +4161,7 @@ func (p projEQInt8Int8ConstOp) Init() {
 }
 
 type projEQInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4209,7 +4209,7 @@ func (p projEQInt8ConstInt8Op) Init() {
 }
 
 type projEQInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4259,7 +4259,7 @@ func (p projEQInt8Int8Op) Init() {
 }
 
 type projNEInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4307,7 +4307,7 @@ func (p projNEInt8Int8ConstOp) Init() {
 }
 
 type projNEInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4355,7 +4355,7 @@ func (p projNEInt8ConstInt8Op) Init() {
 }
 
 type projNEInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4405,7 +4405,7 @@ func (p projNEInt8Int8Op) Init() {
 }
 
 type projLTInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4453,7 +4453,7 @@ func (p projLTInt8Int8ConstOp) Init() {
 }
 
 type projLTInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4501,7 +4501,7 @@ func (p projLTInt8ConstInt8Op) Init() {
 }
 
 type projLTInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4551,7 +4551,7 @@ func (p projLTInt8Int8Op) Init() {
 }
 
 type projLEInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4599,7 +4599,7 @@ func (p projLEInt8Int8ConstOp) Init() {
 }
 
 type projLEInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4647,7 +4647,7 @@ func (p projLEInt8ConstInt8Op) Init() {
 }
 
 type projLEInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4697,7 +4697,7 @@ func (p projLEInt8Int8Op) Init() {
 }
 
 type projGTInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4745,7 +4745,7 @@ func (p projGTInt8Int8ConstOp) Init() {
 }
 
 type projGTInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4793,7 +4793,7 @@ func (p projGTInt8ConstInt8Op) Init() {
 }
 
 type projGTInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4843,7 +4843,7 @@ func (p projGTInt8Int8Op) Init() {
 }
 
 type projGEInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4891,7 +4891,7 @@ func (p projGEInt8Int8ConstOp) Init() {
 }
 
 type projGEInt8ConstInt8Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4939,7 +4939,7 @@ func (p projGEInt8ConstInt8Op) Init() {
 }
 
 type projGEInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4989,7 +4989,7 @@ func (p projGEInt8Int8Op) Init() {
 }
 
 type projPlusInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5053,7 +5053,7 @@ func (p projPlusInt16Int16ConstOp) Init() {
 }
 
 type projPlusInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5117,7 +5117,7 @@ func (p projPlusInt16ConstInt16Op) Init() {
 }
 
 type projPlusInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5183,7 +5183,7 @@ func (p projPlusInt16Int16Op) Init() {
 }
 
 type projMinusInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5247,7 +5247,7 @@ func (p projMinusInt16Int16ConstOp) Init() {
 }
 
 type projMinusInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5311,7 +5311,7 @@ func (p projMinusInt16ConstInt16Op) Init() {
 }
 
 type projMinusInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5377,7 +5377,7 @@ func (p projMinusInt16Int16Op) Init() {
 }
 
 type projMultInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5455,7 +5455,7 @@ func (p projMultInt16Int16ConstOp) Init() {
 }
 
 type projMultInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5533,7 +5533,7 @@ func (p projMultInt16ConstInt16Op) Init() {
 }
 
 type projMultInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5613,7 +5613,7 @@ func (p projMultInt16Int16Op) Init() {
 }
 
 type projDivInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5683,7 +5683,7 @@ func (p projDivInt16Int16ConstOp) Init() {
 }
 
 type projDivInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5753,7 +5753,7 @@ func (p projDivInt16ConstInt16Op) Init() {
 }
 
 type projDivInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5825,7 +5825,7 @@ func (p projDivInt16Int16Op) Init() {
 }
 
 type projEQInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5873,7 +5873,7 @@ func (p projEQInt16Int16ConstOp) Init() {
 }
 
 type projEQInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5921,7 +5921,7 @@ func (p projEQInt16ConstInt16Op) Init() {
 }
 
 type projEQInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5971,7 +5971,7 @@ func (p projEQInt16Int16Op) Init() {
 }
 
 type projNEInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6019,7 +6019,7 @@ func (p projNEInt16Int16ConstOp) Init() {
 }
 
 type projNEInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6067,7 +6067,7 @@ func (p projNEInt16ConstInt16Op) Init() {
 }
 
 type projNEInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6117,7 +6117,7 @@ func (p projNEInt16Int16Op) Init() {
 }
 
 type projLTInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6165,7 +6165,7 @@ func (p projLTInt16Int16ConstOp) Init() {
 }
 
 type projLTInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6213,7 +6213,7 @@ func (p projLTInt16ConstInt16Op) Init() {
 }
 
 type projLTInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6263,7 +6263,7 @@ func (p projLTInt16Int16Op) Init() {
 }
 
 type projLEInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6311,7 +6311,7 @@ func (p projLEInt16Int16ConstOp) Init() {
 }
 
 type projLEInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6359,7 +6359,7 @@ func (p projLEInt16ConstInt16Op) Init() {
 }
 
 type projLEInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6409,7 +6409,7 @@ func (p projLEInt16Int16Op) Init() {
 }
 
 type projGTInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6457,7 +6457,7 @@ func (p projGTInt16Int16ConstOp) Init() {
 }
 
 type projGTInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6505,7 +6505,7 @@ func (p projGTInt16ConstInt16Op) Init() {
 }
 
 type projGTInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6555,7 +6555,7 @@ func (p projGTInt16Int16Op) Init() {
 }
 
 type projGEInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6603,7 +6603,7 @@ func (p projGEInt16Int16ConstOp) Init() {
 }
 
 type projGEInt16ConstInt16Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -6651,7 +6651,7 @@ func (p projGEInt16ConstInt16Op) Init() {
 }
 
 type projGEInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6701,7 +6701,7 @@ func (p projGEInt16Int16Op) Init() {
 }
 
 type projPlusInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -6765,7 +6765,7 @@ func (p projPlusInt32Int32ConstOp) Init() {
 }
 
 type projPlusInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -6829,7 +6829,7 @@ func (p projPlusInt32ConstInt32Op) Init() {
 }
 
 type projPlusInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6895,7 +6895,7 @@ func (p projPlusInt32Int32Op) Init() {
 }
 
 type projMinusInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -6959,7 +6959,7 @@ func (p projMinusInt32Int32ConstOp) Init() {
 }
 
 type projMinusInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7023,7 +7023,7 @@ func (p projMinusInt32ConstInt32Op) Init() {
 }
 
 type projMinusInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7089,7 +7089,7 @@ func (p projMinusInt32Int32Op) Init() {
 }
 
 type projMultInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7167,7 +7167,7 @@ func (p projMultInt32Int32ConstOp) Init() {
 }
 
 type projMultInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7245,7 +7245,7 @@ func (p projMultInt32ConstInt32Op) Init() {
 }
 
 type projMultInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7325,7 +7325,7 @@ func (p projMultInt32Int32Op) Init() {
 }
 
 type projDivInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7395,7 +7395,7 @@ func (p projDivInt32Int32ConstOp) Init() {
 }
 
 type projDivInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7465,7 +7465,7 @@ func (p projDivInt32ConstInt32Op) Init() {
 }
 
 type projDivInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7537,7 +7537,7 @@ func (p projDivInt32Int32Op) Init() {
 }
 
 type projEQInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7585,7 +7585,7 @@ func (p projEQInt32Int32ConstOp) Init() {
 }
 
 type projEQInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7633,7 +7633,7 @@ func (p projEQInt32ConstInt32Op) Init() {
 }
 
 type projEQInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7683,7 +7683,7 @@ func (p projEQInt32Int32Op) Init() {
 }
 
 type projNEInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7731,7 +7731,7 @@ func (p projNEInt32Int32ConstOp) Init() {
 }
 
 type projNEInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7779,7 +7779,7 @@ func (p projNEInt32ConstInt32Op) Init() {
 }
 
 type projNEInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7829,7 +7829,7 @@ func (p projNEInt32Int32Op) Init() {
 }
 
 type projLTInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7877,7 +7877,7 @@ func (p projLTInt32Int32ConstOp) Init() {
 }
 
 type projLTInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -7925,7 +7925,7 @@ func (p projLTInt32ConstInt32Op) Init() {
 }
 
 type projLTInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7975,7 +7975,7 @@ func (p projLTInt32Int32Op) Init() {
 }
 
 type projLEInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -8023,7 +8023,7 @@ func (p projLEInt32Int32ConstOp) Init() {
 }
 
 type projLEInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -8071,7 +8071,7 @@ func (p projLEInt32ConstInt32Op) Init() {
 }
 
 type projLEInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8121,7 +8121,7 @@ func (p projLEInt32Int32Op) Init() {
 }
 
 type projGTInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -8169,7 +8169,7 @@ func (p projGTInt32Int32ConstOp) Init() {
 }
 
 type projGTInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -8217,7 +8217,7 @@ func (p projGTInt32ConstInt32Op) Init() {
 }
 
 type projGTInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8267,7 +8267,7 @@ func (p projGTInt32Int32Op) Init() {
 }
 
 type projGEInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -8315,7 +8315,7 @@ func (p projGEInt32Int32ConstOp) Init() {
 }
 
 type projGEInt32ConstInt32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -8363,7 +8363,7 @@ func (p projGEInt32ConstInt32Op) Init() {
 }
 
 type projGEInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8413,7 +8413,7 @@ func (p projGEInt32Int32Op) Init() {
 }
 
 type projPlusInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -8477,7 +8477,7 @@ func (p projPlusInt64Int64ConstOp) Init() {
 }
 
 type projPlusInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -8541,7 +8541,7 @@ func (p projPlusInt64ConstInt64Op) Init() {
 }
 
 type projPlusInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8607,7 +8607,7 @@ func (p projPlusInt64Int64Op) Init() {
 }
 
 type projMinusInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -8671,7 +8671,7 @@ func (p projMinusInt64Int64ConstOp) Init() {
 }
 
 type projMinusInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -8735,7 +8735,7 @@ func (p projMinusInt64ConstInt64Op) Init() {
 }
 
 type projMinusInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8801,7 +8801,7 @@ func (p projMinusInt64Int64Op) Init() {
 }
 
 type projMultInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -8879,7 +8879,7 @@ func (p projMultInt64Int64ConstOp) Init() {
 }
 
 type projMultInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -8957,7 +8957,7 @@ func (p projMultInt64ConstInt64Op) Init() {
 }
 
 type projMultInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9037,7 +9037,7 @@ func (p projMultInt64Int64Op) Init() {
 }
 
 type projDivInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9107,7 +9107,7 @@ func (p projDivInt64Int64ConstOp) Init() {
 }
 
 type projDivInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9177,7 +9177,7 @@ func (p projDivInt64ConstInt64Op) Init() {
 }
 
 type projDivInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9249,7 +9249,7 @@ func (p projDivInt64Int64Op) Init() {
 }
 
 type projEQInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9297,7 +9297,7 @@ func (p projEQInt64Int64ConstOp) Init() {
 }
 
 type projEQInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9345,7 +9345,7 @@ func (p projEQInt64ConstInt64Op) Init() {
 }
 
 type projEQInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9395,7 +9395,7 @@ func (p projEQInt64Int64Op) Init() {
 }
 
 type projNEInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9443,7 +9443,7 @@ func (p projNEInt64Int64ConstOp) Init() {
 }
 
 type projNEInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9491,7 +9491,7 @@ func (p projNEInt64ConstInt64Op) Init() {
 }
 
 type projNEInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9541,7 +9541,7 @@ func (p projNEInt64Int64Op) Init() {
 }
 
 type projLTInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9589,7 +9589,7 @@ func (p projLTInt64Int64ConstOp) Init() {
 }
 
 type projLTInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9637,7 +9637,7 @@ func (p projLTInt64ConstInt64Op) Init() {
 }
 
 type projLTInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9687,7 +9687,7 @@ func (p projLTInt64Int64Op) Init() {
 }
 
 type projLEInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9735,7 +9735,7 @@ func (p projLEInt64Int64ConstOp) Init() {
 }
 
 type projLEInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9783,7 +9783,7 @@ func (p projLEInt64ConstInt64Op) Init() {
 }
 
 type projLEInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9833,7 +9833,7 @@ func (p projLEInt64Int64Op) Init() {
 }
 
 type projGTInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9881,7 +9881,7 @@ func (p projGTInt64Int64ConstOp) Init() {
 }
 
 type projGTInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -9929,7 +9929,7 @@ func (p projGTInt64ConstInt64Op) Init() {
 }
 
 type projGTInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9979,7 +9979,7 @@ func (p projGTInt64Int64Op) Init() {
 }
 
 type projGEInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -10027,7 +10027,7 @@ func (p projGEInt64Int64ConstOp) Init() {
 }
 
 type projGEInt64ConstInt64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -10075,7 +10075,7 @@ func (p projGEInt64ConstInt64Op) Init() {
 }
 
 type projGEInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -10125,7 +10125,7 @@ func (p projGEInt64Int64Op) Init() {
 }
 
 type projPlusFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10173,7 +10173,7 @@ func (p projPlusFloat32Float32ConstOp) Init() {
 }
 
 type projPlusFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10221,7 +10221,7 @@ func (p projPlusFloat32ConstFloat32Op) Init() {
 }
 
 type projPlusFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -10271,7 +10271,7 @@ func (p projPlusFloat32Float32Op) Init() {
 }
 
 type projMinusFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10319,7 +10319,7 @@ func (p projMinusFloat32Float32ConstOp) Init() {
 }
 
 type projMinusFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10367,7 +10367,7 @@ func (p projMinusFloat32ConstFloat32Op) Init() {
 }
 
 type projMinusFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -10417,7 +10417,7 @@ func (p projMinusFloat32Float32Op) Init() {
 }
 
 type projMultFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10465,7 +10465,7 @@ func (p projMultFloat32Float32ConstOp) Init() {
 }
 
 type projMultFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10513,7 +10513,7 @@ func (p projMultFloat32ConstFloat32Op) Init() {
 }
 
 type projMultFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -10563,7 +10563,7 @@ func (p projMultFloat32Float32Op) Init() {
 }
 
 type projDivFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10611,7 +10611,7 @@ func (p projDivFloat32Float32ConstOp) Init() {
 }
 
 type projDivFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10659,7 +10659,7 @@ func (p projDivFloat32ConstFloat32Op) Init() {
 }
 
 type projDivFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -10709,7 +10709,7 @@ func (p projDivFloat32Float32Op) Init() {
 }
 
 type projEQFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10757,7 +10757,7 @@ func (p projEQFloat32Float32ConstOp) Init() {
 }
 
 type projEQFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10805,7 +10805,7 @@ func (p projEQFloat32ConstFloat32Op) Init() {
 }
 
 type projEQFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -10855,7 +10855,7 @@ func (p projEQFloat32Float32Op) Init() {
 }
 
 type projNEFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10903,7 +10903,7 @@ func (p projNEFloat32Float32ConstOp) Init() {
 }
 
 type projNEFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -10951,7 +10951,7 @@ func (p projNEFloat32ConstFloat32Op) Init() {
 }
 
 type projNEFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11001,7 +11001,7 @@ func (p projNEFloat32Float32Op) Init() {
 }
 
 type projLTFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11049,7 +11049,7 @@ func (p projLTFloat32Float32ConstOp) Init() {
 }
 
 type projLTFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11097,7 +11097,7 @@ func (p projLTFloat32ConstFloat32Op) Init() {
 }
 
 type projLTFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11147,7 +11147,7 @@ func (p projLTFloat32Float32Op) Init() {
 }
 
 type projLEFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11195,7 +11195,7 @@ func (p projLEFloat32Float32ConstOp) Init() {
 }
 
 type projLEFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11243,7 +11243,7 @@ func (p projLEFloat32ConstFloat32Op) Init() {
 }
 
 type projLEFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11293,7 +11293,7 @@ func (p projLEFloat32Float32Op) Init() {
 }
 
 type projGTFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11341,7 +11341,7 @@ func (p projGTFloat32Float32ConstOp) Init() {
 }
 
 type projGTFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11389,7 +11389,7 @@ func (p projGTFloat32ConstFloat32Op) Init() {
 }
 
 type projGTFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11439,7 +11439,7 @@ func (p projGTFloat32Float32Op) Init() {
 }
 
 type projGEFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11487,7 +11487,7 @@ func (p projGEFloat32Float32ConstOp) Init() {
 }
 
 type projGEFloat32ConstFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -11535,7 +11535,7 @@ func (p projGEFloat32ConstFloat32Op) Init() {
 }
 
 type projGEFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11585,7 +11585,7 @@ func (p projGEFloat32Float32Op) Init() {
 }
 
 type projPlusFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -11633,7 +11633,7 @@ func (p projPlusFloat64Float64ConstOp) Init() {
 }
 
 type projPlusFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -11681,7 +11681,7 @@ func (p projPlusFloat64ConstFloat64Op) Init() {
 }
 
 type projPlusFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11731,7 +11731,7 @@ func (p projPlusFloat64Float64Op) Init() {
 }
 
 type projMinusFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -11779,7 +11779,7 @@ func (p projMinusFloat64Float64ConstOp) Init() {
 }
 
 type projMinusFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -11827,7 +11827,7 @@ func (p projMinusFloat64ConstFloat64Op) Init() {
 }
 
 type projMinusFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -11877,7 +11877,7 @@ func (p projMinusFloat64Float64Op) Init() {
 }
 
 type projMultFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -11925,7 +11925,7 @@ func (p projMultFloat64Float64ConstOp) Init() {
 }
 
 type projMultFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -11973,7 +11973,7 @@ func (p projMultFloat64ConstFloat64Op) Init() {
 }
 
 type projMultFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12023,7 +12023,7 @@ func (p projMultFloat64Float64Op) Init() {
 }
 
 type projDivFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12071,7 +12071,7 @@ func (p projDivFloat64Float64ConstOp) Init() {
 }
 
 type projDivFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12119,7 +12119,7 @@ func (p projDivFloat64ConstFloat64Op) Init() {
 }
 
 type projDivFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12169,7 +12169,7 @@ func (p projDivFloat64Float64Op) Init() {
 }
 
 type projEQFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12217,7 +12217,7 @@ func (p projEQFloat64Float64ConstOp) Init() {
 }
 
 type projEQFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12265,7 +12265,7 @@ func (p projEQFloat64ConstFloat64Op) Init() {
 }
 
 type projEQFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12315,7 +12315,7 @@ func (p projEQFloat64Float64Op) Init() {
 }
 
 type projNEFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12363,7 +12363,7 @@ func (p projNEFloat64Float64ConstOp) Init() {
 }
 
 type projNEFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12411,7 +12411,7 @@ func (p projNEFloat64ConstFloat64Op) Init() {
 }
 
 type projNEFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12461,7 +12461,7 @@ func (p projNEFloat64Float64Op) Init() {
 }
 
 type projLTFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12509,7 +12509,7 @@ func (p projLTFloat64Float64ConstOp) Init() {
 }
 
 type projLTFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12557,7 +12557,7 @@ func (p projLTFloat64ConstFloat64Op) Init() {
 }
 
 type projLTFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12607,7 +12607,7 @@ func (p projLTFloat64Float64Op) Init() {
 }
 
 type projLEFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12655,7 +12655,7 @@ func (p projLEFloat64Float64ConstOp) Init() {
 }
 
 type projLEFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12703,7 +12703,7 @@ func (p projLEFloat64ConstFloat64Op) Init() {
 }
 
 type projLEFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12753,7 +12753,7 @@ func (p projLEFloat64Float64Op) Init() {
 }
 
 type projGTFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12801,7 +12801,7 @@ func (p projGTFloat64Float64ConstOp) Init() {
 }
 
 type projGTFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12849,7 +12849,7 @@ func (p projGTFloat64ConstFloat64Op) Init() {
 }
 
 type projGTFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -12899,7 +12899,7 @@ func (p projGTFloat64Float64Op) Init() {
 }
 
 type projGEFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12947,7 +12947,7 @@ func (p projGEFloat64Float64ConstOp) Init() {
 }
 
 type projGEFloat64ConstFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -12995,7 +12995,7 @@ func (p projGEFloat64ConstFloat64Op) Init() {
 }
 
 type projGEFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -13073,50 +13073,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQBoolBoolConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEBoolBoolConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTBoolBoolConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEBoolBoolConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTBoolBoolConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEBoolBoolConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13139,50 +13139,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQBytesBytesConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEBytesBytesConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTBytesBytesConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEBytesBytesConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTBytesBytesConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEBytesBytesConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13199,34 +13199,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13237,50 +13237,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEDecimalDecimalConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13297,34 +13297,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13335,50 +13335,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt8Int8ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13395,34 +13395,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13433,50 +13433,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt16Int16ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13493,34 +13493,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13531,50 +13531,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt32Int32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13591,34 +13591,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13629,50 +13629,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt64Int64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13689,34 +13689,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13727,50 +13727,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEFloat32Float32ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13787,34 +13787,34 @@ func GetProjectionRConstOperator(
 
 			case tree.Plus:
 				return &projPlusFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13825,50 +13825,50 @@ func GetProjectionRConstOperator(
 
 			case tree.EQ:
 				return &projEQFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEFloat64Float64ConstOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13912,50 +13912,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQBoolConstBoolOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEBoolConstBoolOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTBoolConstBoolOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEBoolConstBoolOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTBoolConstBoolOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEBoolConstBoolOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(bool),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -13978,50 +13978,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQBytesConstBytesOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEBytesConstBytesOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTBytesConstBytesOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEBytesConstBytesOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTBytesConstBytesOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEBytesConstBytesOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.([]byte),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14038,34 +14038,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14076,50 +14076,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEDecimalConstDecimalOp{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(apd.Decimal),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14136,34 +14136,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14174,50 +14174,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt8ConstInt8Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int8),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14234,34 +14234,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14272,50 +14272,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt16ConstInt16Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int16),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14332,34 +14332,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14370,50 +14370,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt32ConstInt32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14430,34 +14430,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14468,50 +14468,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt64ConstInt64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(int64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14528,34 +14528,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14566,50 +14566,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEFloat32ConstFloat32Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float32),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14626,34 +14626,34 @@ func GetProjectionLConstOperator(
 
 			case tree.Plus:
 				return &projPlusFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14664,50 +14664,50 @@ func GetProjectionLConstOperator(
 
 			case tree.EQ:
 				return &projEQFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEFloat64ConstFloat64Op{
-					input:     input,
-					colIdx:    colIdx,
-					constArg:  c.(float64),
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14747,50 +14747,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQBoolBoolOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEBoolBoolOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTBoolBoolOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEBoolBoolOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTBoolBoolOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEBoolBoolOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14813,50 +14813,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQBytesBytesOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEBytesBytesOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTBytesBytesOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEBytesBytesOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTBytesBytesOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEBytesBytesOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14873,34 +14873,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14911,50 +14911,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEDecimalDecimalOp{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -14971,34 +14971,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15009,50 +15009,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt8Int8Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15069,34 +15069,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15107,50 +15107,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt16Int16Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15167,34 +15167,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15205,50 +15205,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt32Int32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15265,34 +15265,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15303,50 +15303,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEInt64Int64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15363,34 +15363,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15401,50 +15401,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEFloat32Float32Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15461,34 +15461,34 @@ func GetProjectionOperator(
 
 			case tree.Plus:
 				return &projPlusFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Minus:
 				return &projMinusFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Mult:
 				return &projMultFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.Div:
 				return &projDivFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:
@@ -15499,50 +15499,50 @@ func GetProjectionOperator(
 
 			case tree.EQ:
 				return &projEQFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.NE:
 				return &projNEFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LT:
 				return &projLTFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.LE:
 				return &projLEFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GT:
 				return &projGTFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			case tree.GE:
 				return &projGEFloat64Float64Op{
-					input:     input,
-					col1Idx:   col1Idx,
-					col2Idx:   col2Idx,
-					outputIdx: outputIdx,
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+					outputIdx:    outputIdx,
 				}, nil
 
 			default:

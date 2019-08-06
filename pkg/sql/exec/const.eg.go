@@ -24,66 +24,66 @@ func NewConstOp(input Operator, t types.T, constVal interface{}, outputIdx int) 
 	switch t {
 	case types.Bool:
 		return &constBoolOp{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(bool),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(bool),
 		}, nil
 	case types.Bytes:
 		return &constBytesOp{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.([]byte),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.([]byte),
 		}, nil
 	case types.Decimal:
 		return &constDecimalOp{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(apd.Decimal),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(apd.Decimal),
 		}, nil
 	case types.Int8:
 		return &constInt8Op{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(int8),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(int8),
 		}, nil
 	case types.Int16:
 		return &constInt16Op{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(int16),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(int16),
 		}, nil
 	case types.Int32:
 		return &constInt32Op{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(int32),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(int32),
 		}, nil
 	case types.Int64:
 		return &constInt64Op{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(int64),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(int64),
 		}, nil
 	case types.Float32:
 		return &constFloat32Op{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(float32),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(float32),
 		}, nil
 	case types.Float64:
 		return &constFloat64Op{
-			input:     input,
-			outputIdx: outputIdx,
-			typ:       t,
-			constVal:  constVal.(float64),
+			OneInputNode: NewOneInputNode(input),
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(float64),
 		}, nil
 	default:
 		return nil, errors.Errorf("unsupported const type %s", t)
@@ -91,7 +91,7 @@ func NewConstOp(input Operator, t types.T, constVal interface{}, outputIdx int) 
 }
 
 type constBoolOp struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -126,7 +126,7 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 }
 
 type constBytesOp struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -161,7 +161,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 }
 
 type constDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -196,7 +196,7 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 type constInt8Op struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -231,7 +231,7 @@ func (c constInt8Op) Next(ctx context.Context) coldata.Batch {
 }
 
 type constInt16Op struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -266,7 +266,7 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 }
 
 type constInt32Op struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -301,7 +301,7 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 type constInt64Op struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -336,7 +336,7 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 }
 
 type constFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -371,7 +371,7 @@ func (c constFloat32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 type constFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	typ       types.T
 	outputIdx int
@@ -409,13 +409,13 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 // value at index outputIdx.
 func NewConstNullOp(input Operator, outputIdx int) Operator {
 	return &constNullOp{
-		input:     input,
-		outputIdx: outputIdx,
+		OneInputNode: NewOneInputNode(input),
+		outputIdx:    outputIdx,
 	}
 }
 
 type constNullOp struct {
-	input     Operator
+	OneInputNode
 	outputIdx int
 }
 

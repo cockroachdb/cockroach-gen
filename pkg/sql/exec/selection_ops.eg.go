@@ -16,7 +16,7 @@ import (
 )
 
 type selEQBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -99,7 +99,7 @@ func (p selEQBoolBoolConstOp) Init() {
 }
 
 type selEQBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -187,7 +187,7 @@ func (p selEQBoolBoolOp) Init() {
 }
 
 type selNEBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -270,7 +270,7 @@ func (p selNEBoolBoolConstOp) Init() {
 }
 
 type selNEBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -358,7 +358,7 @@ func (p selNEBoolBoolOp) Init() {
 }
 
 type selLTBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -441,7 +441,7 @@ func (p selLTBoolBoolConstOp) Init() {
 }
 
 type selLTBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -529,7 +529,7 @@ func (p selLTBoolBoolOp) Init() {
 }
 
 type selLEBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -612,7 +612,7 @@ func (p selLEBoolBoolConstOp) Init() {
 }
 
 type selLEBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -700,7 +700,7 @@ func (p selLEBoolBoolOp) Init() {
 }
 
 type selGTBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -783,7 +783,7 @@ func (p selGTBoolBoolConstOp) Init() {
 }
 
 type selGTBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -871,7 +871,7 @@ func (p selGTBoolBoolOp) Init() {
 }
 
 type selGEBoolBoolConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg bool
@@ -954,7 +954,7 @@ func (p selGEBoolBoolConstOp) Init() {
 }
 
 type selGEBoolBoolOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1042,7 +1042,7 @@ func (p selGEBoolBoolOp) Init() {
 }
 
 type selEQBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1125,7 +1125,7 @@ func (p selEQBytesBytesConstOp) Init() {
 }
 
 type selEQBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1213,7 +1213,7 @@ func (p selEQBytesBytesOp) Init() {
 }
 
 type selNEBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1296,7 +1296,7 @@ func (p selNEBytesBytesConstOp) Init() {
 }
 
 type selNEBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1384,7 +1384,7 @@ func (p selNEBytesBytesOp) Init() {
 }
 
 type selLTBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1467,7 +1467,7 @@ func (p selLTBytesBytesConstOp) Init() {
 }
 
 type selLTBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1555,7 +1555,7 @@ func (p selLTBytesBytesOp) Init() {
 }
 
 type selLEBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1638,7 +1638,7 @@ func (p selLEBytesBytesConstOp) Init() {
 }
 
 type selLEBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1726,7 +1726,7 @@ func (p selLEBytesBytesOp) Init() {
 }
 
 type selGTBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1809,7 +1809,7 @@ func (p selGTBytesBytesConstOp) Init() {
 }
 
 type selGTBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -1897,7 +1897,7 @@ func (p selGTBytesBytesOp) Init() {
 }
 
 type selGEBytesBytesConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg []byte
@@ -1980,7 +1980,7 @@ func (p selGEBytesBytesConstOp) Init() {
 }
 
 type selGEBytesBytesOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2068,7 +2068,7 @@ func (p selGEBytesBytesOp) Init() {
 }
 
 type selEQDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2151,7 +2151,7 @@ func (p selEQDecimalDecimalConstOp) Init() {
 }
 
 type selEQDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2239,7 +2239,7 @@ func (p selEQDecimalDecimalOp) Init() {
 }
 
 type selNEDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2322,7 +2322,7 @@ func (p selNEDecimalDecimalConstOp) Init() {
 }
 
 type selNEDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2410,7 +2410,7 @@ func (p selNEDecimalDecimalOp) Init() {
 }
 
 type selLTDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2493,7 +2493,7 @@ func (p selLTDecimalDecimalConstOp) Init() {
 }
 
 type selLTDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2581,7 +2581,7 @@ func (p selLTDecimalDecimalOp) Init() {
 }
 
 type selLEDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2664,7 +2664,7 @@ func (p selLEDecimalDecimalConstOp) Init() {
 }
 
 type selLEDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2752,7 +2752,7 @@ func (p selLEDecimalDecimalOp) Init() {
 }
 
 type selGTDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -2835,7 +2835,7 @@ func (p selGTDecimalDecimalConstOp) Init() {
 }
 
 type selGTDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -2923,7 +2923,7 @@ func (p selGTDecimalDecimalOp) Init() {
 }
 
 type selGEDecimalDecimalConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg apd.Decimal
@@ -3006,7 +3006,7 @@ func (p selGEDecimalDecimalConstOp) Init() {
 }
 
 type selGEDecimalDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3094,7 +3094,7 @@ func (p selGEDecimalDecimalOp) Init() {
 }
 
 type selEQInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3177,7 +3177,7 @@ func (p selEQInt8Int8ConstOp) Init() {
 }
 
 type selEQInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3265,7 +3265,7 @@ func (p selEQInt8Int8Op) Init() {
 }
 
 type selNEInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3348,7 +3348,7 @@ func (p selNEInt8Int8ConstOp) Init() {
 }
 
 type selNEInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3436,7 +3436,7 @@ func (p selNEInt8Int8Op) Init() {
 }
 
 type selLTInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3519,7 +3519,7 @@ func (p selLTInt8Int8ConstOp) Init() {
 }
 
 type selLTInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3607,7 +3607,7 @@ func (p selLTInt8Int8Op) Init() {
 }
 
 type selLEInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3690,7 +3690,7 @@ func (p selLEInt8Int8ConstOp) Init() {
 }
 
 type selLEInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3778,7 +3778,7 @@ func (p selLEInt8Int8Op) Init() {
 }
 
 type selGTInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -3861,7 +3861,7 @@ func (p selGTInt8Int8ConstOp) Init() {
 }
 
 type selGTInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -3949,7 +3949,7 @@ func (p selGTInt8Int8Op) Init() {
 }
 
 type selGEInt8Int8ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int8
@@ -4032,7 +4032,7 @@ func (p selGEInt8Int8ConstOp) Init() {
 }
 
 type selGEInt8Int8Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4120,7 +4120,7 @@ func (p selGEInt8Int8Op) Init() {
 }
 
 type selEQInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -4203,7 +4203,7 @@ func (p selEQInt16Int16ConstOp) Init() {
 }
 
 type selEQInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4291,7 +4291,7 @@ func (p selEQInt16Int16Op) Init() {
 }
 
 type selNEInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -4374,7 +4374,7 @@ func (p selNEInt16Int16ConstOp) Init() {
 }
 
 type selNEInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4462,7 +4462,7 @@ func (p selNEInt16Int16Op) Init() {
 }
 
 type selLTInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -4545,7 +4545,7 @@ func (p selLTInt16Int16ConstOp) Init() {
 }
 
 type selLTInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4633,7 +4633,7 @@ func (p selLTInt16Int16Op) Init() {
 }
 
 type selLEInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -4716,7 +4716,7 @@ func (p selLEInt16Int16ConstOp) Init() {
 }
 
 type selLEInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4804,7 +4804,7 @@ func (p selLEInt16Int16Op) Init() {
 }
 
 type selGTInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -4887,7 +4887,7 @@ func (p selGTInt16Int16ConstOp) Init() {
 }
 
 type selGTInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -4975,7 +4975,7 @@ func (p selGTInt16Int16Op) Init() {
 }
 
 type selGEInt16Int16ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int16
@@ -5058,7 +5058,7 @@ func (p selGEInt16Int16ConstOp) Init() {
 }
 
 type selGEInt16Int16Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5146,7 +5146,7 @@ func (p selGEInt16Int16Op) Init() {
 }
 
 type selEQInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -5229,7 +5229,7 @@ func (p selEQInt32Int32ConstOp) Init() {
 }
 
 type selEQInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5317,7 +5317,7 @@ func (p selEQInt32Int32Op) Init() {
 }
 
 type selNEInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -5400,7 +5400,7 @@ func (p selNEInt32Int32ConstOp) Init() {
 }
 
 type selNEInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5488,7 +5488,7 @@ func (p selNEInt32Int32Op) Init() {
 }
 
 type selLTInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -5571,7 +5571,7 @@ func (p selLTInt32Int32ConstOp) Init() {
 }
 
 type selLTInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5659,7 +5659,7 @@ func (p selLTInt32Int32Op) Init() {
 }
 
 type selLEInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -5742,7 +5742,7 @@ func (p selLEInt32Int32ConstOp) Init() {
 }
 
 type selLEInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -5830,7 +5830,7 @@ func (p selLEInt32Int32Op) Init() {
 }
 
 type selGTInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -5913,7 +5913,7 @@ func (p selGTInt32Int32ConstOp) Init() {
 }
 
 type selGTInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6001,7 +6001,7 @@ func (p selGTInt32Int32Op) Init() {
 }
 
 type selGEInt32Int32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int32
@@ -6084,7 +6084,7 @@ func (p selGEInt32Int32ConstOp) Init() {
 }
 
 type selGEInt32Int32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6172,7 +6172,7 @@ func (p selGEInt32Int32Op) Init() {
 }
 
 type selEQInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -6255,7 +6255,7 @@ func (p selEQInt64Int64ConstOp) Init() {
 }
 
 type selEQInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6343,7 +6343,7 @@ func (p selEQInt64Int64Op) Init() {
 }
 
 type selNEInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -6426,7 +6426,7 @@ func (p selNEInt64Int64ConstOp) Init() {
 }
 
 type selNEInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6514,7 +6514,7 @@ func (p selNEInt64Int64Op) Init() {
 }
 
 type selLTInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -6597,7 +6597,7 @@ func (p selLTInt64Int64ConstOp) Init() {
 }
 
 type selLTInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6685,7 +6685,7 @@ func (p selLTInt64Int64Op) Init() {
 }
 
 type selLEInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -6768,7 +6768,7 @@ func (p selLEInt64Int64ConstOp) Init() {
 }
 
 type selLEInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -6856,7 +6856,7 @@ func (p selLEInt64Int64Op) Init() {
 }
 
 type selGTInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -6939,7 +6939,7 @@ func (p selGTInt64Int64ConstOp) Init() {
 }
 
 type selGTInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7027,7 +7027,7 @@ func (p selGTInt64Int64Op) Init() {
 }
 
 type selGEInt64Int64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg int64
@@ -7110,7 +7110,7 @@ func (p selGEInt64Int64ConstOp) Init() {
 }
 
 type selGEInt64Int64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7198,7 +7198,7 @@ func (p selGEInt64Int64Op) Init() {
 }
 
 type selEQFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -7281,7 +7281,7 @@ func (p selEQFloat32Float32ConstOp) Init() {
 }
 
 type selEQFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7369,7 +7369,7 @@ func (p selEQFloat32Float32Op) Init() {
 }
 
 type selNEFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -7452,7 +7452,7 @@ func (p selNEFloat32Float32ConstOp) Init() {
 }
 
 type selNEFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7540,7 +7540,7 @@ func (p selNEFloat32Float32Op) Init() {
 }
 
 type selLTFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -7623,7 +7623,7 @@ func (p selLTFloat32Float32ConstOp) Init() {
 }
 
 type selLTFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7711,7 +7711,7 @@ func (p selLTFloat32Float32Op) Init() {
 }
 
 type selLEFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -7794,7 +7794,7 @@ func (p selLEFloat32Float32ConstOp) Init() {
 }
 
 type selLEFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -7882,7 +7882,7 @@ func (p selLEFloat32Float32Op) Init() {
 }
 
 type selGTFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -7965,7 +7965,7 @@ func (p selGTFloat32Float32ConstOp) Init() {
 }
 
 type selGTFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8053,7 +8053,7 @@ func (p selGTFloat32Float32Op) Init() {
 }
 
 type selGEFloat32Float32ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float32
@@ -8136,7 +8136,7 @@ func (p selGEFloat32Float32ConstOp) Init() {
 }
 
 type selGEFloat32Float32Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8224,7 +8224,7 @@ func (p selGEFloat32Float32Op) Init() {
 }
 
 type selEQFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -8307,7 +8307,7 @@ func (p selEQFloat64Float64ConstOp) Init() {
 }
 
 type selEQFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8395,7 +8395,7 @@ func (p selEQFloat64Float64Op) Init() {
 }
 
 type selNEFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -8478,7 +8478,7 @@ func (p selNEFloat64Float64ConstOp) Init() {
 }
 
 type selNEFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8566,7 +8566,7 @@ func (p selNEFloat64Float64Op) Init() {
 }
 
 type selLTFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -8649,7 +8649,7 @@ func (p selLTFloat64Float64ConstOp) Init() {
 }
 
 type selLTFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8737,7 +8737,7 @@ func (p selLTFloat64Float64Op) Init() {
 }
 
 type selLEFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -8820,7 +8820,7 @@ func (p selLEFloat64Float64ConstOp) Init() {
 }
 
 type selLEFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -8908,7 +8908,7 @@ func (p selLEFloat64Float64Op) Init() {
 }
 
 type selGTFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -8991,7 +8991,7 @@ func (p selGTFloat64Float64ConstOp) Init() {
 }
 
 type selGTFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9079,7 +9079,7 @@ func (p selGTFloat64Float64Op) Init() {
 }
 
 type selGEFloat64Float64ConstOp struct {
-	input Operator
+	OneInputNode
 
 	colIdx   int
 	constArg float64
@@ -9162,7 +9162,7 @@ func (p selGEFloat64Float64ConstOp) Init() {
 }
 
 type selGEFloat64Float64Op struct {
-	input Operator
+	OneInputNode
 
 	col1Idx int
 	col2Idx int
@@ -9269,44 +9269,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQBoolBoolConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(bool),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(bool),
 			}, nil
 
 		case tree.NE:
 			return &selNEBoolBoolConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(bool),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(bool),
 			}, nil
 
 		case tree.LT:
 			return &selLTBoolBoolConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(bool),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(bool),
 			}, nil
 
 		case tree.LE:
 			return &selLEBoolBoolConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(bool),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(bool),
 			}, nil
 
 		case tree.GT:
 			return &selGTBoolBoolConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(bool),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(bool),
 			}, nil
 
 		case tree.GE:
 			return &selGEBoolBoolConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(bool),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(bool),
 			}, nil
 
 		default:
@@ -9318,44 +9318,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQBytesBytesConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.([]byte),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.([]byte),
 			}, nil
 
 		case tree.NE:
 			return &selNEBytesBytesConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.([]byte),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.([]byte),
 			}, nil
 
 		case tree.LT:
 			return &selLTBytesBytesConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.([]byte),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.([]byte),
 			}, nil
 
 		case tree.LE:
 			return &selLEBytesBytesConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.([]byte),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.([]byte),
 			}, nil
 
 		case tree.GT:
 			return &selGTBytesBytesConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.([]byte),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.([]byte),
 			}, nil
 
 		case tree.GE:
 			return &selGEBytesBytesConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.([]byte),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.([]byte),
 			}, nil
 
 		default:
@@ -9367,44 +9367,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQDecimalDecimalConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(apd.Decimal),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(apd.Decimal),
 			}, nil
 
 		case tree.NE:
 			return &selNEDecimalDecimalConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(apd.Decimal),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(apd.Decimal),
 			}, nil
 
 		case tree.LT:
 			return &selLTDecimalDecimalConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(apd.Decimal),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(apd.Decimal),
 			}, nil
 
 		case tree.LE:
 			return &selLEDecimalDecimalConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(apd.Decimal),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(apd.Decimal),
 			}, nil
 
 		case tree.GT:
 			return &selGTDecimalDecimalConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(apd.Decimal),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(apd.Decimal),
 			}, nil
 
 		case tree.GE:
 			return &selGEDecimalDecimalConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(apd.Decimal),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(apd.Decimal),
 			}, nil
 
 		default:
@@ -9416,44 +9416,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQInt8Int8ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int8),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int8),
 			}, nil
 
 		case tree.NE:
 			return &selNEInt8Int8ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int8),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int8),
 			}, nil
 
 		case tree.LT:
 			return &selLTInt8Int8ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int8),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int8),
 			}, nil
 
 		case tree.LE:
 			return &selLEInt8Int8ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int8),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int8),
 			}, nil
 
 		case tree.GT:
 			return &selGTInt8Int8ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int8),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int8),
 			}, nil
 
 		case tree.GE:
 			return &selGEInt8Int8ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int8),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int8),
 			}, nil
 
 		default:
@@ -9465,44 +9465,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQInt16Int16ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int16),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int16),
 			}, nil
 
 		case tree.NE:
 			return &selNEInt16Int16ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int16),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int16),
 			}, nil
 
 		case tree.LT:
 			return &selLTInt16Int16ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int16),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int16),
 			}, nil
 
 		case tree.LE:
 			return &selLEInt16Int16ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int16),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int16),
 			}, nil
 
 		case tree.GT:
 			return &selGTInt16Int16ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int16),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int16),
 			}, nil
 
 		case tree.GE:
 			return &selGEInt16Int16ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int16),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int16),
 			}, nil
 
 		default:
@@ -9514,44 +9514,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQInt32Int32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int32),
 			}, nil
 
 		case tree.NE:
 			return &selNEInt32Int32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int32),
 			}, nil
 
 		case tree.LT:
 			return &selLTInt32Int32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int32),
 			}, nil
 
 		case tree.LE:
 			return &selLEInt32Int32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int32),
 			}, nil
 
 		case tree.GT:
 			return &selGTInt32Int32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int32),
 			}, nil
 
 		case tree.GE:
 			return &selGEInt32Int32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int32),
 			}, nil
 
 		default:
@@ -9563,44 +9563,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQInt64Int64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int64),
 			}, nil
 
 		case tree.NE:
 			return &selNEInt64Int64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int64),
 			}, nil
 
 		case tree.LT:
 			return &selLTInt64Int64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int64),
 			}, nil
 
 		case tree.LE:
 			return &selLEInt64Int64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int64),
 			}, nil
 
 		case tree.GT:
 			return &selGTInt64Int64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int64),
 			}, nil
 
 		case tree.GE:
 			return &selGEInt64Int64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(int64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(int64),
 			}, nil
 
 		default:
@@ -9612,44 +9612,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQFloat32Float32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float32),
 			}, nil
 
 		case tree.NE:
 			return &selNEFloat32Float32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float32),
 			}, nil
 
 		case tree.LT:
 			return &selLTFloat32Float32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float32),
 			}, nil
 
 		case tree.LE:
 			return &selLEFloat32Float32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float32),
 			}, nil
 
 		case tree.GT:
 			return &selGTFloat32Float32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float32),
 			}, nil
 
 		case tree.GE:
 			return &selGEFloat32Float32ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float32),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float32),
 			}, nil
 
 		default:
@@ -9661,44 +9661,44 @@ func GetSelectionConstOperator(
 
 		case tree.EQ:
 			return &selEQFloat64Float64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float64),
 			}, nil
 
 		case tree.NE:
 			return &selNEFloat64Float64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float64),
 			}, nil
 
 		case tree.LT:
 			return &selLTFloat64Float64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float64),
 			}, nil
 
 		case tree.LE:
 			return &selLEFloat64Float64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float64),
 			}, nil
 
 		case tree.GT:
 			return &selGTFloat64Float64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float64),
 			}, nil
 
 		case tree.GE:
 			return &selGEFloat64Float64ConstOp{
-				input:    input,
-				colIdx:   colIdx,
-				constArg: c.(float64),
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				constArg:     c.(float64),
 			}, nil
 
 		default:
@@ -9726,44 +9726,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQBoolBoolOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEBoolBoolOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTBoolBoolOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEBoolBoolOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTBoolBoolOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEBoolBoolOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -9775,44 +9775,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQBytesBytesOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEBytesBytesOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTBytesBytesOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEBytesBytesOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTBytesBytesOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEBytesBytesOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -9824,44 +9824,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQDecimalDecimalOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEDecimalDecimalOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTDecimalDecimalOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEDecimalDecimalOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTDecimalDecimalOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEDecimalDecimalOp{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -9873,44 +9873,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQInt8Int8Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEInt8Int8Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTInt8Int8Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEInt8Int8Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTInt8Int8Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEInt8Int8Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -9922,44 +9922,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQInt16Int16Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEInt16Int16Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTInt16Int16Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEInt16Int16Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTInt16Int16Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEInt16Int16Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -9971,44 +9971,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQInt32Int32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEInt32Int32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTInt32Int32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEInt32Int32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTInt32Int32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEInt32Int32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -10020,44 +10020,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQInt64Int64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEInt64Int64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTInt64Int64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEInt64Int64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTInt64Int64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEInt64Int64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -10069,44 +10069,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQFloat32Float32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEFloat32Float32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTFloat32Float32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEFloat32Float32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTFloat32Float32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEFloat32Float32Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:
@@ -10118,44 +10118,44 @@ func GetSelectionOperator(
 
 		case tree.EQ:
 			return &selEQFloat64Float64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.NE:
 			return &selNEFloat64Float64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LT:
 			return &selLTFloat64Float64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.LE:
 			return &selLEFloat64Float64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GT:
 			return &selGTFloat64Float64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		case tree.GE:
 			return &selGEFloat64Float64Op{
-				input:   input,
-				col1Idx: col1Idx,
-				col2Idx: col2Idx,
+				OneInputNode: NewOneInputNode(input),
+				col1Idx:      col1Idx,
+				col2Idx:      col2Idx,
 			}, nil
 
 		default:

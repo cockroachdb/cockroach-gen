@@ -28,7 +28,10 @@ func OrderedDistinctColsToOperators(
 ) (Operator, []bool, error) {
 	distinctCol := make([]bool, coldata.BatchSize)
 	// zero the boolean column on every iteration.
-	input = fnOp{input: input, fn: func() { copy(distinctCol, zeroBoolColumn) }}
+	input = fnOp{
+		OneInputNode: NewOneInputNode(input),
+		fn:           func() { copy(distinctCol, zeroBoolColumn) },
+	}
 	var err error
 	for i := range distinctCols {
 		input, err = newSingleOrderedDistinct(input, int(distinctCols[i]), distinctCol, typs[distinctCols[i]])
@@ -47,8 +50,8 @@ func NewOrderedDistinct(input Operator, distinctCols []uint32, typs []types.T) (
 		return nil, err
 	}
 	return &boolVecToSelOp{
-		input:     op,
-		outputCol: outputCol,
+		OneInputNode: NewOneInputNode(op),
+		outputCol:    outputCol,
 	}, nil
 }
 
@@ -58,55 +61,55 @@ func newSingleOrderedDistinct(
 	switch t {
 	case types.Bool:
 		return &sortedDistinctBoolOp{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Bytes:
 		return &sortedDistinctBytesOp{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Decimal:
 		return &sortedDistinctDecimalOp{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Int8:
 		return &sortedDistinctInt8Op{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Int16:
 		return &sortedDistinctInt16Op{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Int32:
 		return &sortedDistinctInt32Op{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Int64:
 		return &sortedDistinctInt64Op{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Float32:
 		return &sortedDistinctFloat32Op{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
 	case types.Float64:
 		return &sortedDistinctFloat64Op{
-			input:             input,
+			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
@@ -155,7 +158,7 @@ func newPartitioner(t types.T) (partitioner, error) {
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctBoolOp struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -342,7 +345,7 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint6
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctBytesOp struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -529,7 +532,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctDecimalOp struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -716,7 +719,7 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctInt8Op struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -903,7 +906,7 @@ func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint6
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctInt16Op struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -1090,7 +1093,7 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctInt32Op struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -1277,7 +1280,7 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctInt64Op struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -1464,7 +1467,7 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctFloat32Op struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
@@ -1651,7 +1654,7 @@ func (p partitionerFloat32) partition(colVec coldata.Vec, outputCol []bool, n ui
 // TODO(solon): Update this name to remove "sorted". The input values are not
 // necessarily in sorted order.
 type sortedDistinctFloat64Op struct {
-	input Operator
+	OneInputNode
 
 	// sortedDistinctCol is the index of the column to distinct upon.
 	sortedDistinctCol int
