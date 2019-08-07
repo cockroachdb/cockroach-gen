@@ -32,14 +32,38 @@ func OrderedDistinctColsToOperators(
 		OneInputNode: NewOneInputNode(input),
 		fn:           func() { copy(distinctCol, zeroBoolColumn) },
 	}
-	var err error
+	var (
+		err error
+		r   resettableOperator
+		ok  bool
+	)
 	for i := range distinctCols {
 		input, err = newSingleOrderedDistinct(input, int(distinctCols[i]), distinctCol, typs[distinctCols[i]])
 		if err != nil {
 			return nil, nil, err
 		}
 	}
-	return input, distinctCol, nil
+	if r, ok = input.(resettableOperator); !ok {
+		panic("unexpectedly an ordered distinct is not a resetter")
+	}
+	distinctChain := distinctChainOps{
+		resettableOperator:         r,
+		estimatedStaticMemoryUsage: EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize),
+	}
+	return distinctChain, distinctCol, nil
+}
+
+type distinctChainOps struct {
+	resettableOperator
+
+	estimatedStaticMemoryUsage int
+}
+
+var _ StaticMemoryOperator = &distinctChainOps{}
+var _ resettableOperator = &distinctChainOps{}
+
+func (d *distinctChainOps) EstimateStaticMemoryUsage() int {
+	return d.estimatedStaticMemoryUsage
 }
 
 // NewOrderedDistinct creates a new ordered distinct operator on the given
@@ -177,7 +201,7 @@ type sortedDistinctBoolOp struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctBoolOp{}
+var _ resettableOperator = &sortedDistinctBoolOp{}
 
 func (p *sortedDistinctBoolOp) Init() {
 	p.input.Init()
@@ -364,7 +388,7 @@ type sortedDistinctBytesOp struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctBytesOp{}
+var _ resettableOperator = &sortedDistinctBytesOp{}
 
 func (p *sortedDistinctBytesOp) Init() {
 	p.input.Init()
@@ -551,7 +575,7 @@ type sortedDistinctDecimalOp struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctDecimalOp{}
+var _ resettableOperator = &sortedDistinctDecimalOp{}
 
 func (p *sortedDistinctDecimalOp) Init() {
 	p.input.Init()
@@ -738,7 +762,7 @@ type sortedDistinctInt8Op struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctInt8Op{}
+var _ resettableOperator = &sortedDistinctInt8Op{}
 
 func (p *sortedDistinctInt8Op) Init() {
 	p.input.Init()
@@ -925,7 +949,7 @@ type sortedDistinctInt16Op struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctInt16Op{}
+var _ resettableOperator = &sortedDistinctInt16Op{}
 
 func (p *sortedDistinctInt16Op) Init() {
 	p.input.Init()
@@ -1112,7 +1136,7 @@ type sortedDistinctInt32Op struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctInt32Op{}
+var _ resettableOperator = &sortedDistinctInt32Op{}
 
 func (p *sortedDistinctInt32Op) Init() {
 	p.input.Init()
@@ -1299,7 +1323,7 @@ type sortedDistinctInt64Op struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctInt64Op{}
+var _ resettableOperator = &sortedDistinctInt64Op{}
 
 func (p *sortedDistinctInt64Op) Init() {
 	p.input.Init()
@@ -1486,7 +1510,7 @@ type sortedDistinctFloat32Op struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctFloat32Op{}
+var _ resettableOperator = &sortedDistinctFloat32Op{}
 
 func (p *sortedDistinctFloat32Op) Init() {
 	p.input.Init()
@@ -1673,7 +1697,7 @@ type sortedDistinctFloat64Op struct {
 	lastValNull bool
 }
 
-var _ Operator = &sortedDistinctFloat64Op{}
+var _ resettableOperator = &sortedDistinctFloat64Op{}
 
 func (p *sortedDistinctFloat64Op) Init() {
 	p.input.Init()
