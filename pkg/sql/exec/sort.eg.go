@@ -117,14 +117,12 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction) (colSor
 type sortBoolAscOp struct {
 	sortCol       []bool
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortBoolAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortBoolAscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Bool()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortBoolAscOp) sort(ctx context.Context) {
@@ -132,35 +130,11 @@ func (s *sortBoolAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBoolAscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -169,7 +143,6 @@ func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64)
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -177,17 +150,15 @@ func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64)
 
 func (s *sortBoolAscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = tree.CompareBools(arg1, arg2) < 0
 	return lt
 }
 
 func (s *sortBoolAscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -198,14 +169,12 @@ func (s *sortBoolAscOp) Len() int {
 type sortBoolDescOp struct {
 	sortCol       []bool
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortBoolDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortBoolDescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Bool()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortBoolDescOp) sort(ctx context.Context) {
@@ -213,35 +182,11 @@ func (s *sortBoolDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBoolDescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -250,7 +195,6 @@ func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -258,17 +202,15 @@ func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortBoolDescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = tree.CompareBools(arg1, arg2) > 0
 	return lt
 }
 
 func (s *sortBoolDescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -279,14 +221,12 @@ func (s *sortBoolDescOp) Len() int {
 type sortBytesAscOp struct {
 	sortCol       *coldata.Bytes
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Bytes()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortBytesAscOp) sort(ctx context.Context) {
@@ -294,35 +234,11 @@ func (s *sortBytesAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBytesAscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol.Swap(int(index[i]), i)
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -331,7 +247,6 @@ func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol.Slice(int(partitionStart), int(partitionEnd))
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -339,17 +254,15 @@ func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortBytesAscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol.Get(i)
-	arg2 := s.sortCol.Get(j)
+	// We always indirect via the order vector.
+	arg1 := s.sortCol.Get(int(s.order[i]))
+	arg2 := s.sortCol.Get(int(s.order[j]))
 	lt = bytes.Compare(arg1, arg2) < 0
 	return lt
 }
 
 func (s *sortBytesAscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol.Swap(i, j)
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -360,14 +273,12 @@ func (s *sortBytesAscOp) Len() int {
 type sortBytesDescOp struct {
 	sortCol       *coldata.Bytes
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Bytes()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortBytesDescOp) sort(ctx context.Context) {
@@ -375,35 +286,11 @@ func (s *sortBytesDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBytesDescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol.Swap(int(index[i]), i)
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -412,7 +299,6 @@ func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol.Slice(int(partitionStart), int(partitionEnd))
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -420,17 +306,15 @@ func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortBytesDescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol.Get(i)
-	arg2 := s.sortCol.Get(j)
+	// We always indirect via the order vector.
+	arg1 := s.sortCol.Get(int(s.order[i]))
+	arg2 := s.sortCol.Get(int(s.order[j]))
 	lt = bytes.Compare(arg1, arg2) > 0
 	return lt
 }
 
 func (s *sortBytesDescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol.Swap(i, j)
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -441,14 +325,12 @@ func (s *sortBytesDescOp) Len() int {
 type sortDecimalAscOp struct {
 	sortCol       []apd.Decimal
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortDecimalAscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortDecimalAscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Decimal()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortDecimalAscOp) sort(ctx context.Context) {
@@ -456,35 +338,11 @@ func (s *sortDecimalAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortDecimalAscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -493,7 +351,6 @@ func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -501,17 +358,15 @@ func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortDecimalAscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = tree.CompareDecimals(&arg1, &arg2) < 0
 	return lt
 }
 
 func (s *sortDecimalAscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -522,14 +377,12 @@ func (s *sortDecimalAscOp) Len() int {
 type sortDecimalDescOp struct {
 	sortCol       []apd.Decimal
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortDecimalDescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortDecimalDescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Decimal()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortDecimalDescOp) sort(ctx context.Context) {
@@ -537,35 +390,11 @@ func (s *sortDecimalDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortDecimalDescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -574,7 +403,6 @@ func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uin
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -582,17 +410,15 @@ func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortDecimalDescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = tree.CompareDecimals(&arg1, &arg2) > 0
 	return lt
 }
 
 func (s *sortDecimalDescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -603,14 +429,12 @@ func (s *sortDecimalDescOp) Len() int {
 type sortInt8AscOp struct {
 	sortCol       []int8
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt8AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt8AscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int8()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt8AscOp) sort(ctx context.Context) {
@@ -618,35 +442,11 @@ func (s *sortInt8AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt8AscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -655,7 +455,6 @@ func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64)
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -663,17 +462,15 @@ func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64)
 
 func (s *sortInt8AscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 < arg2
 	return lt
 }
 
 func (s *sortInt8AscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -684,14 +481,12 @@ func (s *sortInt8AscOp) Len() int {
 type sortInt8DescOp struct {
 	sortCol       []int8
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt8DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt8DescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int8()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt8DescOp) sort(ctx context.Context) {
@@ -699,35 +494,11 @@ func (s *sortInt8DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt8DescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -736,7 +507,6 @@ func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -744,17 +514,15 @@ func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt8DescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 > arg2
 	return lt
 }
 
 func (s *sortInt8DescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -765,14 +533,12 @@ func (s *sortInt8DescOp) Len() int {
 type sortInt16AscOp struct {
 	sortCol       []int16
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt16AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt16AscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int16()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt16AscOp) sort(ctx context.Context) {
@@ -780,35 +546,11 @@ func (s *sortInt16AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt16AscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -817,7 +559,6 @@ func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -825,17 +566,15 @@ func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt16AscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 < arg2
 	return lt
 }
 
 func (s *sortInt16AscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -846,14 +585,12 @@ func (s *sortInt16AscOp) Len() int {
 type sortInt16DescOp struct {
 	sortCol       []int16
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt16DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt16DescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int16()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt16DescOp) sort(ctx context.Context) {
@@ -861,35 +598,11 @@ func (s *sortInt16DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt16DescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -898,7 +611,6 @@ func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -906,17 +618,15 @@ func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortInt16DescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 > arg2
 	return lt
 }
 
 func (s *sortInt16DescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -927,14 +637,12 @@ func (s *sortInt16DescOp) Len() int {
 type sortInt32AscOp struct {
 	sortCol       []int32
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt32AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt32AscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int32()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt32AscOp) sort(ctx context.Context) {
@@ -942,35 +650,11 @@ func (s *sortInt32AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt32AscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -979,7 +663,6 @@ func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -987,17 +670,15 @@ func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt32AscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 < arg2
 	return lt
 }
 
 func (s *sortInt32AscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1008,14 +689,12 @@ func (s *sortInt32AscOp) Len() int {
 type sortInt32DescOp struct {
 	sortCol       []int32
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt32DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt32DescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int32()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt32DescOp) sort(ctx context.Context) {
@@ -1023,35 +702,11 @@ func (s *sortInt32DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt32DescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1060,7 +715,6 @@ func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1068,17 +722,15 @@ func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortInt32DescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 > arg2
 	return lt
 }
 
 func (s *sortInt32DescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1089,14 +741,12 @@ func (s *sortInt32DescOp) Len() int {
 type sortInt64AscOp struct {
 	sortCol       []int64
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt64AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt64AscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int64()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt64AscOp) sort(ctx context.Context) {
@@ -1104,35 +754,11 @@ func (s *sortInt64AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt64AscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1141,7 +767,6 @@ func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1149,17 +774,15 @@ func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt64AscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 < arg2
 	return lt
 }
 
 func (s *sortInt64AscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1170,14 +793,12 @@ func (s *sortInt64AscOp) Len() int {
 type sortInt64DescOp struct {
 	sortCol       []int64
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt64DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortInt64DescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Int64()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortInt64DescOp) sort(ctx context.Context) {
@@ -1185,35 +806,11 @@ func (s *sortInt64DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt64DescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1222,7 +819,6 @@ func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1230,17 +826,15 @@ func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortInt64DescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = arg1 > arg2
 	return lt
 }
 
 func (s *sortInt64DescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1251,14 +845,12 @@ func (s *sortInt64DescOp) Len() int {
 type sortFloat32AscOp struct {
 	sortCol       []float32
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat32AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat32AscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Float32()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortFloat32AscOp) sort(ctx context.Context) {
@@ -1266,35 +858,11 @@ func (s *sortFloat32AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat32AscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1303,7 +871,6 @@ func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1311,17 +878,15 @@ func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortFloat32AscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = compareFloats(float64(arg1), float64(arg2)) < 0
 	return lt
 }
 
 func (s *sortFloat32AscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1332,14 +897,12 @@ func (s *sortFloat32AscOp) Len() int {
 type sortFloat32DescOp struct {
 	sortCol       []float32
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat32DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat32DescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Float32()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortFloat32DescOp) sort(ctx context.Context) {
@@ -1347,35 +910,11 @@ func (s *sortFloat32DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat32DescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1384,7 +923,6 @@ func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uin
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1392,17 +930,15 @@ func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortFloat32DescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = compareFloats(float64(arg1), float64(arg2)) > 0
 	return lt
 }
 
 func (s *sortFloat32DescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1413,14 +949,12 @@ func (s *sortFloat32DescOp) Len() int {
 type sortFloat64AscOp struct {
 	sortCol       []float64
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat64AscOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat64AscOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Float64()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortFloat64AscOp) sort(ctx context.Context) {
@@ -1428,35 +962,11 @@ func (s *sortFloat64AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat64AscOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1465,7 +975,6 @@ func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1473,17 +982,15 @@ func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortFloat64AscOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = compareFloats(float64(arg1), float64(arg2)) < 0
 	return lt
 }
 
 func (s *sortFloat64AscOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -1494,14 +1001,12 @@ func (s *sortFloat64AscOp) Len() int {
 type sortFloat64DescOp struct {
 	sortCol       []float64
 	order         []uint64
-	workingSpace  []uint64
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat64DescOp) init(col coldata.Vec, order []uint64, workingSpace []uint64) {
+func (s *sortFloat64DescOp) init(col coldata.Vec, order []uint64) {
 	s.sortCol = col.Float64()
 	s.order = order
-	s.workingSpace = workingSpace
 }
 
 func (s *sortFloat64DescOp) sort(ctx context.Context) {
@@ -1509,35 +1014,11 @@ func (s *sortFloat64DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat64DescOp) reorder() {
-	// Initialize our index vector to the inverse of the order vector. This
-	// creates what is known as a permutation. Position i in the permutation has
-	// the output index for the value at position i in the original ordering of
-	// the data we sorted. For example, if we were sorting the column [d,c,a,b],
-	// the order vector would be [2,3,1,0], and the permutation would be
-	// [3,2,0,1].
-	index := s.workingSpace
-	for idx, ord := range s.order {
-		index[int(ord)] = uint64(idx)
-	}
-	// Once we have our permutation, we apply it to our value column by following
-	// each cycle within the permutation until we reach the identity. This
-	// algorithm takes just O(n) swaps to reorder the sortCol. It also returns
-	// the index array to an ordinal list in the process.
-	for i := range index {
-		for index[i] != uint64(i) {
-			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
-			index[i], index[index[i]] = index[index[i]], index[i]
-		}
-	}
-}
-
 func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
 		panic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
-	sortCol := s.sortCol
 	for i, partitionStart := range partitions {
 		var partitionEnd uint64
 		if i == len(partitions)-1 {
@@ -1546,7 +1027,6 @@ func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uin
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1554,17 +1034,15 @@ func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortFloat64DescOp) Less(i, j int) bool {
 	var lt bool
-	arg1 := s.sortCol[i]
-	arg2 := s.sortCol[j]
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
 	lt = compareFloats(float64(arg1), float64(arg2)) > 0
 	return lt
 }
 
 func (s *sortFloat64DescOp) Swap(i, j int) {
-	// Swap needs to swap the values in the column being sorted, as otherwise
-	// subsequent calls to Less would be incorrect.
-	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	// We don't physically swap the column - we merely edit the order vector.
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
