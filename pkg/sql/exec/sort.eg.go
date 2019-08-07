@@ -17,10 +17,14 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/distsqlpb"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction) (colSorter, error) {
 	switch t {
@@ -145,7 +149,7 @@ func (s *sortBoolAscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -165,7 +169,7 @@ func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64)
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -173,7 +177,9 @@ func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64)
 
 func (s *sortBoolAscOp) Less(i, j int) bool {
 	var lt bool
-	lt = tree.CompareBools(s.sortCol[i], s.sortCol[j]) < 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = tree.CompareBools(arg1, arg2) < 0
 	return lt
 }
 
@@ -224,7 +230,7 @@ func (s *sortBoolDescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -244,7 +250,7 @@ func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -252,7 +258,9 @@ func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortBoolDescOp) Less(i, j int) bool {
 	var lt bool
-	lt = tree.CompareBools(s.sortCol[i], s.sortCol[j]) > 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = tree.CompareBools(arg1, arg2) > 0
 	return lt
 }
 
@@ -269,7 +277,7 @@ func (s *sortBoolDescOp) Len() int {
 }
 
 type sortBytesAscOp struct {
-	sortCol       [][]byte
+	sortCol       *coldata.Bytes
 	order         []uint64
 	workingSpace  []uint64
 	cancelChecker CancelChecker
@@ -282,7 +290,7 @@ func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64, workingSpace []ui
 }
 
 func (s *sortBytesAscOp) sort(ctx context.Context) {
-	n := len(s.sortCol)
+	n := s.sortCol.Len()
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
@@ -303,7 +311,7 @@ func (s *sortBytesAscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol.Swap(int(index[i]), i)
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -323,7 +331,7 @@ func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol.Slice(int(partitionStart), int(partitionEnd))
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -331,7 +339,9 @@ func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortBytesAscOp) Less(i, j int) bool {
 	var lt bool
-	lt = bytes.Compare(s.sortCol[i], s.sortCol[j]) < 0
+	arg1 := s.sortCol.Get(i)
+	arg2 := s.sortCol.Get(j)
+	lt = bytes.Compare(arg1, arg2) < 0
 	return lt
 }
 
@@ -339,7 +349,7 @@ func (s *sortBytesAscOp) Swap(i, j int) {
 	// Swap needs to swap the values in the column being sorted, as otherwise
 	// subsequent calls to Less would be incorrect.
 	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	s.sortCol.Swap(i, j)
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -348,7 +358,7 @@ func (s *sortBytesAscOp) Len() int {
 }
 
 type sortBytesDescOp struct {
-	sortCol       [][]byte
+	sortCol       *coldata.Bytes
 	order         []uint64
 	workingSpace  []uint64
 	cancelChecker CancelChecker
@@ -361,7 +371,7 @@ func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64, workingSpace []u
 }
 
 func (s *sortBytesDescOp) sort(ctx context.Context) {
-	n := len(s.sortCol)
+	n := s.sortCol.Len()
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
@@ -382,7 +392,7 @@ func (s *sortBytesDescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol.Swap(int(index[i]), i)
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -402,7 +412,7 @@ func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol.Slice(int(partitionStart), int(partitionEnd))
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -410,7 +420,9 @@ func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortBytesDescOp) Less(i, j int) bool {
 	var lt bool
-	lt = bytes.Compare(s.sortCol[i], s.sortCol[j]) > 0
+	arg1 := s.sortCol.Get(i)
+	arg2 := s.sortCol.Get(j)
+	lt = bytes.Compare(arg1, arg2) > 0
 	return lt
 }
 
@@ -418,7 +430,7 @@ func (s *sortBytesDescOp) Swap(i, j int) {
 	// Swap needs to swap the values in the column being sorted, as otherwise
 	// subsequent calls to Less would be incorrect.
 	// We also store the swap order in s.order to swap all the other columns.
-	s.sortCol[i], s.sortCol[j] = s.sortCol[j], s.sortCol[i]
+	s.sortCol.Swap(i, j)
 	s.order[i], s.order[j] = s.order[j], s.order[i]
 }
 
@@ -461,7 +473,7 @@ func (s *sortDecimalAscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -481,7 +493,7 @@ func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -489,7 +501,9 @@ func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortDecimalAscOp) Less(i, j int) bool {
 	var lt bool
-	lt = tree.CompareDecimals(&s.sortCol[i], &s.sortCol[j]) < 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = tree.CompareDecimals(&arg1, &arg2) < 0
 	return lt
 }
 
@@ -540,7 +554,7 @@ func (s *sortDecimalDescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -560,7 +574,7 @@ func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uin
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -568,7 +582,9 @@ func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortDecimalDescOp) Less(i, j int) bool {
 	var lt bool
-	lt = tree.CompareDecimals(&s.sortCol[i], &s.sortCol[j]) > 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = tree.CompareDecimals(&arg1, &arg2) > 0
 	return lt
 }
 
@@ -619,7 +635,7 @@ func (s *sortInt8AscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -639,7 +655,7 @@ func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64)
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -647,7 +663,9 @@ func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64)
 
 func (s *sortInt8AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] < s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 < arg2
 	return lt
 }
 
@@ -698,7 +716,7 @@ func (s *sortInt8DescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -718,7 +736,7 @@ func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -726,7 +744,9 @@ func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt8DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] > s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 > arg2
 	return lt
 }
 
@@ -777,7 +797,7 @@ func (s *sortInt16AscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -797,7 +817,7 @@ func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -805,7 +825,9 @@ func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt16AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] < s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 < arg2
 	return lt
 }
 
@@ -856,7 +878,7 @@ func (s *sortInt16DescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -876,7 +898,7 @@ func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -884,7 +906,9 @@ func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortInt16DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] > s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 > arg2
 	return lt
 }
 
@@ -935,7 +959,7 @@ func (s *sortInt32AscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -955,7 +979,7 @@ func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -963,7 +987,9 @@ func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt32AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] < s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 < arg2
 	return lt
 }
 
@@ -1014,7 +1040,7 @@ func (s *sortInt32DescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1034,7 +1060,7 @@ func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1042,7 +1068,9 @@ func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortInt32DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] > s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 > arg2
 	return lt
 }
 
@@ -1093,7 +1121,7 @@ func (s *sortInt64AscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1113,7 +1141,7 @@ func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1121,7 +1149,9 @@ func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64
 
 func (s *sortInt64AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] < s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 < arg2
 	return lt
 }
 
@@ -1172,7 +1202,7 @@ func (s *sortInt64DescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1192,7 +1222,7 @@ func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint6
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1200,7 +1230,9 @@ func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint6
 
 func (s *sortInt64DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = s.sortCol[i] > s.sortCol[j]
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = arg1 > arg2
 	return lt
 }
 
@@ -1251,7 +1283,7 @@ func (s *sortFloat32AscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1271,7 +1303,7 @@ func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1279,7 +1311,9 @@ func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortFloat32AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) < 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = compareFloats(float64(arg1), float64(arg2)) < 0
 	return lt
 }
 
@@ -1330,7 +1364,7 @@ func (s *sortFloat32DescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1350,7 +1384,7 @@ func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uin
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1358,7 +1392,9 @@ func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortFloat32DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) > 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = compareFloats(float64(arg1), float64(arg2)) > 0
 	return lt
 }
 
@@ -1409,7 +1445,7 @@ func (s *sortFloat64AscOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1429,7 +1465,7 @@ func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1437,7 +1473,9 @@ func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint
 
 func (s *sortFloat64AscOp) Less(i, j int) bool {
 	var lt bool
-	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) < 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = compareFloats(float64(arg1), float64(arg2)) < 0
 	return lt
 }
 
@@ -1488,7 +1526,7 @@ func (s *sortFloat64DescOp) reorder() {
 	// the index array to an ordinal list in the process.
 	for i := range index {
 		for index[i] != uint64(i) {
-			s.sortCol[index[i]], s.sortCol[i] = s.sortCol[i], s.sortCol[index[i]]
+			s.sortCol[int(index[i])], s.sortCol[i] = s.sortCol[i], s.sortCol[int(index[i])]
 			index[i], index[index[i]] = index[index[i]], index[i]
 		}
 	}
@@ -1508,7 +1546,7 @@ func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uin
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		s.sortCol = sortCol[partitionStart:partitionEnd]
+		s.sortCol = sortCol[int(partitionStart):int(partitionEnd)]
 		n := int(partitionEnd - partitionStart)
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
@@ -1516,7 +1554,9 @@ func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uin
 
 func (s *sortFloat64DescOp) Less(i, j int) bool {
 	var lt bool
-	lt = compareFloats(float64(s.sortCol[i]), float64(s.sortCol[j])) > 0
+	arg1 := s.sortCol[i]
+	arg2 := s.sortCol[j]
+	lt = compareFloats(float64(arg1), float64(arg2)) > 0
 	return lt
 }
 

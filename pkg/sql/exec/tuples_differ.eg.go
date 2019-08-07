@@ -13,10 +13,14 @@ import (
 	"bytes"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 // tuplesDiffer takes in two ColVecs as well as tuple indices to check whether
 // the tuples differ.
@@ -28,63 +32,81 @@ func tuplesDiffer(
 		aCol := aColVec.Bool()
 		bCol := bColVec.Bool()
 		var unique bool
-		unique = tree.CompareBools(aCol[aTupleIdx], bCol[bTupleIdx]) != 0
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = tree.CompareBools(arg1, arg2) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Bytes:
 		aCol := aColVec.Bytes()
 		bCol := bColVec.Bytes()
 		var unique bool
-		unique = bytes.Compare(aCol[aTupleIdx], bCol[bTupleIdx]) != 0
+		arg1 := aCol.Get(aTupleIdx)
+		arg2 := bCol.Get(bTupleIdx)
+		unique = bytes.Compare(arg1, arg2) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Decimal:
 		aCol := aColVec.Decimal()
 		bCol := bColVec.Decimal()
 		var unique bool
-		unique = tree.CompareDecimals(&aCol[aTupleIdx], &bCol[bTupleIdx]) != 0
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = tree.CompareDecimals(&arg1, &arg2) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Int8:
 		aCol := aColVec.Int8()
 		bCol := bColVec.Int8()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
 	case types.Int16:
 		aCol := aColVec.Int16()
 		bCol := bColVec.Int16()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
 	case types.Int32:
 		aCol := aColVec.Int32()
 		bCol := bColVec.Int32()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
 	case types.Int64:
 		aCol := aColVec.Int64()
 		bCol := bColVec.Int64()
 		var unique bool
-		unique = aCol[aTupleIdx] != bCol[bTupleIdx]
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
 	case types.Float32:
 		aCol := aColVec.Float32()
 		bCol := bColVec.Float32()
 		var unique bool
-		unique = compareFloats(float64(aCol[aTupleIdx]), float64(bCol[bTupleIdx])) != 0
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = compareFloats(float64(arg1), float64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
 	case types.Float64:
 		aCol := aColVec.Float64()
 		bCol := bColVec.Float64()
 		var unique bool
-		unique = compareFloats(float64(aCol[aTupleIdx]), float64(bCol[bTupleIdx])) != 0
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+		unique = compareFloats(float64(arg1), float64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
 	default:

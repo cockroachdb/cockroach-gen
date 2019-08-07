@@ -17,9 +17,13 @@ import (
 	"unsafe"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 // rehash takes an element of a key (tuple representing a row of equality
 // column values) at a given column and computes a new hash by applying a
@@ -44,7 +48,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					x := 0
@@ -62,7 +67,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					x := 0
@@ -79,7 +85,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					x := 0
@@ -94,7 +101,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					x := 0
@@ -118,7 +126,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys.Get(int(selIdx))
 					p := uintptr(buckets[i])
 
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
@@ -133,7 +142,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys.Get(int(selIdx))
 					p := uintptr(buckets[i])
 
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
@@ -147,7 +157,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys.Get(int(selIdx))
 					p := uintptr(buckets[i])
 
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
@@ -159,7 +170,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys.Get(int(selIdx))
 					p := uintptr(buckets[i])
 
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
@@ -180,7 +192,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					d, err := v.Float64()
@@ -199,7 +212,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					d, err := v.Float64()
@@ -217,7 +231,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					d, err := v.Float64()
@@ -233,7 +248,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
 					d, err := v.Float64()
@@ -258,7 +274,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash8(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -270,7 +287,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash8(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -281,7 +299,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash8(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -290,7 +309,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash8(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -308,7 +328,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash16(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -320,7 +341,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash16(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -331,7 +353,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash16(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -340,7 +363,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash16(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -358,7 +382,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash32(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -370,7 +395,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash32(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -381,7 +407,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash32(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -390,7 +417,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash32(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -408,7 +436,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash64(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -420,7 +449,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash64(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -431,7 +461,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash64(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -440,7 +471,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash64(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -458,7 +490,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f32hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -470,7 +503,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f32hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -481,7 +515,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f32hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -490,7 +525,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f32hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -508,7 +544,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(sel[i])) {
 						continue
 					}
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f64hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -520,7 +557,8 @@ func (ht *hashTable) rehash(
 					if nulls.NullAt(uint16(i)) {
 						continue
 					}
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f64hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -531,7 +569,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[sel[i]]
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f64hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -540,7 +579,8 @@ func (ht *hashTable) rehash(
 
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					v := keys[i]
+					selIdx := i
+					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f64hash(noescape(unsafe.Pointer(&v)), p)
 					buckets[i] = uint64(p)
@@ -604,8 +644,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -642,8 +683,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -679,8 +721,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -717,8 +760,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -751,8 +795,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -801,8 +846,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -839,8 +885,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -876,8 +923,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -914,8 +962,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -948,8 +997,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareBools(buildVal, probeVal) != 0
 
@@ -1006,8 +1056,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys.Get(int(keyID - 1))
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 									unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1044,8 +1095,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys.Get(int(keyID - 1))
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 									unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1081,8 +1133,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys.Get(int(keyID - 1))
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 								unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1119,8 +1172,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys.Get(int(keyID - 1))
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 								unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1153,8 +1207,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys.Get(int(keyID - 1))
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 								unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1203,8 +1258,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys.Get(int(keyID - 1))
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 									unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1241,8 +1297,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys.Get(int(keyID - 1))
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 									unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1278,8 +1335,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys.Get(int(keyID - 1))
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 								unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1316,8 +1374,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys.Get(int(keyID - 1))
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 								unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1350,8 +1409,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys.Get(int(keyID - 1))
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 								unique = bytes.Compare(buildVal, probeVal) != 0
 
@@ -1408,8 +1468,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1446,8 +1507,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1483,8 +1545,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1521,8 +1584,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1555,8 +1619,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1605,8 +1670,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1643,8 +1709,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1680,8 +1747,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1718,8 +1786,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1752,8 +1821,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
 
@@ -1810,8 +1880,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -1848,8 +1919,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -1885,8 +1957,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -1923,8 +1996,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -1957,8 +2031,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2007,8 +2082,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2045,8 +2121,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2082,8 +2159,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2120,8 +2198,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2154,8 +2233,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2212,8 +2292,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2250,8 +2331,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2287,8 +2369,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2325,8 +2408,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2359,8 +2443,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2409,8 +2494,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2447,8 +2533,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2484,8 +2571,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2522,8 +2610,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2556,8 +2645,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2614,8 +2704,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2652,8 +2743,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2689,8 +2781,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2727,8 +2820,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2761,8 +2855,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2811,8 +2906,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2849,8 +2945,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -2886,8 +2983,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2924,8 +3022,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -2958,8 +3057,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3016,8 +3116,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -3054,8 +3155,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -3091,8 +3193,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3129,8 +3232,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3163,8 +3267,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3213,8 +3318,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -3251,8 +3357,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = buildVal != probeVal
 
@@ -3288,8 +3395,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3326,8 +3434,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3360,8 +3469,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = buildVal != probeVal
 
@@ -3418,8 +3528,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3456,8 +3567,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3493,8 +3605,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3531,8 +3644,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3565,8 +3679,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3615,8 +3730,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3653,8 +3769,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3690,8 +3807,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3728,8 +3846,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3762,8 +3881,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3820,8 +3940,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3858,8 +3979,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[sel[ht.toCheck[i]]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := sel[ht.toCheck[i]]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3895,8 +4017,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3933,8 +4056,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -3967,8 +4091,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[sel[ht.toCheck[i]]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := sel[ht.toCheck[i]]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -4017,8 +4142,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -4055,8 +4181,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 									ht.differs[ht.toCheck[i]] = true
 								} else {
 
-									buildVal := buildKeys[keyID-1]
-									probeVal := probeKeys[ht.toCheck[i]]
+									buildVal := buildKeys[int(keyID-1)]
+									selIdx := ht.toCheck[i]
+									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -4092,8 +4219,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -4130,8 +4258,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 
@@ -4164,8 +4293,9 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 								ht.differs[ht.toCheck[i]] = true
 							} else {
 
-								buildVal := buildKeys[keyID-1]
-								probeVal := probeKeys[ht.toCheck[i]]
+								buildVal := buildKeys[int(keyID-1)]
+								selIdx := ht.toCheck[i]
+								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
 

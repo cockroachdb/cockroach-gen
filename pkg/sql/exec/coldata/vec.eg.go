@@ -13,8 +13,12 @@ import (
 	"fmt"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 func (m *memColumn) Append(args AppendArgs) {
 	switch args.ColType {
@@ -23,15 +27,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Bool()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]bool, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -42,15 +49,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Bytes()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol.AppendSlice(fromCol, int(args.DestIdx), int(args.SrcStartIdx), int(args.SrcEndIdx))
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([][]byte, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol.Slice(0, int(args.DestIdx))
+			for _, selIdx := range sel {
+				val := fromCol.Get(int(selIdx))
+				toCol.AppendVal(val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -61,15 +71,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Decimal()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]apd.Decimal, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -80,15 +93,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Int8()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]int8, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -99,15 +115,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Int16()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]int16, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -118,15 +137,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Int32()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]int32, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -137,15 +159,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Int64()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]int64, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -156,15 +181,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Float32()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]float32, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -175,15 +203,18 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Float64()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:args.DestIdx], fromCol[args.SrcStartIdx:args.SrcEndIdx]...)
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			appendVals := make([]float64, len(sel))
-			for i, selIdx := range sel {
-				appendVals[i] = fromCol[selIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
 			}
-			toCol = append(toCol[:args.DestIdx], appendVals...)
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
@@ -211,23 +242,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -235,45 +270,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -293,23 +336,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := toCol.Len()
+					toColSliced := toCol.Slice(int(args.DestIdx), n)
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol.Get(int(selIdx))
+							toColSliced.Set(i, v)
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := toCol.Len()
+				toColSliced := toCol.Slice(int(args.DestIdx), n)
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol.Get(int(selIdx))
+						toColSliced.Set(i, v)
 					}
 				}
 				return
@@ -317,45 +364,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := toCol.Len()
+				toColSliced := toCol.Slice(int(args.DestIdx), n)
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol.Get(int(selIdx))
+						toColSliced.Set(i, v)
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := toCol.Len()
+			toColSliced := toCol.Slice(int(args.DestIdx), n)
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol.Get(int(selIdx))
+				toColSliced.Set(i, v)
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := toCol.Len()
+				toColSliced := toCol.Slice(int(args.DestIdx), n)
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol.Get(int(selIdx))
+						toColSliced.Set(i, v)
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := toCol.Len()
+			toColSliced := toCol.Slice(int(args.DestIdx), n)
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol.Get(int(selIdx))
+				toColSliced.Set(i, v)
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		toCol.CopySlice(fromCol, int(args.DestIdx), int(args.SrcStartIdx), int(args.SrcEndIdx))
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -375,23 +430,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -399,45 +458,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -457,23 +524,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -481,45 +552,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -539,23 +618,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -563,45 +646,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -621,23 +712,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -645,45 +740,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -703,23 +806,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -727,45 +834,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -785,23 +900,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -809,45 +928,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -867,23 +994,27 @@ func (m *memColumn) Copy(args CopyArgs) {
 			if args.Nils != nil {
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
-					toColSliced := toCol[args.DestIdx:]
+					n := len(toCol)
+					toColSliced := toCol[int(args.DestIdx):n]
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if args.Nils[i] || nulls.NullAt64(selIdx) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
-							toColSliced[i] = fromCol[selIdx]
+							v := fromCol[int(selIdx)]
+							toColSliced[i] = v
 						}
 					}
 					return
 				}
 				// Nils but no Nulls.
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if args.Nils[i] {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
@@ -891,45 +1022,53 @@ func (m *memColumn) Copy(args CopyArgs) {
 			// No Nils.
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(selIdx) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nils or Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.Src.MaybeHasNulls() {
 				nulls := args.Src.Nulls()
-				toColSliced := toCol[args.DestIdx:]
+				n := len(toCol)
+				toColSliced := toCol[int(args.DestIdx):n]
 				for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					if nulls.NullAt64(uint64(selIdx)) {
 						m.nulls.SetNull64(uint64(i) + args.DestIdx)
 					} else {
-						toColSliced[i] = fromCol[selIdx]
+						v := fromCol[int(selIdx)]
+						toColSliced[i] = v
 					}
 				}
 				return
 			}
 			// No Nulls.
-			toColSliced := toCol[args.DestIdx:]
+			n := len(toCol)
+			toColSliced := toCol[int(args.DestIdx):n]
 			for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-				toColSliced[i] = fromCol[selIdx]
+				v := fromCol[int(selIdx)]
+				toColSliced[i] = v
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -950,55 +1089,55 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 	case types.Bool:
 		col := m.Bool()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Bytes:
 		col := m.Bytes()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col.Slice(int(start), int(end)),
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Decimal:
 		col := m.Decimal()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int8:
 		col := m.Int8()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int16:
 		col := m.Int16()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int32:
 		col := m.Int32()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Int64:
 		col := m.Int64()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Float32:
 		col := m.Float32()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	case types.Float64:
 		col := m.Float64()
 		return &memColumn{
-			col:   col[start:end],
+			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
 	default:
@@ -1012,23 +1151,41 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 	}
 	switch colType {
 	case types.Bool:
-		return fmt.Sprintf("%v", m.Bool()[colIdx])
+		col := m.Bool()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Bytes:
-		return fmt.Sprintf("%v", m.Bytes()[colIdx])
+		col := m.Bytes()
+		v := col.Get(int(colIdx))
+		return fmt.Sprintf("%v", v)
 	case types.Decimal:
-		return fmt.Sprintf("%v", m.Decimal()[colIdx])
+		col := m.Decimal()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Int8:
-		return fmt.Sprintf("%v", m.Int8()[colIdx])
+		col := m.Int8()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Int16:
-		return fmt.Sprintf("%v", m.Int16()[colIdx])
+		col := m.Int16()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Int32:
-		return fmt.Sprintf("%v", m.Int32()[colIdx])
+		col := m.Int32()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Int64:
-		return fmt.Sprintf("%v", m.Int64()[colIdx])
+		col := m.Int64()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Float32:
-		return fmt.Sprintf("%v", m.Float32()[colIdx])
+		col := m.Float32()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	case types.Float64:
-		return fmt.Sprintf("%v", m.Float64()[colIdx])
+		col := m.Float64()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
@@ -1038,23 +1195,41 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType types.T) {
 	switch colType {
 	case types.Bool:
-		v.Bool()[rowIdx] = elem.(bool)
+		target := v.Bool()
+		newVal := elem.(bool)
+		target[int(rowIdx)] = newVal
 	case types.Bytes:
-		v.Bytes()[rowIdx] = elem.([]byte)
+		target := v.Bytes()
+		newVal := elem.([]byte)
+		target.Set(int(rowIdx), newVal)
 	case types.Decimal:
-		v.Decimal()[rowIdx] = elem.(apd.Decimal)
+		target := v.Decimal()
+		newVal := elem.(apd.Decimal)
+		target[int(rowIdx)] = newVal
 	case types.Int8:
-		v.Int8()[rowIdx] = elem.(int8)
+		target := v.Int8()
+		newVal := elem.(int8)
+		target[int(rowIdx)] = newVal
 	case types.Int16:
-		v.Int16()[rowIdx] = elem.(int16)
+		target := v.Int16()
+		newVal := elem.(int16)
+		target[int(rowIdx)] = newVal
 	case types.Int32:
-		v.Int32()[rowIdx] = elem.(int32)
+		target := v.Int32()
+		newVal := elem.(int32)
+		target[int(rowIdx)] = newVal
 	case types.Int64:
-		v.Int64()[rowIdx] = elem.(int64)
+		target := v.Int64()
+		newVal := elem.(int64)
+		target[int(rowIdx)] = newVal
 	case types.Float32:
-		v.Float32()[rowIdx] = elem.(float32)
+		target := v.Float32()
+		newVal := elem.(float32)
+		target[int(rowIdx)] = newVal
 	case types.Float64:
-		v.Float64()[rowIdx] = elem.(float64)
+		target := v.Float64()
+		newVal := elem.(float64)
+		target[int(rowIdx)] = newVal
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}

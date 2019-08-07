@@ -36,7 +36,8 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = bytes.HasPrefix(arg, p.constArg)
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -45,10 +46,11 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = bytes.HasPrefix(arg, p.constArg)
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -62,7 +64,8 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = bytes.HasPrefix(arg, p.constArg)
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -71,10 +74,11 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = bytes.HasPrefix(arg, p.constArg)
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -122,13 +126,16 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = bytes.HasPrefix(col[i], p.constArg)
+			arg := col.Get(int(i))
+			projCol[i] = bytes.HasPrefix(arg, p.constArg)
 		}
 	} else {
-		col = col[:n]
-		_ = projCol[len(col)-1]
-		for i := range col {
-			projCol[i] = bytes.HasPrefix(col[i], p.constArg)
+		col = col.Slice(0, int(n))
+		colLen := col.Len()
+		_ = projCol[colLen-1]
+		for i := 0; i < col.Len(); i++ {
+			arg := col.Get(i)
+			projCol[i] = bytes.HasPrefix(arg, p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -167,7 +174,8 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = bytes.HasSuffix(arg, p.constArg)
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -176,10 +184,11 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = bytes.HasSuffix(arg, p.constArg)
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -193,7 +202,8 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = bytes.HasSuffix(arg, p.constArg)
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -202,10 +212,11 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = bytes.HasSuffix(arg, p.constArg)
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -253,13 +264,16 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = bytes.HasSuffix(col[i], p.constArg)
+			arg := col.Get(int(i))
+			projCol[i] = bytes.HasSuffix(arg, p.constArg)
 		}
 	} else {
-		col = col[:n]
-		_ = projCol[len(col)-1]
-		for i := range col {
-			projCol[i] = bytes.HasSuffix(col[i], p.constArg)
+		col = col.Slice(0, int(n))
+		colLen := col.Len()
+		_ = projCol[colLen-1]
+		for i := 0; i < col.Len(); i++ {
+			arg := col.Get(i)
+			projCol[i] = bytes.HasSuffix(arg, p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -298,7 +312,8 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = p.constArg.Match(col[i])
+					arg := col.Get(int(i))
+					cmp = p.constArg.Match(arg)
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -307,10 +322,11 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = p.constArg.Match(col[i])
+					arg := col.Get(i)
+					cmp = p.constArg.Match(arg)
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -324,7 +340,8 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = p.constArg.Match(col[i])
+					arg := col.Get(int(i))
+					cmp = p.constArg.Match(arg)
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -333,10 +350,11 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = p.constArg.Match(col[i])
+					arg := col.Get(i)
+					cmp = p.constArg.Match(arg)
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -384,13 +402,16 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = p.constArg.Match(col[i])
+			arg := col.Get(int(i))
+			projCol[i] = p.constArg.Match(arg)
 		}
 	} else {
-		col = col[:n]
-		_ = projCol[len(col)-1]
-		for i := range col {
-			projCol[i] = p.constArg.Match(col[i])
+		col = col.Slice(0, int(n))
+		colLen := col.Len()
+		_ = projCol[colLen-1]
+		for i := 0; i < col.Len(); i++ {
+			arg := col.Get(i)
+			projCol[i] = p.constArg.Match(arg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -429,7 +450,8 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = !bytes.HasPrefix(arg, p.constArg)
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -438,10 +460,11 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = !bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = !bytes.HasPrefix(arg, p.constArg)
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -455,7 +478,8 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = !bytes.HasPrefix(arg, p.constArg)
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -464,10 +488,11 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = !bytes.HasPrefix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = !bytes.HasPrefix(arg, p.constArg)
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -515,13 +540,16 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = !bytes.HasPrefix(col[i], p.constArg)
+			arg := col.Get(int(i))
+			projCol[i] = !bytes.HasPrefix(arg, p.constArg)
 		}
 	} else {
-		col = col[:n]
-		_ = projCol[len(col)-1]
-		for i := range col {
-			projCol[i] = !bytes.HasPrefix(col[i], p.constArg)
+		col = col.Slice(0, int(n))
+		colLen := col.Len()
+		_ = projCol[colLen-1]
+		for i := 0; i < col.Len(); i++ {
+			arg := col.Get(i)
+			projCol[i] = !bytes.HasPrefix(arg, p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -560,7 +588,8 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = !bytes.HasSuffix(arg, p.constArg)
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -569,10 +598,11 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = !bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = !bytes.HasSuffix(arg, p.constArg)
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -586,7 +616,8 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(int(i))
+					cmp = !bytes.HasSuffix(arg, p.constArg)
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -595,10 +626,11 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = !bytes.HasSuffix(col[i], p.constArg)
+					arg := col.Get(i)
+					cmp = !bytes.HasSuffix(arg, p.constArg)
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -646,13 +678,16 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = !bytes.HasSuffix(col[i], p.constArg)
+			arg := col.Get(int(i))
+			projCol[i] = !bytes.HasSuffix(arg, p.constArg)
 		}
 	} else {
-		col = col[:n]
-		_ = projCol[len(col)-1]
-		for i := range col {
-			projCol[i] = !bytes.HasSuffix(col[i], p.constArg)
+		col = col.Slice(0, int(n))
+		colLen := col.Len()
+		_ = projCol[colLen-1]
+		for i := 0; i < col.Len(); i++ {
+			arg := col.Get(i)
+			projCol[i] = !bytes.HasSuffix(arg, p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -691,7 +726,8 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !p.constArg.Match(col[i])
+					arg := col.Get(int(i))
+					cmp = !p.constArg.Match(arg)
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -700,10 +736,11 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = !p.constArg.Match(col[i])
+					arg := col.Get(i)
+					cmp = !p.constArg.Match(arg)
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -717,7 +754,8 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
-					cmp = !p.constArg.Match(col[i])
+					arg := col.Get(int(i))
+					cmp = !p.constArg.Match(arg)
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -726,10 +764,11 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[:n]
-				for i := range col {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
 					var cmp bool
-					cmp = !p.constArg.Match(col[i])
+					arg := col.Get(i)
+					cmp = !p.constArg.Match(arg)
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -777,13 +816,16 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
-			projCol[i] = !p.constArg.Match(col[i])
+			arg := col.Get(int(i))
+			projCol[i] = !p.constArg.Match(arg)
 		}
 	} else {
-		col = col[:n]
-		_ = projCol[len(col)-1]
-		for i := range col {
-			projCol[i] = !p.constArg.Match(col[i])
+		col = col.Slice(0, int(n))
+		colLen := col.Len()
+		_ = projCol[colLen-1]
+		for i := 0; i < col.Len(); i++ {
+			arg := col.Get(i)
+			projCol[i] = !p.constArg.Match(arg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {

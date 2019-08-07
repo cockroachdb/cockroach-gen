@@ -14,9 +14,13 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/pkg/errors"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 // NewConstOp creates a new operator that produces a constant value constVal of
 // type t at index outputIdx.
@@ -115,10 +119,11 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Bool()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -150,11 +155,12 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Bytes()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col.Set(int(i), c.constVal)
 		}
 	} else {
-		for i := range col[:n] {
-			col[i] = c.constVal
+		col = col.Slice(0, int(n))
+		for i := 0; i < col.Len(); i++ {
+			col.Set(i, c.constVal)
 		}
 	}
 	return batch
@@ -185,10 +191,11 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Decimal()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -220,10 +227,11 @@ func (c constInt8Op) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Int8()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -255,10 +263,11 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Int16()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -290,10 +299,11 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Int32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -325,10 +335,11 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Int64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -360,10 +371,11 @@ func (c constFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Float32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}
@@ -395,10 +407,11 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Float64()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[i] = c.constVal
+			col[int(i)] = c.constVal
 		}
 	} else {
-		for i := range col[:n] {
+		col = col[0:int(n)]
+		for i := range col {
 			col[i] = c.constVal
 		}
 	}

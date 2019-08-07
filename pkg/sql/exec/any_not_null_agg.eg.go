@@ -12,6 +12,7 @@ package exec
 import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/pkg/errors"
 )
@@ -41,6 +42,9 @@ func newAnyNotNullAgg(t types.T) (aggregateFunc, error) {
 	}
 }
 
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
+
 // anyNotNullBoolAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullBoolAgg struct {
@@ -60,7 +64,8 @@ func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullBoolAgg) Reset() {
-	copy(a.vec, zeroBoolColumn)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroBoolColumn) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -74,7 +79,10 @@ func (a *anyNotNullBoolAgg) CurrentOutputIndex() int {
 func (a *anyNotNullBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroBoolColumn)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroBoolColumn) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -118,12 +126,16 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -142,7 +154,11 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -168,12 +184,16 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -192,7 +212,11 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -209,7 +233,7 @@ func (a *anyNotNullBoolAgg) HandleEmptyInputScalar() {
 type anyNotNullBytesAgg struct {
 	done                        bool
 	groups                      []bool
-	vec                         [][]byte
+	vec                         *coldata.Bytes
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -223,7 +247,7 @@ func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullBytesAgg) Reset() {
-	copy(a.vec, zeroBytesColumn)
+	a.vec.Zero()
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -237,7 +261,9 @@ func (a *anyNotNullBytesAgg) CurrentOutputIndex() int {
 func (a *anyNotNullBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroBytesColumn)
+		vecLen := a.vec.Len()
+		target := a.vec.Slice(idx+1, vecLen)
+		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -281,13 +307,17 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col.Get(int(i))
+					a.vec.Set(a.curIdx, v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
-			for i := range col {
+			col = col.Slice(0, int(inputLen))
+			for i := 0; i < col.Len(); i++ {
 
 				if a.groups[i] {
 					// If this is a new group, check if any non-nulls have been found for the
@@ -305,7 +335,11 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col.Get(int(i))
+					a.vec.Set(a.curIdx, v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -331,13 +365,17 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col.Get(int(i))
+					a.vec.Set(a.curIdx, v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
-			for i := range col {
+			col = col.Slice(0, int(inputLen))
+			for i := 0; i < col.Len(); i++ {
 
 				if a.groups[i] {
 					// If this is a new group, check if any non-nulls have been found for the
@@ -355,7 +393,11 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col.Get(int(i))
+					a.vec.Set(a.curIdx, v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -386,7 +428,8 @@ func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullDecimalAgg) Reset() {
-	copy(a.vec, zeroDecimalColumn)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroDecimalColumn) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -400,7 +443,10 @@ func (a *anyNotNullDecimalAgg) CurrentOutputIndex() int {
 func (a *anyNotNullDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroDecimalColumn)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroDecimalColumn) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -444,12 +490,16 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -468,7 +518,11 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -494,12 +548,16 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -518,7 +576,11 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -549,7 +611,8 @@ func (a *anyNotNullInt8Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt8Agg) Reset() {
-	copy(a.vec, zeroInt8Column)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt8Column) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -563,7 +626,10 @@ func (a *anyNotNullInt8Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt8Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt8Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt8Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -607,12 +673,16 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -631,7 +701,11 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -657,12 +731,16 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -681,7 +759,11 @@ func (a *anyNotNullInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -712,7 +794,8 @@ func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt16Agg) Reset() {
-	copy(a.vec, zeroInt16Column)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt16Column) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -726,7 +809,10 @@ func (a *anyNotNullInt16Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt16Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt16Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -770,12 +856,16 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -794,7 +884,11 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -820,12 +914,16 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -844,7 +942,11 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -875,7 +977,8 @@ func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt32Agg) Reset() {
-	copy(a.vec, zeroInt32Column)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt32Column) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -889,7 +992,10 @@ func (a *anyNotNullInt32Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt32Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt32Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -933,12 +1039,16 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -957,7 +1067,11 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -983,12 +1097,16 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1007,7 +1125,11 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1038,7 +1160,8 @@ func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt64Agg) Reset() {
-	copy(a.vec, zeroInt64Column)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt64Column) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -1052,7 +1175,10 @@ func (a *anyNotNullInt64Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt64Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt64Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1096,12 +1222,16 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1120,7 +1250,11 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1146,12 +1280,16 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1170,7 +1308,11 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1201,7 +1343,8 @@ func (a *anyNotNullFloat32Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullFloat32Agg) Reset() {
-	copy(a.vec, zeroFloat32Column)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat32Column) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -1215,7 +1358,10 @@ func (a *anyNotNullFloat32Agg) CurrentOutputIndex() int {
 func (a *anyNotNullFloat32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroFloat32Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroFloat32Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1259,12 +1405,16 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1283,7 +1433,11 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1309,12 +1463,16 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1333,7 +1491,11 @@ func (a *anyNotNullFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1364,7 +1526,8 @@ func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullFloat64Agg) Reset() {
-	copy(a.vec, zeroFloat64Column)
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat64Column) {
+	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -1378,7 +1541,10 @@ func (a *anyNotNullFloat64Agg) CurrentOutputIndex() int {
 func (a *anyNotNullFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroFloat64Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroFloat64Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1422,12 +1588,16 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1446,7 +1616,11 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -1472,12 +1646,16 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1496,7 +1674,11 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// If we haven't seen any non-nulls for the current group yet, and the
 					// current value is non-null, then we can pick the current value to be the
 					// output.
-					a.vec[a.curIdx] = col[i]
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
 					a.foundNonNullForCurrentGroup = true
 				}
 			}

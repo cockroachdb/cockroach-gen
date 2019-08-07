@@ -14,10 +14,14 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 func newMinAgg(t types.T) (aggregateFunc, error) {
 	switch t {
@@ -70,7 +74,9 @@ func (a *minBoolAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minBoolAgg) Reset() {
-	copy(a.vec, zeroBoolColumn)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroBoolColumn) {
+	}
 	a.curAgg = zeroBoolColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -85,7 +91,10 @@ func (a *minBoolAgg) CurrentOutputIndex() int {
 func (a *minBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroBoolColumn)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroBoolColumn) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -127,7 +136,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -135,19 +144,20 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -163,7 +173,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -171,13 +181,14 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -201,7 +212,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -209,19 +220,20 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -237,7 +249,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -245,13 +257,14 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -272,7 +285,7 @@ type minBytesAgg struct {
 	// group, instead of on each iteration.
 	curAgg []byte
 	// vec points to the output vector we are updating.
-	vec [][]byte
+	vec *coldata.Bytes
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -290,7 +303,8 @@ func (a *minBytesAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minBytesAgg) Reset() {
-	copy(a.vec, zeroBytesColumn)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	a.vec.Zero()
 	a.curAgg = zeroBytesColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -305,7 +319,9 @@ func (a *minBytesAgg) CurrentOutputIndex() int {
 func (a *minBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroBytesColumn)
+		vecLen := a.vec.Len()
+		target := a.vec.Slice(idx+1, vecLen)
+		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -322,7 +338,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.vec.Set(a.curIdx, a.curAgg)
 		a.curIdx++
 		a.done = true
 		return
@@ -342,33 +358,34 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) < 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
-			for i := range col {
+			col = col.Slice(0, int(inputLen))
+			for i := 0; i < col.Len(); i++ {
 
 				if a.groups[i] {
 					// If we encounter a new group, and we haven't found any non-nulls for the
@@ -378,26 +395,27 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) < 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -416,33 +434,34 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) < 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
-			for i := range col {
+			col = col.Slice(0, int(inputLen))
+			for i := 0; i < col.Len(); i++ {
 
 				if a.groups[i] {
 					// If we encounter a new group, and we haven't found any non-nulls for the
@@ -452,26 +471,27 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) < 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -510,7 +530,9 @@ func (a *minDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minDecimalAgg) Reset() {
-	copy(a.vec, zeroDecimalColumn)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroDecimalColumn) {
+	}
 	a.curAgg = zeroDecimalColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -525,7 +547,10 @@ func (a *minDecimalAgg) CurrentOutputIndex() int {
 func (a *minDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroDecimalColumn)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroDecimalColumn) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -567,7 +592,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -575,19 +600,20 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -603,7 +629,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -611,13 +637,14 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -641,7 +668,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -649,19 +676,20 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -677,7 +705,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -685,13 +713,14 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) < 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -730,7 +759,9 @@ func (a *minInt8Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minInt8Agg) Reset() {
-	copy(a.vec, zeroInt8Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt8Column) {
+	}
 	a.curAgg = zeroInt8Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -745,7 +776,10 @@ func (a *minInt8Agg) CurrentOutputIndex() int {
 func (a *minInt8Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt8Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt8Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -787,7 +821,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -795,19 +829,20 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -823,7 +858,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -831,13 +866,14 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -861,7 +897,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -869,19 +905,20 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -897,7 +934,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -905,13 +942,14 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -950,7 +988,9 @@ func (a *minInt16Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minInt16Agg) Reset() {
-	copy(a.vec, zeroInt16Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt16Column) {
+	}
 	a.curAgg = zeroInt16Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -965,7 +1005,10 @@ func (a *minInt16Agg) CurrentOutputIndex() int {
 func (a *minInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt16Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt16Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1007,7 +1050,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1015,19 +1058,20 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1043,7 +1087,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1051,13 +1095,14 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1081,7 +1126,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1089,19 +1134,20 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1117,7 +1163,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1125,13 +1171,14 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1170,7 +1217,9 @@ func (a *minInt32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minInt32Agg) Reset() {
-	copy(a.vec, zeroInt32Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt32Column) {
+	}
 	a.curAgg = zeroInt32Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -1185,7 +1234,10 @@ func (a *minInt32Agg) CurrentOutputIndex() int {
 func (a *minInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt32Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt32Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1227,7 +1279,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1235,19 +1287,20 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1263,7 +1316,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1271,13 +1324,14 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1301,7 +1355,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1309,19 +1363,20 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1337,7 +1392,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1345,13 +1400,14 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1390,7 +1446,9 @@ func (a *minInt64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minInt64Agg) Reset() {
-	copy(a.vec, zeroInt64Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt64Column) {
+	}
 	a.curAgg = zeroInt64Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -1405,7 +1463,10 @@ func (a *minInt64Agg) CurrentOutputIndex() int {
 func (a *minInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt64Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt64Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1447,7 +1508,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1455,19 +1516,20 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1483,7 +1545,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1491,13 +1553,14 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1521,7 +1584,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1529,19 +1592,20 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1557,7 +1621,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1565,13 +1629,14 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] < a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate < a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1610,7 +1675,9 @@ func (a *minFloat32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minFloat32Agg) Reset() {
-	copy(a.vec, zeroFloat32Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat32Column) {
+	}
 	a.curAgg = zeroFloat32Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -1625,7 +1692,10 @@ func (a *minFloat32Agg) CurrentOutputIndex() int {
 func (a *minFloat32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroFloat32Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroFloat32Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1667,7 +1737,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1675,19 +1745,20 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1703,7 +1774,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1711,13 +1782,14 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1741,7 +1813,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1749,19 +1821,20 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1777,7 +1850,7 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1785,13 +1858,14 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1830,7 +1904,9 @@ func (a *minFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *minFloat64Agg) Reset() {
-	copy(a.vec, zeroFloat64Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat64Column) {
+	}
 	a.curAgg = zeroFloat64Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -1845,7 +1921,10 @@ func (a *minFloat64Agg) CurrentOutputIndex() int {
 func (a *minFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroFloat64Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroFloat64Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1887,7 +1966,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1895,19 +1974,20 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1923,7 +2003,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1931,13 +2011,14 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -1961,7 +2042,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -1969,19 +2050,20 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -1997,7 +2079,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2005,13 +2087,14 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) < 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2075,7 +2158,9 @@ func (a *maxBoolAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxBoolAgg) Reset() {
-	copy(a.vec, zeroBoolColumn)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroBoolColumn) {
+	}
 	a.curAgg = zeroBoolColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -2090,7 +2175,10 @@ func (a *maxBoolAgg) CurrentOutputIndex() int {
 func (a *maxBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroBoolColumn)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroBoolColumn) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -2132,7 +2220,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2140,19 +2228,20 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -2168,7 +2257,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2176,13 +2265,14 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2206,7 +2296,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2214,19 +2304,20 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -2242,7 +2333,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBoolColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2250,13 +2341,14 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareBools(col[i], a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareBools(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2277,7 +2369,7 @@ type maxBytesAgg struct {
 	// group, instead of on each iteration.
 	curAgg []byte
 	// vec points to the output vector we are updating.
-	vec [][]byte
+	vec *coldata.Bytes
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -2295,7 +2387,8 @@ func (a *maxBytesAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxBytesAgg) Reset() {
-	copy(a.vec, zeroBytesColumn)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	a.vec.Zero()
 	a.curAgg = zeroBytesColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -2310,7 +2403,9 @@ func (a *maxBytesAgg) CurrentOutputIndex() int {
 func (a *maxBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroBytesColumn)
+		vecLen := a.vec.Len()
+		target := a.vec.Slice(idx+1, vecLen)
+		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -2327,7 +2422,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.vec.Set(a.curIdx, a.curAgg)
 		a.curIdx++
 		a.done = true
 		return
@@ -2347,33 +2442,34 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) > 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
-			for i := range col {
+			col = col.Slice(0, int(inputLen))
+			for i := 0; i < col.Len(); i++ {
 
 				if a.groups[i] {
 					// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2383,26 +2479,27 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) > 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2421,33 +2518,34 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) > 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
-			for i := range col {
+			col = col.Slice(0, int(inputLen))
+			for i := 0; i < col.Len(); i++ {
 
 				if a.groups[i] {
 					// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2457,26 +2555,27 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec.Set(a.curIdx, a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroBytesColumn here because this is outside of
 					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
+					a.curAgg = a.vec.Get(a.curIdx)
 				}
 				var isNull bool
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col.Get(int(i))
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = bytes.Compare(col[i], a.curAgg) > 0
+						candidate := col.Get(int(i))
+						cmp = bytes.Compare(candidate, a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2515,7 +2614,9 @@ func (a *maxDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxDecimalAgg) Reset() {
-	copy(a.vec, zeroDecimalColumn)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroDecimalColumn) {
+	}
 	a.curAgg = zeroDecimalColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -2530,7 +2631,10 @@ func (a *maxDecimalAgg) CurrentOutputIndex() int {
 func (a *maxDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroDecimalColumn)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroDecimalColumn) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -2572,7 +2676,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2580,19 +2684,20 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -2608,7 +2713,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2616,13 +2721,14 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2646,7 +2752,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2654,19 +2760,20 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -2682,7 +2789,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroDecimalColumn here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2690,13 +2797,14 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = tree.CompareDecimals(&col[i], &a.curAgg) > 0
+						candidate := col[int(i)]
+						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2735,7 +2843,9 @@ func (a *maxInt8Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxInt8Agg) Reset() {
-	copy(a.vec, zeroInt8Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt8Column) {
+	}
 	a.curAgg = zeroInt8Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -2750,7 +2860,10 @@ func (a *maxInt8Agg) CurrentOutputIndex() int {
 func (a *maxInt8Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt8Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt8Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -2792,7 +2905,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2800,19 +2913,20 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -2828,7 +2942,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2836,13 +2950,14 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2866,7 +2981,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2874,19 +2989,20 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -2902,7 +3018,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt8Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -2910,13 +3026,14 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -2955,7 +3072,9 @@ func (a *maxInt16Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxInt16Agg) Reset() {
-	copy(a.vec, zeroInt16Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt16Column) {
+	}
 	a.curAgg = zeroInt16Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -2970,7 +3089,10 @@ func (a *maxInt16Agg) CurrentOutputIndex() int {
 func (a *maxInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt16Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt16Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -3012,7 +3134,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3020,19 +3142,20 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3048,7 +3171,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3056,13 +3179,14 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3086,7 +3210,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3094,19 +3218,20 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3122,7 +3247,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt16Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3130,13 +3255,14 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3175,7 +3301,9 @@ func (a *maxInt32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxInt32Agg) Reset() {
-	copy(a.vec, zeroInt32Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt32Column) {
+	}
 	a.curAgg = zeroInt32Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -3190,7 +3318,10 @@ func (a *maxInt32Agg) CurrentOutputIndex() int {
 func (a *maxInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt32Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt32Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -3232,7 +3363,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3240,19 +3371,20 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3268,7 +3400,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3276,13 +3408,14 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3306,7 +3439,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3314,19 +3447,20 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3342,7 +3476,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3350,13 +3484,14 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3395,7 +3530,9 @@ func (a *maxInt64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxInt64Agg) Reset() {
-	copy(a.vec, zeroInt64Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt64Column) {
+	}
 	a.curAgg = zeroInt64Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -3410,7 +3547,10 @@ func (a *maxInt64Agg) CurrentOutputIndex() int {
 func (a *maxInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroInt64Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroInt64Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -3452,7 +3592,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3460,19 +3600,20 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3488,7 +3629,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3496,13 +3637,14 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3526,7 +3668,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3534,19 +3676,20 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3562,7 +3705,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroInt64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3570,13 +3713,14 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = col[i] > a.curAgg
+						candidate := col[int(i)]
+						cmp = candidate > a.curAgg
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3615,7 +3759,9 @@ func (a *maxFloat32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxFloat32Agg) Reset() {
-	copy(a.vec, zeroFloat32Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat32Column) {
+	}
 	a.curAgg = zeroFloat32Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -3630,7 +3776,10 @@ func (a *maxFloat32Agg) CurrentOutputIndex() int {
 func (a *maxFloat32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroFloat32Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroFloat32Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -3672,7 +3821,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3680,19 +3829,20 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3708,7 +3858,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3716,13 +3866,14 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3746,7 +3897,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3754,19 +3905,20 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3782,7 +3934,7 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat32Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3790,13 +3942,14 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3835,7 +3988,9 @@ func (a *maxFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *maxFloat64Agg) Reset() {
-	copy(a.vec, zeroFloat64Column)
+	// TODO(asubiotto): Zeros don't seem necessary.
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat64Column) {
+	}
 	a.curAgg = zeroFloat64Column[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -3850,7 +4005,10 @@ func (a *maxFloat64Agg) CurrentOutputIndex() int {
 func (a *maxFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		copy(a.vec[idx+1:], zeroFloat64Column)
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroFloat64Column) {
+		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -3892,7 +4050,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3900,19 +4058,20 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -3928,7 +4087,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3936,13 +4095,14 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
@@ -3966,7 +4126,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -3974,19 +4134,20 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}
 			}
 		} else {
-			col = col[:inputLen]
+			col = col[0:int(inputLen)]
 			for i := range col {
 
 				if a.groups[i] {
@@ -4002,7 +4163,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
 					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
+					// value. We can't use zeroFloat64Column here because this is outside of
 					// the earlier template block.
 					a.curAgg = a.vec[a.curIdx]
 				}
@@ -4010,13 +4171,14 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[i]
+						a.curAgg = col[int(i)]
 						a.foundNonNullForCurrentGroup = true
 					} else {
 						var cmp bool
-						cmp = compareFloats(float64(col[i]), float64(a.curAgg)) > 0
+						candidate := col[int(i)]
+						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
 						if cmp {
-							a.curAgg = col[i]
+							a.curAgg = candidate
 						}
 					}
 				}

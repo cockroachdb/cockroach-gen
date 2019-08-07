@@ -15,9 +15,13 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
+
+// Use execgen package to remove unused import warning.
+var _ interface{} = execgen.GET
 
 type BoolVecComparator struct {
 	vecs  [][]bool
@@ -34,8 +38,8 @@ func (c *BoolVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint1
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	cmp = tree.CompareBools(left, right)
 	return cmp
@@ -51,12 +55,13 @@ func (c *BoolVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16)
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
 type BytesVecComparator struct {
-	vecs  [][][]byte
+	vecs  []*coldata.Bytes
 	nulls []*coldata.Nulls
 }
 
@@ -70,8 +75,8 @@ func (c *BytesVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1].Get(int(valIdx1))
+	right := c.vecs[vecIdx2].Get(int(valIdx2))
 	var cmp int
 	cmp = bytes.Compare(left, right)
 	return cmp
@@ -87,7 +92,8 @@ func (c *BytesVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx].Get(int(srcIdx))
+		c.vecs[dstVecIdx].Set(int(dstIdx), v)
 	}
 }
 
@@ -106,8 +112,8 @@ func (c *DecimalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	cmp = tree.CompareDecimals(&left, &right)
 	return cmp
@@ -123,7 +129,8 @@ func (c *DecimalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -142,8 +149,8 @@ func (c *Int8VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint1
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	if left < right {
 		cmp = -1
@@ -165,7 +172,8 @@ func (c *Int8VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16)
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -184,8 +192,8 @@ func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	if left < right {
 		cmp = -1
@@ -207,7 +215,8 @@ func (c *Int16VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -226,8 +235,8 @@ func (c *Int32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	if left < right {
 		cmp = -1
@@ -249,7 +258,8 @@ func (c *Int32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -268,8 +278,8 @@ func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	if left < right {
 		cmp = -1
@@ -291,7 +301,8 @@ func (c *Int64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -310,8 +321,8 @@ func (c *Float32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	cmp = compareFloats(float64(left), float64(right))
 	return cmp
@@ -327,7 +338,8 @@ func (c *Float32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -346,8 +358,8 @@ func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][valIdx1]
-	right := c.vecs[vecIdx2][valIdx2]
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
 	cmp = compareFloats(float64(left), float64(right))
 	return cmp
@@ -363,7 +375,8 @@ func (c *Float64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		c.vecs[dstVecIdx][dstIdx] = c.vecs[srcVecIdx][srcIdx]
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
 	}
 }
 
@@ -376,7 +389,7 @@ func GetVecComparator(t types.T, numVecs int) vecComparator {
 		}
 	case types.Bytes:
 		return &BytesVecComparator{
-			vecs:  make([][][]byte, numVecs),
+			vecs:  make([]*coldata.Bytes, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
 	case types.Decimal:
