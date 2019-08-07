@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 )
 
 type selPrefixBytesBytesConstOp struct {
@@ -90,6 +91,54 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p selPrefixBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projPrefixBytesBytesConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p projPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
+func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Bytes()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.HasPrefix(col[i], p.constArg)
+		}
+	} else {
+		col = col[:n]
+		_ = projCol[len(col)-1]
+		for i := range col {
+			projCol[i] = bytes.HasPrefix(col[i], p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPrefixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
@@ -176,6 +225,54 @@ func (p selSuffixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
+type projSuffixBytesBytesConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p projSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
+func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Bytes()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = bytes.HasSuffix(col[i], p.constArg)
+		}
+	} else {
+		col = col[:n]
+		_ = projCol[len(col)-1]
+		for i := range col {
+			projCol[i] = bytes.HasSuffix(col[i], p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projSuffixBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
 type selRegexpBytesBytesConstOp struct {
 	OneInputNode
 
@@ -256,6 +353,54 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p selRegexpBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projRegexpBytesBytesConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg *regexp.Regexp
+
+	outputIdx int
+}
+
+func (p projRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
+func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Bytes()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = p.constArg.Match(col[i])
+		}
+	} else {
+		col = col[:n]
+		_ = projCol[len(col)-1]
+		for i := range col {
+			projCol[i] = p.constArg.Match(col[i])
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
@@ -342,6 +487,54 @@ func (p selNotPrefixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
+type projNotPrefixBytesBytesConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p projNotPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
+func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Bytes()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = !bytes.HasPrefix(col[i], p.constArg)
+		}
+	} else {
+		col = col[:n]
+		_ = projCol[len(col)-1]
+		for i := range col {
+			projCol[i] = !bytes.HasPrefix(col[i], p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNotPrefixBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
 type selNotSuffixBytesBytesConstOp struct {
 	OneInputNode
 
@@ -425,6 +618,54 @@ func (p selNotSuffixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
+type projNotSuffixBytesBytesConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg []byte
+
+	outputIdx int
+}
+
+func (p projNotSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
+func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Bytes()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = !bytes.HasSuffix(col[i], p.constArg)
+		}
+	} else {
+		col = col[:n]
+		_ = projCol[len(col)-1]
+		for i := range col {
+			projCol[i] = !bytes.HasSuffix(col[i], p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNotSuffixBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
 type selNotRegexpBytesBytesConstOp struct {
 	OneInputNode
 
@@ -505,5 +746,53 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 }
 
 func (p selNotRegexpBytesBytesConstOp) Init() {
+	p.input.Init()
+}
+
+type projNotRegexpBytesBytesConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg *regexp.Regexp
+
+	outputIdx int
+}
+
+func (p projNotRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+}
+
+func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(types.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Bytes()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			projCol[i] = !p.constArg.Match(col[i])
+		}
+	} else {
+		col = col[:n]
+		_ = projCol[len(col)-1]
+		for i := range col {
+			projCol[i] = !p.constArg.Match(col[i])
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNotRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
