@@ -54,6 +54,7 @@ var KeywordsCategories = map[string]string{
 	"commit":                    "U",
 	"committed":                 "U",
 	"compact":                   "U",
+	"complete":                  "U",
 	"configuration":             "U",
 	"configurations":            "U",
 	"configure":                 "U",
@@ -450,6 +451,7 @@ var KeywordNames = []string{
 	"commit",
 	"committed",
 	"compact",
+	"complete",
 	"configuration",
 	"configurations",
 	"configure",
@@ -902,6 +904,8 @@ func GetKeywordID(k string) int32 {
 		return COMMITTED
 	case "compact":
 		return COMPACT
+	case "complete":
+		return COMPLETE
 	case "configuration":
 		return CONFIGURATION
 	case "configurations":
