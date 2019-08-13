@@ -13093,6 +13093,7 @@ func (_f *Factory) ConstructArrayFlatten(
 		if _f.funcs.HasOuterCols(input) {
 			subquery := subqueryPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeArrayFlattenToAgg) {
+				requestedCol := _f.funcs.SubqueryRequestedCol(subquery)
 				_expr := _f.ConstructCoalesce(
 					memo.ScalarListExpr{
 						_f.ConstructSubquery(
@@ -13102,10 +13103,10 @@ func (_f *Factory) ConstructArrayFlatten(
 									{
 										Agg: _f.ConstructArrayAgg(
 											_f.ConstructVariable(
-												_f.funcs.FirstCol(input),
+												requestedCol,
 											),
 										),
-										ColPrivate: *_f.funcs.MakeArrayAggCol(_f.funcs.ArrayType(input)),
+										ColPrivate: *_f.funcs.MakeArrayAggCol(_f.funcs.ArrayType(requestedCol)),
 									},
 								},
 								_f.funcs.MakeOrderedGrouping(_f.funcs.MakeEmptyColSet(), _f.funcs.SubqueryOrdering(subquery)),
@@ -13114,7 +13115,7 @@ func (_f *Factory) ConstructArrayFlatten(
 						),
 						_f.ConstructArray(
 							memo.EmptyScalarListExpr,
-							_f.funcs.ArrayType(input),
+							_f.funcs.ArrayType(requestedCol),
 						),
 					},
 				)

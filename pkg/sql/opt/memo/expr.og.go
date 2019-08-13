@@ -6287,7 +6287,7 @@ type SubqueryPrivate struct {
 
 	// RequestedCol is set if there could possibly be other columns in the input
 	// (say, if there was an ordering that must be respected) besides the one that
-	// will eventually be output.
+	// will eventually be output. It is only used for ArrayFlatten expressions.
 	RequestedCol opt.ColumnID
 
 	// Cmp is only used for AnyOp.
