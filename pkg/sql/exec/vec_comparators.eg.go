@@ -16,6 +16,7 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
@@ -428,5 +429,7 @@ func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
 	}
-	panic(fmt.Sprintf("unhandled type %v", t))
+	execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %v", t))
+	// This code is unreachable, but the compiler cannot infer that.
+	return nil
 }

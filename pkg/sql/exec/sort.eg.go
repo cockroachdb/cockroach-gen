@@ -18,6 +18,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/distsqlpb"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
@@ -126,7 +127,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortBoolDescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -135,10 +136,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortBoolDescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Bytes:
 		switch hasNulls {
@@ -149,7 +150,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortBytesDescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -158,10 +159,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortBytesDescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Decimal:
 		switch hasNulls {
@@ -172,7 +173,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortDecimalDescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -181,10 +182,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortDecimalDescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Int8:
 		switch hasNulls {
@@ -195,7 +196,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt8DescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -204,10 +205,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt8DescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Int16:
 		switch hasNulls {
@@ -218,7 +219,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt16DescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -227,10 +228,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt16DescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Int32:
 		switch hasNulls {
@@ -241,7 +242,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt32DescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -250,10 +251,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt32DescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Int64:
 		switch hasNulls {
@@ -264,7 +265,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt64DescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -273,10 +274,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortInt64DescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Float32:
 		switch hasNulls {
@@ -287,7 +288,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortFloat32DescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -296,10 +297,10 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortFloat32DescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	case coltypes.Float64:
 		switch hasNulls {
@@ -310,7 +311,7 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortFloat64DescOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		case true:
 			switch dir {
@@ -319,14 +320,16 @@ func newSingleSorter(
 			case distsqlpb.Ordering_Column_DESC:
 				return &sortFloat64DescWithNullsOp{}
 			default:
-				panic("nulls switch failed")
+				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
 		default:
-			panic("nulls switch failed")
+			execerror.VectorizedInternalPanic("nulls switch failed")
 		}
 	default:
-		panic("nulls switch failed")
+		execerror.VectorizedInternalPanic("nulls switch failed")
 	}
+	// This code is unreachable, but the compiler cannot infer that.
+	return nil
 }
 
 type sortBoolAscOp struct {
@@ -349,7 +352,7 @@ func (s *sortBoolAscOp) sort(ctx context.Context) {
 
 func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -403,7 +406,7 @@ func (s *sortBoolDescOp) sort(ctx context.Context) {
 
 func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -457,7 +460,7 @@ func (s *sortBoolAscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortBoolAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -521,7 +524,7 @@ func (s *sortBoolDescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortBoolDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -585,7 +588,7 @@ func (s *sortBytesAscOp) sort(ctx context.Context) {
 
 func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -639,7 +642,7 @@ func (s *sortBytesDescOp) sort(ctx context.Context) {
 
 func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -693,7 +696,7 @@ func (s *sortBytesAscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortBytesAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -757,7 +760,7 @@ func (s *sortBytesDescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortBytesDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -821,7 +824,7 @@ func (s *sortDecimalAscOp) sort(ctx context.Context) {
 
 func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -875,7 +878,7 @@ func (s *sortDecimalDescOp) sort(ctx context.Context) {
 
 func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -929,7 +932,7 @@ func (s *sortDecimalAscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortDecimalAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -993,7 +996,7 @@ func (s *sortDecimalDescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortDecimalDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1057,7 +1060,7 @@ func (s *sortInt8AscOp) sort(ctx context.Context) {
 
 func (s *sortInt8AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1111,7 +1114,7 @@ func (s *sortInt8DescOp) sort(ctx context.Context) {
 
 func (s *sortInt8DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1165,7 +1168,7 @@ func (s *sortInt8AscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt8AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1229,7 +1232,7 @@ func (s *sortInt8DescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt8DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1293,7 +1296,7 @@ func (s *sortInt16AscOp) sort(ctx context.Context) {
 
 func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1347,7 +1350,7 @@ func (s *sortInt16DescOp) sort(ctx context.Context) {
 
 func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1401,7 +1404,7 @@ func (s *sortInt16AscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt16AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1465,7 +1468,7 @@ func (s *sortInt16DescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt16DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1529,7 +1532,7 @@ func (s *sortInt32AscOp) sort(ctx context.Context) {
 
 func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1583,7 +1586,7 @@ func (s *sortInt32DescOp) sort(ctx context.Context) {
 
 func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1637,7 +1640,7 @@ func (s *sortInt32AscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt32AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1701,7 +1704,7 @@ func (s *sortInt32DescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt32DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1765,7 +1768,7 @@ func (s *sortInt64AscOp) sort(ctx context.Context) {
 
 func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1819,7 +1822,7 @@ func (s *sortInt64DescOp) sort(ctx context.Context) {
 
 func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1873,7 +1876,7 @@ func (s *sortInt64AscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt64AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -1937,7 +1940,7 @@ func (s *sortInt64DescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortInt64DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2001,7 +2004,7 @@ func (s *sortFloat32AscOp) sort(ctx context.Context) {
 
 func (s *sortFloat32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2055,7 +2058,7 @@ func (s *sortFloat32DescOp) sort(ctx context.Context) {
 
 func (s *sortFloat32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2109,7 +2112,7 @@ func (s *sortFloat32AscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortFloat32AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2173,7 +2176,7 @@ func (s *sortFloat32DescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortFloat32DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2237,7 +2240,7 @@ func (s *sortFloat64AscOp) sort(ctx context.Context) {
 
 func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2291,7 +2294,7 @@ func (s *sortFloat64DescOp) sort(ctx context.Context) {
 
 func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2345,7 +2348,7 @@ func (s *sortFloat64AscWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortFloat64AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
@@ -2409,7 +2412,7 @@ func (s *sortFloat64DescWithNullsOp) sort(ctx context.Context) {
 
 func (s *sortFloat64DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
 	if len(partitions) < 1 {
-		panic(fmt.Sprintf("invalid partitions list %v", partitions))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {

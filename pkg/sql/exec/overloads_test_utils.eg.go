@@ -6,33 +6,34 @@ import (
 	"math"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
 func performPlusDecimal(a, b apd.Decimal) apd.Decimal {
 	if _, err := tree.DecimalCtx.Add(&a, &a, &b); err != nil {
-		panic(err)
+		execerror.NonVectorizedPanic(err)
 	}
 	return a
 }
 
 func performMinusDecimal(a, b apd.Decimal) apd.Decimal {
 	if _, err := tree.DecimalCtx.Sub(&a, &a, &b); err != nil {
-		panic(err)
+		execerror.NonVectorizedPanic(err)
 	}
 	return a
 }
 
 func performMultDecimal(a, b apd.Decimal) apd.Decimal {
 	if _, err := tree.DecimalCtx.Mul(&a, &a, &b); err != nil {
-		panic(err)
+		execerror.NonVectorizedPanic(err)
 	}
 	return a
 }
 
 func performDivDecimal(a, b apd.Decimal) apd.Decimal {
 	if _, err := tree.DecimalCtx.Quo(&a, &a, &b); err != nil {
-		panic(err)
+		execerror.NonVectorizedPanic(err)
 	}
 	return a
 }
@@ -42,7 +43,7 @@ func performPlusInt8(a, b int8) int8 {
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -55,7 +56,7 @@ func performMinusInt8(a, b int8) int8 {
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -71,9 +72,9 @@ func performMultInt8(a, b int8) int8 {
 			if a != 0 && b != 0 {
 				sameSign := (a < 0) == (b < 0)
 				if (result < 0) == sameSign {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				} else if result/b != a {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -87,11 +88,11 @@ func performDivInt8(a, b int8) int8 {
 
 	{
 		if b == 0 {
-			panic(tree.ErrDivByZero)
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
 		result := a / b
 		if a == math.MinInt8 && b == -1 {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -104,7 +105,7 @@ func performPlusInt16(a, b int16) int16 {
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -117,7 +118,7 @@ func performMinusInt16(a, b int16) int16 {
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -133,9 +134,9 @@ func performMultInt16(a, b int16) int16 {
 			if a != 0 && b != 0 {
 				sameSign := (a < 0) == (b < 0)
 				if (result < 0) == sameSign {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				} else if result/b != a {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -149,11 +150,11 @@ func performDivInt16(a, b int16) int16 {
 
 	{
 		if b == 0 {
-			panic(tree.ErrDivByZero)
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
 		result := a / b
 		if a == math.MinInt16 && b == -1 {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -166,7 +167,7 @@ func performPlusInt32(a, b int32) int32 {
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -179,7 +180,7 @@ func performMinusInt32(a, b int32) int32 {
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -195,9 +196,9 @@ func performMultInt32(a, b int32) int32 {
 			if a != 0 && b != 0 {
 				sameSign := (a < 0) == (b < 0)
 				if (result < 0) == sameSign {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				} else if result/b != a {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -211,11 +212,11 @@ func performDivInt32(a, b int32) int32 {
 
 	{
 		if b == 0 {
-			panic(tree.ErrDivByZero)
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
 		result := a / b
 		if a == math.MinInt32 && b == -1 {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -228,7 +229,7 @@ func performPlusInt64(a, b int64) int64 {
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -241,7 +242,7 @@ func performMinusInt64(a, b int64) int64 {
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}
@@ -257,9 +258,9 @@ func performMultInt64(a, b int64) int64 {
 			if a != 0 && b != 0 {
 				sameSign := (a < 0) == (b < 0)
 				if (result < 0) == sameSign {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				} else if result/b != a {
-					panic(tree.ErrIntOutOfRange)
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -273,11 +274,11 @@ func performDivInt64(a, b int64) int64 {
 
 	{
 		if b == 0 {
-			panic(tree.ErrDivByZero)
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
 		result := a / b
 		if a == math.MinInt64 && b == -1 {
-			panic(tree.ErrIntOutOfRange)
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		a = result
 	}

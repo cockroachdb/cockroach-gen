@@ -16,6 +16,7 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
@@ -45,7 +46,7 @@ func OrderedDistinctColsToOperators(
 		}
 	}
 	if r, ok = input.(resettableOperator); !ok {
-		panic("unexpectedly an ordered distinct is not a resetter")
+		execerror.VectorizedInternalPanic("unexpectedly an ordered distinct is not a resetter")
 	}
 	distinctChain := distinctChainOps{
 		resettableOperator:         r,

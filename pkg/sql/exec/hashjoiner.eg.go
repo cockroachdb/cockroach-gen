@@ -18,6 +18,7 @@ import (
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
@@ -198,7 +199,7 @@ func (ht *hashTable) rehash(
 
 					d, err := v.Float64()
 					if err != nil {
-						panic(fmt.Sprintf("%v", err))
+						execerror.NonVectorizedPanic(err)
 					}
 
 					p = f64hash(noescape(unsafe.Pointer(&d)), p)
@@ -218,7 +219,7 @@ func (ht *hashTable) rehash(
 
 					d, err := v.Float64()
 					if err != nil {
-						panic(fmt.Sprintf("%v", err))
+						execerror.NonVectorizedPanic(err)
 					}
 
 					p = f64hash(noescape(unsafe.Pointer(&d)), p)
@@ -237,7 +238,7 @@ func (ht *hashTable) rehash(
 
 					d, err := v.Float64()
 					if err != nil {
-						panic(fmt.Sprintf("%v", err))
+						execerror.NonVectorizedPanic(err)
 					}
 
 					p = f64hash(noescape(unsafe.Pointer(&d)), p)
@@ -254,7 +255,7 @@ func (ht *hashTable) rehash(
 
 					d, err := v.Float64()
 					if err != nil {
-						panic(fmt.Sprintf("%v", err))
+						execerror.NonVectorizedPanic(err)
 					}
 
 					p = f64hash(noescape(unsafe.Pointer(&d)), p)
@@ -589,7 +590,7 @@ func (ht *hashTable) rehash(
 		}
 
 	default:
-		panic(fmt.Sprintf("unhandled type %d", t))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", t))
 	}
 }
 
@@ -4309,7 +4310,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	default:
-		panic(fmt.Sprintf("unhandled type %d", t))
+		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", t))
 	}
 }
 
