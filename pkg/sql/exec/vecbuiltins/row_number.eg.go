@@ -12,9 +12,9 @@ package vecbuiltins
 import (
 	"context"
 
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 )
 
 type rowNumberNoPartitionOp struct {
@@ -30,7 +30,7 @@ func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(types.Int64)
+		batch.AppendCol(coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		panic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
@@ -62,14 +62,14 @@ func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if r.partitionColIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	} else if r.partitionColIdx > batch.Width() {
 		panic("unexpected: column partitionColIdx is neither present nor the next to be appended")
 	}
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 
 	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(types.Int64)
+		batch.AppendCol(coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		panic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}

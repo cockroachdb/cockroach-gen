@@ -13,12 +13,16 @@ import (
 	"fmt"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	// HACK: crlfmt removes the "*/}}" comment if it's the last line in the import
+	// block. This was picked because it sorts after "pkg/sql/exec/execgen" and
+	// has no deps.
+	_ "github.com/cockroachdb/cockroach/pkg/util/bufalloc"
 )
 
 func (m *memColumn) Append(args AppendArgs) {
 	switch args.ColType {
-	case types.Bool:
+	case coltypes.Bool:
 		fromCol := args.Src.Bool()
 		toCol := m.Bool()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -40,7 +44,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Bytes:
+	case coltypes.Bytes:
 		fromCol := args.Src.Bytes()
 		toCol := m.Bytes()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -62,7 +66,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Decimal:
+	case coltypes.Decimal:
 		fromCol := args.Src.Decimal()
 		toCol := m.Decimal()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -84,7 +88,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Int8:
+	case coltypes.Int8:
 		fromCol := args.Src.Int8()
 		toCol := m.Int8()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -106,7 +110,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Int16:
+	case coltypes.Int16:
 		fromCol := args.Src.Int16()
 		toCol := m.Int16()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -128,7 +132,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Int32:
+	case coltypes.Int32:
 		fromCol := args.Src.Int32()
 		toCol := m.Int32()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -150,7 +154,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Int64:
+	case coltypes.Int64:
 		fromCol := args.Src.Int64()
 		toCol := m.Int64()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -172,7 +176,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Float32:
+	case coltypes.Float32:
 		fromCol := args.Src.Float32()
 		toCol := m.Float32()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -194,7 +198,7 @@ func (m *memColumn) Append(args AppendArgs) {
 			m.nulls.ExtendWithSel(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend, args.Sel)
 		}
 		m.col = toCol
-	case types.Float64:
+	case coltypes.Float64:
 		fromCol := args.Src.Float64()
 		toCol := m.Float64()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
@@ -229,7 +233,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 	m.Nulls().UnsetNullRange(args.DestIdx, args.DestIdx+(args.SrcEndIdx-args.SrcStartIdx))
 
 	switch args.ColType {
-	case types.Bool:
+	case coltypes.Bool:
 		fromCol := args.Src.Bool()
 		toCol := m.Bool()
 		if args.Sel64 != nil {
@@ -323,7 +327,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Bytes:
+	case coltypes.Bytes:
 		fromCol := args.Src.Bytes()
 		toCol := m.Bytes()
 		if args.Sel64 != nil {
@@ -417,7 +421,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Decimal:
+	case coltypes.Decimal:
 		fromCol := args.Src.Decimal()
 		toCol := m.Decimal()
 		if args.Sel64 != nil {
@@ -511,7 +515,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Int8:
+	case coltypes.Int8:
 		fromCol := args.Src.Int8()
 		toCol := m.Int8()
 		if args.Sel64 != nil {
@@ -605,7 +609,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Int16:
+	case coltypes.Int16:
 		fromCol := args.Src.Int16()
 		toCol := m.Int16()
 		if args.Sel64 != nil {
@@ -699,7 +703,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Int32:
+	case coltypes.Int32:
 		fromCol := args.Src.Int32()
 		toCol := m.Int32()
 		if args.Sel64 != nil {
@@ -793,7 +797,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Int64:
+	case coltypes.Int64:
 		fromCol := args.Src.Int64()
 		toCol := m.Int64()
 		if args.Sel64 != nil {
@@ -887,7 +891,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Float32:
+	case coltypes.Float32:
 		fromCol := args.Src.Float32()
 		toCol := m.Float32()
 		if args.Sel64 != nil {
@@ -981,7 +985,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				}
 			}
 		}
-	case types.Float64:
+	case coltypes.Float64:
 		fromCol := args.Src.Float64()
 		toCol := m.Float64()
 		if args.Sel64 != nil {
@@ -1080,57 +1084,57 @@ func (m *memColumn) Copy(args CopyArgs) {
 	}
 }
 
-func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
+func (m *memColumn) Slice(colType coltypes.T, start uint64, end uint64) Vec {
 	switch colType {
-	case types.Bool:
+	case coltypes.Bool:
 		col := m.Bool()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Bytes:
+	case coltypes.Bytes:
 		col := m.Bytes()
 		return &memColumn{
 			col:   col.Slice(int(start), int(end)),
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Decimal:
+	case coltypes.Decimal:
 		col := m.Decimal()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Int8:
+	case coltypes.Int8:
 		col := m.Int8()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Int16:
+	case coltypes.Int16:
 		col := m.Int16()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Int32:
+	case coltypes.Int32:
 		col := m.Int32()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Int64:
+	case coltypes.Int64:
 		col := m.Int64()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Float32:
+	case coltypes.Float32:
 		col := m.Float32()
 		return &memColumn{
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case types.Float64:
+	case coltypes.Float64:
 		col := m.Float64()
 		return &memColumn{
 			col:   col[int(start):int(end)],
@@ -1141,44 +1145,44 @@ func (m *memColumn) Slice(colType types.T, start uint64, end uint64) Vec {
 	}
 }
 
-func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
+func (m *memColumn) PrettyValueAt(colIdx uint16, colType coltypes.T) string {
 	if m.nulls.NullAt(colIdx) {
 		return "NULL"
 	}
 	switch colType {
-	case types.Bool:
+	case coltypes.Bool:
 		col := m.Bool()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Bytes:
+	case coltypes.Bytes:
 		col := m.Bytes()
 		v := col.Get(int(colIdx))
 		return fmt.Sprintf("%v", v)
-	case types.Decimal:
+	case coltypes.Decimal:
 		col := m.Decimal()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Int8:
+	case coltypes.Int8:
 		col := m.Int8()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Int16:
+	case coltypes.Int16:
 		col := m.Int16()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Int32:
+	case coltypes.Int32:
 		col := m.Int32()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Int64:
+	case coltypes.Int64:
 		col := m.Int64()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Float32:
+	case coltypes.Float32:
 		col := m.Float32()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case types.Float64:
+	case coltypes.Float64:
 		col := m.Float64()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
@@ -1188,41 +1192,41 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType types.T) string {
 }
 
 // Helper to set the value in a Vec when the type is unknown.
-func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType types.T) {
+func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 	switch colType {
-	case types.Bool:
+	case coltypes.Bool:
 		target := v.Bool()
 		newVal := elem.(bool)
 		target[int(rowIdx)] = newVal
-	case types.Bytes:
+	case coltypes.Bytes:
 		target := v.Bytes()
 		newVal := elem.([]byte)
 		target.Set(int(rowIdx), newVal)
-	case types.Decimal:
+	case coltypes.Decimal:
 		target := v.Decimal()
 		newVal := elem.(apd.Decimal)
 		target[int(rowIdx)] = newVal
-	case types.Int8:
+	case coltypes.Int8:
 		target := v.Int8()
 		newVal := elem.(int8)
 		target[int(rowIdx)] = newVal
-	case types.Int16:
+	case coltypes.Int16:
 		target := v.Int16()
 		newVal := elem.(int16)
 		target[int(rowIdx)] = newVal
-	case types.Int32:
+	case coltypes.Int32:
 		target := v.Int32()
 		newVal := elem.(int32)
 		target[int(rowIdx)] = newVal
-	case types.Int64:
+	case coltypes.Int64:
 		target := v.Int64()
 		newVal := elem.(int64)
 		target[int(rowIdx)] = newVal
-	case types.Float32:
+	case coltypes.Float32:
 		target := v.Float32()
 		newVal := elem.(float32)
 		target[int(rowIdx)] = newVal
-	case types.Float64:
+	case coltypes.Float64:
 		target := v.Float64()
 		newVal := elem.(float64)
 		target[int(rowIdx)] = newVal

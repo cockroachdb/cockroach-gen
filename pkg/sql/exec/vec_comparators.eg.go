@@ -14,9 +14,9 @@ import (
 	"fmt"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
@@ -380,49 +380,49 @@ func (c *Float64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 	}
 }
 
-func GetVecComparator(t types.T, numVecs int) vecComparator {
+func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return &BoolVecComparator{
 			vecs:  make([][]bool, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Bytes:
+	case coltypes.Bytes:
 		return &BytesVecComparator{
 			vecs:  make([]*coldata.Bytes, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &DecimalVecComparator{
 			vecs:  make([][]apd.Decimal, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Int8:
+	case coltypes.Int8:
 		return &Int8VecComparator{
 			vecs:  make([][]int8, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Int16:
+	case coltypes.Int16:
 		return &Int16VecComparator{
 			vecs:  make([][]int16, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Int32:
+	case coltypes.Int32:
 		return &Int32VecComparator{
 			vecs:  make([][]int32, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Int64:
+	case coltypes.Int64:
 		return &Int64VecComparator{
 			vecs:  make([][]int64, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Float32:
+	case coltypes.Float32:
 		return &Float32VecComparator{
 			vecs:  make([][]float32, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case types.Float64:
+	case coltypes.Float64:
 		return &Float64VecComparator{
 			vecs:  make([][]float64, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),

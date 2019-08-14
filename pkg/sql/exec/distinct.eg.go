@@ -14,9 +14,9 @@ import (
 	"context"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
@@ -25,7 +25,7 @@ import (
 // a slice of columns, creates a chain of distinct operators and returns the
 // last distinct operator in that chain as well as its output column.
 func OrderedDistinctColsToOperators(
-	input Operator, distinctCols []uint32, typs []types.T,
+	input Operator, distinctCols []uint32, typs []coltypes.T,
 ) (Operator, []bool, error) {
 	distinctCol := make([]bool, coldata.BatchSize)
 	// zero the boolean column on every iteration.
@@ -49,7 +49,7 @@ func OrderedDistinctColsToOperators(
 	}
 	distinctChain := distinctChainOps{
 		resettableOperator:         r,
-		estimatedStaticMemoryUsage: EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize),
+		estimatedStaticMemoryUsage: EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize),
 	}
 	return distinctChain, distinctCol, nil
 }
@@ -68,8 +68,10 @@ func (d *distinctChainOps) EstimateStaticMemoryUsage() int {
 }
 
 // NewOrderedDistinct creates a new ordered distinct operator on the given
-// input columns with the given types.
-func NewOrderedDistinct(input Operator, distinctCols []uint32, typs []types.T) (Operator, error) {
+// input columns with the given coltypes.
+func NewOrderedDistinct(
+	input Operator, distinctCols []uint32, typs []coltypes.T,
+) (Operator, error) {
 	op, outputCol, err := OrderedDistinctColsToOperators(input, distinctCols, typs)
 	if err != nil {
 		return nil, err
@@ -84,58 +86,58 @@ func NewOrderedDistinct(input Operator, distinctCols []uint32, typs []types.T) (
 var _ interface{} = execgen.GET
 
 func newSingleOrderedDistinct(
-	input Operator, distinctColIdx int, outputCol []bool, t types.T,
+	input Operator, distinctColIdx int, outputCol []bool, t coltypes.T,
 ) (Operator, error) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return &sortedDistinctBoolOp{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		return &sortedDistinctBytesOp{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &sortedDistinctDecimalOp{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return &sortedDistinctInt8Op{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return &sortedDistinctInt16Op{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return &sortedDistinctInt32Op{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return &sortedDistinctInt64Op{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &sortedDistinctFloat32Op{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &sortedDistinctFloat64Op{
 			OneInputNode:      NewOneInputNode(input),
 			sortedDistinctCol: distinctColIdx,
@@ -164,25 +166,25 @@ type partitioner interface {
 }
 
 // newPartitioner returns a new partitioner on type t.
-func newPartitioner(t types.T) (partitioner, error) {
+func newPartitioner(t coltypes.T) (partitioner, error) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return partitionerBool{}, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		return partitionerBytes{}, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		return partitionerDecimal{}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return partitionerInt8{}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return partitionerInt16{}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return partitionerInt32{}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return partitionerInt64{}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return partitionerFloat32{}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return partitionerFloat64{}, nil
 	default:
 		return nil, errors.Errorf("unsupported partition type %s", t)

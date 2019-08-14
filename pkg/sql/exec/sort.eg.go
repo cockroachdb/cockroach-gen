@@ -15,19 +15,19 @@ import (
 	"fmt"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/distsqlpb"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
 // Use execgen package to remove unused import warning.
 var _ interface{} = execgen.GET
 
-func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool {
+func isSorterSupported(t coltypes.T, dir distsqlpb.Ordering_Column_Direction) bool {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -36,7 +36,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Bytes:
+	case coltypes.Bytes:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -45,7 +45,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Decimal:
+	case coltypes.Decimal:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -54,7 +54,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Int8:
+	case coltypes.Int8:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -63,7 +63,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Int16:
+	case coltypes.Int16:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -72,7 +72,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Int32:
+	case coltypes.Int32:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -81,7 +81,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Int64:
+	case coltypes.Int64:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -90,7 +90,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Float32:
+	case coltypes.Float32:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -99,7 +99,7 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 		default:
 			return false
 		}
-	case types.Float64:
+	case coltypes.Float64:
 		switch dir {
 		case distsqlpb.Ordering_Column_ASC:
 			return true
@@ -113,9 +113,11 @@ func isSorterSupported(t types.T, dir distsqlpb.Ordering_Column_Direction) bool 
 	}
 }
 
-func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNulls bool) colSorter {
+func newSingleSorter(
+	t coltypes.T, dir distsqlpb.Ordering_Column_Direction, hasNulls bool,
+) colSorter {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -138,7 +140,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Bytes:
+	case coltypes.Bytes:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -161,7 +163,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Decimal:
+	case coltypes.Decimal:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -184,7 +186,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Int8:
+	case coltypes.Int8:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -207,7 +209,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Int16:
+	case coltypes.Int16:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -230,7 +232,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Int32:
+	case coltypes.Int32:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -253,7 +255,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Int64:
+	case coltypes.Int64:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -276,7 +278,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Float32:
+	case coltypes.Float32:
 		switch hasNulls {
 		case false:
 			switch dir {
@@ -299,7 +301,7 @@ func newSingleSorter(t types.T, dir distsqlpb.Ordering_Column_Direction, hasNull
 		default:
 			panic("nulls switch failed")
 		}
-	case types.Float64:
+	case coltypes.Float64:
 		switch hasNulls {
 		case false:
 			switch dir {

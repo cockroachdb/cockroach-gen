@@ -13,9 +13,9 @@ import (
 	"bytes"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
@@ -23,25 +23,25 @@ import (
 // Use execgen package to remove unused import warning.
 var _ interface{} = execgen.GET
 
-func newMinAgg(t types.T) (aggregateFunc, error) {
+func newMinAgg(t coltypes.T) (aggregateFunc, error) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return &minBoolAgg{}, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		return &minBytesAgg{}, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &minDecimalAgg{}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return &minInt8Agg{}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return &minInt16Agg{}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return &minInt32Agg{}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return &minInt64Agg{}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &minFloat32Agg{}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &minFloat64Agg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported min agg type %s", t)
@@ -2107,25 +2107,25 @@ func (a *minFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
-func newMaxAgg(t types.T) (aggregateFunc, error) {
+func newMaxAgg(t coltypes.T) (aggregateFunc, error) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return &maxBoolAgg{}, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		return &maxBytesAgg{}, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &maxDecimalAgg{}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return &maxInt8Agg{}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return &maxInt16Agg{}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return &maxInt32Agg{}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return &maxInt64Agg{}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &maxFloat32Agg{}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &maxFloat64Agg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported min agg type %s", t)

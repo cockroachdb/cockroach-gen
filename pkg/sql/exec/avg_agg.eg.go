@@ -11,19 +11,19 @@ package exec
 
 import (
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
 
-func newAvgAgg(t types.T) (aggregateFunc, error) {
+func newAvgAgg(t coltypes.T) (aggregateFunc, error) {
 	switch t {
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &avgDecimalAgg{}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &avgFloat32Agg{}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &avgFloat64Agg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported avg agg type %s", t)

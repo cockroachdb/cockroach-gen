@@ -12,9 +12,9 @@ package exec
 import (
 	"bytes"
 
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
@@ -25,10 +25,15 @@ var _ interface{} = execgen.GET
 // tuplesDiffer takes in two ColVecs as well as tuple indices to check whether
 // the tuples differ.
 func tuplesDiffer(
-	t types.T, aColVec coldata.Vec, aTupleIdx int, bColVec coldata.Vec, bTupleIdx int, differ *bool,
+	t coltypes.T,
+	aColVec coldata.Vec,
+	aTupleIdx int,
+	bColVec coldata.Vec,
+	bTupleIdx int,
+	differ *bool,
 ) error {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		aCol := aColVec.Bool()
 		bCol := bColVec.Bool()
 		var unique bool
@@ -37,7 +42,7 @@ func tuplesDiffer(
 		unique = tree.CompareBools(arg1, arg2) != 0
 		*differ = *differ || unique
 		return nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		aCol := aColVec.Bytes()
 		bCol := bColVec.Bytes()
 		var unique bool
@@ -46,7 +51,7 @@ func tuplesDiffer(
 		unique = bytes.Compare(arg1, arg2) != 0
 		*differ = *differ || unique
 		return nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		aCol := aColVec.Decimal()
 		bCol := bColVec.Decimal()
 		var unique bool
@@ -55,7 +60,7 @@ func tuplesDiffer(
 		unique = tree.CompareDecimals(&arg1, &arg2) != 0
 		*differ = *differ || unique
 		return nil
-	case types.Int8:
+	case coltypes.Int8:
 		aCol := aColVec.Int8()
 		bCol := bColVec.Int8()
 		var unique bool
@@ -64,7 +69,7 @@ func tuplesDiffer(
 		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
-	case types.Int16:
+	case coltypes.Int16:
 		aCol := aColVec.Int16()
 		bCol := bColVec.Int16()
 		var unique bool
@@ -73,7 +78,7 @@ func tuplesDiffer(
 		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
-	case types.Int32:
+	case coltypes.Int32:
 		aCol := aColVec.Int32()
 		bCol := bColVec.Int32()
 		var unique bool
@@ -82,7 +87,7 @@ func tuplesDiffer(
 		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
-	case types.Int64:
+	case coltypes.Int64:
 		aCol := aColVec.Int64()
 		bCol := bColVec.Int64()
 		var unique bool
@@ -91,7 +96,7 @@ func tuplesDiffer(
 		unique = arg1 != arg2
 		*differ = *differ || unique
 		return nil
-	case types.Float32:
+	case coltypes.Float32:
 		aCol := aColVec.Float32()
 		bCol := bColVec.Float32()
 		var unique bool
@@ -100,7 +105,7 @@ func tuplesDiffer(
 		unique = compareFloats(float64(arg1), float64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
-	case types.Float64:
+	case coltypes.Float64:
 		aCol := aColVec.Float64()
 		bCol := bColVec.Float64()
 		var unique bool

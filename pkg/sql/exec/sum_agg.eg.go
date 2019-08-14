@@ -11,27 +11,27 @@ package exec
 
 import (
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/pkg/errors"
 )
 
-func newSumAgg(t types.T) (aggregateFunc, error) {
+func newSumAgg(t coltypes.T) (aggregateFunc, error) {
 	switch t {
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &sumDecimalAgg{}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return &sumInt8Agg{}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return &sumInt16Agg{}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return &sumInt32Agg{}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return &sumInt64Agg{}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &sumFloat32Agg{}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &sumFloat64Agg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported sum agg type %s", t)

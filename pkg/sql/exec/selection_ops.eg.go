@@ -7,11 +7,11 @@ import (
 	"context"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types/conv"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	semtypes "github.com/cockroachdb/cockroach/pkg/sql/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/pkg/errors"
 )
 
@@ -10008,19 +10008,19 @@ func (p selGEFloat64Float64Op) Init() {
 // GetSelectionConstOperator returns the appropriate constant selection operator
 // for the given column type and comparison.
 func GetSelectionConstOperator(
-	ct *semtypes.T,
+	ct *types.T,
 	cmpOp tree.ComparisonOperator,
 	input Operator,
 	colIdx int,
 	constArg tree.Datum,
 ) (Operator, error) {
-	c, err := conv.GetDatumToPhysicalFn(ct)(constArg)
+	c, err := typeconv.GetDatumToPhysicalFn(ct)(constArg)
 	if err != nil {
 		return nil, err
 	}
-	switch t := conv.FromColumnType(ct); t {
+	switch t := typeconv.FromColumnType(ct); t {
 
-	case types.Bool:
+	case coltypes.Bool:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10069,7 +10069,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Bytes:
+	case coltypes.Bytes:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10118,7 +10118,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Decimal:
+	case coltypes.Decimal:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10167,7 +10167,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int8:
+	case coltypes.Int8:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10216,7 +10216,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int16:
+	case coltypes.Int16:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10265,7 +10265,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int32:
+	case coltypes.Int32:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10314,7 +10314,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int64:
+	case coltypes.Int64:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10363,7 +10363,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Float32:
+	case coltypes.Float32:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10412,7 +10412,7 @@ func GetSelectionConstOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Float64:
+	case coltypes.Float64:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10469,15 +10469,15 @@ func GetSelectionConstOperator(
 // GetSelectionOperator returns the appropriate two column selection operator
 // for the given column type and comparison.
 func GetSelectionOperator(
-	ct *semtypes.T,
+	ct *types.T,
 	cmpOp tree.ComparisonOperator,
 	input Operator,
 	col1Idx int,
 	col2Idx int,
 ) (Operator, error) {
-	switch t := conv.FromColumnType(ct); t {
+	switch t := typeconv.FromColumnType(ct); t {
 
-	case types.Bool:
+	case coltypes.Bool:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10526,7 +10526,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Bytes:
+	case coltypes.Bytes:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10575,7 +10575,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Decimal:
+	case coltypes.Decimal:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10624,7 +10624,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int8:
+	case coltypes.Int8:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10673,7 +10673,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int16:
+	case coltypes.Int16:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10722,7 +10722,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int32:
+	case coltypes.Int32:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10771,7 +10771,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Int64:
+	case coltypes.Int64:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10820,7 +10820,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Float32:
+	case coltypes.Float32:
 		switch cmpOp {
 
 		case tree.EQ:
@@ -10869,7 +10869,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 		}
 
-	case types.Float64:
+	case coltypes.Float64:
 		switch cmpOp {
 
 		case tree.EQ:

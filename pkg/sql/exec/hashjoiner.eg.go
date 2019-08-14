@@ -16,9 +16,9 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
@@ -32,13 +32,13 @@ func (ht *hashTable) rehash(
 	ctx context.Context,
 	buckets []uint64,
 	keyIdx int,
-	t types.T,
+	t coltypes.T,
 	col coldata.Vec,
 	nKeys uint64,
 	sel []uint16,
 ) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		keys, nulls := col.Bool(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -116,7 +116,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Bytes:
+	case coltypes.Bytes:
 		keys, nulls := col.Bytes(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -182,7 +182,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Decimal:
+	case coltypes.Decimal:
 		keys, nulls := col.Decimal(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -264,7 +264,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Int8:
+	case coltypes.Int8:
 		keys, nulls := col.Int8(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -318,7 +318,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Int16:
+	case coltypes.Int16:
 		keys, nulls := col.Int16(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -372,7 +372,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Int32:
+	case coltypes.Int32:
 		keys, nulls := col.Int32(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -426,7 +426,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Int64:
+	case coltypes.Int64:
 		keys, nulls := col.Int64(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -480,7 +480,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Float32:
+	case coltypes.Float32:
 		keys, nulls := col.Float32(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -534,7 +534,7 @@ func (ht *hashTable) rehash(
 			}
 		}
 
-	case types.Float64:
+	case coltypes.Float64:
 		keys, nulls := col.Float64(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
@@ -598,9 +598,9 @@ func (ht *hashTable) rehash(
 // to differs. If the bucket has reached the end, the key is rejected. If the
 // hashTable disallows null equality, then if any element in the key is null,
 // there is no match.
-func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []uint16) {
+func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel []uint16) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -1012,7 +1012,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Bytes:
+	case coltypes.Bytes:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -1424,7 +1424,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Decimal:
+	case coltypes.Decimal:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -1836,7 +1836,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Int8:
+	case coltypes.Int8:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -2248,7 +2248,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Int16:
+	case coltypes.Int16:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -2660,7 +2660,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Int32:
+	case coltypes.Int32:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -3072,7 +3072,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Int64:
+	case coltypes.Int64:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -3484,7 +3484,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Float32:
+	case coltypes.Float32:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
@@ -3896,7 +3896,7 @@ func (ht *hashTable) checkCol(t types.T, keyColIdx int, nToCheck uint16, sel []u
 				}
 			}
 		}
-	case types.Float64:
+	case coltypes.Float64:
 		buildVec := ht.vals[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 

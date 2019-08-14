@@ -13,9 +13,9 @@ import (
 	"context"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/pkg/errors"
 )
 
@@ -24,65 +24,67 @@ var _ interface{} = execgen.GET
 
 // NewConstOp creates a new operator that produces a constant value constVal of
 // type t at index outputIdx.
-func NewConstOp(input Operator, t types.T, constVal interface{}, outputIdx int) (Operator, error) {
+func NewConstOp(
+	input Operator, t coltypes.T, constVal interface{}, outputIdx int,
+) (Operator, error) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return &constBoolOp{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(bool),
 		}, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		return &constBytesOp{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.([]byte),
 		}, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &constDecimalOp{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(apd.Decimal),
 		}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return &constInt8Op{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int8),
 		}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return &constInt16Op{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int16),
 		}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return &constInt32Op{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int32),
 		}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return &constInt64Op{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int64),
 		}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &constFloat32Op{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(float32),
 		}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &constFloat64Op{
 			OneInputNode: NewOneInputNode(input),
 			outputIdx:    outputIdx,
@@ -97,7 +99,7 @@ func NewConstOp(input Operator, t types.T, constVal interface{}, outputIdx int) 
 type constBoolOp struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  bool
 }
@@ -133,7 +135,7 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 type constBytesOp struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  []byte
 }
@@ -169,7 +171,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 type constDecimalOp struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  apd.Decimal
 }
@@ -205,7 +207,7 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 type constInt8Op struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  int8
 }
@@ -241,7 +243,7 @@ func (c constInt8Op) Next(ctx context.Context) coldata.Batch {
 type constInt16Op struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  int16
 }
@@ -277,7 +279,7 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 type constInt32Op struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  int32
 }
@@ -313,7 +315,7 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 type constInt64Op struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  int64
 }
@@ -349,7 +351,7 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 type constFloat32Op struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  float32
 }
@@ -385,7 +387,7 @@ func (c constFloat32Op) Next(ctx context.Context) coldata.Batch {
 type constFloat64Op struct {
 	OneInputNode
 
-	typ       types.T
+	typ       coltypes.T
 	outputIdx int
 	constVal  float64
 }
@@ -444,7 +446,7 @@ func (c constNullOp) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(types.Int8)
+		batch.AppendCol(coltypes.Int8)
 	}
 	col := batch.ColVec(c.outputIdx)
 	nulls := col.Nulls()

@@ -11,31 +11,31 @@ package exec
 
 import (
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
 	"github.com/pkg/errors"
 )
 
-func newAnyNotNullAgg(t types.T) (aggregateFunc, error) {
+func newAnyNotNullAgg(t coltypes.T) (aggregateFunc, error) {
 	switch t {
-	case types.Bool:
+	case coltypes.Bool:
 		return &anyNotNullBoolAgg{}, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		return &anyNotNullBytesAgg{}, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		return &anyNotNullDecimalAgg{}, nil
-	case types.Int8:
+	case coltypes.Int8:
 		return &anyNotNullInt8Agg{}, nil
-	case types.Int16:
+	case coltypes.Int16:
 		return &anyNotNullInt16Agg{}, nil
-	case types.Int32:
+	case coltypes.Int32:
 		return &anyNotNullInt32Agg{}, nil
-	case types.Int64:
+	case coltypes.Int64:
 		return &anyNotNullInt64Agg{}, nil
-	case types.Float32:
+	case coltypes.Float32:
 		return &anyNotNullFloat32Agg{}, nil
-	case types.Float64:
+	case coltypes.Float64:
 		return &anyNotNullFloat64Agg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported any not null agg type %s", t)

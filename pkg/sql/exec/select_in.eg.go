@@ -14,12 +14,12 @@ import (
 	"context"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/exec/execgen"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types"
-	"github.com/cockroachdb/cockroach/pkg/sql/exec/types/conv"
+	"github.com/cockroachdb/cockroach/pkg/sql/exec/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	semtypes "github.com/cockroachdb/cockroach/pkg/sql/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/pkg/errors"
 )
 
@@ -36,11 +36,11 @@ const (
 )
 
 func GetInProjectionOperator(
-	ct *semtypes.T, input Operator, colIdx int, resultIdx int, datumTuple *tree.DTuple, negate bool,
+	ct *types.T, input Operator, colIdx int, resultIdx int, datumTuple *tree.DTuple, negate bool,
 ) (Operator, error) {
 	var err error
-	switch t := conv.FromColumnType(ct); t {
-	case types.Bool:
+	switch t := typeconv.FromColumnType(ct); t {
+	case coltypes.Bool:
 		obj := &projectInOpBool{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -52,7 +52,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		obj := &projectInOpBytes{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -64,7 +64,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		obj := &projectInOpDecimal{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -76,7 +76,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int8:
+	case coltypes.Int8:
 		obj := &projectInOpInt8{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -88,7 +88,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int16:
+	case coltypes.Int16:
 		obj := &projectInOpInt16{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -100,7 +100,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int32:
+	case coltypes.Int32:
 		obj := &projectInOpInt32{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -112,7 +112,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int64:
+	case coltypes.Int64:
 		obj := &projectInOpInt64{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -124,7 +124,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Float32:
+	case coltypes.Float32:
 		obj := &projectInOpFloat32{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -136,7 +136,7 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Float64:
+	case coltypes.Float64:
 		obj := &projectInOpFloat64{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -154,11 +154,11 @@ func GetInProjectionOperator(
 }
 
 func GetInOperator(
-	ct *semtypes.T, input Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
+	ct *types.T, input Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
 ) (Operator, error) {
 	var err error
-	switch t := conv.FromColumnType(ct); t {
-	case types.Bool:
+	switch t := typeconv.FromColumnType(ct); t {
+	case coltypes.Bool:
 		obj := &selectInOpBool{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -169,7 +169,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Bytes:
+	case coltypes.Bytes:
 		obj := &selectInOpBytes{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -180,7 +180,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Decimal:
+	case coltypes.Decimal:
 		obj := &selectInOpDecimal{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -191,7 +191,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int8:
+	case coltypes.Int8:
 		obj := &selectInOpInt8{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -202,7 +202,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int16:
+	case coltypes.Int16:
 		obj := &selectInOpInt16{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -213,7 +213,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int32:
+	case coltypes.Int32:
 		obj := &selectInOpInt32{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -224,7 +224,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Int64:
+	case coltypes.Int64:
 		obj := &selectInOpInt64{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -235,7 +235,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Float32:
+	case coltypes.Float32:
 		obj := &selectInOpFloat32{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -246,7 +246,7 @@ func GetInOperator(
 			return nil, err
 		}
 		return obj, nil
-	case types.Float64:
+	case coltypes.Float64:
 		obj := &selectInOpFloat64{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
@@ -282,11 +282,11 @@ type projectInOpBool struct {
 var _ StaticMemoryOperator = &projectInOpBool{}
 
 func (p *projectInOpBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowBool(ct *semtypes.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowBool(ct *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []bool
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -405,7 +405,7 @@ func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -503,11 +503,11 @@ type projectInOpBytes struct {
 var _ StaticMemoryOperator = &projectInOpBytes{}
 
 func (p *projectInOpBytes) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowBytes(ct *semtypes.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowBytes(ct *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result [][]byte
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -626,7 +626,7 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -724,11 +724,11 @@ type projectInOpDecimal struct {
 var _ StaticMemoryOperator = &projectInOpDecimal{}
 
 func (p *projectInOpDecimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowDecimal(ct *semtypes.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowDecimal(ct *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []apd.Decimal
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -847,7 +847,7 @@ func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -945,11 +945,11 @@ type projectInOpInt8 struct {
 var _ StaticMemoryOperator = &projectInOpInt8{}
 
 func (p *projectInOpInt8) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowInt8(ct *semtypes.T, datumTuple *tree.DTuple) ([]int8, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt8(ct *types.T, datumTuple *tree.DTuple) ([]int8, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []int8
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1068,7 +1068,7 @@ func (pi *projectInOpInt8) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -1166,11 +1166,11 @@ type projectInOpInt16 struct {
 var _ StaticMemoryOperator = &projectInOpInt16{}
 
 func (p *projectInOpInt16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowInt16(ct *semtypes.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt16(ct *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []int16
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1289,7 +1289,7 @@ func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -1387,11 +1387,11 @@ type projectInOpInt32 struct {
 var _ StaticMemoryOperator = &projectInOpInt32{}
 
 func (p *projectInOpInt32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowInt32(ct *semtypes.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt32(ct *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []int32
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1510,7 +1510,7 @@ func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -1608,11 +1608,11 @@ type projectInOpInt64 struct {
 var _ StaticMemoryOperator = &projectInOpInt64{}
 
 func (p *projectInOpInt64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowInt64(ct *semtypes.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt64(ct *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []int64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1731,7 +1731,7 @@ func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -1829,11 +1829,11 @@ type projectInOpFloat32 struct {
 var _ StaticMemoryOperator = &projectInOpFloat32{}
 
 func (p *projectInOpFloat32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowFloat32(ct *semtypes.T, datumTuple *tree.DTuple) ([]float32, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowFloat32(ct *types.T, datumTuple *tree.DTuple) ([]float32, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []float32
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1952,7 +1952,7 @@ func (pi *projectInOpFloat32) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
@@ -2050,11 +2050,11 @@ type projectInOpFloat64 struct {
 var _ StaticMemoryOperator = &projectInOpFloat64{}
 
 func (p *projectInOpFloat64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]types.T{types.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
 }
 
-func fillDatumRowFloat64(ct *semtypes.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
-	conv := conv.GetDatumToPhysicalFn(ct)
+func fillDatumRowFloat64(ct *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
 	var result []float64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -2173,7 +2173,7 @@ func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	}
 
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(types.Bool)
+		batch.AppendCol(coltypes.Bool)
 	}
 
 	vec := batch.ColVec(pi.colIdx)
