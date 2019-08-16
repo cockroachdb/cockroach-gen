@@ -3371,7 +3371,7 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3384,7 +3384,7 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3399,7 +3399,7 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3412,7 +3412,7 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3462,7 +3462,7 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3478,7 +3478,7 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3494,7 +3494,7 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3510,7 +3510,7 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3556,7 +3556,7 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3569,7 +3569,7 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3584,7 +3584,7 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3597,7 +3597,7 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3647,7 +3647,7 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3663,7 +3663,7 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3679,7 +3679,7 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3695,7 +3695,7 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3741,7 +3741,7 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3754,7 +3754,7 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3769,7 +3769,7 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3782,7 +3782,7 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3832,7 +3832,7 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3848,7 +3848,7 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3864,7 +3864,7 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3880,7 +3880,7 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3926,7 +3926,7 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3939,7 +3939,7 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3954,7 +3954,7 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3967,7 +3967,7 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4017,7 +4017,7 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4033,7 +4033,7 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4049,7 +4049,7 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4065,7 +4065,7 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4111,7 +4111,7 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4124,7 +4124,7 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4139,7 +4139,7 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4152,7 +4152,7 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4202,7 +4202,7 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4218,7 +4218,7 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4234,7 +4234,7 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4250,7 +4250,7 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4296,7 +4296,7 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4309,7 +4309,7 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4324,7 +4324,7 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4337,7 +4337,7 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4387,7 +4387,7 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4403,7 +4403,7 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4419,7 +4419,7 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4435,7 +4435,7 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4452,6 +4452,4446 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p selGEInt8Int8Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int8()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int8()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt16Int8Op) Init() {
 	p.input.Init()
 }
 
@@ -4481,7 +8921,7 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4494,7 +8934,7 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4509,7 +8949,7 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4522,7 +8962,7 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4572,7 +9012,7 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4588,7 +9028,7 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4604,7 +9044,7 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4620,7 +9060,7 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4666,7 +9106,7 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4679,7 +9119,7 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4694,7 +9134,7 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4707,7 +9147,7 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4757,7 +9197,7 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4773,7 +9213,7 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4789,7 +9229,7 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4805,7 +9245,7 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4851,7 +9291,7 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4864,7 +9304,7 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4879,7 +9319,7 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4892,7 +9332,7 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4942,7 +9382,7 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4958,7 +9398,7 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4974,7 +9414,7 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4990,7 +9430,7 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5036,7 +9476,7 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5049,7 +9489,7 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5064,7 +9504,7 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5077,7 +9517,7 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5127,7 +9567,7 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5143,7 +9583,7 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5159,7 +9599,7 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5175,7 +9615,7 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5221,7 +9661,7 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5234,7 +9674,7 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5249,7 +9689,7 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5262,7 +9702,7 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5312,7 +9752,7 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5328,7 +9768,7 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5344,7 +9784,7 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5360,7 +9800,7 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5406,7 +9846,7 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5419,7 +9859,7 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5434,7 +9874,7 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5447,7 +9887,7 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5497,7 +9937,7 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5513,7 +9953,7 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5529,7 +9969,7 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5545,7 +9985,7 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5562,6 +10002,4446 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p selGEInt16Int16Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int16()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int16()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt32Int16Op) Init() {
 	p.input.Init()
 }
 
@@ -5591,7 +14471,7 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5604,7 +14484,7 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5619,7 +14499,7 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5632,7 +14512,7 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5682,7 +14562,7 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5698,7 +14578,7 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5714,7 +14594,7 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5730,7 +14610,7 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5776,7 +14656,7 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5789,7 +14669,7 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5804,7 +14684,7 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5817,7 +14697,7 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5867,7 +14747,7 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5883,7 +14763,7 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5899,7 +14779,7 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5915,7 +14795,7 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5961,7 +14841,7 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5974,7 +14854,7 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5989,7 +14869,7 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6002,7 +14882,7 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6052,7 +14932,7 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6068,7 +14948,7 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6084,7 +14964,7 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6100,7 +14980,7 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6146,7 +15026,7 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6159,7 +15039,7 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6174,7 +15054,7 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6187,7 +15067,7 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6237,7 +15117,7 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6253,7 +15133,7 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6269,7 +15149,7 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6285,7 +15165,7 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6331,7 +15211,7 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6344,7 +15224,7 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6359,7 +15239,7 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6372,7 +15252,7 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6422,7 +15302,7 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6438,7 +15318,7 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6454,7 +15334,7 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6470,7 +15350,7 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6516,7 +15396,7 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6529,7 +15409,7 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6544,7 +15424,7 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6557,7 +15437,7 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6607,7 +15487,7 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6623,7 +15503,7 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6639,7 +15519,7 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6655,7 +15535,7 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6672,6 +15552,4446 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p selGEInt32Int32Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+}
+
+func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int32()
+		col2 := vec2.Int64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+}
+
+func (p *selGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int8()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+}
+
+func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int16()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type selEQInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type selNEInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type selLTInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type selLEInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type selGTInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type selGEInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+}
+
+func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Int64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Int64()
+		col2 := vec2.Int32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEInt64Int32Op) Init() {
 	p.input.Init()
 }
 
@@ -6701,7 +20021,7 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6714,7 +20034,7 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6729,7 +20049,7 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6742,7 +20062,7 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg == p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6792,7 +20112,7 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6808,7 +20128,7 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6824,7 +20144,7 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6840,7 +20160,7 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 == arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) == 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6886,7 +20206,7 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6899,7 +20219,7 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6914,7 +20234,7 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6927,7 +20247,7 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg != p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6977,7 +20297,7 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6993,7 +20313,7 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7009,7 +20329,7 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7025,7 +20345,7 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 != arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) != 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7071,7 +20391,7 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7084,7 +20404,7 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7099,7 +20419,7 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7112,7 +20432,7 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg < p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7162,7 +20482,7 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7178,7 +20498,7 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7194,7 +20514,7 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7210,7 +20530,7 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 < arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) < 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7256,7 +20576,7 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7269,7 +20589,7 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7284,7 +20604,7 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7297,7 +20617,7 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg <= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7347,7 +20667,7 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7363,7 +20683,7 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7379,7 +20699,7 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7395,7 +20715,7 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 <= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7441,7 +20761,7 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7454,7 +20774,7 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7469,7 +20789,7 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7482,7 +20802,7 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg > p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7532,7 +20852,7 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7548,7 +20868,7 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7564,7 +20884,7 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7580,7 +20900,7 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 > arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) > 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7626,7 +20946,7 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7639,7 +20959,7 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7654,7 +20974,7 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7667,7 +20987,7 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = arg >= p.constArg
+					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7717,7 +21037,7 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7733,7 +21053,7 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7749,7 +21069,7 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7765,7 +21085,7 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = arg1 >= arg2
+					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8895,6 +22215,2226 @@ func (p selGEFloat32Float32Op) Init() {
 	p.input.Init()
 }
 
+type selEQFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+}
+
+func (p *selEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float32()
+		col2 := vec2.Float64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type selNEFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+}
+
+func (p *selNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float32()
+		col2 := vec2.Float64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type selLTFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+}
+
+func (p *selLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float32()
+		col2 := vec2.Float64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type selLEFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+}
+
+func (p *selLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float32()
+		col2 := vec2.Float64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type selGTFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+}
+
+func (p *selGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float32()
+		col2 := vec2.Float64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type selGEFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+}
+
+func (p *selGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float32()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float32()
+		col2 := vec2.Float64()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type selEQFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+}
+
+func (p *selEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float64()
+		col2 := vec2.Float32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selEQFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type selNEFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+}
+
+func (p *selNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float64()
+		col2 := vec2.Float32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selNEFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type selLTFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+}
+
+func (p *selLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float64()
+		col2 := vec2.Float32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLTFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type selLEFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+}
+
+func (p *selLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float64()
+		col2 := vec2.Float32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selLEFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type selGTFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+}
+
+func (p *selGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float64()
+		col2 := vec2.Float32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGTFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type selGEFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+}
+
+func (p *selGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Float64()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+}
+
+func (p *selGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Float64()
+		col2 := vec2.Float32()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp && !nulls.NullAt(i) {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp && !nulls.NullAt(uint16(i)) {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		} else {
+
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+					if cmp {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p selGEFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
 type selEQFloat64Float64ConstOp struct {
 	OneInputNode
 
@@ -10006,919 +25546,2419 @@ func (p selGEFloat64Float64Op) Init() {
 }
 
 // GetSelectionConstOperator returns the appropriate constant selection operator
-// for the given column type and comparison.
+// for the given left and right column types and comparison.
 func GetSelectionConstOperator(
-	ct *types.T,
+	leftColType *types.T,
+	constColType *types.T,
 	cmpOp tree.ComparisonOperator,
 	input Operator,
 	colIdx int,
 	constArg tree.Datum,
 ) (Operator, error) {
-	c, err := typeconv.GetDatumToPhysicalFn(ct)(constArg)
+	c, err := typeconv.GetDatumToPhysicalFn(constColType)(constArg)
 	if err != nil {
 		return nil, err
 	}
-	switch t := typeconv.FromColumnType(ct); t {
+	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 
 	case coltypes.Bool:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQBoolBoolConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(bool),
-			}, nil
+		case coltypes.Bool:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEBoolBoolConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(bool),
-			}, nil
+			case tree.EQ:
+				return &selEQBoolBoolConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+				}, nil
 
-		case tree.LT:
-			return &selLTBoolBoolConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(bool),
-			}, nil
+			case tree.NE:
+				return &selNEBoolBoolConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+				}, nil
 
-		case tree.LE:
-			return &selLEBoolBoolConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(bool),
-			}, nil
+			case tree.LT:
+				return &selLTBoolBoolConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+				}, nil
 
-		case tree.GT:
-			return &selGTBoolBoolConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(bool),
-			}, nil
+			case tree.LE:
+				return &selLEBoolBoolConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+				}, nil
 
-		case tree.GE:
-			return &selGEBoolBoolConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(bool),
-			}, nil
+			case tree.GT:
+				return &selGTBoolBoolConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+				}, nil
+
+			case tree.GE:
+				return &selGEBoolBoolConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(bool),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Bytes:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQBytesBytesConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.([]byte),
-			}, nil
+		case coltypes.Bytes:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEBytesBytesConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.([]byte),
-			}, nil
+			case tree.EQ:
+				return &selEQBytesBytesConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+				}, nil
 
-		case tree.LT:
-			return &selLTBytesBytesConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.([]byte),
-			}, nil
+			case tree.NE:
+				return &selNEBytesBytesConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+				}, nil
 
-		case tree.LE:
-			return &selLEBytesBytesConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.([]byte),
-			}, nil
+			case tree.LT:
+				return &selLTBytesBytesConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+				}, nil
 
-		case tree.GT:
-			return &selGTBytesBytesConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.([]byte),
-			}, nil
+			case tree.LE:
+				return &selLEBytesBytesConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+				}, nil
 
-		case tree.GE:
-			return &selGEBytesBytesConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.([]byte),
-			}, nil
+			case tree.GT:
+				return &selGTBytesBytesConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+				}, nil
+
+			case tree.GE:
+				return &selGEBytesBytesConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.([]byte),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Decimal:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQDecimalDecimalConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(apd.Decimal),
-			}, nil
+		case coltypes.Decimal:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEDecimalDecimalConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(apd.Decimal),
-			}, nil
+			case tree.EQ:
+				return &selEQDecimalDecimalConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+				}, nil
 
-		case tree.LT:
-			return &selLTDecimalDecimalConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(apd.Decimal),
-			}, nil
+			case tree.NE:
+				return &selNEDecimalDecimalConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+				}, nil
 
-		case tree.LE:
-			return &selLEDecimalDecimalConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(apd.Decimal),
-			}, nil
+			case tree.LT:
+				return &selLTDecimalDecimalConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+				}, nil
 
-		case tree.GT:
-			return &selGTDecimalDecimalConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(apd.Decimal),
-			}, nil
+			case tree.LE:
+				return &selLEDecimalDecimalConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+				}, nil
 
-		case tree.GE:
-			return &selGEDecimalDecimalConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(apd.Decimal),
-			}, nil
+			case tree.GT:
+				return &selGTDecimalDecimalConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+				}, nil
+
+			case tree.GE:
+				return &selGEDecimalDecimalConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(apd.Decimal),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int8:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt8Int8ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int8),
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt8Int8ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int8),
-			}, nil
+			case tree.EQ:
+				return &selEQInt8Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LT:
-			return &selLTInt8Int8ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int8),
-			}, nil
+			case tree.NE:
+				return &selNEInt8Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LE:
-			return &selLEInt8Int8ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int8),
-			}, nil
+			case tree.LT:
+				return &selLTInt8Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GT:
-			return &selGTInt8Int8ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int8),
-			}, nil
+			case tree.LE:
+				return &selLEInt8Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GE:
-			return &selGEInt8Int8ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int8),
-			}, nil
+			case tree.GT:
+				return &selGTInt8Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt8Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt8Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt8Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt8Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt8Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt8Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt8Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt8Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt8Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt8Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt8Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt8Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt8Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt8Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt8Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int16:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt16Int16ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int16),
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt16Int16ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int16),
-			}, nil
+			case tree.EQ:
+				return &selEQInt16Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LT:
-			return &selLTInt16Int16ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int16),
-			}, nil
+			case tree.NE:
+				return &selNEInt16Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LE:
-			return &selLEInt16Int16ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int16),
-			}, nil
+			case tree.LT:
+				return &selLTInt16Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GT:
-			return &selGTInt16Int16ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int16),
-			}, nil
+			case tree.LE:
+				return &selLEInt16Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GE:
-			return &selGEInt16Int16ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int16),
-			}, nil
+			case tree.GT:
+				return &selGTInt16Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt16Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt16Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt16Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt16Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt16Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt16Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt16Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt16Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt16Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt16Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt16Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt16Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt16Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt16Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt16Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int32:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt32Int32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int32),
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt32Int32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int32),
-			}, nil
+			case tree.EQ:
+				return &selEQInt32Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LT:
-			return &selLTInt32Int32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int32),
-			}, nil
+			case tree.NE:
+				return &selNEInt32Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LE:
-			return &selLEInt32Int32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int32),
-			}, nil
+			case tree.LT:
+				return &selLTInt32Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GT:
-			return &selGTInt32Int32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int32),
-			}, nil
+			case tree.LE:
+				return &selLEInt32Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GE:
-			return &selGEInt32Int32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int32),
-			}, nil
+			case tree.GT:
+				return &selGTInt32Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt32Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt32Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt32Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt32Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt32Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt32Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt32Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt32Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt32Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt32Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt32Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt32Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt32Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt32Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt32Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int64:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt64Int64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int64),
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt64Int64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int64),
-			}, nil
+			case tree.EQ:
+				return &selEQInt64Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LT:
-			return &selLTInt64Int64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int64),
-			}, nil
+			case tree.NE:
+				return &selNEInt64Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.LE:
-			return &selLEInt64Int64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int64),
-			}, nil
+			case tree.LT:
+				return &selLTInt64Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GT:
-			return &selGTInt64Int64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int64),
-			}, nil
+			case tree.LE:
+				return &selLEInt64Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
 
-		case tree.GE:
-			return &selGEInt64Int64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(int64),
-			}, nil
+			case tree.GT:
+				return &selGTInt64Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int8ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int8),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt64Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt64Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt64Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt64Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt64Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int16ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int16),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt64Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt64Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt64Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt64Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt64Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int32),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt64Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.NE:
+				return &selNEInt64Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LT:
+				return &selLTInt64Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.LE:
+				return &selLEInt64Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GT:
+				return &selGTInt64Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(int64),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float32:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQFloat32Float32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float32),
-			}, nil
+		case coltypes.Float32:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEFloat32Float32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float32),
-			}, nil
+			case tree.EQ:
+				return &selEQFloat32Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.LT:
-			return &selLTFloat32Float32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float32),
-			}, nil
+			case tree.NE:
+				return &selNEFloat32Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.LE:
-			return &selLEFloat32Float32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float32),
-			}, nil
+			case tree.LT:
+				return &selLTFloat32Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.GT:
-			return &selGTFloat32Float32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float32),
-			}, nil
+			case tree.LE:
+				return &selLEFloat32Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.GE:
-			return &selGEFloat32Float32ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float32),
-			}, nil
+			case tree.GT:
+				return &selGTFloat32Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat32Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Float64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQFloat32Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.NE:
+				return &selNEFloat32Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.LT:
+				return &selLTFloat32Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.LE:
+				return &selLEFloat32Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.GT:
+				return &selGTFloat32Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat32Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float64:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
-		case tree.EQ:
-			return &selEQFloat64Float64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float64),
-			}, nil
+		case coltypes.Float32:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEFloat64Float64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float64),
-			}, nil
+			case tree.EQ:
+				return &selEQFloat64Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.LT:
-			return &selLTFloat64Float64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float64),
-			}, nil
+			case tree.NE:
+				return &selNEFloat64Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.LE:
-			return &selLEFloat64Float64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float64),
-			}, nil
+			case tree.LT:
+				return &selLTFloat64Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.GT:
-			return &selGTFloat64Float64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float64),
-			}, nil
+			case tree.LE:
+				return &selLEFloat64Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
 
-		case tree.GE:
-			return &selGEFloat64Float64ConstOp{
-				OneInputNode: NewOneInputNode(input),
-				colIdx:       colIdx,
-				constArg:     c.(float64),
-			}, nil
+			case tree.GT:
+				return &selGTFloat64Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat64Float32ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float32),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Float64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQFloat64Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.NE:
+				return &selNEFloat64Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.LT:
+				return &selLTFloat64Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.LE:
+				return &selLEFloat64Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.GT:
+				return &selGTFloat64Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat64Float64ConstOp{
+					OneInputNode: NewOneInputNode(input),
+					colIdx:       colIdx,
+					constArg:     c.(float64),
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
 }
 
 // GetSelectionOperator returns the appropriate two column selection operator
-// for the given column type and comparison.
+// for the given left and right column types and comparison.
 func GetSelectionOperator(
-	ct *types.T,
+	leftColType *types.T,
+	rightColType *types.T,
 	cmpOp tree.ComparisonOperator,
 	input Operator,
 	col1Idx int,
 	col2Idx int,
 ) (Operator, error) {
-	switch t := typeconv.FromColumnType(ct); t {
+	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 
 	case coltypes.Bool:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQBoolBoolOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Bool:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEBoolBoolOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQBoolBoolOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTBoolBoolOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEBoolBoolOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEBoolBoolOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTBoolBoolOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTBoolBoolOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEBoolBoolOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEBoolBoolOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTBoolBoolOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEBoolBoolOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Bytes:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQBytesBytesOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Bytes:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEBytesBytesOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQBytesBytesOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTBytesBytesOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEBytesBytesOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEBytesBytesOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTBytesBytesOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTBytesBytesOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEBytesBytesOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEBytesBytesOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTBytesBytesOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEBytesBytesOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Decimal:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQDecimalDecimalOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Decimal:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEDecimalDecimalOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQDecimalDecimalOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTDecimalDecimalOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEDecimalDecimalOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEDecimalDecimalOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTDecimalDecimalOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTDecimalDecimalOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEDecimalDecimalOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEDecimalDecimalOp{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTDecimalDecimalOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEDecimalDecimalOp{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int8:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt8Int8Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt8Int8Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQInt8Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTInt8Int8Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEInt8Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEInt8Int8Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTInt8Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTInt8Int8Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEInt8Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEInt8Int8Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTInt8Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt8Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt8Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt8Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt8Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt8Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt8Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt8Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt8Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt8Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt8Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt8Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt8Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt8Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt8Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt8Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt8Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int16:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt16Int16Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt16Int16Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQInt16Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTInt16Int16Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEInt16Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEInt16Int16Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTInt16Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTInt16Int16Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEInt16Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEInt16Int16Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTInt16Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt16Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt16Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt16Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt16Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt16Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt16Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt16Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt16Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt16Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt16Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt16Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt16Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt16Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt16Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt16Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt16Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int32:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt32Int32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt32Int32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQInt32Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTInt32Int32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEInt32Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEInt32Int32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTInt32Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTInt32Int32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEInt32Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEInt32Int32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTInt32Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt32Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt32Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt32Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt32Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt32Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt32Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt32Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt32Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt32Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt32Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt32Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt32Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt32Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt32Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt32Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt32Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int64:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQInt64Int64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Int8:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEInt64Int64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQInt64Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTInt64Int64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEInt64Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEInt64Int64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTInt64Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTInt64Int64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEInt64Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEInt64Int64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTInt64Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int8Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int16:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt64Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt64Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt64Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt64Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt64Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int16Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int32:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt64Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt64Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt64Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt64Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt64Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Int64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQInt64Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEInt64Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTInt64Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEInt64Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTInt64Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEInt64Int64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float32:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQFloat32Float32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Float32:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEFloat32Float32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQFloat32Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTFloat32Float32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEFloat32Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEFloat32Float32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTFloat32Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTFloat32Float32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEFloat32Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEFloat32Float32Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTFloat32Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat32Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Float64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQFloat32Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEFloat32Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTFloat32Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEFloat32Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTFloat32Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat32Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float64:
-		switch cmpOp {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-		case tree.EQ:
-			return &selEQFloat64Float64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+		case coltypes.Float32:
+			switch cmpOp {
 
-		case tree.NE:
-			return &selNEFloat64Float64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.EQ:
+				return &selEQFloat64Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LT:
-			return &selLTFloat64Float64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.NE:
+				return &selNEFloat64Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.LE:
-			return &selLEFloat64Float64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LT:
+				return &selLTFloat64Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GT:
-			return &selGTFloat64Float64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.LE:
+				return &selLEFloat64Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
 
-		case tree.GE:
-			return &selGEFloat64Float64Op{
-				OneInputNode: NewOneInputNode(input),
-				col1Idx:      col1Idx,
-				col2Idx:      col2Idx,
-			}, nil
+			case tree.GT:
+				return &selGTFloat64Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat64Float32Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+
+		case coltypes.Float64:
+			switch cmpOp {
+
+			case tree.EQ:
+				return &selEQFloat64Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.NE:
+				return &selNEFloat64Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LT:
+				return &selLTFloat64Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.LE:
+				return &selLEFloat64Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GT:
+				return &selGTFloat64Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			case tree.GE:
+				return &selGEFloat64Float64Op{
+					OneInputNode: NewOneInputNode(input),
+					col1Idx:      col1Idx,
+					col2Idx:      col2Idx,
+				}, nil
+
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
 
 		default:
-			return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
 }

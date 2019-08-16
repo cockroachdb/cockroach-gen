@@ -995,7 +995,7 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1007,7 +1007,7 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1029,7 +1029,7 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1041,7 +1041,7 @@ func (p *sortedDistinctInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1085,7 +1085,7 @@ func (p partitionerInt8) partitionWithOrder(
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1096,7 +1096,7 @@ func (p partitionerInt8) partitionWithOrder(
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1129,7 +1129,7 @@ func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint6
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1141,7 +1141,7 @@ func (p partitionerInt8) partition(colVec coldata.Vec, outputCol []bool, n uint6
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1234,7 +1234,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1246,7 +1246,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1268,7 +1268,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1280,7 +1280,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1324,7 +1324,7 @@ func (p partitionerInt16) partitionWithOrder(
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1335,7 +1335,7 @@ func (p partitionerInt16) partitionWithOrder(
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1368,7 +1368,7 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1380,7 +1380,7 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1473,7 +1473,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1485,7 +1485,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1507,7 +1507,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1519,7 +1519,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1563,7 +1563,7 @@ func (p partitionerInt32) partitionWithOrder(
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1574,7 +1574,7 @@ func (p partitionerInt32) partitionWithOrder(
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1607,7 +1607,7 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1619,7 +1619,7 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1712,7 +1712,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1724,7 +1724,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1746,7 +1746,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 				} else if !null {
 					// Neither value is null, so we must compare.
 					var unique bool
-					unique = v != lastVal
+					unique = compareInts(int64(v), int64(lastVal)) != 0
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
 				lastVal = v
@@ -1758,7 +1758,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				v := col[int(checkIdx)]
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 				lastVal = v
 			}
@@ -1802,7 +1802,7 @@ func (p partitionerInt64) partitionWithOrder(
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1813,7 +1813,7 @@ func (p partitionerInt64) partitionWithOrder(
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}
@@ -1846,7 +1846,7 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 			} else if !null {
 				// Neither value is null, so we must compare.
 				var unique bool
-				unique = v != lastVal
+				unique = compareInts(int64(v), int64(lastVal)) != 0
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
 			lastVal = v
@@ -1858,7 +1858,7 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 
 			v := col[int(checkIdx)]
 			var unique bool
-			unique = v != lastVal
+			unique = compareInts(int64(v), int64(lastVal)) != 0
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
 			lastVal = v
 		}

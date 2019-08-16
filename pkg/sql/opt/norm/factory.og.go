@@ -4178,6 +4178,26 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [PruneSemiAntiJoinRightCols]
+	{
+		private := joinPrivate
+		needed := _f.funcs.FilterOuterCols(on)
+		if _f.funcs.CanPruneCols(right, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneSemiAntiJoinRightCols) {
+				_expr := _f.ConstructSemiJoin(
+					left,
+					_f.funcs.PruneCols(right, needed),
+					on,
+					private,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneSemiAntiJoinRightCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		for i := range on {
@@ -4592,6 +4612,26 @@ func (_f *Factory) ConstructAntiJoin(
 						}
 					}
 				}
+			}
+		}
+	}
+
+	// [PruneSemiAntiJoinRightCols]
+	{
+		private := joinPrivate
+		needed := _f.funcs.FilterOuterCols(on)
+		if _f.funcs.CanPruneCols(right, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneSemiAntiJoinRightCols) {
+				_expr := _f.ConstructAntiJoin(
+					left,
+					_f.funcs.PruneCols(right, needed),
+					on,
+					private,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneSemiAntiJoinRightCols, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}
@@ -6502,6 +6542,26 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [PruneSemiAntiJoinRightCols]
+	{
+		private := joinPrivate
+		needed := _f.funcs.FilterOuterCols(on)
+		if _f.funcs.CanPruneCols(right, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneSemiAntiJoinRightCols) {
+				_expr := _f.ConstructSemiJoinApply(
+					left,
+					_f.funcs.PruneCols(right, needed),
+					on,
+					private,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneSemiAntiJoinRightCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeSemiJoinApply(left, right, on, joinPrivate)
 	return _f.onConstructRelational(e)
 }
@@ -6883,6 +6943,26 @@ func (_f *Factory) ConstructAntiJoinApply(
 						}
 					}
 				}
+			}
+		}
+	}
+
+	// [PruneSemiAntiJoinRightCols]
+	{
+		private := joinPrivate
+		needed := _f.funcs.FilterOuterCols(on)
+		if _f.funcs.CanPruneCols(right, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneSemiAntiJoinRightCols) {
+				_expr := _f.ConstructAntiJoinApply(
+					left,
+					_f.funcs.PruneCols(right, needed),
+					on,
+					private,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneSemiAntiJoinRightCols, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}

@@ -1081,7 +1081,7 @@ func (s *sortInt8AscOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1135,7 +1135,7 @@ func (s *sortInt8DescOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1199,7 +1199,7 @@ func (s *sortInt8AscWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1263,7 +1263,7 @@ func (s *sortInt8DescWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1317,7 +1317,7 @@ func (s *sortInt16AscOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1371,7 +1371,7 @@ func (s *sortInt16DescOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1435,7 +1435,7 @@ func (s *sortInt16AscWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1499,7 +1499,7 @@ func (s *sortInt16DescWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1553,7 +1553,7 @@ func (s *sortInt32AscOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1607,7 +1607,7 @@ func (s *sortInt32DescOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1671,7 +1671,7 @@ func (s *sortInt32AscWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1735,7 +1735,7 @@ func (s *sortInt32DescWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1789,7 +1789,7 @@ func (s *sortInt64AscOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1843,7 +1843,7 @@ func (s *sortInt64DescOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 
@@ -1907,7 +1907,7 @@ func (s *sortInt64AscWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 < arg2
+	lt = compareInts(int64(arg1), int64(arg2)) < 0
 	return lt
 }
 
@@ -1971,7 +1971,7 @@ func (s *sortInt64DescWithNullsOp) Less(i, j int) bool {
 	// We always indirect via the order vector.
 	arg1 := s.sortCol[int(s.order[i])]
 	arg2 := s.sortCol[int(s.order[j])]
-	lt = arg1 > arg2
+	lt = compareInts(int64(arg1), int64(arg2)) > 0
 	return lt
 }
 

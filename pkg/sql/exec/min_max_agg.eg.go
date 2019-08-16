@@ -834,7 +834,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -871,7 +871,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -910,7 +910,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -947,7 +947,7 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1063,7 +1063,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1100,7 +1100,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1139,7 +1139,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1176,7 +1176,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1292,7 +1292,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1329,7 +1329,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1368,7 +1368,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1405,7 +1405,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1521,7 +1521,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1558,7 +1558,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1597,7 +1597,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1634,7 +1634,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate < a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2918,7 +2918,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2955,7 +2955,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2994,7 +2994,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3031,7 +3031,7 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3147,7 +3147,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3184,7 +3184,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3223,7 +3223,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3260,7 +3260,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3376,7 +3376,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3413,7 +3413,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3452,7 +3452,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3489,7 +3489,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3605,7 +3605,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3642,7 +3642,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3681,7 +3681,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3718,7 +3718,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = candidate > a.curAgg
+						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
 						if cmp {
 							a.curAgg = candidate
 						}

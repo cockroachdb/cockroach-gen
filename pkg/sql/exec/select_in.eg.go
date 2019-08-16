@@ -970,7 +970,7 @@ func fillDatumRowInt8(ct *types.T, datumTuple *tree.DTuple) ([]int8, bool, error
 func cmpInInt8(target int8, filterRow []int8, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = target == filterRow[i]
+		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
 		if cmp {
 			return siTrue
 		}
@@ -1191,7 +1191,7 @@ func fillDatumRowInt16(ct *types.T, datumTuple *tree.DTuple) ([]int16, bool, err
 func cmpInInt16(target int16, filterRow []int16, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = target == filterRow[i]
+		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
 		if cmp {
 			return siTrue
 		}
@@ -1412,7 +1412,7 @@ func fillDatumRowInt32(ct *types.T, datumTuple *tree.DTuple) ([]int32, bool, err
 func cmpInInt32(target int32, filterRow []int32, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = target == filterRow[i]
+		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
 		if cmp {
 			return siTrue
 		}
@@ -1633,7 +1633,7 @@ func fillDatumRowInt64(ct *types.T, datumTuple *tree.DTuple) ([]int64, bool, err
 func cmpInInt64(target int64, filterRow []int64, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = target == filterRow[i]
+		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
 		if cmp {
 			return siTrue
 		}

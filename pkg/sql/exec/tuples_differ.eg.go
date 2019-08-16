@@ -66,7 +66,7 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = arg1 != arg2
+		unique = compareInts(int64(arg1), int64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int16:
@@ -75,7 +75,7 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = arg1 != arg2
+		unique = compareInts(int64(arg1), int64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int32:
@@ -84,7 +84,7 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = arg1 != arg2
+		unique = compareInts(int64(arg1), int64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int64:
@@ -93,7 +93,7 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = arg1 != arg2
+		unique = compareInts(int64(arg1), int64(arg2)) != 0
 		*differ = *differ || unique
 		return nil
 	case coltypes.Float32:

@@ -141,6 +141,7 @@ const (
 	PruneOffsetCols
 	PruneJoinLeftCols
 	PruneJoinRightCols
+	PruneSemiAntiJoinRightCols
 	PruneAggCols
 	PruneGroupByCols
 	PruneValuesCols

@@ -153,13 +153,7 @@ func (c *Int8VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint1
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	if left < right {
-		cmp = -1
-	} else if left > right {
-		cmp = 1
-	} else {
-		cmp = 0
-	}
+	cmp = compareInts(int64(left), int64(right))
 	return cmp
 }
 
@@ -196,13 +190,7 @@ func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	if left < right {
-		cmp = -1
-	} else if left > right {
-		cmp = 1
-	} else {
-		cmp = 0
-	}
+	cmp = compareInts(int64(left), int64(right))
 	return cmp
 }
 
@@ -239,13 +227,7 @@ func (c *Int32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	if left < right {
-		cmp = -1
-	} else if left > right {
-		cmp = 1
-	} else {
-		cmp = 0
-	}
+	cmp = compareInts(int64(left), int64(right))
 	return cmp
 }
 
@@ -282,13 +264,7 @@ func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	if left < right {
-		cmp = -1
-	} else if left > right {
-		cmp = 1
-	} else {
-		cmp = 0
-	}
+	cmp = compareInts(int64(left), int64(right))
 	return cmp
 }
 

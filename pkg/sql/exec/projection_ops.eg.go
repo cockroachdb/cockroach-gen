@@ -4428,7 +4428,7 @@ func (p projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4436,7 +4436,7 @@ func (p projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4479,7 +4479,7 @@ func (p projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4487,7 +4487,7 @@ func (p projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4533,7 +4533,7 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -4543,7 +4543,7 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4585,7 +4585,7 @@ func (p projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4593,7 +4593,7 @@ func (p projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4636,7 +4636,7 @@ func (p projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4644,7 +4644,7 @@ func (p projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4690,7 +4690,7 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -4700,7 +4700,7 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4742,7 +4742,7 @@ func (p projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4750,7 +4750,7 @@ func (p projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4793,7 +4793,7 @@ func (p projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4801,7 +4801,7 @@ func (p projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4847,7 +4847,7 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -4857,7 +4857,7 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4899,7 +4899,7 @@ func (p projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4907,7 +4907,7 @@ func (p projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4950,7 +4950,7 @@ func (p projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4958,7 +4958,7 @@ func (p projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5004,7 +5004,7 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5014,7 +5014,7 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5056,7 +5056,7 @@ func (p projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5064,7 +5064,7 @@ func (p projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5107,7 +5107,7 @@ func (p projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5115,7 +5115,7 @@ func (p projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5161,7 +5161,7 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5171,7 +5171,7 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5213,7 +5213,7 @@ func (p projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5221,7 +5221,7 @@ func (p projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5264,7 +5264,7 @@ func (p projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5272,7 +5272,7 @@ func (p projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5318,7 +5318,7 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5328,7 +5328,7 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5338,6 +5338,3774 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt8Int8Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projEQInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projEQInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projNEInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projNEInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLTInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLTInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLEInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLEInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGTInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGTInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGEInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGEInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projEQInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projEQInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projNEInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projNEInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLTInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLTInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLEInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLEInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGTInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGTInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGEInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGEInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projEQInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projEQInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projNEInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projNEInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLTInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLTInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLEInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLEInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGTInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGTInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGEInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGEInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projEQInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projEQInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projNEInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projNEInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLTInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLTInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLEInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLEInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGTInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGTInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGEInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGEInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt16Int8Op) Init() {
 	p.input.Init()
 }
 
@@ -6250,7 +10018,7 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6258,7 +10026,7 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6301,7 +10069,7 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6309,7 +10077,7 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6355,7 +10123,7 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6365,7 +10133,7 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6407,7 +10175,7 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6415,7 +10183,7 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6458,7 +10226,7 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6466,7 +10234,7 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6512,7 +10280,7 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6522,7 +10290,7 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6564,7 +10332,7 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6572,7 +10340,7 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6615,7 +10383,7 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6623,7 +10391,7 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6669,7 +10437,7 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6679,7 +10447,7 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6721,7 +10489,7 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6729,7 +10497,7 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6772,7 +10540,7 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6780,7 +10548,7 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6826,7 +10594,7 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6836,7 +10604,7 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6878,7 +10646,7 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6886,7 +10654,7 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6929,7 +10697,7 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6937,7 +10705,7 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6983,7 +10751,7 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6993,7 +10761,7 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7035,7 +10803,7 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7043,7 +10811,7 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7086,7 +10854,7 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7094,7 +10862,7 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7140,7 +10908,7 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7150,7 +10918,7 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7160,6 +10928,3774 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt16Int16Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projEQInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projEQInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projNEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projNEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLTInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLTInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGTInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGTInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projEQInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projEQInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projNEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projNEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLTInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLTInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGTInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGTInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projEQInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projEQInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projNEInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projNEInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLTInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLTInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLEInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLEInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGTInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGTInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGEInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGEInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projEQInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projEQInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projNEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projNEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLTInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLTInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGTInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGTInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt32Int16Op) Init() {
 	p.input.Init()
 }
 
@@ -8072,7 +15608,7 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8080,7 +15616,7 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8123,7 +15659,7 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8131,7 +15667,7 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8177,7 +15713,7 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8187,7 +15723,7 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8229,7 +15765,7 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8237,7 +15773,7 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8280,7 +15816,7 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8288,7 +15824,7 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8334,7 +15870,7 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8344,7 +15880,7 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8386,7 +15922,7 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8394,7 +15930,7 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8437,7 +15973,7 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8445,7 +15981,7 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8491,7 +16027,7 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8501,7 +16037,7 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8543,7 +16079,7 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8551,7 +16087,7 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8594,7 +16130,7 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8602,7 +16138,7 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8648,7 +16184,7 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8658,7 +16194,7 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8700,7 +16236,7 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8708,7 +16244,7 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8751,7 +16287,7 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8759,7 +16295,7 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8805,7 +16341,7 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8815,7 +16351,7 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8857,7 +16393,7 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8865,7 +16401,7 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8908,7 +16444,7 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8916,7 +16452,7 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8962,7 +16498,7 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8972,7 +16508,7 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8982,6 +16518,3774 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt32Int32Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projEQInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projEQInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projNEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projNEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLTInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLTInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGTInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGTInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projEQInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projEQInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projNEInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projNEInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLTInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLTInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projLEInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLEInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGTInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGTInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projGEInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGEInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projEQInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projEQInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projNEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projNEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLTInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLTInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projLEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGTInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGTInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projGEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projEQInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projEQInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projEQInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projNEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projNEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projNEInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLTInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLTInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLTInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projLEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projLEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLEInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGTInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGTInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projGTInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projGEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projGEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projGEInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEInt64Int32Op) Init() {
 	p.input.Init()
 }
 
@@ -9894,7 +21198,7 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -9902,7 +21206,7 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg == p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -9945,7 +21249,7 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -9953,7 +21257,7 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg == arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -9999,7 +21303,7 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10009,7 +21313,7 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 == arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10051,7 +21355,7 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10059,7 +21363,7 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg != p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10102,7 +21406,7 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10110,7 +21414,7 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg != arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10156,7 +21460,7 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10166,7 +21470,7 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 != arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10208,7 +21512,7 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10216,7 +21520,7 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg < p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10259,7 +21563,7 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10267,7 +21571,7 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg < arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10313,7 +21617,7 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10323,7 +21627,7 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 < arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10365,7 +21669,7 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10373,7 +21677,7 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg <= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10416,7 +21720,7 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10424,7 +21728,7 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg <= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10470,7 +21774,7 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10480,7 +21784,7 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 <= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10522,7 +21826,7 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10530,7 +21834,7 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg > p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10573,7 +21877,7 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10581,7 +21885,7 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg > arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10627,7 +21931,7 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10637,7 +21941,7 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 > arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10679,7 +21983,7 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10687,7 +21991,7 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg >= p.constArg
+			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10730,7 +22034,7 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10738,7 +22042,7 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg >= arg
+			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10784,7 +22088,7 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10794,7 +22098,7 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 >= arg2
+			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12377,6 +23681,1890 @@ func (p projGEFloat32Float32Op) Init() {
 	p.input.Init()
 }
 
+type projEQFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projEQFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projEQFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projEQFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projNEFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projNEFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projNEFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projNEFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projLTFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projLTFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projLTFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projLTFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projLEFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projLEFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projLEFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projLEFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projGTFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projGTFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projGTFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projGTFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projGEFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projGEFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projGEFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projGEFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projEQFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projEQFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projEQFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projEQFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projEQFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projEQFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projEQFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projEQFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projNEFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projNEFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projNEFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projNEFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projNEFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projNEFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projNEFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projLTFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projLTFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projLTFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLTFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projLTFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLTFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLTFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projLEFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projLEFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projLEFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projLEFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projLEFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projLEFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projLEFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projGTFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projGTFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projGTFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGTFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projGTFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGTFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGTFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projGEFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projGEFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projGEFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projGEFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projGEFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projGEFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projGEFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+}
+
+func (p projGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projGEFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
 type projPlusFloat64Float64ConstOp struct {
 	OneInputNode
 
@@ -13948,2514 +27136,5478 @@ func (p projGEFloat64Float64Op) Init() {
 }
 
 // GetProjectionConstOperator returns the appropriate constant projection
-// operator for the given column type and comparison.
+// operator for the given left and right column types and comparison.
 func GetProjectionRConstOperator(
-	ct *types.T,
+	leftColType *types.T,
+	rightColType *types.T,
 	op tree.Operator,
 	input Operator,
 	colIdx int,
 	constArg tree.Datum,
 	outputIdx int,
 ) (Operator, error) {
-	c, err := typeconv.GetDatumToPhysicalFn(ct)(constArg)
+	c, err := typeconv.GetDatumToPhysicalFn(rightColType)(constArg)
 	if err != nil {
 		return nil, err
 	}
-	switch t := typeconv.FromColumnType(ct); t {
+	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 
 	case coltypes.Bool:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
+		case coltypes.Bool:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQBoolBoolConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEBoolBoolConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTBoolBoolConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEBoolBoolConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTBoolBoolConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEBoolBoolConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Bytes:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
+		case coltypes.Bytes:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQBytesBytesConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEBytesBytesConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTBytesBytesConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEBytesBytesConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTBytesBytesConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEBytesBytesConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Decimal:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Decimal:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEDecimalDecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int8:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int16:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LT:
-				return &projLTInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Div:
+					return &projDivInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
+				case tree.EQ:
+					return &projEQInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int32:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int64:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float32:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat32Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float64:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LT:
-				return &projLTFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Div:
+					return &projDivFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
+				case tree.EQ:
+					return &projEQFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat64Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
 }
 
 // GetProjectionConstOperator returns the appropriate constant projection
-// operator for the given column type and comparison.
+// operator for the given left and right column types and comparison.
 func GetProjectionLConstOperator(
-	ct *types.T,
+	leftColType *types.T,
+	rightColType *types.T,
 	op tree.Operator,
 	input Operator,
 	colIdx int,
 	constArg tree.Datum,
 	outputIdx int,
 ) (Operator, error) {
-	c, err := typeconv.GetDatumToPhysicalFn(ct)(constArg)
+	c, err := typeconv.GetDatumToPhysicalFn(leftColType)(constArg)
 	if err != nil {
 		return nil, err
 	}
-	switch t := typeconv.FromColumnType(ct); t {
+	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 
 	case coltypes.Bool:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
+		case coltypes.Bool:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQBoolConstBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEBoolConstBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTBoolConstBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEBoolConstBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTBoolConstBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEBoolConstBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(bool),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQBoolConstBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEBoolConstBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTBoolConstBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEBoolConstBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTBoolConstBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEBoolConstBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Bytes:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
+		case coltypes.Bytes:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQBytesConstBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEBytesConstBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTBytesConstBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEBytesConstBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTBytesConstBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEBytesConstBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.([]byte),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQBytesConstBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEBytesConstBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTBytesConstBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEBytesConstBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTBytesConstBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEBytesConstBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Decimal:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Decimal:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEDecimalConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEDecimalConstDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int8:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt8ConstInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int16:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LT:
-				return &projLTInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Div:
+					return &projDivInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt16ConstInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
+				case tree.EQ:
+					return &projEQInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int32:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt32ConstInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int64:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt64ConstInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float32:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat32ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEFloat32ConstFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float64:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LT:
-				return &projLTFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Div:
+					return &projDivFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEFloat64ConstFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
+				case tree.EQ:
+					return &projEQFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat64ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
 }
 
 // GetProjectionOperator returns the appropriate projection operator for the
-// given column type and comparison.
+// given left and right column types and comparison.
 func GetProjectionOperator(
-	ct *types.T,
+	leftColType *types.T,
+	rightColType *types.T,
 	op tree.Operator,
 	input Operator,
 	col1Idx int,
 	col2Idx int,
 	outputIdx int,
 ) (Operator, error) {
-	switch t := typeconv.FromColumnType(ct); t {
+	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 
 	case coltypes.Bool:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
+		case coltypes.Bool:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQBoolBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEBoolBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTBoolBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEBoolBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTBoolBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEBoolBoolOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Bytes:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
+		case coltypes.Bytes:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQBytesBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEBytesBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTBytesBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEBytesBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTBytesBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEBytesBytesOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Decimal:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Decimal:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEDecimalDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.NE:
-				return &projNEDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LT:
-				return &projLTDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.LE:
-				return &projLEDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GT:
-				return &projGTDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			case tree.GE:
-				return &projGEDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
-
-			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
-			}
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int8:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int16:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LT:
-				return &projLTInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Div:
+					return &projDivInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
+				case tree.EQ:
+					return &projEQInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int32:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Int64:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int8:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEInt64Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float32:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Mult:
-				return &projMultFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.Div:
+					return &projDivFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+
+				case tree.EQ:
+					return &projEQFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat32Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.LT:
-				return &projLTFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LT:
+					return &projLTFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.LE:
+					return &projLEFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.GT:
+					return &projGTFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	case coltypes.Float64:
-		switch op.(type) {
-		case tree.BinaryOperator:
-			switch op {
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
-			case tree.Plus:
-				return &projPlusFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.Minus:
-				return &projMinusFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
-			case tree.Mult:
-				return &projMultFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.EQ:
+					return &projEQFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.Div:
-				return &projDivFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.NE:
+					return &projNEFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
+				case tree.LT:
+					return &projLTFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled binary operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
-		case tree.ComparisonOperator:
-			switch op {
 
-			case tree.EQ:
-				return &projEQFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
 
-			case tree.NE:
-				return &projNEFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Plus:
+					return &projPlusFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LT:
-				return &projLTFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Minus:
+					return &projMinusFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.LE:
-				return &projLEFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Mult:
+					return &projMultFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GT:
-				return &projGTFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				case tree.Div:
+					return &projDivFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
-			case tree.GE:
-				return &projGEFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-					outputIdx:    outputIdx,
-				}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 
+				case tree.EQ:
+					return &projEQFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.NE:
+					return &projNEFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LT:
+					return &projLTFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.LE:
+					return &projLEFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GT:
+					return &projGTFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.GE:
+					return &projGEFloat64Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
 			default:
-				return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				return nil, errors.New("unhandled operator type")
 			}
+
 		default:
-			return nil, errors.New("unhandled operator type")
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
 }
