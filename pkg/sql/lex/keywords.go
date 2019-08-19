@@ -101,6 +101,7 @@ var KeywordsCategories = map[string]string{
 	"enum":                      "U",
 	"escape":                    "U",
 	"except":                    "R",
+	"exclude":                   "U",
 	"execute":                   "U",
 	"exists":                    "C",
 	"experimental":              "U",
@@ -237,6 +238,7 @@ var KeywordsCategories = map[string]string{
 	"or":                        "R",
 	"order":                     "R",
 	"ordinality":                "U",
+	"others":                    "U",
 	"out":                       "C",
 	"outer":                     "T",
 	"over":                      "U",
@@ -346,6 +348,7 @@ var KeywordsCategories = map[string]string{
 	"text":                      "U",
 	"then":                      "R",
 	"throttling":                "U",
+	"ties":                      "U",
 	"time":                      "C",
 	"timestamp":                 "C",
 	"timestamptz":               "C",
@@ -498,6 +501,7 @@ var KeywordNames = []string{
 	"enum",
 	"escape",
 	"except",
+	"exclude",
 	"execute",
 	"exists",
 	"experimental",
@@ -634,6 +638,7 @@ var KeywordNames = []string{
 	"or",
 	"order",
 	"ordinality",
+	"others",
 	"out",
 	"outer",
 	"over",
@@ -743,6 +748,7 @@ var KeywordNames = []string{
 	"text",
 	"then",
 	"throttling",
+	"ties",
 	"time",
 	"timestamp",
 	"timestamptz",
@@ -998,6 +1004,8 @@ func GetKeywordID(k string) int32 {
 		return ESCAPE
 	case "except":
 		return EXCEPT
+	case "exclude":
+		return EXCLUDE
 	case "execute":
 		return EXECUTE
 	case "exists":
@@ -1270,6 +1278,8 @@ func GetKeywordID(k string) int32 {
 		return ORDER
 	case "ordinality":
 		return ORDINALITY
+	case "others":
+		return OTHERS
 	case "out":
 		return OUT
 	case "outer":
@@ -1488,6 +1498,8 @@ func GetKeywordID(k string) int32 {
 		return THEN
 	case "throttling":
 		return THROTTLING
+	case "ties":
+		return TIES
 	case "time":
 		return TIME
 	case "timestamp":
