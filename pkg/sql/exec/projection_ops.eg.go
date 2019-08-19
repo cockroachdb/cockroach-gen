@@ -46,7 +46,21 @@ func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(arg, p.constArg) == 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -54,7 +68,21 @@ func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(arg, p.constArg) == 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -97,7 +125,21 @@ func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(p.constArg, arg) == 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -105,7 +147,21 @@ func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(p.constArg, arg) == 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -151,7 +207,21 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareBools(arg1, arg2) == 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -161,7 +231,21 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareBools(arg1, arg2) == 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -203,7 +287,21 @@ func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(arg, p.constArg) != 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -211,7 +309,21 @@ func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(arg, p.constArg) != 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -254,7 +366,21 @@ func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(p.constArg, arg) != 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -262,7 +388,21 @@ func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(p.constArg, arg) != 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -308,7 +448,21 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareBools(arg1, arg2) != 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -318,7 +472,21 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareBools(arg1, arg2) != 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -360,7 +528,21 @@ func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(arg, p.constArg) < 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -368,7 +550,21 @@ func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(arg, p.constArg) < 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -411,7 +607,21 @@ func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(p.constArg, arg) < 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -419,7 +629,21 @@ func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(p.constArg, arg) < 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -465,7 +689,21 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareBools(arg1, arg2) < 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -475,7 +713,21 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareBools(arg1, arg2) < 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -517,7 +769,21 @@ func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(arg, p.constArg) <= 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -525,7 +791,21 @@ func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(arg, p.constArg) <= 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -568,7 +848,21 @@ func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(p.constArg, arg) <= 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -576,7 +870,21 @@ func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(p.constArg, arg) <= 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -622,7 +930,21 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareBools(arg1, arg2) <= 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -632,7 +954,21 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareBools(arg1, arg2) <= 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -674,7 +1010,21 @@ func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(arg, p.constArg) > 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -682,7 +1032,21 @@ func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(arg, p.constArg) > 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -725,7 +1089,21 @@ func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(p.constArg, arg) > 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -733,7 +1111,21 @@ func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(p.constArg, arg) > 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -779,7 +1171,21 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareBools(arg1, arg2) > 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -789,7 +1195,21 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareBools(arg1, arg2) > 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -831,7 +1251,21 @@ func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(arg, p.constArg) >= 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -839,7 +1273,21 @@ func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(arg, p.constArg) >= 0
+
+			{
+				var cmpResult int
+
+				if !arg && p.constArg {
+					cmpResult = -1
+				} else if arg && !p.constArg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -882,7 +1330,21 @@ func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareBools(p.constArg, arg) >= 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -890,7 +1352,21 @@ func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareBools(p.constArg, arg) >= 0
+
+			{
+				var cmpResult int
+
+				if !p.constArg && arg {
+					cmpResult = -1
+				} else if p.constArg && !arg {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -936,7 +1412,21 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareBools(arg1, arg2) >= 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -946,7 +1436,21 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareBools(arg1, arg2) >= 0
+
+			{
+				var cmpResult int
+
+				if !arg1 && arg2 {
+					cmpResult = -1
+				} else if arg1 && !arg2 {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -988,7 +1492,13 @@ func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(arg, p.constArg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -996,7 +1506,13 @@ func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(arg, p.constArg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1039,7 +1555,13 @@ func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(p.constArg, arg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1047,7 +1569,13 @@ func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(p.constArg, arg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1093,7 +1621,13 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
-			projCol[i] = bytes.Compare(arg1, arg2) == 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1.Slice(0, int(n))
@@ -1103,7 +1637,13 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
-			projCol[i] = bytes.Compare(arg1, arg2) == 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -1145,7 +1685,13 @@ func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(arg, p.constArg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1153,7 +1699,13 @@ func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(arg, p.constArg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1196,7 +1748,13 @@ func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(p.constArg, arg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1204,7 +1762,13 @@ func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(p.constArg, arg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1250,7 +1814,13 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
-			projCol[i] = bytes.Compare(arg1, arg2) != 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1.Slice(0, int(n))
@@ -1260,7 +1830,13 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
-			projCol[i] = bytes.Compare(arg1, arg2) != 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -1302,7 +1878,13 @@ func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(arg, p.constArg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1310,7 +1892,13 @@ func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(arg, p.constArg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1353,7 +1941,13 @@ func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(p.constArg, arg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1361,7 +1955,13 @@ func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(p.constArg, arg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1407,7 +2007,13 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
-			projCol[i] = bytes.Compare(arg1, arg2) < 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1.Slice(0, int(n))
@@ -1417,7 +2023,13 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
-			projCol[i] = bytes.Compare(arg1, arg2) < 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -1459,7 +2071,13 @@ func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(arg, p.constArg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1467,7 +2085,13 @@ func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(arg, p.constArg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1510,7 +2134,13 @@ func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(p.constArg, arg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1518,7 +2148,13 @@ func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(p.constArg, arg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1564,7 +2200,13 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
-			projCol[i] = bytes.Compare(arg1, arg2) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1.Slice(0, int(n))
@@ -1574,7 +2216,13 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
-			projCol[i] = bytes.Compare(arg1, arg2) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -1616,7 +2264,13 @@ func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(arg, p.constArg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1624,7 +2278,13 @@ func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(arg, p.constArg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1667,7 +2327,13 @@ func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(p.constArg, arg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1675,7 +2341,13 @@ func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(p.constArg, arg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1721,7 +2393,13 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
-			projCol[i] = bytes.Compare(arg1, arg2) > 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1.Slice(0, int(n))
@@ -1731,7 +2409,13 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
-			projCol[i] = bytes.Compare(arg1, arg2) > 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -1773,7 +2457,13 @@ func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(arg, p.constArg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1781,7 +2471,13 @@ func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(arg, p.constArg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg, p.constArg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1824,7 +2520,13 @@ func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col.Get(int(i))
-			projCol[i] = bytes.Compare(p.constArg, arg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col.Slice(0, int(n))
@@ -1832,7 +2534,13 @@ func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := 0; i < col.Len(); i++ {
 			arg := col.Get(i)
-			projCol[i] = bytes.Compare(p.constArg, arg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(p.constArg, arg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -1878,7 +2586,13 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
-			projCol[i] = bytes.Compare(arg1, arg2) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1.Slice(0, int(n))
@@ -1888,7 +2602,13 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
-			projCol[i] = bytes.Compare(arg1, arg2) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -2606,7 +3326,13 @@ func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -2614,7 +3340,13 @@ func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -2657,7 +3389,13 @@ func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -2665,7 +3403,13 @@ func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) == 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -2711,7 +3455,13 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) == 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -2721,7 +3471,13 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) == 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -2763,7 +3519,13 @@ func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -2771,7 +3533,13 @@ func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -2814,7 +3582,13 @@ func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -2822,7 +3596,13 @@ func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) != 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -2868,7 +3648,13 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) != 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -2878,7 +3664,13 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) != 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -2920,7 +3712,13 @@ func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -2928,7 +3726,13 @@ func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -2971,7 +3775,13 @@ func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -2979,7 +3789,13 @@ func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) < 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3025,7 +3841,13 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) < 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -3035,7 +3857,13 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) < 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -3077,7 +3905,13 @@ func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -3085,7 +3919,13 @@ func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3128,7 +3968,13 @@ func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -3136,7 +3982,13 @@ func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3182,7 +4034,13 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -3192,7 +4050,13 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) <= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -3234,7 +4098,13 @@ func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -3242,7 +4112,13 @@ func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3285,7 +4161,13 @@ func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -3293,7 +4175,13 @@ func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) > 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3339,7 +4227,13 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) > 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -3349,7 +4243,13 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) > 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -3391,7 +4291,13 @@ func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -3399,7 +4305,13 @@ func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&arg, &p.constArg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3442,7 +4354,13 @@ func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -3450,7 +4368,13 @@ func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = tree.CompareDecimals(&p.constArg, &arg) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&p.constArg, &arg)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -3496,7 +4420,13 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -3506,7 +4436,13 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = tree.CompareDecimals(&arg1, &arg2) >= 0
+
+			{
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4428,7 +5364,24 @@ func (p projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4436,7 +5389,24 @@ func (p projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4479,7 +5449,24 @@ func (p projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4487,7 +5474,24 @@ func (p projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4533,7 +5537,24 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -4543,7 +5564,24 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4585,7 +5623,24 @@ func (p projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4593,7 +5648,24 @@ func (p projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4636,7 +5708,24 @@ func (p projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4644,7 +5733,24 @@ func (p projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4690,7 +5796,24 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -4700,7 +5823,24 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4742,7 +5882,24 @@ func (p projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4750,7 +5907,24 @@ func (p projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4793,7 +5967,24 @@ func (p projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4801,7 +5992,24 @@ func (p projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4847,7 +6055,24 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -4857,7 +6082,24 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -4899,7 +6141,24 @@ func (p projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4907,7 +6166,24 @@ func (p projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -4950,7 +6226,24 @@ func (p projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -4958,7 +6251,24 @@ func (p projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5004,7 +6314,24 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5014,7 +6341,24 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5056,7 +6400,24 @@ func (p projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5064,7 +6425,24 @@ func (p projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5107,7 +6485,24 @@ func (p projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5115,7 +6510,24 @@ func (p projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5161,7 +6573,24 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5171,7 +6600,24 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5213,7 +6659,24 @@ func (p projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5221,7 +6684,24 @@ func (p projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5264,7 +6744,24 @@ func (p projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5272,7 +6769,24 @@ func (p projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5318,7 +6832,24 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5328,7 +6859,24 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5370,7 +6918,24 @@ func (p projEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5378,7 +6943,24 @@ func (p projEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5421,7 +7003,24 @@ func (p projEQInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5429,7 +7028,24 @@ func (p projEQInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5475,7 +7091,24 @@ func (p projEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5485,7 +7118,24 @@ func (p projEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5527,7 +7177,24 @@ func (p projNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5535,7 +7202,24 @@ func (p projNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5578,7 +7262,24 @@ func (p projNEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5586,7 +7287,24 @@ func (p projNEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5632,7 +7350,24 @@ func (p projNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5642,7 +7377,24 @@ func (p projNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5684,7 +7436,24 @@ func (p projLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5692,7 +7461,24 @@ func (p projLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5735,7 +7521,24 @@ func (p projLTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5743,7 +7546,24 @@ func (p projLTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5789,7 +7609,24 @@ func (p projLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5799,7 +7636,24 @@ func (p projLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5841,7 +7695,24 @@ func (p projLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5849,7 +7720,24 @@ func (p projLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5892,7 +7780,24 @@ func (p projLEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -5900,7 +7805,24 @@ func (p projLEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -5946,7 +7868,24 @@ func (p projLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -5956,7 +7895,24 @@ func (p projLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -5998,7 +7954,24 @@ func (p projGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6006,7 +7979,24 @@ func (p projGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6049,7 +8039,24 @@ func (p projGTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6057,7 +8064,24 @@ func (p projGTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6103,7 +8127,24 @@ func (p projGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6113,7 +8154,24 @@ func (p projGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6155,7 +8213,24 @@ func (p projGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6163,7 +8238,24 @@ func (p projGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6206,7 +8298,24 @@ func (p projGEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6214,7 +8323,24 @@ func (p projGEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6260,7 +8386,24 @@ func (p projGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6270,7 +8413,24 @@ func (p projGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6312,7 +8472,24 @@ func (p projEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6320,7 +8497,24 @@ func (p projEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6363,7 +8557,24 @@ func (p projEQInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6371,7 +8582,24 @@ func (p projEQInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6417,7 +8645,24 @@ func (p projEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6427,7 +8672,24 @@ func (p projEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6469,7 +8731,24 @@ func (p projNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6477,7 +8756,24 @@ func (p projNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6520,7 +8816,24 @@ func (p projNEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6528,7 +8841,24 @@ func (p projNEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6574,7 +8904,24 @@ func (p projNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6584,7 +8931,24 @@ func (p projNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6626,7 +8990,24 @@ func (p projLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6634,7 +9015,24 @@ func (p projLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6677,7 +9075,24 @@ func (p projLTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6685,7 +9100,24 @@ func (p projLTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6731,7 +9163,24 @@ func (p projLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6741,7 +9190,24 @@ func (p projLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6783,7 +9249,24 @@ func (p projLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6791,7 +9274,24 @@ func (p projLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6834,7 +9334,24 @@ func (p projLEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6842,7 +9359,24 @@ func (p projLEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6888,7 +9422,24 @@ func (p projLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -6898,7 +9449,24 @@ func (p projLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -6940,7 +9508,24 @@ func (p projGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6948,7 +9533,24 @@ func (p projGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -6991,7 +9593,24 @@ func (p projGTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -6999,7 +9618,24 @@ func (p projGTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7045,7 +9681,24 @@ func (p projGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7055,7 +9708,24 @@ func (p projGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7097,7 +9767,24 @@ func (p projGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7105,7 +9792,24 @@ func (p projGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7148,7 +9852,24 @@ func (p projGEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7156,7 +9877,24 @@ func (p projGEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7202,7 +9940,24 @@ func (p projGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7212,7 +9967,24 @@ func (p projGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7254,7 +10026,24 @@ func (p projEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7262,7 +10051,24 @@ func (p projEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7305,7 +10111,24 @@ func (p projEQInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7313,7 +10136,24 @@ func (p projEQInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7359,7 +10199,24 @@ func (p projEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7369,7 +10226,24 @@ func (p projEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7411,7 +10285,24 @@ func (p projNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7419,7 +10310,24 @@ func (p projNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7462,7 +10370,24 @@ func (p projNEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7470,7 +10395,24 @@ func (p projNEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7516,7 +10458,24 @@ func (p projNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7526,7 +10485,24 @@ func (p projNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7568,7 +10544,24 @@ func (p projLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7576,7 +10569,24 @@ func (p projLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7619,7 +10629,24 @@ func (p projLTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7627,7 +10654,24 @@ func (p projLTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7673,7 +10717,24 @@ func (p projLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7683,7 +10744,24 @@ func (p projLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7725,7 +10803,24 @@ func (p projLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7733,7 +10828,24 @@ func (p projLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7776,7 +10888,24 @@ func (p projLEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7784,7 +10913,24 @@ func (p projLEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7830,7 +10976,24 @@ func (p projLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7840,7 +11003,24 @@ func (p projLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -7882,7 +11062,24 @@ func (p projGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7890,7 +11087,24 @@ func (p projGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7933,7 +11147,24 @@ func (p projGTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -7941,7 +11172,24 @@ func (p projGTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -7987,7 +11235,24 @@ func (p projGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -7997,7 +11262,24 @@ func (p projGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8039,7 +11321,24 @@ func (p projGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8047,7 +11346,24 @@ func (p projGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8090,7 +11406,24 @@ func (p projGEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8098,7 +11431,24 @@ func (p projGEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8144,7 +11494,24 @@ func (p projGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8154,7 +11521,24 @@ func (p projGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8196,7 +11580,24 @@ func (p projEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8204,7 +11605,24 @@ func (p projEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8247,7 +11665,24 @@ func (p projEQInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8255,7 +11690,24 @@ func (p projEQInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8301,7 +11753,24 @@ func (p projEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8311,7 +11780,24 @@ func (p projEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8353,7 +11839,24 @@ func (p projNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8361,7 +11864,24 @@ func (p projNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8404,7 +11924,24 @@ func (p projNEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8412,7 +11949,24 @@ func (p projNEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8458,7 +12012,24 @@ func (p projNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8468,7 +12039,24 @@ func (p projNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8510,7 +12098,24 @@ func (p projLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8518,7 +12123,24 @@ func (p projLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8561,7 +12183,24 @@ func (p projLTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8569,7 +12208,24 @@ func (p projLTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8615,7 +12271,24 @@ func (p projLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8625,7 +12298,24 @@ func (p projLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8667,7 +12357,24 @@ func (p projLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8675,7 +12382,24 @@ func (p projLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8718,7 +12442,24 @@ func (p projLEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8726,7 +12467,24 @@ func (p projLEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8772,7 +12530,24 @@ func (p projLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8782,7 +12557,24 @@ func (p projLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8824,7 +12616,24 @@ func (p projGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8832,7 +12641,24 @@ func (p projGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8875,7 +12701,24 @@ func (p projGTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8883,7 +12726,24 @@ func (p projGTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -8929,7 +12789,24 @@ func (p projGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -8939,7 +12816,24 @@ func (p projGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -8981,7 +12875,24 @@ func (p projGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -8989,7 +12900,24 @@ func (p projGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -9032,7 +12960,24 @@ func (p projGEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -9040,7 +12985,24 @@ func (p projGEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -9086,7 +13048,24 @@ func (p projGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -9096,7 +13075,24 @@ func (p projGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10018,7 +14014,24 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10026,7 +14039,24 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10069,7 +14099,24 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10077,7 +14124,24 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10123,7 +14187,24 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10133,7 +14214,24 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10175,7 +14273,24 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10183,7 +14298,24 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10226,7 +14358,24 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10234,7 +14383,24 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10280,7 +14446,24 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10290,7 +14473,24 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10332,7 +14532,24 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10340,7 +14557,24 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10383,7 +14617,24 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10391,7 +14642,24 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10437,7 +14705,24 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10447,7 +14732,24 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10489,7 +14791,24 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10497,7 +14816,24 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10540,7 +14876,24 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10548,7 +14901,24 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10594,7 +14964,24 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10604,7 +14991,24 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10646,7 +15050,24 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10654,7 +15075,24 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10697,7 +15135,24 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10705,7 +15160,24 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10751,7 +15223,24 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10761,7 +15250,24 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10803,7 +15309,24 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10811,7 +15334,24 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10854,7 +15394,24 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10862,7 +15419,24 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -10908,7 +15482,24 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -10918,7 +15509,24 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -10960,7 +15568,24 @@ func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -10968,7 +15593,24 @@ func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11011,7 +15653,24 @@ func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11019,7 +15678,24 @@ func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11065,7 +15741,24 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -11075,7 +15768,24 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -11117,7 +15827,24 @@ func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11125,7 +15852,24 @@ func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11168,7 +15912,24 @@ func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11176,7 +15937,24 @@ func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11222,7 +16000,24 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -11232,7 +16027,24 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -11274,7 +16086,24 @@ func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11282,7 +16111,24 @@ func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11325,7 +16171,24 @@ func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11333,7 +16196,24 @@ func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11379,7 +16259,24 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -11389,7 +16286,24 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -11431,7 +16345,24 @@ func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11439,7 +16370,24 @@ func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11482,7 +16430,24 @@ func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11490,7 +16455,24 @@ func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11536,7 +16518,24 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -11546,7 +16545,24 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -11588,7 +16604,24 @@ func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11596,7 +16629,24 @@ func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11639,7 +16689,24 @@ func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11647,7 +16714,24 @@ func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11693,7 +16777,24 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -11703,7 +16804,24 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -11745,7 +16863,24 @@ func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11753,7 +16888,24 @@ func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11796,7 +16948,24 @@ func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11804,7 +16973,24 @@ func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11850,7 +17036,24 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -11860,7 +17063,24 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -11902,7 +17122,24 @@ func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11910,7 +17147,24 @@ func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -11953,7 +17207,24 @@ func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -11961,7 +17232,24 @@ func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12007,7 +17295,24 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12017,7 +17322,24 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12059,7 +17381,24 @@ func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12067,7 +17406,24 @@ func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12110,7 +17466,24 @@ func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12118,7 +17491,24 @@ func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12164,7 +17554,24 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12174,7 +17581,24 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12216,7 +17640,24 @@ func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12224,7 +17665,24 @@ func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12267,7 +17725,24 @@ func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12275,7 +17750,24 @@ func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12321,7 +17813,24 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12331,7 +17840,24 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12373,7 +17899,24 @@ func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12381,7 +17924,24 @@ func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12424,7 +17984,24 @@ func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12432,7 +18009,24 @@ func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12478,7 +18072,24 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12488,7 +18099,24 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12530,7 +18158,24 @@ func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12538,7 +18183,24 @@ func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12581,7 +18243,24 @@ func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12589,7 +18268,24 @@ func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12635,7 +18331,24 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12645,7 +18358,24 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12687,7 +18417,24 @@ func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12695,7 +18442,24 @@ func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12738,7 +18502,24 @@ func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12746,7 +18527,24 @@ func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12792,7 +18590,24 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12802,7 +18617,24 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -12844,7 +18676,24 @@ func (p projEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12852,7 +18701,24 @@ func (p projEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12895,7 +18761,24 @@ func (p projEQInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -12903,7 +18786,24 @@ func (p projEQInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -12949,7 +18849,24 @@ func (p projEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -12959,7 +18876,24 @@ func (p projEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13001,7 +18935,24 @@ func (p projNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13009,7 +18960,24 @@ func (p projNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13052,7 +19020,24 @@ func (p projNEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13060,7 +19045,24 @@ func (p projNEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13106,7 +19108,24 @@ func (p projNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -13116,7 +19135,24 @@ func (p projNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13158,7 +19194,24 @@ func (p projLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13166,7 +19219,24 @@ func (p projLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13209,7 +19279,24 @@ func (p projLTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13217,7 +19304,24 @@ func (p projLTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13263,7 +19367,24 @@ func (p projLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -13273,7 +19394,24 @@ func (p projLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13315,7 +19453,24 @@ func (p projLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13323,7 +19478,24 @@ func (p projLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13366,7 +19538,24 @@ func (p projLEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13374,7 +19563,24 @@ func (p projLEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13420,7 +19626,24 @@ func (p projLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -13430,7 +19653,24 @@ func (p projLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13472,7 +19712,24 @@ func (p projGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13480,7 +19737,24 @@ func (p projGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13523,7 +19797,24 @@ func (p projGTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13531,7 +19822,24 @@ func (p projGTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13577,7 +19885,24 @@ func (p projGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -13587,7 +19912,24 @@ func (p projGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13629,7 +19971,24 @@ func (p projGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13637,7 +19996,24 @@ func (p projGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13680,7 +20056,24 @@ func (p projGEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13688,7 +20081,24 @@ func (p projGEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13734,7 +20144,24 @@ func (p projGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -13744,7 +20171,24 @@ func (p projGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13786,7 +20230,24 @@ func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13794,7 +20255,24 @@ func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13837,7 +20315,24 @@ func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13845,7 +20340,24 @@ func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13891,7 +20403,24 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -13901,7 +20430,24 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -13943,7 +20489,24 @@ func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -13951,7 +20514,24 @@ func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -13994,7 +20574,24 @@ func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14002,7 +20599,24 @@ func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14048,7 +20662,24 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -14058,7 +20689,24 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -14100,7 +20748,24 @@ func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14108,7 +20773,24 @@ func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14151,7 +20833,24 @@ func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14159,7 +20858,24 @@ func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14205,7 +20921,24 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -14215,7 +20948,24 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -14257,7 +21007,24 @@ func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14265,7 +21032,24 @@ func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14308,7 +21092,24 @@ func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14316,7 +21117,24 @@ func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14362,7 +21180,24 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -14372,7 +21207,24 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -14414,7 +21266,24 @@ func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14422,7 +21291,24 @@ func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14465,7 +21351,24 @@ func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14473,7 +21376,24 @@ func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14519,7 +21439,24 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -14529,7 +21466,24 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -14571,7 +21525,24 @@ func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14579,7 +21550,24 @@ func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14622,7 +21610,24 @@ func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -14630,7 +21635,24 @@ func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -14676,7 +21698,24 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -14686,7 +21725,24 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -15608,7 +22664,24 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -15616,7 +22689,24 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -15659,7 +22749,24 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -15667,7 +22774,24 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -15713,7 +22837,24 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -15723,7 +22864,24 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -15765,7 +22923,24 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -15773,7 +22948,24 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -15816,7 +23008,24 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -15824,7 +23033,24 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -15870,7 +23096,24 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -15880,7 +23123,24 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -15922,7 +23182,24 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -15930,7 +23207,24 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -15973,7 +23267,24 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -15981,7 +23292,24 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16027,7 +23355,24 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16037,7 +23382,24 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -16079,7 +23441,24 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16087,7 +23466,24 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16130,7 +23526,24 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16138,7 +23551,24 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16184,7 +23614,24 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16194,7 +23641,24 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -16236,7 +23700,24 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16244,7 +23725,24 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16287,7 +23785,24 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16295,7 +23810,24 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16341,7 +23873,24 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16351,7 +23900,24 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -16393,7 +23959,24 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16401,7 +23984,24 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16444,7 +24044,24 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16452,7 +24069,24 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16498,7 +24132,24 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16508,7 +24159,24 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -16550,7 +24218,24 @@ func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16558,7 +24243,24 @@ func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16601,7 +24303,24 @@ func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16609,7 +24328,24 @@ func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16655,7 +24391,24 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16665,7 +24418,24 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -16707,7 +24477,24 @@ func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16715,7 +24502,24 @@ func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16758,7 +24562,24 @@ func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16766,7 +24587,24 @@ func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16812,7 +24650,24 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16822,7 +24677,24 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -16864,7 +24736,24 @@ func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16872,7 +24761,24 @@ func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16915,7 +24821,24 @@ func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -16923,7 +24846,24 @@ func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -16969,7 +24909,24 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -16979,7 +24936,24 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17021,7 +24995,24 @@ func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17029,7 +25020,24 @@ func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17072,7 +25080,24 @@ func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17080,7 +25105,24 @@ func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17126,7 +25168,24 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -17136,7 +25195,24 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17178,7 +25254,24 @@ func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17186,7 +25279,24 @@ func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17229,7 +25339,24 @@ func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17237,7 +25364,24 @@ func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17283,7 +25427,24 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -17293,7 +25454,24 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17335,7 +25513,24 @@ func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17343,7 +25538,24 @@ func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17386,7 +25598,24 @@ func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17394,7 +25623,24 @@ func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17440,7 +25686,24 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -17450,7 +25713,24 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17492,7 +25772,24 @@ func (p projEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17500,7 +25797,24 @@ func (p projEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17543,7 +25857,24 @@ func (p projEQInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17551,7 +25882,24 @@ func (p projEQInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17597,7 +25945,24 @@ func (p projEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -17607,7 +25972,24 @@ func (p projEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17649,7 +26031,24 @@ func (p projNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17657,7 +26056,24 @@ func (p projNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17700,7 +26116,24 @@ func (p projNEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17708,7 +26141,24 @@ func (p projNEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17754,7 +26204,24 @@ func (p projNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -17764,7 +26231,24 @@ func (p projNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17806,7 +26290,24 @@ func (p projLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17814,7 +26315,24 @@ func (p projLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17857,7 +26375,24 @@ func (p projLTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17865,7 +26400,24 @@ func (p projLTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -17911,7 +26463,24 @@ func (p projLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -17921,7 +26490,24 @@ func (p projLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -17963,7 +26549,24 @@ func (p projLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -17971,7 +26574,24 @@ func (p projLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18014,7 +26634,24 @@ func (p projLEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18022,7 +26659,24 @@ func (p projLEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18068,7 +26722,24 @@ func (p projLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -18078,7 +26749,24 @@ func (p projLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -18120,7 +26808,24 @@ func (p projGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18128,7 +26833,24 @@ func (p projGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18171,7 +26893,24 @@ func (p projGTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18179,7 +26918,24 @@ func (p projGTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18225,7 +26981,24 @@ func (p projGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -18235,7 +27008,24 @@ func (p projGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -18277,7 +27067,24 @@ func (p projGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18285,7 +27092,24 @@ func (p projGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18328,7 +27152,24 @@ func (p projGEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18336,7 +27177,24 @@ func (p projGEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18382,7 +27240,24 @@ func (p projGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -18392,7 +27267,24 @@ func (p projGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -18434,7 +27326,24 @@ func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18442,7 +27351,24 @@ func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18485,7 +27411,24 @@ func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18493,7 +27436,24 @@ func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18539,7 +27499,24 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -18549,7 +27526,24 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -18591,7 +27585,24 @@ func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18599,7 +27610,24 @@ func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18642,7 +27670,24 @@ func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18650,7 +27695,24 @@ func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18696,7 +27758,24 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -18706,7 +27785,24 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -18748,7 +27844,24 @@ func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18756,7 +27869,24 @@ func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18799,7 +27929,24 @@ func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18807,7 +27954,24 @@ func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18853,7 +28017,24 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -18863,7 +28044,24 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -18905,7 +28103,24 @@ func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18913,7 +28128,24 @@ func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -18956,7 +28188,24 @@ func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -18964,7 +28213,24 @@ func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19010,7 +28276,24 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19020,7 +28303,24 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -19062,7 +28362,24 @@ func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19070,7 +28387,24 @@ func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19113,7 +28447,24 @@ func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19121,7 +28472,24 @@ func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19167,7 +28535,24 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19177,7 +28562,24 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -19219,7 +28621,24 @@ func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19227,7 +28646,24 @@ func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19270,7 +28706,24 @@ func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19278,7 +28731,24 @@ func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19324,7 +28794,24 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19334,7 +28821,24 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -19376,7 +28880,24 @@ func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19384,7 +28905,24 @@ func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19427,7 +28965,24 @@ func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19435,7 +28990,24 @@ func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19481,7 +29053,24 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19491,7 +29080,24 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -19533,7 +29139,24 @@ func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19541,7 +29164,24 @@ func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19584,7 +29224,24 @@ func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19592,7 +29249,24 @@ func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19638,7 +29312,24 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19648,7 +29339,24 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -19690,7 +29398,24 @@ func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19698,7 +29423,24 @@ func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19741,7 +29483,24 @@ func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19749,7 +29508,24 @@ func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19795,7 +29571,24 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19805,7 +29598,24 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -19847,7 +29657,24 @@ func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19855,7 +29682,24 @@ func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19898,7 +29742,24 @@ func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -19906,7 +29767,24 @@ func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -19952,7 +29830,24 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -19962,7 +29857,24 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -20004,7 +29916,24 @@ func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -20012,7 +29941,24 @@ func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -20055,7 +30001,24 @@ func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -20063,7 +30026,24 @@ func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -20109,7 +30089,24 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -20119,7 +30116,24 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -20161,7 +30175,24 @@ func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -20169,7 +30200,24 @@ func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -20212,7 +30260,24 @@ func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -20220,7 +30285,24 @@ func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -20266,7 +30348,24 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -20276,7 +30375,24 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -21198,7 +31314,24 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21206,7 +31339,24 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21249,7 +31399,24 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21257,7 +31424,24 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21303,7 +31487,24 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -21313,7 +31514,24 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -21355,7 +31573,24 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21363,7 +31598,24 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21406,7 +31658,24 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21414,7 +31683,24 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21460,7 +31746,24 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -21470,7 +31773,24 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -21512,7 +31832,24 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21520,7 +31857,24 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21563,7 +31917,24 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21571,7 +31942,24 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21617,7 +32005,24 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -21627,7 +32032,24 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -21669,7 +32091,24 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21677,7 +32116,24 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21720,7 +32176,24 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21728,7 +32201,24 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21774,7 +32264,24 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -21784,7 +32291,24 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -21826,7 +32350,24 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21834,7 +32375,24 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21877,7 +32435,24 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21885,7 +32460,24 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -21931,7 +32523,24 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -21941,7 +32550,24 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -21983,7 +32609,24 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -21991,7 +32634,24 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg), int64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -22034,7 +32694,24 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -22042,7 +32719,24 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareInts(int64(p.constArg), int64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(p.constArg), int64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -22088,7 +32782,24 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -22098,7 +32809,24 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareInts(int64(arg1), int64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -22768,7 +33496,32 @@ func (p projEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -22776,7 +33529,32 @@ func (p projEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -22819,7 +33597,32 @@ func (p projEQFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -22827,7 +33630,32 @@ func (p projEQFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -22873,7 +33701,32 @@ func (p projEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -22883,7 +33736,32 @@ func (p projEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -22925,7 +33803,32 @@ func (p projNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -22933,7 +33836,32 @@ func (p projNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -22976,7 +33904,32 @@ func (p projNEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -22984,7 +33937,32 @@ func (p projNEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23030,7 +34008,32 @@ func (p projNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23040,7 +34043,32 @@ func (p projNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -23082,7 +34110,32 @@ func (p projLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23090,7 +34143,32 @@ func (p projLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23133,7 +34211,32 @@ func (p projLTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23141,7 +34244,32 @@ func (p projLTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23187,7 +34315,32 @@ func (p projLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23197,7 +34350,32 @@ func (p projLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -23239,7 +34417,32 @@ func (p projLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23247,7 +34450,32 @@ func (p projLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23290,7 +34518,32 @@ func (p projLEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23298,7 +34551,32 @@ func (p projLEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23344,7 +34622,32 @@ func (p projLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23354,7 +34657,32 @@ func (p projLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -23396,7 +34724,32 @@ func (p projGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23404,7 +34757,32 @@ func (p projGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23447,7 +34825,32 @@ func (p projGTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23455,7 +34858,32 @@ func (p projGTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23501,7 +34929,32 @@ func (p projGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23511,7 +34964,32 @@ func (p projGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -23553,7 +35031,32 @@ func (p projGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23561,7 +35064,32 @@ func (p projGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23604,7 +35132,32 @@ func (p projGEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23612,7 +35165,32 @@ func (p projGEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23658,7 +35236,32 @@ func (p projGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23668,7 +35271,32 @@ func (p projGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -23710,7 +35338,32 @@ func (p projEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23718,7 +35371,32 @@ func (p projEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23761,7 +35439,32 @@ func (p projEQFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23769,7 +35472,32 @@ func (p projEQFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23815,7 +35543,32 @@ func (p projEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23825,7 +35578,32 @@ func (p projEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -23867,7 +35645,32 @@ func (p projNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23875,7 +35678,32 @@ func (p projNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23918,7 +35746,32 @@ func (p projNEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -23926,7 +35779,32 @@ func (p projNEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -23972,7 +35850,32 @@ func (p projNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -23982,7 +35885,32 @@ func (p projNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24024,7 +35952,32 @@ func (p projLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24032,7 +35985,32 @@ func (p projLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24075,7 +36053,32 @@ func (p projLTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24083,7 +36086,32 @@ func (p projLTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24129,7 +36157,32 @@ func (p projLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -24139,7 +36192,32 @@ func (p projLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24181,7 +36259,32 @@ func (p projLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24189,7 +36292,32 @@ func (p projLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24232,7 +36360,32 @@ func (p projLEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24240,7 +36393,32 @@ func (p projLEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24286,7 +36464,32 @@ func (p projLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -24296,7 +36499,32 @@ func (p projLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24338,7 +36566,32 @@ func (p projGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24346,7 +36599,32 @@ func (p projGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24389,7 +36667,32 @@ func (p projGTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24397,7 +36700,32 @@ func (p projGTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24443,7 +36771,32 @@ func (p projGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -24453,7 +36806,32 @@ func (p projGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24495,7 +36873,32 @@ func (p projGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24503,7 +36906,32 @@ func (p projGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24546,7 +36974,32 @@ func (p projGEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24554,7 +37007,32 @@ func (p projGEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24600,7 +37078,32 @@ func (p projGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -24610,7 +37113,32 @@ func (p projGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24652,7 +37180,32 @@ func (p projEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24660,7 +37213,32 @@ func (p projEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24703,7 +37281,32 @@ func (p projEQFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24711,7 +37314,32 @@ func (p projEQFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24757,7 +37385,32 @@ func (p projEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -24767,7 +37420,32 @@ func (p projEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24809,7 +37487,32 @@ func (p projNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24817,7 +37520,32 @@ func (p projNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24860,7 +37588,32 @@ func (p projNEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24868,7 +37621,32 @@ func (p projNEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -24914,7 +37692,32 @@ func (p projNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -24924,7 +37727,32 @@ func (p projNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -24966,7 +37794,32 @@ func (p projLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -24974,7 +37827,32 @@ func (p projLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25017,7 +37895,32 @@ func (p projLTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25025,7 +37928,32 @@ func (p projLTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25071,7 +37999,32 @@ func (p projLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -25081,7 +38034,32 @@ func (p projLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -25123,7 +38101,32 @@ func (p projLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25131,7 +38134,32 @@ func (p projLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25174,7 +38202,32 @@ func (p projLEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25182,7 +38235,32 @@ func (p projLEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25228,7 +38306,32 @@ func (p projLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -25238,7 +38341,32 @@ func (p projLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -25280,7 +38408,32 @@ func (p projGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25288,7 +38441,32 @@ func (p projGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25331,7 +38509,32 @@ func (p projGTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25339,7 +38542,32 @@ func (p projGTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25385,7 +38613,32 @@ func (p projGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -25395,7 +38648,32 @@ func (p projGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -25437,7 +38715,32 @@ func (p projGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25445,7 +38748,32 @@ func (p projGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25488,7 +38816,32 @@ func (p projGEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -25496,7 +38849,32 @@ func (p projGEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -25542,7 +38920,32 @@ func (p projGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -25552,7 +38955,32 @@ func (p projGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -26222,7 +39650,32 @@ func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26230,7 +39683,32 @@ func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26273,7 +39751,32 @@ func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26281,7 +39784,32 @@ func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26327,7 +39855,32 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -26337,7 +39890,32 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) == 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult == 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -26379,7 +39957,32 @@ func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26387,7 +39990,32 @@ func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26430,7 +40058,32 @@ func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26438,7 +40091,32 @@ func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26484,7 +40162,32 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -26494,7 +40197,32 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) != 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult != 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -26536,7 +40264,32 @@ func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26544,7 +40297,32 @@ func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26587,7 +40365,32 @@ func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26595,7 +40398,32 @@ func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26641,7 +40469,32 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -26651,7 +40504,32 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) < 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult < 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -26693,7 +40571,32 @@ func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26701,7 +40604,32 @@ func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26744,7 +40672,32 @@ func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26752,7 +40705,32 @@ func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26798,7 +40776,32 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -26808,7 +40811,32 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult <= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -26850,7 +40878,32 @@ func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26858,7 +40911,32 @@ func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26901,7 +40979,32 @@ func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -26909,7 +41012,32 @@ func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -26955,7 +41083,32 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -26965,7 +41118,32 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) > 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult > 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -27007,7 +41185,32 @@ func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -27015,7 +41218,32 @@ func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg), float64(p.constArg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -27058,7 +41286,32 @@ func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col = col[0:int(n)]
@@ -27066,7 +41319,32 @@ func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = compareFloats(float64(p.constArg), float64(arg)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(p.constArg), float64(arg)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -27112,7 +41390,32 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -27122,7 +41425,32 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				projCol[i] = cmpResult >= 0
+			}
+
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {

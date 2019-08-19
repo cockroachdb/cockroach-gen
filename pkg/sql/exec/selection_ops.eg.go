@@ -5,6 +5,7 @@ package exec
 import (
 	"bytes"
 	"context"
+	"math"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -41,7 +42,21 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -54,7 +69,21 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -69,7 +98,21 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -82,7 +125,21 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -132,7 +189,21 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -148,7 +219,21 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -164,7 +249,21 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -180,7 +279,21 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -226,7 +339,21 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -239,7 +366,21 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -254,7 +395,21 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -267,7 +422,21 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -317,7 +486,21 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -333,7 +516,21 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -349,7 +546,21 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -365,7 +576,21 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -411,7 +636,21 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -424,7 +663,21 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -439,7 +692,21 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -452,7 +719,21 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -502,7 +783,21 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -518,7 +813,21 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -534,7 +843,21 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -550,7 +873,21 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -596,7 +933,21 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -609,7 +960,21 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -624,7 +989,21 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -637,7 +1016,21 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -687,7 +1080,21 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -703,7 +1110,21 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -719,7 +1140,21 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -735,7 +1170,21 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -781,7 +1230,21 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -794,7 +1257,21 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -809,7 +1286,21 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -822,7 +1313,21 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -872,7 +1377,21 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -888,7 +1407,21 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -904,7 +1437,21 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -920,7 +1467,21 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -966,7 +1527,21 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -979,7 +1554,21 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -994,7 +1583,21 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareBools(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1007,7 +1610,21 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareBools(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg && p.constArg {
+							cmpResult = -1
+						} else if arg && !p.constArg {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1057,7 +1674,21 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1073,7 +1704,21 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1089,7 +1734,21 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareBools(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1105,7 +1764,21 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareBools(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+
+						if !arg1 && arg2 {
+							cmpResult = -1
+						} else if arg1 && !arg2 {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1151,7 +1824,13 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1164,7 +1843,13 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1179,7 +1864,13 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1192,7 +1883,13 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1242,7 +1939,13 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1258,7 +1961,13 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1274,7 +1983,13 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1290,7 +2005,13 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1336,7 +2057,13 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1349,7 +2076,13 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1364,7 +2097,13 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1377,7 +2116,13 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1427,7 +2172,13 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1443,7 +2194,13 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1459,7 +2216,13 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1475,7 +2238,13 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1521,7 +2290,13 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1534,7 +2309,13 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1549,7 +2330,13 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1562,7 +2349,13 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1612,7 +2405,13 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1628,7 +2427,13 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1644,7 +2449,13 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1660,7 +2471,13 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1706,7 +2523,13 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1719,7 +2542,13 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1734,7 +2563,13 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1747,7 +2582,13 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1797,7 +2638,13 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1813,7 +2660,13 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1829,7 +2682,13 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1845,7 +2704,13 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1891,7 +2756,13 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1904,7 +2775,13 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -1919,7 +2796,13 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -1932,7 +2815,13 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -1982,7 +2871,13 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -1998,7 +2893,13 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2014,7 +2915,13 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2030,7 +2937,13 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2076,7 +2989,13 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2089,7 +3008,13 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2104,7 +3029,13 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(int(i))
-					cmp = bytes.Compare(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2117,7 +3048,13 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := 0; i < col.Len(); i++ {
 					var cmp bool
 					arg := col.Get(i)
-					cmp = bytes.Compare(arg, p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg, p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2167,7 +3104,13 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2183,7 +3126,13 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2199,7 +3148,13 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(int(i))
 					arg2 := col2.Get(int(i))
-					cmp = bytes.Compare(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2215,7 +3170,13 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1.Get(i)
 					arg2 := col2.Get(i)
-					cmp = bytes.Compare(arg1, arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = bytes.Compare(arg1, arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2261,7 +3222,13 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2274,7 +3241,13 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2289,7 +3262,13 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2302,7 +3281,13 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2352,7 +3337,13 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2368,7 +3359,13 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2384,7 +3381,13 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2400,7 +3403,13 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) == 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2446,7 +3455,13 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2459,7 +3474,13 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2474,7 +3495,13 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2487,7 +3514,13 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2537,7 +3570,13 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2553,7 +3592,13 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2569,7 +3614,13 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2585,7 +3636,13 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) != 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2631,7 +3688,13 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2644,7 +3707,13 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2659,7 +3728,13 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2672,7 +3747,13 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2722,7 +3803,13 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2738,7 +3825,13 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2754,7 +3847,13 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2770,7 +3869,13 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) < 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2816,7 +3921,13 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2829,7 +3940,13 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2844,7 +3961,13 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2857,7 +3980,13 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -2907,7 +4036,13 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -2923,7 +4058,13 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -2939,7 +4080,13 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -2955,7 +4102,13 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) <= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3001,7 +4154,13 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3014,7 +4173,13 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3029,7 +4194,13 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3042,7 +4213,13 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3092,7 +4269,13 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3108,7 +4291,13 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3124,7 +4313,13 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3140,7 +4335,13 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) > 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3186,7 +4387,13 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3199,7 +4406,13 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3214,7 +4427,13 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3227,7 +4446,13 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = tree.CompareDecimals(&arg, &p.constArg) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg, &p.constArg)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3277,7 +4502,13 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3293,7 +4524,13 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3309,7 +4546,13 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = tree.CompareDecimals(&arg1, &arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3325,7 +4568,13 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = tree.CompareDecimals(&arg1, &arg2) >= 0
+
+					{
+						var cmpResult int
+						cmpResult = tree.CompareDecimals(&arg1, &arg2)
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3371,7 +4620,24 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3384,7 +4650,24 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3399,7 +4682,24 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3412,7 +4712,24 @@ func (p *selEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3462,7 +4779,24 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3478,7 +4812,24 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3494,7 +4845,24 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3510,7 +4878,24 @@ func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3556,7 +4941,24 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3569,7 +4971,24 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3584,7 +5003,24 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3597,7 +5033,24 @@ func (p *selNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3647,7 +5100,24 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3663,7 +5133,24 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3679,7 +5166,24 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3695,7 +5199,24 @@ func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3741,7 +5262,24 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3754,7 +5292,24 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3769,7 +5324,24 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3782,7 +5354,24 @@ func (p *selLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3832,7 +5421,24 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3848,7 +5454,24 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3864,7 +5487,24 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3880,7 +5520,24 @@ func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -3926,7 +5583,24 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -3939,7 +5613,24 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -3954,7 +5645,24 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -3967,7 +5675,24 @@ func (p *selLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4017,7 +5742,24 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4033,7 +5775,24 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4049,7 +5808,24 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4065,7 +5841,24 @@ func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4111,7 +5904,24 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4124,7 +5934,24 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4139,7 +5966,24 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4152,7 +5996,24 @@ func (p *selGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4202,7 +6063,24 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4218,7 +6096,24 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4234,7 +6129,24 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4250,7 +6162,24 @@ func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4296,7 +6225,24 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4309,7 +6255,24 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4324,7 +6287,24 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4337,7 +6317,24 @@ func (p *selGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4387,7 +6384,24 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4403,7 +6417,24 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4419,7 +6450,24 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4435,7 +6483,24 @@ func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4481,7 +6546,24 @@ func (p *selEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4494,7 +6576,24 @@ func (p *selEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4509,7 +6608,24 @@ func (p *selEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4522,7 +6638,24 @@ func (p *selEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4572,7 +6705,24 @@ func (p *selEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4588,7 +6738,24 @@ func (p *selEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4604,7 +6771,24 @@ func (p *selEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4620,7 +6804,24 @@ func (p *selEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4666,7 +6867,24 @@ func (p *selNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4679,7 +6897,24 @@ func (p *selNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4694,7 +6929,24 @@ func (p *selNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4707,7 +6959,24 @@ func (p *selNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4757,7 +7026,24 @@ func (p *selNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4773,7 +7059,24 @@ func (p *selNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4789,7 +7092,24 @@ func (p *selNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4805,7 +7125,24 @@ func (p *selNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4851,7 +7188,24 @@ func (p *selLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4864,7 +7218,24 @@ func (p *selLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4879,7 +7250,24 @@ func (p *selLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4892,7 +7280,24 @@ func (p *selLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -4942,7 +7347,24 @@ func (p *selLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -4958,7 +7380,24 @@ func (p *selLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -4974,7 +7413,24 @@ func (p *selLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -4990,7 +7446,24 @@ func (p *selLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5036,7 +7509,24 @@ func (p *selLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5049,7 +7539,24 @@ func (p *selLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5064,7 +7571,24 @@ func (p *selLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5077,7 +7601,24 @@ func (p *selLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5127,7 +7668,24 @@ func (p *selLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5143,7 +7701,24 @@ func (p *selLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5159,7 +7734,24 @@ func (p *selLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5175,7 +7767,24 @@ func (p *selLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5221,7 +7830,24 @@ func (p *selGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5234,7 +7860,24 @@ func (p *selGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5249,7 +7892,24 @@ func (p *selGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5262,7 +7922,24 @@ func (p *selGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5312,7 +7989,24 @@ func (p *selGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5328,7 +8022,24 @@ func (p *selGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5344,7 +8055,24 @@ func (p *selGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5360,7 +8088,24 @@ func (p *selGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5406,7 +8151,24 @@ func (p *selGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5419,7 +8181,24 @@ func (p *selGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5434,7 +8213,24 @@ func (p *selGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5447,7 +8243,24 @@ func (p *selGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5497,7 +8310,24 @@ func (p *selGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5513,7 +8343,24 @@ func (p *selGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5529,7 +8376,24 @@ func (p *selGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5545,7 +8409,24 @@ func (p *selGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5591,7 +8472,24 @@ func (p *selEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5604,7 +8502,24 @@ func (p *selEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5619,7 +8534,24 @@ func (p *selEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5632,7 +8564,24 @@ func (p *selEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5682,7 +8631,24 @@ func (p *selEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5698,7 +8664,24 @@ func (p *selEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5714,7 +8697,24 @@ func (p *selEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5730,7 +8730,24 @@ func (p *selEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5776,7 +8793,24 @@ func (p *selNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5789,7 +8823,24 @@ func (p *selNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5804,7 +8855,24 @@ func (p *selNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5817,7 +8885,24 @@ func (p *selNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5867,7 +8952,24 @@ func (p *selNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5883,7 +8985,24 @@ func (p *selNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5899,7 +9018,24 @@ func (p *selNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -5915,7 +9051,24 @@ func (p *selNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -5961,7 +9114,24 @@ func (p *selLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -5974,7 +9144,24 @@ func (p *selLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -5989,7 +9176,24 @@ func (p *selLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6002,7 +9206,24 @@ func (p *selLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6052,7 +9273,24 @@ func (p *selLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6068,7 +9306,24 @@ func (p *selLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6084,7 +9339,24 @@ func (p *selLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6100,7 +9372,24 @@ func (p *selLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6146,7 +9435,24 @@ func (p *selLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6159,7 +9465,24 @@ func (p *selLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6174,7 +9497,24 @@ func (p *selLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6187,7 +9527,24 @@ func (p *selLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6237,7 +9594,24 @@ func (p *selLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6253,7 +9627,24 @@ func (p *selLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6269,7 +9660,24 @@ func (p *selLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6285,7 +9693,24 @@ func (p *selLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6331,7 +9756,24 @@ func (p *selGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6344,7 +9786,24 @@ func (p *selGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6359,7 +9818,24 @@ func (p *selGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6372,7 +9848,24 @@ func (p *selGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6422,7 +9915,24 @@ func (p *selGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6438,7 +9948,24 @@ func (p *selGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6454,7 +9981,24 @@ func (p *selGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6470,7 +10014,24 @@ func (p *selGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6516,7 +10077,24 @@ func (p *selGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6529,7 +10107,24 @@ func (p *selGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6544,7 +10139,24 @@ func (p *selGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6557,7 +10169,24 @@ func (p *selGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6607,7 +10236,24 @@ func (p *selGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6623,7 +10269,24 @@ func (p *selGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6639,7 +10302,24 @@ func (p *selGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6655,7 +10335,24 @@ func (p *selGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6701,7 +10398,24 @@ func (p *selEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6714,7 +10428,24 @@ func (p *selEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6729,7 +10460,24 @@ func (p *selEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6742,7 +10490,24 @@ func (p *selEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6792,7 +10557,24 @@ func (p *selEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6808,7 +10590,24 @@ func (p *selEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6824,7 +10623,24 @@ func (p *selEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6840,7 +10656,24 @@ func (p *selEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6886,7 +10719,24 @@ func (p *selNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6899,7 +10749,24 @@ func (p *selNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -6914,7 +10781,24 @@ func (p *selNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -6927,7 +10811,24 @@ func (p *selNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -6977,7 +10878,24 @@ func (p *selNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -6993,7 +10911,24 @@ func (p *selNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7009,7 +10944,24 @@ func (p *selNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7025,7 +10977,24 @@ func (p *selNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7071,7 +11040,24 @@ func (p *selLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7084,7 +11070,24 @@ func (p *selLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7099,7 +11102,24 @@ func (p *selLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7112,7 +11132,24 @@ func (p *selLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7162,7 +11199,24 @@ func (p *selLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7178,7 +11232,24 @@ func (p *selLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7194,7 +11265,24 @@ func (p *selLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7210,7 +11298,24 @@ func (p *selLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7256,7 +11361,24 @@ func (p *selLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7269,7 +11391,24 @@ func (p *selLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7284,7 +11423,24 @@ func (p *selLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7297,7 +11453,24 @@ func (p *selLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7347,7 +11520,24 @@ func (p *selLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7363,7 +11553,24 @@ func (p *selLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7379,7 +11586,24 @@ func (p *selLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7395,7 +11619,24 @@ func (p *selLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7441,7 +11682,24 @@ func (p *selGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7454,7 +11712,24 @@ func (p *selGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7469,7 +11744,24 @@ func (p *selGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7482,7 +11774,24 @@ func (p *selGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7532,7 +11841,24 @@ func (p *selGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7548,7 +11874,24 @@ func (p *selGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7564,7 +11907,24 @@ func (p *selGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7580,7 +11940,24 @@ func (p *selGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7626,7 +12003,24 @@ func (p *selGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7639,7 +12033,24 @@ func (p *selGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7654,7 +12065,24 @@ func (p *selGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7667,7 +12095,24 @@ func (p *selGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7717,7 +12162,24 @@ func (p *selGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7733,7 +12195,24 @@ func (p *selGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7749,7 +12228,24 @@ func (p *selGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7765,7 +12261,24 @@ func (p *selGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7811,7 +12324,24 @@ func (p *selEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7824,7 +12354,24 @@ func (p *selEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7839,7 +12386,24 @@ func (p *selEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7852,7 +12416,24 @@ func (p *selEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7902,7 +12483,24 @@ func (p *selEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -7918,7 +12516,24 @@ func (p *selEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -7934,7 +12549,24 @@ func (p *selEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -7950,7 +12582,24 @@ func (p *selEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -7996,7 +12645,24 @@ func (p *selNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8009,7 +12675,24 @@ func (p *selNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8024,7 +12707,24 @@ func (p *selNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8037,7 +12737,24 @@ func (p *selNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8087,7 +12804,24 @@ func (p *selNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8103,7 +12837,24 @@ func (p *selNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8119,7 +12870,24 @@ func (p *selNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8135,7 +12903,24 @@ func (p *selNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8181,7 +12966,24 @@ func (p *selLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8194,7 +12996,24 @@ func (p *selLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8209,7 +13028,24 @@ func (p *selLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8222,7 +13058,24 @@ func (p *selLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8272,7 +13125,24 @@ func (p *selLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8288,7 +13158,24 @@ func (p *selLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8304,7 +13191,24 @@ func (p *selLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8320,7 +13224,24 @@ func (p *selLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8366,7 +13287,24 @@ func (p *selLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8379,7 +13317,24 @@ func (p *selLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8394,7 +13349,24 @@ func (p *selLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8407,7 +13379,24 @@ func (p *selLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8457,7 +13446,24 @@ func (p *selLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8473,7 +13479,24 @@ func (p *selLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8489,7 +13512,24 @@ func (p *selLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8505,7 +13545,24 @@ func (p *selLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8551,7 +13608,24 @@ func (p *selGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8564,7 +13638,24 @@ func (p *selGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8579,7 +13670,24 @@ func (p *selGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8592,7 +13700,24 @@ func (p *selGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8642,7 +13767,24 @@ func (p *selGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8658,7 +13800,24 @@ func (p *selGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8674,7 +13833,24 @@ func (p *selGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8690,7 +13866,24 @@ func (p *selGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8736,7 +13929,24 @@ func (p *selGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8749,7 +13959,24 @@ func (p *selGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8764,7 +13991,24 @@ func (p *selGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8777,7 +14021,24 @@ func (p *selGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8827,7 +14088,24 @@ func (p *selGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8843,7 +14121,24 @@ func (p *selGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8859,7 +14154,24 @@ func (p *selGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8875,7 +14187,24 @@ func (p *selGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -8921,7 +14250,24 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -8934,7 +14280,24 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -8949,7 +14312,24 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -8962,7 +14342,24 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9012,7 +14409,24 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9028,7 +14442,24 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9044,7 +14475,24 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9060,7 +14508,24 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9106,7 +14571,24 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9119,7 +14601,24 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9134,7 +14633,24 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9147,7 +14663,24 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9197,7 +14730,24 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9213,7 +14763,24 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9229,7 +14796,24 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9245,7 +14829,24 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9291,7 +14892,24 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9304,7 +14922,24 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9319,7 +14954,24 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9332,7 +14984,24 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9382,7 +15051,24 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9398,7 +15084,24 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9414,7 +15117,24 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9430,7 +15150,24 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9476,7 +15213,24 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9489,7 +15243,24 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9504,7 +15275,24 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9517,7 +15305,24 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9567,7 +15372,24 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9583,7 +15405,24 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9599,7 +15438,24 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9615,7 +15471,24 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9661,7 +15534,24 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9674,7 +15564,24 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9689,7 +15596,24 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9702,7 +15626,24 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9752,7 +15693,24 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9768,7 +15726,24 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9784,7 +15759,24 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9800,7 +15792,24 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9846,7 +15855,24 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9859,7 +15885,24 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9874,7 +15917,24 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9887,7 +15947,24 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -9937,7 +16014,24 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -9953,7 +16047,24 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -9969,7 +16080,24 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -9985,7 +16113,24 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10031,7 +16176,24 @@ func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10044,7 +16206,24 @@ func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10059,7 +16238,24 @@ func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10072,7 +16268,24 @@ func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10122,7 +16335,24 @@ func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10138,7 +16368,24 @@ func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10154,7 +16401,24 @@ func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10170,7 +16434,24 @@ func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10216,7 +16497,24 @@ func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10229,7 +16527,24 @@ func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10244,7 +16559,24 @@ func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10257,7 +16589,24 @@ func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10307,7 +16656,24 @@ func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10323,7 +16689,24 @@ func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10339,7 +16722,24 @@ func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10355,7 +16755,24 @@ func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10401,7 +16818,24 @@ func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10414,7 +16848,24 @@ func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10429,7 +16880,24 @@ func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10442,7 +16910,24 @@ func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10492,7 +16977,24 @@ func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10508,7 +17010,24 @@ func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10524,7 +17043,24 @@ func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10540,7 +17076,24 @@ func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10586,7 +17139,24 @@ func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10599,7 +17169,24 @@ func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10614,7 +17201,24 @@ func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10627,7 +17231,24 @@ func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10677,7 +17298,24 @@ func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10693,7 +17331,24 @@ func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10709,7 +17364,24 @@ func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10725,7 +17397,24 @@ func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10771,7 +17460,24 @@ func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10784,7 +17490,24 @@ func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10799,7 +17522,24 @@ func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10812,7 +17552,24 @@ func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10862,7 +17619,24 @@ func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10878,7 +17652,24 @@ func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10894,7 +17685,24 @@ func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10910,7 +17718,24 @@ func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -10956,7 +17781,24 @@ func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -10969,7 +17811,24 @@ func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -10984,7 +17843,24 @@ func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -10997,7 +17873,24 @@ func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11047,7 +17940,24 @@ func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11063,7 +17973,24 @@ func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11079,7 +18006,24 @@ func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11095,7 +18039,24 @@ func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11141,7 +18102,24 @@ func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11154,7 +18132,24 @@ func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11169,7 +18164,24 @@ func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11182,7 +18194,24 @@ func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11232,7 +18261,24 @@ func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11248,7 +18294,24 @@ func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11264,7 +18327,24 @@ func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11280,7 +18360,24 @@ func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11326,7 +18423,24 @@ func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11339,7 +18453,24 @@ func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11354,7 +18485,24 @@ func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11367,7 +18515,24 @@ func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11417,7 +18582,24 @@ func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11433,7 +18615,24 @@ func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11449,7 +18648,24 @@ func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11465,7 +18681,24 @@ func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11511,7 +18744,24 @@ func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11524,7 +18774,24 @@ func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11539,7 +18806,24 @@ func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11552,7 +18836,24 @@ func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11602,7 +18903,24 @@ func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11618,7 +18936,24 @@ func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11634,7 +18969,24 @@ func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11650,7 +19002,24 @@ func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11696,7 +19065,24 @@ func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11709,7 +19095,24 @@ func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11724,7 +19127,24 @@ func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11737,7 +19157,24 @@ func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11787,7 +19224,24 @@ func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11803,7 +19257,24 @@ func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11819,7 +19290,24 @@ func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11835,7 +19323,24 @@ func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11881,7 +19386,24 @@ func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11894,7 +19416,24 @@ func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -11909,7 +19448,24 @@ func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -11922,7 +19478,24 @@ func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -11972,7 +19545,24 @@ func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -11988,7 +19578,24 @@ func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12004,7 +19611,24 @@ func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12020,7 +19644,24 @@ func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12066,7 +19707,24 @@ func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12079,7 +19737,24 @@ func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12094,7 +19769,24 @@ func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12107,7 +19799,24 @@ func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12157,7 +19866,24 @@ func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12173,7 +19899,24 @@ func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12189,7 +19932,24 @@ func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12205,7 +19965,24 @@ func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12251,7 +20028,24 @@ func (p *selEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12264,7 +20058,24 @@ func (p *selEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12279,7 +20090,24 @@ func (p *selEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12292,7 +20120,24 @@ func (p *selEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12342,7 +20187,24 @@ func (p *selEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12358,7 +20220,24 @@ func (p *selEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12374,7 +20253,24 @@ func (p *selEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12390,7 +20286,24 @@ func (p *selEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12436,7 +20349,24 @@ func (p *selNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12449,7 +20379,24 @@ func (p *selNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12464,7 +20411,24 @@ func (p *selNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12477,7 +20441,24 @@ func (p *selNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12527,7 +20508,24 @@ func (p *selNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12543,7 +20541,24 @@ func (p *selNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12559,7 +20574,24 @@ func (p *selNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12575,7 +20607,24 @@ func (p *selNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12621,7 +20670,24 @@ func (p *selLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12634,7 +20700,24 @@ func (p *selLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12649,7 +20732,24 @@ func (p *selLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12662,7 +20762,24 @@ func (p *selLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12712,7 +20829,24 @@ func (p *selLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12728,7 +20862,24 @@ func (p *selLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12744,7 +20895,24 @@ func (p *selLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12760,7 +20928,24 @@ func (p *selLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12806,7 +20991,24 @@ func (p *selLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12819,7 +21021,24 @@ func (p *selLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12834,7 +21053,24 @@ func (p *selLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12847,7 +21083,24 @@ func (p *selLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12897,7 +21150,24 @@ func (p *selLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -12913,7 +21183,24 @@ func (p *selLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -12929,7 +21216,24 @@ func (p *selLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -12945,7 +21249,24 @@ func (p *selLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -12991,7 +21312,24 @@ func (p *selGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13004,7 +21342,24 @@ func (p *selGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13019,7 +21374,24 @@ func (p *selGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13032,7 +21404,24 @@ func (p *selGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13082,7 +21471,24 @@ func (p *selGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13098,7 +21504,24 @@ func (p *selGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13114,7 +21537,24 @@ func (p *selGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13130,7 +21570,24 @@ func (p *selGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13176,7 +21633,24 @@ func (p *selGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13189,7 +21663,24 @@ func (p *selGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13204,7 +21695,24 @@ func (p *selGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13217,7 +21725,24 @@ func (p *selGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13267,7 +21792,24 @@ func (p *selGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13283,7 +21825,24 @@ func (p *selGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13299,7 +21858,24 @@ func (p *selGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13315,7 +21891,24 @@ func (p *selGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13361,7 +21954,24 @@ func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13374,7 +21984,24 @@ func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13389,7 +22016,24 @@ func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13402,7 +22046,24 @@ func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13452,7 +22113,24 @@ func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13468,7 +22146,24 @@ func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13484,7 +22179,24 @@ func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13500,7 +22212,24 @@ func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13546,7 +22275,24 @@ func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13559,7 +22305,24 @@ func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13574,7 +22337,24 @@ func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13587,7 +22367,24 @@ func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13637,7 +22434,24 @@ func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13653,7 +22467,24 @@ func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13669,7 +22500,24 @@ func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13685,7 +22533,24 @@ func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13731,7 +22596,24 @@ func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13744,7 +22626,24 @@ func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13759,7 +22658,24 @@ func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13772,7 +22688,24 @@ func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13822,7 +22755,24 @@ func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13838,7 +22788,24 @@ func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13854,7 +22821,24 @@ func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13870,7 +22854,24 @@ func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -13916,7 +22917,24 @@ func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -13929,7 +22947,24 @@ func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -13944,7 +22979,24 @@ func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -13957,7 +23009,24 @@ func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14007,7 +23076,24 @@ func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14023,7 +23109,24 @@ func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14039,7 +23142,24 @@ func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14055,7 +23175,24 @@ func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14101,7 +23238,24 @@ func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14114,7 +23268,24 @@ func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14129,7 +23300,24 @@ func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14142,7 +23330,24 @@ func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14192,7 +23397,24 @@ func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14208,7 +23430,24 @@ func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14224,7 +23463,24 @@ func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14240,7 +23496,24 @@ func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14286,7 +23559,24 @@ func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14299,7 +23589,24 @@ func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14314,7 +23621,24 @@ func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14327,7 +23651,24 @@ func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14377,7 +23718,24 @@ func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14393,7 +23751,24 @@ func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14409,7 +23784,24 @@ func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14425,7 +23817,24 @@ func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14471,7 +23880,24 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14484,7 +23910,24 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14499,7 +23942,24 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14512,7 +23972,24 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14562,7 +24039,24 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14578,7 +24072,24 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14594,7 +24105,24 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14610,7 +24138,24 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14656,7 +24201,24 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14669,7 +24231,24 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14684,7 +24263,24 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14697,7 +24293,24 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14747,7 +24360,24 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14763,7 +24393,24 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14779,7 +24426,24 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14795,7 +24459,24 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14841,7 +24522,24 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14854,7 +24552,24 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14869,7 +24584,24 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14882,7 +24614,24 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -14932,7 +24681,24 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -14948,7 +24714,24 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -14964,7 +24747,24 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -14980,7 +24780,24 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15026,7 +24843,24 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15039,7 +24873,24 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15054,7 +24905,24 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15067,7 +24935,24 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15117,7 +25002,24 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15133,7 +25035,24 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15149,7 +25068,24 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15165,7 +25101,24 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15211,7 +25164,24 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15224,7 +25194,24 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15239,7 +25226,24 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15252,7 +25256,24 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15302,7 +25323,24 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15318,7 +25356,24 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15334,7 +25389,24 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15350,7 +25422,24 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15396,7 +25485,24 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15409,7 +25515,24 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15424,7 +25547,24 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15437,7 +25577,24 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15487,7 +25644,24 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15503,7 +25677,24 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15519,7 +25710,24 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15535,7 +25743,24 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15581,7 +25806,24 @@ func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15594,7 +25836,24 @@ func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15609,7 +25868,24 @@ func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15622,7 +25898,24 @@ func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15672,7 +25965,24 @@ func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15688,7 +25998,24 @@ func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15704,7 +26031,24 @@ func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15720,7 +26064,24 @@ func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15766,7 +26127,24 @@ func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15779,7 +26157,24 @@ func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15794,7 +26189,24 @@ func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15807,7 +26219,24 @@ func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15857,7 +26286,24 @@ func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15873,7 +26319,24 @@ func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15889,7 +26352,24 @@ func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15905,7 +26385,24 @@ func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -15951,7 +26448,24 @@ func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -15964,7 +26478,24 @@ func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -15979,7 +26510,24 @@ func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -15992,7 +26540,24 @@ func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16042,7 +26607,24 @@ func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16058,7 +26640,24 @@ func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16074,7 +26673,24 @@ func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16090,7 +26706,24 @@ func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16136,7 +26769,24 @@ func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16149,7 +26799,24 @@ func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16164,7 +26831,24 @@ func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16177,7 +26861,24 @@ func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16227,7 +26928,24 @@ func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16243,7 +26961,24 @@ func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16259,7 +26994,24 @@ func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16275,7 +27027,24 @@ func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16321,7 +27090,24 @@ func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16334,7 +27120,24 @@ func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16349,7 +27152,24 @@ func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16362,7 +27182,24 @@ func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16412,7 +27249,24 @@ func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16428,7 +27282,24 @@ func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16444,7 +27315,24 @@ func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16460,7 +27348,24 @@ func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16506,7 +27411,24 @@ func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16519,7 +27441,24 @@ func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16534,7 +27473,24 @@ func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16547,7 +27503,24 @@ func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16597,7 +27570,24 @@ func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16613,7 +27603,24 @@ func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16629,7 +27636,24 @@ func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16645,7 +27669,24 @@ func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16691,7 +27732,24 @@ func (p *selEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16704,7 +27762,24 @@ func (p *selEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16719,7 +27794,24 @@ func (p *selEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16732,7 +27824,24 @@ func (p *selEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16782,7 +27891,24 @@ func (p *selEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16798,7 +27924,24 @@ func (p *selEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16814,7 +27957,24 @@ func (p *selEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16830,7 +27990,24 @@ func (p *selEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16876,7 +28053,24 @@ func (p *selNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16889,7 +28083,24 @@ func (p *selNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16904,7 +28115,24 @@ func (p *selNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -16917,7 +28145,24 @@ func (p *selNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -16967,7 +28212,24 @@ func (p *selNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -16983,7 +28245,24 @@ func (p *selNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -16999,7 +28278,24 @@ func (p *selNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17015,7 +28311,24 @@ func (p *selNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17061,7 +28374,24 @@ func (p *selLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17074,7 +28404,24 @@ func (p *selLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17089,7 +28436,24 @@ func (p *selLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17102,7 +28466,24 @@ func (p *selLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17152,7 +28533,24 @@ func (p *selLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17168,7 +28566,24 @@ func (p *selLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17184,7 +28599,24 @@ func (p *selLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17200,7 +28632,24 @@ func (p *selLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17246,7 +28695,24 @@ func (p *selLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17259,7 +28725,24 @@ func (p *selLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17274,7 +28757,24 @@ func (p *selLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17287,7 +28787,24 @@ func (p *selLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17337,7 +28854,24 @@ func (p *selLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17353,7 +28887,24 @@ func (p *selLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17369,7 +28920,24 @@ func (p *selLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17385,7 +28953,24 @@ func (p *selLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17431,7 +29016,24 @@ func (p *selGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17444,7 +29046,24 @@ func (p *selGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17459,7 +29078,24 @@ func (p *selGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17472,7 +29108,24 @@ func (p *selGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17522,7 +29175,24 @@ func (p *selGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17538,7 +29208,24 @@ func (p *selGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17554,7 +29241,24 @@ func (p *selGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17570,7 +29274,24 @@ func (p *selGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17616,7 +29337,24 @@ func (p *selGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17629,7 +29367,24 @@ func (p *selGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17644,7 +29399,24 @@ func (p *selGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17657,7 +29429,24 @@ func (p *selGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17707,7 +29496,24 @@ func (p *selGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17723,7 +29529,24 @@ func (p *selGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17739,7 +29562,24 @@ func (p *selGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17755,7 +29595,24 @@ func (p *selGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17801,7 +29658,24 @@ func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17814,7 +29688,24 @@ func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17829,7 +29720,24 @@ func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17842,7 +29750,24 @@ func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17892,7 +29817,24 @@ func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17908,7 +29850,24 @@ func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -17924,7 +29883,24 @@ func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -17940,7 +29916,24 @@ func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -17986,7 +29979,24 @@ func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -17999,7 +30009,24 @@ func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18014,7 +30041,24 @@ func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18027,7 +30071,24 @@ func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18077,7 +30138,24 @@ func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18093,7 +30171,24 @@ func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18109,7 +30204,24 @@ func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18125,7 +30237,24 @@ func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18171,7 +30300,24 @@ func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18184,7 +30330,24 @@ func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18199,7 +30362,24 @@ func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18212,7 +30392,24 @@ func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18262,7 +30459,24 @@ func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18278,7 +30492,24 @@ func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18294,7 +30525,24 @@ func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18310,7 +30558,24 @@ func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18356,7 +30621,24 @@ func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18369,7 +30651,24 @@ func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18384,7 +30683,24 @@ func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18397,7 +30713,24 @@ func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18447,7 +30780,24 @@ func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18463,7 +30813,24 @@ func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18479,7 +30846,24 @@ func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18495,7 +30879,24 @@ func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18541,7 +30942,24 @@ func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18554,7 +30972,24 @@ func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18569,7 +31004,24 @@ func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18582,7 +31034,24 @@ func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18632,7 +31101,24 @@ func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18648,7 +31134,24 @@ func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18664,7 +31167,24 @@ func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18680,7 +31200,24 @@ func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18726,7 +31263,24 @@ func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18739,7 +31293,24 @@ func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18754,7 +31325,24 @@ func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18767,7 +31355,24 @@ func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18817,7 +31422,24 @@ func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18833,7 +31455,24 @@ func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18849,7 +31488,24 @@ func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18865,7 +31521,24 @@ func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -18911,7 +31584,24 @@ func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -18924,7 +31614,24 @@ func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -18939,7 +31646,24 @@ func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -18952,7 +31676,24 @@ func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19002,7 +31743,24 @@ func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19018,7 +31776,24 @@ func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19034,7 +31809,24 @@ func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19050,7 +31842,24 @@ func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19096,7 +31905,24 @@ func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19109,7 +31935,24 @@ func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19124,7 +31967,24 @@ func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19137,7 +31997,24 @@ func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19187,7 +32064,24 @@ func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19203,7 +32097,24 @@ func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19219,7 +32130,24 @@ func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19235,7 +32163,24 @@ func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19281,7 +32226,24 @@ func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19294,7 +32256,24 @@ func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19309,7 +32288,24 @@ func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19322,7 +32318,24 @@ func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19372,7 +32385,24 @@ func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19388,7 +32418,24 @@ func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19404,7 +32451,24 @@ func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19420,7 +32484,24 @@ func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19466,7 +32547,24 @@ func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19479,7 +32577,24 @@ func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19494,7 +32609,24 @@ func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19507,7 +32639,24 @@ func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19557,7 +32706,24 @@ func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19573,7 +32739,24 @@ func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19589,7 +32772,24 @@ func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19605,7 +32805,24 @@ func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19651,7 +32868,24 @@ func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19664,7 +32898,24 @@ func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19679,7 +32930,24 @@ func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19692,7 +32960,24 @@ func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19742,7 +33027,24 @@ func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19758,7 +33060,24 @@ func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19774,7 +33093,24 @@ func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19790,7 +33126,24 @@ func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19836,7 +33189,24 @@ func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19849,7 +33219,24 @@ func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19864,7 +33251,24 @@ func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19877,7 +33281,24 @@ func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -19927,7 +33348,24 @@ func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -19943,7 +33381,24 @@ func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -19959,7 +33414,24 @@ func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -19975,7 +33447,24 @@ func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20021,7 +33510,24 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20034,7 +33540,24 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20049,7 +33572,24 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20062,7 +33602,24 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20112,7 +33669,24 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20128,7 +33702,24 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20144,7 +33735,24 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20160,7 +33768,24 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20206,7 +33831,24 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20219,7 +33861,24 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20234,7 +33893,24 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20247,7 +33923,24 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20297,7 +33990,24 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20313,7 +34023,24 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20329,7 +34056,24 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20345,7 +34089,24 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20391,7 +34152,24 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20404,7 +34182,24 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20419,7 +34214,24 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20432,7 +34244,24 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20482,7 +34311,24 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20498,7 +34344,24 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20514,7 +34377,24 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20530,7 +34410,24 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20576,7 +34473,24 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20589,7 +34503,24 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20604,7 +34535,24 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20617,7 +34565,24 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20667,7 +34632,24 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20683,7 +34665,24 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20699,7 +34698,24 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20715,7 +34731,24 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20761,7 +34794,24 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20774,7 +34824,24 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20789,7 +34856,24 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20802,7 +34886,24 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20852,7 +34953,24 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20868,7 +34986,24 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20884,7 +35019,24 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20900,7 +35052,24 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -20946,7 +35115,24 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -20959,7 +35145,24 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -20974,7 +35177,24 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -20987,7 +35207,24 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareInts(int64(arg), int64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg), int64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21037,7 +35274,24 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21053,7 +35307,24 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21069,7 +35340,24 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21085,7 +35373,24 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareInts(int64(arg1), int64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := int64(arg1), int64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21131,7 +35436,32 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21144,7 +35474,32 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21159,7 +35514,32 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21172,7 +35552,32 @@ func (p *selEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21222,7 +35627,32 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21238,7 +35668,32 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21254,7 +35709,32 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21270,7 +35750,32 @@ func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21316,7 +35821,32 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21329,7 +35859,32 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21344,7 +35899,32 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21357,7 +35937,32 @@ func (p *selNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21407,7 +36012,32 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21423,7 +36053,32 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21439,7 +36094,32 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21455,7 +36135,32 @@ func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21501,7 +36206,32 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21514,7 +36244,32 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21529,7 +36284,32 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21542,7 +36322,32 @@ func (p *selLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21592,7 +36397,32 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21608,7 +36438,32 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21624,7 +36479,32 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21640,7 +36520,32 @@ func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21686,7 +36591,32 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21699,7 +36629,32 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21714,7 +36669,32 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21727,7 +36707,32 @@ func (p *selLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21777,7 +36782,32 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21793,7 +36823,32 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21809,7 +36864,32 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21825,7 +36905,32 @@ func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21871,7 +36976,32 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21884,7 +37014,32 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21899,7 +37054,32 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -21912,7 +37092,32 @@ func (p *selGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -21962,7 +37167,32 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -21978,7 +37208,32 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -21994,7 +37249,32 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22010,7 +37290,32 @@ func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22056,7 +37361,32 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22069,7 +37399,32 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22084,7 +37439,32 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22097,7 +37477,32 @@ func (p *selGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22147,7 +37552,32 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22163,7 +37593,32 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22179,7 +37634,32 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22195,7 +37675,32 @@ func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22241,7 +37746,32 @@ func (p *selEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22254,7 +37784,32 @@ func (p *selEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22269,7 +37824,32 @@ func (p *selEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22282,7 +37862,32 @@ func (p *selEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22332,7 +37937,32 @@ func (p *selEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22348,7 +37978,32 @@ func (p *selEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22364,7 +38019,32 @@ func (p *selEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22380,7 +38060,32 @@ func (p *selEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22426,7 +38131,32 @@ func (p *selNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22439,7 +38169,32 @@ func (p *selNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22454,7 +38209,32 @@ func (p *selNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22467,7 +38247,32 @@ func (p *selNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22517,7 +38322,32 @@ func (p *selNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22533,7 +38363,32 @@ func (p *selNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22549,7 +38404,32 @@ func (p *selNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22565,7 +38445,32 @@ func (p *selNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22611,7 +38516,32 @@ func (p *selLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22624,7 +38554,32 @@ func (p *selLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22639,7 +38594,32 @@ func (p *selLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22652,7 +38632,32 @@ func (p *selLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22702,7 +38707,32 @@ func (p *selLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22718,7 +38748,32 @@ func (p *selLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22734,7 +38789,32 @@ func (p *selLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22750,7 +38830,32 @@ func (p *selLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22796,7 +38901,32 @@ func (p *selLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22809,7 +38939,32 @@ func (p *selLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22824,7 +38979,32 @@ func (p *selLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22837,7 +39017,32 @@ func (p *selLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22887,7 +39092,32 @@ func (p *selLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22903,7 +39133,32 @@ func (p *selLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -22919,7 +39174,32 @@ func (p *selLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -22935,7 +39215,32 @@ func (p *selLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -22981,7 +39286,32 @@ func (p *selGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -22994,7 +39324,32 @@ func (p *selGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23009,7 +39364,32 @@ func (p *selGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23022,7 +39402,32 @@ func (p *selGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23072,7 +39477,32 @@ func (p *selGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23088,7 +39518,32 @@ func (p *selGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23104,7 +39559,32 @@ func (p *selGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23120,7 +39600,32 @@ func (p *selGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23166,7 +39671,32 @@ func (p *selGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23179,7 +39709,32 @@ func (p *selGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23194,7 +39749,32 @@ func (p *selGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23207,7 +39787,32 @@ func (p *selGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23257,7 +39862,32 @@ func (p *selGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23273,7 +39903,32 @@ func (p *selGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23289,7 +39944,32 @@ func (p *selGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23305,7 +39985,32 @@ func (p *selGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23351,7 +40056,32 @@ func (p *selEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23364,7 +40094,32 @@ func (p *selEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23379,7 +40134,32 @@ func (p *selEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23392,7 +40172,32 @@ func (p *selEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23442,7 +40247,32 @@ func (p *selEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23458,7 +40288,32 @@ func (p *selEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23474,7 +40329,32 @@ func (p *selEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23490,7 +40370,32 @@ func (p *selEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23536,7 +40441,32 @@ func (p *selNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23549,7 +40479,32 @@ func (p *selNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23564,7 +40519,32 @@ func (p *selNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23577,7 +40557,32 @@ func (p *selNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23627,7 +40632,32 @@ func (p *selNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23643,7 +40673,32 @@ func (p *selNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23659,7 +40714,32 @@ func (p *selNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23675,7 +40755,32 @@ func (p *selNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23721,7 +40826,32 @@ func (p *selLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23734,7 +40864,32 @@ func (p *selLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23749,7 +40904,32 @@ func (p *selLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23762,7 +40942,32 @@ func (p *selLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23812,7 +41017,32 @@ func (p *selLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23828,7 +41058,32 @@ func (p *selLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23844,7 +41099,32 @@ func (p *selLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23860,7 +41140,32 @@ func (p *selLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23906,7 +41211,32 @@ func (p *selLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -23919,7 +41249,32 @@ func (p *selLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -23934,7 +41289,32 @@ func (p *selLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -23947,7 +41327,32 @@ func (p *selLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -23997,7 +41402,32 @@ func (p *selLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24013,7 +41443,32 @@ func (p *selLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24029,7 +41484,32 @@ func (p *selLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24045,7 +41525,32 @@ func (p *selLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24091,7 +41596,32 @@ func (p *selGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24104,7 +41634,32 @@ func (p *selGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24119,7 +41674,32 @@ func (p *selGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24132,7 +41712,32 @@ func (p *selGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24182,7 +41787,32 @@ func (p *selGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24198,7 +41828,32 @@ func (p *selGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24214,7 +41869,32 @@ func (p *selGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24230,7 +41910,32 @@ func (p *selGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24276,7 +41981,32 @@ func (p *selGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24289,7 +42019,32 @@ func (p *selGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24304,7 +42059,32 @@ func (p *selGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24317,7 +42097,32 @@ func (p *selGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24367,7 +42172,32 @@ func (p *selGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24383,7 +42213,32 @@ func (p *selGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24399,7 +42254,32 @@ func (p *selGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24415,7 +42295,32 @@ func (p *selGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24461,7 +42366,32 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24474,7 +42404,32 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24489,7 +42444,32 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24502,7 +42482,32 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24552,7 +42557,32 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24568,7 +42598,32 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24584,7 +42639,32 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24600,7 +42680,32 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) == 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult == 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24646,7 +42751,32 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24659,7 +42789,32 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24674,7 +42829,32 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24687,7 +42867,32 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24737,7 +42942,32 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24753,7 +42983,32 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24769,7 +43024,32 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24785,7 +43065,32 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) != 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult != 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24831,7 +43136,32 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24844,7 +43174,32 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24859,7 +43214,32 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24872,7 +43252,32 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -24922,7 +43327,32 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -24938,7 +43368,32 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -24954,7 +43409,32 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -24970,7 +43450,32 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) < 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult < 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -25016,7 +43521,32 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -25029,7 +43559,32 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -25044,7 +43599,32 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -25057,7 +43637,32 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -25107,7 +43712,32 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -25123,7 +43753,32 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -25139,7 +43794,32 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -25155,7 +43835,32 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) <= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult <= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -25201,7 +43906,32 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -25214,7 +43944,32 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -25229,7 +43984,32 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -25242,7 +44022,32 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -25292,7 +44097,32 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -25308,7 +44138,32 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -25324,7 +44179,32 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -25340,7 +44220,32 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) > 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult > 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -25386,7 +44291,32 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -25399,7 +44329,32 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -25414,7 +44369,32 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for _, i := range sel {
 					var cmp bool
 					arg := col[int(i)]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -25427,7 +44407,32 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				for i := range col {
 					var cmp bool
 					arg := col[i]
-					cmp = compareFloats(float64(arg), float64(p.constArg)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg), float64(p.constArg)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++
@@ -25477,7 +44482,32 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(i) {
 						sel[idx] = i
 						idx++
@@ -25493,7 +44523,32 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp && !nulls.NullAt(uint16(i)) {
 						sel[idx] = uint16(i)
 						idx++
@@ -25509,7 +44564,32 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[int(i)]
 					arg2 := col2[int(i)]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = i
 						idx++
@@ -25525,7 +44605,32 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
-					cmp = compareFloats(float64(arg1), float64(arg2)) >= 0
+
+					{
+						var cmpResult int
+
+						{
+							a, b := float64(arg1), float64(arg2)
+							if a < b {
+								cmpResult = -1
+							} else if a > b {
+								cmpResult = 1
+							} else if a == b {
+								cmpResult = 0
+							} else if math.IsNaN(a) {
+								if math.IsNaN(b) {
+									cmpResult = 0
+								} else {
+									cmpResult = -1
+								}
+							} else {
+								cmpResult = 1
+							}
+						}
+
+						cmp = cmpResult >= 0
+					}
+
 					if cmp {
 						sel[idx] = uint16(i)
 						idx++

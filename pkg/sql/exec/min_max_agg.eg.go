@@ -11,6 +11,7 @@ package exec
 
 import (
 	"bytes"
+	"math"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -149,7 +150,21 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -186,7 +201,21 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -225,7 +254,21 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -262,7 +305,21 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -376,7 +433,13 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -413,7 +476,13 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -452,7 +521,13 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -489,7 +564,13 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -605,7 +686,13 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -642,7 +729,13 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -681,7 +774,13 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -718,7 +817,13 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) < 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -834,7 +939,24 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -871,7 +993,24 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -910,7 +1049,24 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -947,7 +1103,24 @@ func (a *minInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1063,7 +1236,24 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1100,7 +1290,24 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1139,7 +1346,24 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1176,7 +1400,24 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1292,7 +1533,24 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1329,7 +1587,24 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1368,7 +1643,24 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1405,7 +1697,24 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1521,7 +1830,24 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1558,7 +1884,24 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1597,7 +1940,24 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1634,7 +1994,24 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1750,7 +2127,32 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1787,7 +2189,32 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1826,7 +2253,32 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1863,7 +2315,32 @@ func (a *minFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -1979,7 +2456,32 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2016,7 +2518,32 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2055,7 +2582,32 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2092,7 +2644,32 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) < 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult < 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2233,7 +2810,21 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2270,7 +2861,21 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2309,7 +2914,21 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2346,7 +2965,21 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareBools(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+
+							if !candidate && a.curAgg {
+								cmpResult = -1
+							} else if candidate && !a.curAgg {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2460,7 +3093,13 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2497,7 +3136,13 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2536,7 +3181,13 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2573,7 +3224,13 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col.Get(int(i))
-						cmp = bytes.Compare(candidate, a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(candidate, a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2689,7 +3346,13 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2726,7 +3389,13 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2765,7 +3434,13 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2802,7 +3477,13 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = tree.CompareDecimals(&candidate, &a.curAgg) > 0
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2918,7 +3599,24 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2955,7 +3653,24 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -2994,7 +3709,24 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3031,7 +3763,24 @@ func (a *maxInt8Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3147,7 +3896,24 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3184,7 +3950,24 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3223,7 +4006,24 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3260,7 +4060,24 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3376,7 +4193,24 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3413,7 +4247,24 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3452,7 +4303,24 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3489,7 +4357,24 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3605,7 +4490,24 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3642,7 +4544,24 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3681,7 +4600,24 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3718,7 +4654,24 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareInts(int64(candidate), int64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(candidate), int64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3834,7 +4787,32 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3871,7 +4849,32 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3910,7 +4913,32 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -3947,7 +4975,32 @@ func (a *maxFloat32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -4063,7 +5116,32 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -4100,7 +5178,32 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -4139,7 +5242,32 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}
@@ -4176,7 +5304,32 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					} else {
 						var cmp bool
 						candidate := col[int(i)]
-						cmp = compareFloats(float64(candidate), float64(a.curAgg)) > 0
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(candidate), float64(a.curAgg)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult > 0
+						}
+
 						if cmp {
 							a.curAgg = candidate
 						}

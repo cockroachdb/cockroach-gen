@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"math"
 	"reflect"
 	"unsafe"
 
@@ -649,7 +650,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareBools(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+
+										if !buildVal && probeVal {
+											cmpResult = -1
+										} else if buildVal && !probeVal {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -688,7 +702,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareBools(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+
+										if !buildVal && probeVal {
+											cmpResult = -1
+										} else if buildVal && !probeVal {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -726,7 +753,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareBools(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+
+									if !buildVal && probeVal {
+										cmpResult = -1
+									} else if buildVal && !probeVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -765,7 +805,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareBools(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+
+									if !buildVal && probeVal {
+										cmpResult = -1
+									} else if buildVal && !probeVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -800,7 +853,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareBools(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+
+									if !buildVal && probeVal {
+										cmpResult = -1
+									} else if buildVal && !probeVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -851,7 +917,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareBools(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+
+										if !buildVal && probeVal {
+											cmpResult = -1
+										} else if buildVal && !probeVal {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -890,7 +969,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareBools(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+
+										if !buildVal && probeVal {
+											cmpResult = -1
+										} else if buildVal && !probeVal {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -928,7 +1020,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareBools(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+
+									if !buildVal && probeVal {
+										cmpResult = -1
+									} else if buildVal && !probeVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -967,7 +1072,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareBools(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+
+									if !buildVal && probeVal {
+										cmpResult = -1
+									} else if buildVal && !probeVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1002,7 +1120,20 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareBools(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+
+									if !buildVal && probeVal {
+										cmpResult = -1
+									} else if buildVal && !probeVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1061,7 +1192,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
-									unique = bytes.Compare(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = bytes.Compare(buildVal, probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1100,7 +1236,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
-									unique = bytes.Compare(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = bytes.Compare(buildVal, probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1138,7 +1279,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
-								unique = bytes.Compare(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(buildVal, probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1177,7 +1323,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
-								unique = bytes.Compare(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(buildVal, probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1212,7 +1363,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
-								unique = bytes.Compare(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(buildVal, probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1263,7 +1419,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
-									unique = bytes.Compare(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = bytes.Compare(buildVal, probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1302,7 +1463,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
-									unique = bytes.Compare(buildVal, probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = bytes.Compare(buildVal, probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1340,7 +1506,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
-								unique = bytes.Compare(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(buildVal, probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1379,7 +1550,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
-								unique = bytes.Compare(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(buildVal, probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1414,7 +1590,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
-								unique = bytes.Compare(buildVal, probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(buildVal, probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1473,7 +1654,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1512,7 +1698,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1550,7 +1741,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1589,7 +1785,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1624,7 +1825,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1675,7 +1881,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1714,7 +1925,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+									{
+										var cmpResult int
+										cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1752,7 +1968,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1791,7 +2012,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1826,7 +2052,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = tree.CompareDecimals(&buildVal, &probeVal) != 0
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&buildVal, &probeVal)
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -1885,7 +2116,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1924,7 +2171,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -1962,7 +2225,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2001,7 +2280,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2036,7 +2331,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2087,7 +2398,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2126,7 +2453,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2164,7 +2507,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2203,7 +2562,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2238,7 +2613,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2297,7 +2688,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2336,7 +2743,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2374,7 +2797,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2413,7 +2852,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2448,7 +2903,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2499,7 +2970,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2538,7 +3025,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2576,7 +3079,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2615,7 +3134,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2650,7 +3185,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2709,7 +3260,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2748,7 +3315,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2786,7 +3369,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2825,7 +3424,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2860,7 +3475,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -2911,7 +3542,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2950,7 +3597,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -2988,7 +3651,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3027,7 +3706,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3062,7 +3757,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3121,7 +3832,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3160,7 +3887,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3198,7 +3941,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3237,7 +3996,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3272,7 +4047,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3323,7 +4114,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3362,7 +4169,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := int64(buildVal), int64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else {
+												cmpResult = 0
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3400,7 +4223,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3439,7 +4278,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3474,7 +4329,23 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareInts(int64(buildVal), int64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(buildVal), int64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3533,7 +4404,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3572,7 +4467,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3610,7 +4529,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3649,7 +4592,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3684,7 +4651,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3735,7 +4726,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3774,7 +4789,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3812,7 +4851,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3851,7 +4914,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3886,7 +4973,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -3945,7 +5056,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -3984,7 +5119,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -4022,7 +5181,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -4061,7 +5244,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -4096,7 +5303,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -4147,7 +5378,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -4186,7 +5441,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
-									unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+									{
+										var cmpResult int
+
+										{
+											a, b := float64(buildVal), float64(probeVal)
+											if a < b {
+												cmpResult = -1
+											} else if a > b {
+												cmpResult = 1
+											} else if a == b {
+												cmpResult = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmpResult = 0
+												} else {
+													cmpResult = -1
+												}
+											} else {
+												cmpResult = 1
+											}
+										}
+
+										unique = cmpResult != 0
+									}
 
 									if unique {
 										ht.differs[ht.toCheck[i]] = true
@@ -4224,7 +5503,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -4263,7 +5566,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true
@@ -4298,7 +5625,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
-								unique = compareFloats(float64(buildVal), float64(probeVal)) != 0
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(buildVal), float64(probeVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
 
 								if unique {
 									ht.differs[ht.toCheck[i]] = true

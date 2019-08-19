@@ -12,6 +12,7 @@ package exec
 import (
 	"bytes"
 	"context"
+	"math"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -307,7 +308,21 @@ func fillDatumRowBool(ct *types.T, datumTuple *tree.DTuple) ([]bool, bool, error
 func cmpInBool(target bool, filterRow []bool, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = tree.CompareBools(target, filterRow[i]) == 0
+
+		{
+			var cmpResult int
+
+			if !target && filterRow[i] {
+				cmpResult = -1
+			} else if target && !filterRow[i] {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -528,7 +543,13 @@ func fillDatumRowBytes(ct *types.T, datumTuple *tree.DTuple) ([][]byte, bool, er
 func cmpInBytes(target []byte, filterRow [][]byte, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = bytes.Compare(target, filterRow[i]) == 0
+
+		{
+			var cmpResult int
+			cmpResult = bytes.Compare(target, filterRow[i])
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -749,7 +770,13 @@ func fillDatumRowDecimal(ct *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, b
 func cmpInDecimal(target apd.Decimal, filterRow []apd.Decimal, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = tree.CompareDecimals(&target, &filterRow[i]) == 0
+
+		{
+			var cmpResult int
+			cmpResult = tree.CompareDecimals(&target, &filterRow[i])
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -970,7 +997,24 @@ func fillDatumRowInt8(ct *types.T, datumTuple *tree.DTuple) ([]int8, bool, error
 func cmpInInt8(target int8, filterRow []int8, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(target), int64(filterRow[i])
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -1191,7 +1235,24 @@ func fillDatumRowInt16(ct *types.T, datumTuple *tree.DTuple) ([]int16, bool, err
 func cmpInInt16(target int16, filterRow []int16, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(target), int64(filterRow[i])
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -1412,7 +1473,24 @@ func fillDatumRowInt32(ct *types.T, datumTuple *tree.DTuple) ([]int32, bool, err
 func cmpInInt32(target int32, filterRow []int32, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(target), int64(filterRow[i])
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -1633,7 +1711,24 @@ func fillDatumRowInt64(ct *types.T, datumTuple *tree.DTuple) ([]int64, bool, err
 func cmpInInt64(target int64, filterRow []int64, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = compareInts(int64(target), int64(filterRow[i])) == 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(target), int64(filterRow[i])
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -1854,7 +1949,32 @@ func fillDatumRowFloat32(ct *types.T, datumTuple *tree.DTuple) ([]float32, bool,
 func cmpInFloat32(target float32, filterRow []float32, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = compareFloats(float64(target), float64(filterRow[i])) == 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := float64(target), float64(filterRow[i])
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else if a == b {
+					cmpResult = 0
+				} else if math.IsNaN(a) {
+					if math.IsNaN(b) {
+						cmpResult = 0
+					} else {
+						cmpResult = -1
+					}
+				} else {
+					cmpResult = 1
+				}
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}
@@ -2075,7 +2195,32 @@ func fillDatumRowFloat64(ct *types.T, datumTuple *tree.DTuple) ([]float64, bool,
 func cmpInFloat64(target float64, filterRow []float64, hasNulls bool) comparisonResult {
 	for i := range filterRow {
 		var cmp bool
-		cmp = compareFloats(float64(target), float64(filterRow[i])) == 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := float64(target), float64(filterRow[i])
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else if a == b {
+					cmpResult = 0
+				} else if math.IsNaN(a) {
+					if math.IsNaN(b) {
+						cmpResult = 0
+					} else {
+						cmpResult = -1
+					}
+				} else {
+					cmpResult = 1
+				}
+			}
+
+			cmp = cmpResult == 0
+		}
+
 		if cmp {
 			return siTrue
 		}

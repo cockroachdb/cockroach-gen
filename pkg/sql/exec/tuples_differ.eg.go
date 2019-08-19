@@ -11,6 +11,7 @@ package exec
 
 import (
 	"bytes"
+	"math"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
@@ -39,7 +40,21 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = tree.CompareBools(arg1, arg2) != 0
+
+		{
+			var cmpResult int
+
+			if !arg1 && arg2 {
+				cmpResult = -1
+			} else if arg1 && !arg2 {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Bytes:
@@ -48,7 +63,13 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol.Get(aTupleIdx)
 		arg2 := bCol.Get(bTupleIdx)
-		unique = bytes.Compare(arg1, arg2) != 0
+
+		{
+			var cmpResult int
+			cmpResult = bytes.Compare(arg1, arg2)
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Decimal:
@@ -57,7 +78,13 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = tree.CompareDecimals(&arg1, &arg2) != 0
+
+		{
+			var cmpResult int
+			cmpResult = tree.CompareDecimals(&arg1, &arg2)
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int8:
@@ -66,7 +93,24 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = compareInts(int64(arg1), int64(arg2)) != 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(arg1), int64(arg2)
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int16:
@@ -75,7 +119,24 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = compareInts(int64(arg1), int64(arg2)) != 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(arg1), int64(arg2)
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int32:
@@ -84,7 +145,24 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = compareInts(int64(arg1), int64(arg2)) != 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(arg1), int64(arg2)
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Int64:
@@ -93,7 +171,24 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = compareInts(int64(arg1), int64(arg2)) != 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := int64(arg1), int64(arg2)
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Float32:
@@ -102,7 +197,32 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = compareFloats(float64(arg1), float64(arg2)) != 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := float64(arg1), float64(arg2)
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else if a == b {
+					cmpResult = 0
+				} else if math.IsNaN(a) {
+					if math.IsNaN(b) {
+						cmpResult = 0
+					} else {
+						cmpResult = -1
+					}
+				} else {
+					cmpResult = 1
+				}
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	case coltypes.Float64:
@@ -111,7 +231,32 @@ func tuplesDiffer(
 		var unique bool
 		arg1 := aCol[aTupleIdx]
 		arg2 := bCol[bTupleIdx]
-		unique = compareFloats(float64(arg1), float64(arg2)) != 0
+
+		{
+			var cmpResult int
+
+			{
+				a, b := float64(arg1), float64(arg2)
+				if a < b {
+					cmpResult = -1
+				} else if a > b {
+					cmpResult = 1
+				} else if a == b {
+					cmpResult = 0
+				} else if math.IsNaN(a) {
+					if math.IsNaN(b) {
+						cmpResult = 0
+					} else {
+						cmpResult = -1
+					}
+				} else {
+					cmpResult = 1
+				}
+			}
+
+			unique = cmpResult != 0
+		}
+
 		*differ = *differ || unique
 		return nil
 	default:

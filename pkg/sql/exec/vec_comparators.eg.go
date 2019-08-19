@@ -12,6 +12,7 @@ package exec
 import (
 	"bytes"
 	"fmt"
+	"math"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -42,7 +43,15 @@ func (c *BoolVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint1
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = tree.CompareBools(left, right)
+
+	if !left && right {
+		cmp = -1
+	} else if left && !right {
+		cmp = 1
+	} else {
+		cmp = 0
+	}
+
 	return cmp
 }
 
@@ -153,7 +162,18 @@ func (c *Int8VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint1
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = compareInts(int64(left), int64(right))
+
+	{
+		a, b := int64(left), int64(right)
+		if a < b {
+			cmp = -1
+		} else if a > b {
+			cmp = 1
+		} else {
+			cmp = 0
+		}
+	}
+
 	return cmp
 }
 
@@ -190,7 +210,18 @@ func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = compareInts(int64(left), int64(right))
+
+	{
+		a, b := int64(left), int64(right)
+		if a < b {
+			cmp = -1
+		} else if a > b {
+			cmp = 1
+		} else {
+			cmp = 0
+		}
+	}
+
 	return cmp
 }
 
@@ -227,7 +258,18 @@ func (c *Int32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = compareInts(int64(left), int64(right))
+
+	{
+		a, b := int64(left), int64(right)
+		if a < b {
+			cmp = -1
+		} else if a > b {
+			cmp = 1
+		} else {
+			cmp = 0
+		}
+	}
+
 	return cmp
 }
 
@@ -264,7 +306,18 @@ func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = compareInts(int64(left), int64(right))
+
+	{
+		a, b := int64(left), int64(right)
+		if a < b {
+			cmp = -1
+		} else if a > b {
+			cmp = 1
+		} else {
+			cmp = 0
+		}
+	}
+
 	return cmp
 }
 
@@ -301,7 +354,26 @@ func (c *Float32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = compareFloats(float64(left), float64(right))
+
+	{
+		a, b := float64(left), float64(right)
+		if a < b {
+			cmp = -1
+		} else if a > b {
+			cmp = 1
+		} else if a == b {
+			cmp = 0
+		} else if math.IsNaN(a) {
+			if math.IsNaN(b) {
+				cmp = 0
+			} else {
+				cmp = -1
+			}
+		} else {
+			cmp = 1
+		}
+	}
+
 	return cmp
 }
 
@@ -338,7 +410,26 @@ func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	left := c.vecs[vecIdx1][int(valIdx1)]
 	right := c.vecs[vecIdx2][int(valIdx2)]
 	var cmp int
-	cmp = compareFloats(float64(left), float64(right))
+
+	{
+		a, b := float64(left), float64(right)
+		if a < b {
+			cmp = -1
+		} else if a > b {
+			cmp = 1
+		} else if a == b {
+			cmp = 0
+		} else if math.IsNaN(a) {
+			if math.IsNaN(b) {
+				cmp = 0
+			} else {
+				cmp = -1
+			}
+		} else {
+			cmp = 1
+		}
+	}
+
 	return cmp
 }
 
