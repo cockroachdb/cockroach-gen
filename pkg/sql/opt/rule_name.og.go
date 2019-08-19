@@ -209,6 +209,7 @@ const (
 	CommuteJoin
 	CommuteLeftJoin
 	CommuteRightJoin
+	CommuteSemiJoin
 	GenerateMergeJoins
 	GenerateLookupJoins
 	GenerateZigzagJoins

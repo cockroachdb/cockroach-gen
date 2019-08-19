@@ -713,6 +713,44 @@ func (_e *explorer) exploreSemiJoin(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [CommuteSemiJoin]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			on := _root.On
+			if _e.funcs.IsSimpleEquality(on) {
+				private := &_root.JoinPrivate
+				if _e.funcs.NoJoinHints(private) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteSemiJoin) {
+						_expr := &memo.ProjectExpr{
+							Input: _e.f.ConstructInnerJoin(
+								left,
+								_e.f.ConstructDistinctOn(
+									right,
+									memo.EmptyAggregationsExpr,
+									_e.funcs.MakeGrouping(_e.funcs.IntersectionCols(_e.funcs.OutputCols(right), _e.funcs.FilterOuterCols(on))),
+								),
+								on,
+								private,
+							),
+							Projections: memo.EmptyProjectionsExpr,
+							Passthrough: _e.funcs.OutputCols(left),
+						}
+						_interned := _e.mem.AddProjectToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.CommuteSemiJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.CommuteSemiJoin, _root, _interned)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {
