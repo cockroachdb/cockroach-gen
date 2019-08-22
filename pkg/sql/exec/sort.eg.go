@@ -25,7 +25,7 @@ import (
 )
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 func isSorterSupported(t coltypes.T, dir distsqlpb.Ordering_Column_Direction) bool {
 	switch t {

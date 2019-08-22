@@ -21,7 +21,7 @@ import (
 )
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 // tuplesDiffer takes in two ColVecs as well as tuple indices to check whether
 // the tuples differ.

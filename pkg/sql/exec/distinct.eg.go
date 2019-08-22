@@ -85,7 +85,7 @@ func NewOrderedDistinct(
 }
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 func newSingleOrderedDistinct(
 	input Operator, distinctColIdx int, outputCol []bool, t coltypes.T,
@@ -623,7 +623,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				outputIdx := checkIdx
 
 				null := nulls.NullAt(uint16(checkIdx))
-				v := col.Get(int(checkIdx))
+				v := append([]byte(nil), col.Get(int(checkIdx))...)
 				if null != lastValNull {
 					// Either the current value is null and the previous was not or vice-versa.
 					outputCol[outputIdx] = true
@@ -646,7 +646,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
 
-				v := col.Get(int(checkIdx))
+				v := append([]byte(nil), col.Get(int(checkIdx))...)
 				var unique bool
 
 				{
@@ -669,7 +669,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				outputIdx := checkIdx
 
 				null := nulls.NullAt(uint16(checkIdx))
-				v := col.Get(int(checkIdx))
+				v := append([]byte(nil), col.Get(int(checkIdx))...)
 				if null != lastValNull {
 					// Either the current value is null and the previous was not or vice-versa.
 					outputCol[outputIdx] = true
@@ -692,7 +692,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 			for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
 				outputIdx := checkIdx
 
-				v := col.Get(int(checkIdx))
+				v := append([]byte(nil), col.Get(int(checkIdx))...)
 				var unique bool
 
 				{
@@ -737,7 +737,7 @@ func (p partitionerBytes) partitionWithOrder(
 		for outputIdx, checkIdx := range order {
 
 			null := nulls.NullAt(uint16(checkIdx))
-			v := col.Get(int(checkIdx))
+			v := append([]byte(nil), col.Get(int(checkIdx))...)
 			if null != lastValNull {
 				// Either the current value is null and the previous was not or vice-versa.
 				outputCol[outputIdx] = true
@@ -759,7 +759,7 @@ func (p partitionerBytes) partitionWithOrder(
 	} else {
 		for outputIdx, checkIdx := range order {
 
-			v := col.Get(int(checkIdx))
+			v := append([]byte(nil), col.Get(int(checkIdx))...)
 			var unique bool
 
 			{
@@ -793,7 +793,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 			outputIdx := checkIdx
 
 			null := nulls.NullAt(uint16(checkIdx))
-			v := col.Get(int(checkIdx))
+			v := append([]byte(nil), col.Get(int(checkIdx))...)
 			if null != lastValNull {
 				// Either the current value is null and the previous was not or vice-versa.
 				outputCol[outputIdx] = true
@@ -816,7 +816,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 		for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
 			outputIdx := checkIdx
 
-			v := col.Get(int(checkIdx))
+			v := append([]byte(nil), col.Get(int(checkIdx))...)
 			var unique bool
 
 			{

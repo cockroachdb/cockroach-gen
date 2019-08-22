@@ -23,7 +23,7 @@ import (
 )
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 type BoolVecComparator struct {
 	vecs  [][]bool

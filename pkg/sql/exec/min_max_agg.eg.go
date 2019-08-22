@@ -22,7 +22,7 @@ import (
 )
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 func newMinAgg(t coltypes.T) (aggregateFunc, error) {
 	switch t {

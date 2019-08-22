@@ -43,7 +43,7 @@ func newAnyNotNullAgg(t coltypes.T) (aggregateFunc, error) {
 }
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 // anyNotNullBoolAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.

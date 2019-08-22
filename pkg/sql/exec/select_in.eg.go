@@ -25,7 +25,7 @@ import (
 )
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 // Enum used to represent comparison results
 type comparisonResult int
