@@ -45,12 +45,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
@@ -64,12 +67,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
@@ -85,6 +91,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -101,6 +110,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -123,12 +135,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys.Get(int(selIdx))
 					p := uintptr(buckets[i])
 
@@ -139,12 +154,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = append([]byte(nil), keys.Get(int(nKeys-1))...)
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys.Get(int(selIdx))
 					p := uintptr(buckets[i])
 
@@ -157,6 +175,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -170,6 +191,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = append([]byte(nil), keys.Get(int(nKeys-1))...)
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -189,12 +213,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
@@ -209,12 +236,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 
@@ -231,6 +261,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -248,6 +281,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -271,12 +307,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash8(noescape(unsafe.Pointer(&v)), p)
@@ -284,12 +323,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash8(noescape(unsafe.Pointer(&v)), p)
@@ -299,6 +341,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -309,6 +354,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -325,12 +373,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash16(noescape(unsafe.Pointer(&v)), p)
@@ -338,12 +389,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash16(noescape(unsafe.Pointer(&v)), p)
@@ -353,6 +407,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -363,6 +420,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -379,12 +439,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash32(noescape(unsafe.Pointer(&v)), p)
@@ -392,12 +455,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash32(noescape(unsafe.Pointer(&v)), p)
@@ -407,6 +473,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -417,6 +486,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -433,12 +505,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash64(noescape(unsafe.Pointer(&v)), p)
@@ -446,12 +521,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = memhash64(noescape(unsafe.Pointer(&v)), p)
@@ -461,6 +539,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -471,6 +552,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -487,12 +571,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f32hash(noescape(unsafe.Pointer(&v)), p)
@@ -500,12 +587,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f32hash(noescape(unsafe.Pointer(&v)), p)
@@ -515,6 +605,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -525,6 +618,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -541,12 +637,15 @@ func (ht *hashTable) rehash(
 		if col.MaybeHasNulls() {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(sel[i])) {
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f64hash(noescape(unsafe.Pointer(&v)), p)
@@ -554,12 +653,15 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
-					if nulls.NullAt(uint16(i)) {
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
 						continue
 					}
-					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
 					p = f64hash(noescape(unsafe.Pointer(&v)), p)
@@ -569,6 +671,9 @@ func (ht *hashTable) rehash(
 		} else {
 			if sel != nil {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := sel[i]
@@ -579,6 +684,9 @@ func (ht *hashTable) rehash(
 				}
 			} else {
 
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -619,35 +727,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -666,7 +770,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -675,31 +779,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -718,7 +819,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -728,29 +829,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -769,7 +867,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -780,29 +878,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -821,7 +917,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -830,27 +926,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -869,7 +963,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -886,35 +980,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -933,7 +1023,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -942,31 +1032,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -985,7 +1072,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -995,29 +1082,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1036,7 +1120,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1047,29 +1131,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1088,7 +1170,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1097,27 +1179,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1136,7 +1216,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1161,35 +1241,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys.Get(int(keyID - 1))
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 
@@ -1200,7 +1276,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1209,31 +1285,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys.Get(int(keyID - 1))
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 
@@ -1244,7 +1317,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1254,29 +1327,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys.Get(int(keyID - 1))
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 
@@ -1287,7 +1357,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1298,29 +1368,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys.Get(int(keyID - 1))
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 
@@ -1331,7 +1399,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1340,27 +1408,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys.Get(int(keyID - 1))
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 
@@ -1371,7 +1437,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1388,35 +1454,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys.Get(int(keyID - 1))
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 
@@ -1427,7 +1489,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1436,31 +1498,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys.Get(int(keyID - 1))
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys.Get(int(selIdx))
 									var unique bool
 
@@ -1471,7 +1530,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1481,29 +1540,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys.Get(int(keyID - 1))
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 
@@ -1514,7 +1570,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1525,29 +1581,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys.Get(int(keyID - 1))
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 
@@ -1558,7 +1612,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1567,27 +1621,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys.Get(int(keyID - 1))
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys.Get(int(selIdx))
 								var unique bool
 
@@ -1598,7 +1650,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1623,35 +1675,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -1662,7 +1710,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1671,31 +1719,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -1706,7 +1751,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1716,29 +1761,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1749,7 +1791,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1760,29 +1802,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1793,7 +1833,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1802,27 +1842,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1833,7 +1871,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1850,35 +1888,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -1889,7 +1923,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1898,31 +1932,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -1933,7 +1964,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -1943,29 +1974,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -1976,7 +2004,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -1987,29 +2015,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2020,7 +2046,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2029,27 +2055,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2060,7 +2084,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2085,35 +2109,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2135,7 +2155,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2144,31 +2164,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2190,7 +2207,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2200,29 +2217,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2244,7 +2258,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2255,29 +2269,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2299,7 +2311,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2308,27 +2320,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2350,7 +2360,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2367,35 +2377,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2417,7 +2423,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2426,31 +2432,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2472,7 +2475,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2482,29 +2485,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2526,7 +2526,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2537,29 +2537,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2581,7 +2579,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2590,27 +2588,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2632,7 +2628,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2657,35 +2653,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2707,7 +2699,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2716,31 +2708,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2762,7 +2751,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2772,29 +2761,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2816,7 +2802,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2827,29 +2813,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2871,7 +2855,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2880,27 +2864,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -2922,7 +2904,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -2939,35 +2921,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -2989,7 +2967,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -2998,31 +2976,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3044,7 +3019,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3054,29 +3029,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3098,7 +3070,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3109,29 +3081,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3153,7 +3123,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3162,27 +3132,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3204,7 +3172,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3229,35 +3197,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3279,7 +3243,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3288,31 +3252,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3334,7 +3295,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3344,29 +3305,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3388,7 +3346,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3399,29 +3357,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3443,7 +3399,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3452,27 +3408,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3494,7 +3448,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3511,35 +3465,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3561,7 +3511,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3570,31 +3520,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3616,7 +3563,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3626,29 +3573,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3670,7 +3614,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3681,29 +3625,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3725,7 +3667,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3734,27 +3676,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3776,7 +3716,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3801,35 +3741,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3851,7 +3787,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3860,31 +3796,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -3906,7 +3839,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -3916,29 +3849,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -3960,7 +3890,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -3971,29 +3901,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4015,7 +3943,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4024,27 +3952,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4066,7 +3992,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4083,35 +4009,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -4133,7 +4055,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -4142,31 +4064,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -4188,7 +4107,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -4198,29 +4117,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4242,7 +4158,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4253,29 +4169,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4297,7 +4211,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4306,27 +4220,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4348,7 +4260,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4373,35 +4285,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -4431,7 +4339,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -4440,31 +4348,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -4494,7 +4399,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -4504,29 +4409,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4556,7 +4458,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4567,29 +4469,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4619,7 +4519,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4628,27 +4528,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4678,7 +4576,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4695,35 +4593,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -4753,7 +4647,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -4762,31 +4656,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -4816,7 +4707,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -4826,29 +4717,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4878,7 +4766,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4889,29 +4777,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -4941,7 +4827,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -4950,27 +4836,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5000,7 +4884,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5025,35 +4909,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -5083,7 +4963,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -5092,31 +4972,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-								/*  */
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := sel[ht.toCheck[i]]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -5146,7 +5023,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -5156,29 +5033,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(sel[ht.toCheck[i]])
-							/*  */
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5208,7 +5082,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5219,29 +5093,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5271,7 +5143,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5280,27 +5152,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := sel[toCheck]
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := sel[ht.toCheck[i]]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5330,7 +5200,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5347,35 +5217,31 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull && buildIsNull {
 									continue
 								}
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -5405,7 +5271,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -5414,31 +5280,28 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 						probeIsNull := false
 						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
 						for i := uint16(0); i < nToCheck; i++ {
 							// keyID of 0 is reserved to represent the end of the next chain.
 
-							if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
 								// the build table key (calculated using keys[keyID - 1] = key) is
 								// compared to the corresponding probe table to determine if a match is
 								// found.
 
-								/*  */
-								probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-								/*  */
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-								/*  */
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-								/*  */
 
-								/*  */
 								if probeIsNull {
-									ht.groupID[ht.toCheck[i]] = 0
+									ht.groupID[toCheck] = 0
 								} else if buildIsNull {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								} else {
-
 									buildVal := buildKeys[int(keyID-1)]
-									selIdx := ht.toCheck[i]
 									probeVal := probeKeys[int(selIdx)]
 									var unique bool
 
@@ -5468,7 +5331,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									}
 
 									if unique {
-										ht.differs[ht.toCheck[i]] = true
+										ht.differs[toCheck] = true
 									}
 								}
 							}
@@ -5478,29 +5341,26 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
-							probeIsNull = probeVec.Nulls().NullAt(ht.toCheck[i])
-							/*  */
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5530,7 +5390,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5541,29 +5401,27 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
 							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
-							/*  */
 
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5593,7 +5451,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5602,27 +5460,25 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 
 					probeIsNull := false
 					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
 					for i := uint16(0); i < nToCheck; i++ {
 						// keyID of 0 is reserved to represent the end of the next chain.
 
-						if keyID := ht.groupID[ht.toCheck[i]]; keyID != 0 {
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
 							// the build table key (calculated using keys[keyID - 1] = key) is
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							/*  */
+							selIdx := toCheck
 
-							/*  */
-
-							/*  */
 							if probeIsNull {
-								ht.groupID[ht.toCheck[i]] = 0
+								ht.groupID[toCheck] = 0
 							} else if buildIsNull {
-								ht.differs[ht.toCheck[i]] = true
+								ht.differs[toCheck] = true
 							} else {
-
 								buildVal := buildKeys[int(keyID-1)]
-								selIdx := ht.toCheck[i]
 								probeVal := probeKeys[int(selIdx)]
 								var unique bool
 
@@ -5652,7 +5508,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								}
 
 								if unique {
-									ht.differs[ht.toCheck[i]] = true
+									ht.differs[toCheck] = true
 								}
 							}
 						}
@@ -5674,6 +5530,9 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 	if prober.spec.outer {
 		if sel != nil {
 
+			// Early bounds checks.
+			_ = prober.ht.headID[batchSize-1]
+			_ = sel[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				currentID := prober.ht.headID[i]
 
@@ -5687,7 +5546,12 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 						return nResults
 					}
 
-					prober.buildIdx[nResults] = currentID - 1
+					if currentID > 0 {
+						// If currentID == 0, nobody will look at this again since
+						// probeRowUnmatched will have been set - so don't populate this with
+						// a garbage value.
+						prober.buildIdx[nResults] = currentID - 1
+					}
 					prober.probeIdx[nResults] = sel[i]
 					currentID = prober.ht.same[currentID]
 					prober.ht.headID[i] = currentID
@@ -5700,6 +5564,8 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 			}
 		} else {
 
+			// Early bounds checks.
+			_ = prober.ht.headID[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				currentID := prober.ht.headID[i]
 
@@ -5713,7 +5579,12 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 						return nResults
 					}
 
-					prober.buildIdx[nResults] = currentID - 1
+					if currentID > 0 {
+						// If currentID == 0, nobody will look at this again since
+						// probeRowUnmatched will have been set - so don't populate this with
+						// a garbage value.
+						prober.buildIdx[nResults] = currentID - 1
+					}
 					prober.probeIdx[nResults] = i
 					currentID = prober.ht.same[currentID]
 					prober.ht.headID[i] = currentID
@@ -5728,6 +5599,9 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 	} else {
 		if sel != nil {
 
+			// Early bounds checks.
+			_ = prober.ht.headID[batchSize-1]
+			_ = sel[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				currentID := prober.ht.headID[i]
 				for currentID != 0 {
@@ -5745,6 +5619,8 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 			}
 		} else {
 
+			// Early bounds checks.
+			_ = prober.ht.headID[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				currentID := prober.ht.headID[i]
 				for currentID != 0 {
@@ -5779,26 +5655,48 @@ func (prober *hashJoinProber) distinctCollect(
 
 		if sel != nil {
 
+			// Early bounds checks.
+			_ = prober.ht.groupID[batchSize-1]
+			_ = prober.probeRowUnmatched[batchSize-1]
+			_ = prober.buildIdx[batchSize-1]
+			_ = prober.probeIdx[batchSize-1]
+			_ = sel[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
-				prober.buildIdx[i] = prober.ht.groupID[i] - 1
+				id := prober.ht.groupID[i]
+				rowUnmatched := id == 0
+				prober.probeRowUnmatched[i] = rowUnmatched
+				if !rowUnmatched {
+					prober.buildIdx[i] = id - 1
+				}
 				prober.probeIdx[i] = sel[i]
-
-				prober.probeRowUnmatched[i] = prober.ht.groupID[i] == 0
 			}
 		} else {
 
+			// Early bounds checks.
+			_ = prober.ht.groupID[batchSize-1]
+			_ = prober.probeRowUnmatched[batchSize-1]
+			_ = prober.buildIdx[batchSize-1]
+			_ = prober.probeIdx[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
-				prober.buildIdx[i] = prober.ht.groupID[i] - 1
+				id := prober.ht.groupID[i]
+				rowUnmatched := id == 0
+				prober.probeRowUnmatched[i] = rowUnmatched
+				if !rowUnmatched {
+					prober.buildIdx[i] = id - 1
+				}
 				prober.probeIdx[i] = i
-
-				prober.probeRowUnmatched[i] = prober.ht.groupID[i] == 0
 			}
 		}
 	} else {
 		if sel != nil {
 
+			// Early bounds checks.
+			_ = prober.ht.groupID[batchSize-1]
+			_ = prober.buildIdx[batchSize-1]
+			_ = prober.probeIdx[batchSize-1]
+			_ = sel[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				if prober.ht.groupID[i] != 0 {
 					// Index of keys and outputs in the hash table is calculated as ID - 1.
@@ -5809,6 +5707,10 @@ func (prober *hashJoinProber) distinctCollect(
 			}
 		} else {
 
+			// Early bounds checks.
+			_ = prober.ht.groupID[batchSize-1]
+			_ = prober.buildIdx[batchSize-1]
+			_ = prober.probeIdx[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				if prober.ht.groupID[i] != 0 {
 					// Index of keys and outputs in the hash table is calculated as ID - 1.
