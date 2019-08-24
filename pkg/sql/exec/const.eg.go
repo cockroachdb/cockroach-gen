@@ -111,12 +111,11 @@ func (c constBoolOp) Init() {
 func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Bool()
 	if sel := batch.Selection(); sel != nil {
@@ -147,12 +146,11 @@ func (c constBytesOp) Init() {
 func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Bytes()
 	if sel := batch.Selection(); sel != nil {
@@ -183,12 +181,11 @@ func (c constDecimalOp) Init() {
 func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Decimal()
 	if sel := batch.Selection(); sel != nil {
@@ -219,12 +216,11 @@ func (c constInt8Op) Init() {
 func (c constInt8Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Int8()
 	if sel := batch.Selection(); sel != nil {
@@ -255,12 +251,11 @@ func (c constInt16Op) Init() {
 func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Int16()
 	if sel := batch.Selection(); sel != nil {
@@ -291,12 +286,11 @@ func (c constInt32Op) Init() {
 func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Int32()
 	if sel := batch.Selection(); sel != nil {
@@ -327,12 +321,11 @@ func (c constInt64Op) Init() {
 func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Int64()
 	if sel := batch.Selection(); sel != nil {
@@ -363,12 +356,11 @@ func (c constFloat32Op) Init() {
 func (c constFloat32Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Float32()
 	if sel := batch.Selection(); sel != nil {
@@ -399,12 +391,11 @@ func (c constFloat64Op) Init() {
 func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
-
 	if batch.Width() == c.outputIdx {
 		batch.AppendCol(c.typ)
+	}
+	if n == 0 {
+		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Float64()
 	if sel := batch.Selection(); sel != nil {

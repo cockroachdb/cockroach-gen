@@ -52,15 +52,17 @@ func (r *rankNoPartitionOp) Init() {
 
 func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
-		return batch
-	}
 
 	if r.outputColIdx == batch.Width() {
 		batch.AppendCol(coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
+
+	if batch.Length() == 0 {
+		return batch
+	}
+
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
@@ -114,10 +116,6 @@ func (r *rankWithPartitionOp) Init() {
 
 func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
-		return batch
-	}
-
 	if r.partitionColIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
 	} else if r.partitionColIdx > batch.Width() {
@@ -130,6 +128,11 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
+
+	if batch.Length() == 0 {
+		return batch
+	}
+
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
@@ -195,15 +198,17 @@ func (r *denseRankNoPartitionOp) Init() {
 
 func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
-		return batch
-	}
 
 	if r.outputColIdx == batch.Width() {
 		batch.AppendCol(coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
+
+	if batch.Length() == 0 {
+		return batch
+	}
+
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
@@ -255,10 +260,6 @@ func (r *denseRankWithPartitionOp) Init() {
 
 func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
-		return batch
-	}
-
 	if r.partitionColIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
 	} else if r.partitionColIdx > batch.Width() {
@@ -271,6 +272,11 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
+
+	if batch.Length() == 0 {
+		return batch
+	}
+
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.

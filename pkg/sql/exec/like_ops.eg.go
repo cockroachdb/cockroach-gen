@@ -114,11 +114,11 @@ func (p projPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
 func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
 	}
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
@@ -252,11 +252,11 @@ func (p projSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
 func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
 	}
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
@@ -390,11 +390,11 @@ func (p projRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
 func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
 	}
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
@@ -528,11 +528,11 @@ func (p projNotPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
 func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
 	}
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
@@ -666,11 +666,11 @@ func (p projNotSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
 func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
 	}
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
@@ -804,11 +804,11 @@ func (p projNotRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
 func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if n == 0 {
-		return batch
-	}
 	if p.outputIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
 	}
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()

@@ -26,14 +26,14 @@ var _ exec.Operator = &rowNumberNoPartitionOp{}
 
 func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
-		return batch
-	}
 
 	if r.outputColIdx == batch.Width() {
 		batch.AppendCol(coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
+	}
+	if batch.Length() == 0 {
+		return batch
 	}
 	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -59,9 +59,6 @@ var _ exec.Operator = &rowNumberWithPartitionOp{}
 
 func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
-		return batch
-	}
 	if r.partitionColIdx == batch.Width() {
 		batch.AppendCol(coltypes.Bool)
 	} else if r.partitionColIdx > batch.Width() {
@@ -73,6 +70,9 @@ func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 		batch.AppendCol(coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
+	}
+	if batch.Length() == 0 {
+		return batch
 	}
 	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
