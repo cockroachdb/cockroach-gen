@@ -3,6 +3,7 @@
 package exec
 
 import (
+	"bytes"
 	"math"
 
 	"github.com/cockroachdb/apd"
@@ -10,61 +11,68 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
-func performPlusDecimal(a, b apd.Decimal) apd.Decimal {
-	if _, err := tree.DecimalCtx.Add(&a, &a, &b); err != nil {
+func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	if _, err := tree.DecimalCtx.Add(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
-	return a
+	return r
 }
 
-func performMinusDecimal(a, b apd.Decimal) apd.Decimal {
-	if _, err := tree.DecimalCtx.Sub(&a, &a, &b); err != nil {
+func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	if _, err := tree.DecimalCtx.Sub(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
-	return a
+	return r
 }
 
-func performMultDecimal(a, b apd.Decimal) apd.Decimal {
-	if _, err := tree.DecimalCtx.Mul(&a, &a, &b); err != nil {
+func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	if _, err := tree.DecimalCtx.Mul(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
-	return a
+	return r
 }
 
-func performDivDecimal(a, b apd.Decimal) apd.Decimal {
-	if _, err := tree.DecimalCtx.Quo(&a, &a, &b); err != nil {
+func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	if _, err := tree.DecimalCtx.Quo(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
-	return a
+	return r
 }
 
-func performPlusInt8(a, b int8) int8 {
+func performPlusInt8Int8(a int8, b int8) int8 {
+	var r int8
 
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMinusInt8(a, b int8) int8 {
+func performMinusInt8Int8(a int8, b int8) int8 {
+	var r int8
 
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMultInt8(a, b int8) int8 {
+func performMultInt8Int8(a int8, b int8) int8 {
+	var r int8
 
 	{
 		result := a * b
@@ -78,13 +86,14 @@ func performMultInt8(a, b int8) int8 {
 				}
 			}
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performDivInt8(a, b int8) int8 {
+func performDivInt8Int8(a int8, b int8) int8 {
+	var r int8
 
 	{
 		if b == 0 {
@@ -94,39 +103,42 @@ func performDivInt8(a, b int8) int8 {
 		if a == math.MinInt8 && b == -1 {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performPlusInt16(a, b int16) int16 {
+func performPlusInt16Int16(a int16, b int16) int16 {
+	var r int16
 
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMinusInt16(a, b int16) int16 {
+func performMinusInt16Int16(a int16, b int16) int16 {
+	var r int16
 
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMultInt16(a, b int16) int16 {
+func performMultInt16Int16(a int16, b int16) int16 {
+	var r int16
 
 	{
 		result := a * b
@@ -140,13 +152,14 @@ func performMultInt16(a, b int16) int16 {
 				}
 			}
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performDivInt16(a, b int16) int16 {
+func performDivInt16Int16(a int16, b int16) int16 {
+	var r int16
 
 	{
 		if b == 0 {
@@ -156,39 +169,42 @@ func performDivInt16(a, b int16) int16 {
 		if a == math.MinInt16 && b == -1 {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performPlusInt32(a, b int32) int32 {
+func performPlusInt32Int32(a int32, b int32) int32 {
+	var r int32
 
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMinusInt32(a, b int32) int32 {
+func performMinusInt32Int32(a int32, b int32) int32 {
+	var r int32
 
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMultInt32(a, b int32) int32 {
+func performMultInt32Int32(a int32, b int32) int32 {
+	var r int32
 
 	{
 		result := a * b
@@ -202,13 +218,14 @@ func performMultInt32(a, b int32) int32 {
 				}
 			}
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performDivInt32(a, b int32) int32 {
+func performDivInt32Int32(a int32, b int32) int32 {
+	var r int32
 
 	{
 		if b == 0 {
@@ -218,39 +235,42 @@ func performDivInt32(a, b int32) int32 {
 		if a == math.MinInt32 && b == -1 {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performPlusInt64(a, b int64) int64 {
+func performPlusInt64Int64(a int64, b int64) int64 {
+	var r int64
 
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMinusInt64(a, b int64) int64 {
+func performMinusInt64Int64(a int64, b int64) int64 {
+	var r int64
 
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performMultInt64(a, b int64) int64 {
+func performMultInt64Int64(a int64, b int64) int64 {
+	var r int64
 
 	{
 		result := a * b
@@ -264,13 +284,14 @@ func performMultInt64(a, b int64) int64 {
 				}
 			}
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performDivInt64(a, b int64) int64 {
+func performDivInt64Int64(a int64, b int64) int64 {
+	var r int64
 
 	{
 		if b == 0 {
@@ -280,48 +301,7592 @@ func performDivInt64(a, b int64) int64 {
 		if a == math.MinInt64 && b == -1 {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
-		a = result
+		r = result
 	}
 
-	return a
+	return r
 }
 
-func performPlusFloat32(a, b float32) float32 {
-	a = a + b
-	return a
+func performPlusFloat32Float32(a float32, b float32) float32 {
+	var r float32
+	r = a + b
+	return r
 }
 
-func performMinusFloat32(a, b float32) float32 {
-	a = a - b
-	return a
+func performMinusFloat32Float32(a float32, b float32) float32 {
+	var r float32
+	r = a - b
+	return r
 }
 
-func performMultFloat32(a, b float32) float32 {
-	a = a * b
-	return a
+func performMultFloat32Float32(a float32, b float32) float32 {
+	var r float32
+	r = a * b
+	return r
 }
 
-func performDivFloat32(a, b float32) float32 {
-	a = a / b
-	return a
+func performDivFloat32Float32(a float32, b float32) float32 {
+	var r float32
+	r = a / b
+	return r
 }
 
-func performPlusFloat64(a, b float64) float64 {
-	a = a + b
-	return a
+func performPlusFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	r = a + b
+	return r
 }
 
-func performMinusFloat64(a, b float64) float64 {
-	a = a - b
-	return a
+func performMinusFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	r = a - b
+	return r
 }
 
-func performMultFloat64(a, b float64) float64 {
-	a = a * b
-	return a
+func performMultFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	r = a * b
+	return r
 }
 
-func performDivFloat64(a, b float64) float64 {
-	a = a / b
-	return a
+func performDivFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	r = a / b
+	return r
+}
+
+func performEQBoolBool(a bool, b bool) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEBoolBool(a bool, b bool) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTBoolBool(a bool, b bool) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEBoolBool(a bool, b bool) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTBoolBool(a bool, b bool) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEBoolBool(a bool, b bool) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQBytesBytes(a []byte, b []byte) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEBytesBytes(a []byte, b []byte) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTBytesBytes(a []byte, b []byte) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEBytesBytes(a []byte, b []byte) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTBytesBytes(a []byte, b []byte) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEBytesBytes(a []byte, b []byte) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalInt8(a apd.Decimal, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt8(a apd.Decimal, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt8(a apd.Decimal, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt8(a apd.Decimal, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt8(a apd.Decimal, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt8(a apd.Decimal, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalFloat32(a apd.Decimal, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalFloat32(a apd.Decimal, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalFloat32(a apd.Decimal, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalFloat32(a apd.Decimal, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalFloat32(a apd.Decimal, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalFloat32(a apd.Decimal, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Int8(a int8, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Int8(a int8, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Int8(a int8, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Int8(a int8, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Int8(a int8, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Int8(a int8, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Int16(a int8, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Int16(a int8, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Int16(a int8, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Int16(a int8, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Int16(a int8, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Int16(a int8, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Int32(a int8, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Int32(a int8, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Int32(a int8, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Int32(a int8, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Int32(a int8, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Int32(a int8, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Int64(a int8, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Int64(a int8, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Int64(a int8, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Int64(a int8, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Int64(a int8, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Int64(a int8, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Float32(a int8, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Float32(a int8, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Float32(a int8, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Float32(a int8, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Float32(a int8, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Float32(a int8, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Float64(a int8, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Float64(a int8, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Float64(a int8, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Float64(a int8, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Float64(a int8, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Float64(a int8, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt8Decimal(a int8, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt8Decimal(a int8, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt8Decimal(a int8, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt8Decimal(a int8, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt8Decimal(a int8, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt8Decimal(a int8, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Int8(a int16, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Int8(a int16, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Int8(a int16, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Int8(a int16, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Int8(a int16, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Int8(a int16, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Int16(a int16, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Int16(a int16, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Int16(a int16, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Int16(a int16, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Int16(a int16, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Int16(a int16, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Int32(a int16, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Int32(a int16, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Int32(a int16, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Int32(a int16, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Int32(a int16, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Int32(a int16, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Int64(a int16, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Int64(a int16, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Int64(a int16, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Int64(a int16, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Int64(a int16, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Int64(a int16, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Float32(a int16, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Float32(a int16, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Float32(a int16, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Float32(a int16, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Float32(a int16, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Float32(a int16, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Float64(a int16, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Float64(a int16, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Float64(a int16, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Float64(a int16, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Float64(a int16, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Float64(a int16, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Int8(a int32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Int8(a int32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Int8(a int32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Int8(a int32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Int8(a int32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Int8(a int32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Int16(a int32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Int16(a int32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Int16(a int32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Int16(a int32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Int16(a int32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Int16(a int32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Int32(a int32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Int32(a int32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Int32(a int32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Int32(a int32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Int32(a int32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Int32(a int32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Int64(a int32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Int64(a int32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Int64(a int32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Int64(a int32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Int64(a int32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Int64(a int32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Float32(a int32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Float32(a int32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Float32(a int32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Float32(a int32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Float32(a int32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Float32(a int32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Float64(a int32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Float64(a int32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Float64(a int32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Float64(a int32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Float64(a int32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Float64(a int32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Int8(a int64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Int8(a int64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Int8(a int64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Int8(a int64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Int8(a int64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Int8(a int64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Int16(a int64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Int16(a int64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Int16(a int64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Int16(a int64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Int16(a int64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Int16(a int64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Int32(a int64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Int32(a int64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Int32(a int64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Int32(a int64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Int32(a int64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Int32(a int64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Int64(a int64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Int64(a int64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Int64(a int64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Int64(a int64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Int64(a int64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Int64(a int64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Float32(a int64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Float32(a int64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Float32(a int64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Float32(a int64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Float32(a int64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Float32(a int64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Float64(a int64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Float64(a int64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Float64(a int64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Float64(a int64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Float64(a int64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Float64(a int64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Int8(a float32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Int8(a float32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Int8(a float32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Int8(a float32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Int8(a float32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Int8(a float32, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Int16(a float32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Int16(a float32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Int16(a float32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Int16(a float32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Int16(a float32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Int16(a float32, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Int32(a float32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Int32(a float32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Int32(a float32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Int32(a float32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Int32(a float32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Int32(a float32, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Int64(a float32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Int64(a float32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Int64(a float32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Int64(a float32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Int64(a float32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Int64(a float32, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Float32(a float32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Float32(a float32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Float32(a float32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Float32(a float32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Float32(a float32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Float32(a float32, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Float64(a float32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Float64(a float32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Float64(a float32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Float64(a float32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Float64(a float32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Float64(a float32, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat32Decimal(a float32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat32Decimal(a float32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat32Decimal(a float32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat32Decimal(a float32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat32Decimal(a float32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat32Decimal(a float32, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Int8(a float64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Int8(a float64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int8(a float64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int8(a float64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int8(a float64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int8(a float64, b int8) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Int16(a float64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Int16(a float64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int16(a float64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int16(a float64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int16(a float64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int16(a float64, b int16) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Int32(a float64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Int32(a float64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int32(a float64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int32(a float64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int32(a float64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int32(a float64, b int32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Int64(a float64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Int64(a float64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int64(a float64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int64(a float64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int64(a float64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int64(a float64, b int64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Float32(a float64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Float32(a float64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Float32(a float64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Float32(a float64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Float32(a float64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Float32(a float64, b float32) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Float64(a float64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Float64(a float64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Float64(a float64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Float64(a float64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Float64(a float64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Float64(a float64, b float64) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &apd.Decimal{}
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				execerror.NonVectorizedPanic(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
 }
