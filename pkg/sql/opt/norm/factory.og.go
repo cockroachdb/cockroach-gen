@@ -15200,6 +15200,7 @@ func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFun
 			newList[i].FKOutbound = list[i].FKOutbound
 			newList[i].FKOrdinal = list[i].FKOrdinal
 			newList[i].KeyCols = list[i].KeyCols
+			newList[i].OpName = list[i].OpName
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -16314,6 +16315,7 @@ func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, repla
 		dst[i].FKOutbound = src[i].FKOutbound
 		dst[i].FKOrdinal = src[i].FKOrdinal
 		dst[i].KeyCols = src[i].KeyCols
+		dst[i].OpName = src[i].OpName
 	}
 	return dst
 }

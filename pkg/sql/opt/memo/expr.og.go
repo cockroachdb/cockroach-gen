@@ -885,6 +885,9 @@ type FKChecksItemPrivate struct {
 	// KeyCols are the columns in the Check query that form the value tuple shown
 	// in the error message.
 	KeyCols opt.ColList
+
+	// OpName is the name that should be used for this check in error messages.
+	OpName string
 }
 
 // ScanExpr returns a result set containing every row in a table by scanning one of
@@ -19260,6 +19263,7 @@ func (in *interner) InternFKChecksItem(val *FKChecksItem) *FKChecksItem {
 	in.hasher.HashBool(val.FKOutbound)
 	in.hasher.HashInt(val.FKOrdinal)
 	in.hasher.HashColList(val.KeyCols)
+	in.hasher.HashString(val.OpName)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -19269,7 +19273,8 @@ func (in *interner) InternFKChecksItem(val *FKChecksItem) *FKChecksItem {
 				in.hasher.IsTableIDEqual(val.ReferencedTable, existing.ReferencedTable) &&
 				in.hasher.IsBoolEqual(val.FKOutbound, existing.FKOutbound) &&
 				in.hasher.IsIntEqual(val.FKOrdinal, existing.FKOrdinal) &&
-				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) {
+				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
+				in.hasher.IsStringEqual(val.OpName, existing.OpName) {
 				return existing
 			}
 		}
