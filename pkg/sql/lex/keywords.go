@@ -316,6 +316,7 @@ var KeywordsCategories = map[string]string{
 	"set":                       "U",
 	"setting":                   "U",
 	"settings":                  "U",
+	"share":                     "U",
 	"show":                      "U",
 	"similar":                   "T",
 	"simple":                    "U",
@@ -716,6 +717,7 @@ var KeywordNames = []string{
 	"set",
 	"setting",
 	"settings",
+	"share",
 	"show",
 	"similar",
 	"simple",
@@ -1434,6 +1436,8 @@ func GetKeywordID(k string) int32 {
 		return SETTING
 	case "settings":
 		return SETTINGS
+	case "share":
+		return SHARE
 	case "show":
 		return SHOW
 	case "similar":
