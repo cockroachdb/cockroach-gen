@@ -224,13 +224,9 @@ func (ht *hashTable) rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-
-					d, err := v.Float64()
-					if err != nil {
-						execerror.NonVectorizedPanic(err)
-					}
-
-					p = f64hash(noescape(unsafe.Pointer(&d)), p)
+					b := []byte(v.String())
+					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
 					buckets[i] = uint64(p)
 				}
@@ -247,13 +243,9 @@ func (ht *hashTable) rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-
-					d, err := v.Float64()
-					if err != nil {
-						execerror.NonVectorizedPanic(err)
-					}
-
-					p = f64hash(noescape(unsafe.Pointer(&d)), p)
+					b := []byte(v.String())
+					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
 					buckets[i] = uint64(p)
 				}
@@ -269,13 +261,9 @@ func (ht *hashTable) rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-
-					d, err := v.Float64()
-					if err != nil {
-						execerror.NonVectorizedPanic(err)
-					}
-
-					p = f64hash(noescape(unsafe.Pointer(&d)), p)
+					b := []byte(v.String())
+					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
 					buckets[i] = uint64(p)
 				}
@@ -289,13 +277,9 @@ func (ht *hashTable) rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-
-					d, err := v.Float64()
-					if err != nil {
-						execerror.NonVectorizedPanic(err)
-					}
-
-					p = f64hash(noescape(unsafe.Pointer(&d)), p)
+					b := []byte(v.String())
+					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
 					buckets[i] = uint64(p)
 				}
@@ -582,7 +566,13 @@ func (ht *hashTable) rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f32hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f32hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -598,7 +588,13 @@ func (ht *hashTable) rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f32hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f32hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			}
@@ -613,7 +609,13 @@ func (ht *hashTable) rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f32hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f32hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -626,7 +628,13 @@ func (ht *hashTable) rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f32hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f32hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			}
@@ -648,7 +656,13 @@ func (ht *hashTable) rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f64hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f64hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -664,7 +678,13 @@ func (ht *hashTable) rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f64hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f64hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			}
@@ -679,7 +699,13 @@ func (ht *hashTable) rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f64hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f64hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -692,7 +718,13 @@ func (ht *hashTable) rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = f64hash(noescape(unsafe.Pointer(&v)), p)
+
+					f := v
+					if math.IsNaN(float64(f)) {
+						f = 0
+					}
+					p = f64hash(noescape(unsafe.Pointer(&f)), p)
+
 					buckets[i] = uint64(p)
 				}
 			}
