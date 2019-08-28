@@ -11,6 +11,230 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
+func performPlusDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
 func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	if _, err := tree.DecimalCtx.Add(&r, &a, &b); err != nil {
@@ -92,18 +316,343 @@ func performMultInt8Int8(a int8, b int8) int8 {
 	return r
 }
 
-func performDivInt8Int8(a int8, b int8) int8 {
-	var r int8
+func performDivInt8Int8(a int8, b int8) apd.Decimal {
+	var r apd.Decimal
 
 	{
 		if b == 0 {
 			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
-		result := a / b
-		if a == math.MinInt8 && b == -1 {
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(a), 0)
+		rightTmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt8Int16(a int8, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		r = result
+	}
+
+	return r
+}
+
+func performMinusInt8Int16(a int8, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt8Int16(a int8, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt8Int16(a int8, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt8Int32(a int8, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt8Int32(a int8, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt8Int32(a int8, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt8Int32(a int8, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt8Int64(a int8, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt8Int64(a int8, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt8Int64(a int8, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt8Int64(a int8, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Add(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt16Int8(a int16, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt16Int8(a int16, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt16Int8(a int16, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt16Int8(a int16, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
 	}
 
 	return r
@@ -158,18 +707,343 @@ func performMultInt16Int16(a int16, b int16) int16 {
 	return r
 }
 
-func performDivInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performDivInt16Int16(a int16, b int16) apd.Decimal {
+	var r apd.Decimal
 
 	{
 		if b == 0 {
 			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
-		result := a / b
-		if a == math.MinInt16 && b == -1 {
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(a), 0)
+		rightTmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt16Int32(a int16, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		r = result
+	}
+
+	return r
+}
+
+func performMinusInt16Int32(a int16, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt16Int32(a int16, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt16Int32(a int16, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt16Int64(a int16, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt16Int64(a int16, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt16Int64(a int16, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt16Int64(a int16, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Add(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt32Int8(a int32, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt32Int8(a int32, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt32Int8(a int32, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt32Int8(a int32, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt32Int16(a int32, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt32Int16(a int32, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt32Int16(a int32, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt32Int16(a int32, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
 	}
 
 	return r
@@ -224,18 +1098,343 @@ func performMultInt32Int32(a int32, b int32) int32 {
 	return r
 }
 
-func performDivInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performDivInt32Int32(a int32, b int32) apd.Decimal {
+	var r apd.Decimal
 
 	{
 		if b == 0 {
 			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
-		result := a / b
-		if a == math.MinInt32 && b == -1 {
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(a), 0)
+		rightTmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt32Int64(a int32, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		r = result
+	}
+
+	return r
+}
+
+func performMinusInt32Int64(a int32, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt32Int64(a int32, b int64) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt32Int64(a int32, b int64) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Add(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt64Int8(a int64, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt64Int8(a int64, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt64Int8(a int64, b int8) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt64Int8(a int64, b int8) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt64Int16(a int64, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt64Int16(a int64, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt64Int16(a int64, b int16) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt64Int16(a int64, b int16) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt64Int32(a int64, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt64Int32(a int64, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt64Int32(a int64, b int32) int64 {
+	var r int64
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performDivInt64Int32(a int64, b int32) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		if int64(b) == 0 {
+			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
 	}
 
 	return r
@@ -245,8 +1444,8 @@ func performPlusInt64Int64(a int64, b int64) int64 {
 	var r int64
 
 	{
-		result := a + b
-		if (result < a) != (b < 0) {
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		r = result
@@ -259,8 +1458,8 @@ func performMinusInt64Int64(a int64, b int64) int64 {
 	var r int64
 
 	{
-		result := a - b
-		if (result < a) != (b > 0) {
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
 			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 		}
 		r = result
@@ -273,13 +1472,13 @@ func performMultInt64Int64(a int64, b int64) int64 {
 	var r int64
 
 	{
-		result := a * b
-		if a > math.MaxInt32 || a < math.MinInt32 || b > math.MaxInt32 || b < math.MinInt32 {
-			if a != 0 && b != 0 {
-				sameSign := (a < 0) == (b < 0)
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				} else if result/b != a {
+				} else if result/int64(b) != int64(a) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 			}
@@ -290,18 +1489,75 @@ func performMultInt64Int64(a int64, b int64) int64 {
 	return r
 }
 
-func performDivInt64Int64(a int64, b int64) int64 {
-	var r int64
+func performDivInt64Int64(a int64, b int64) apd.Decimal {
+	var r apd.Decimal
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			execerror.NonVectorizedPanic(tree.ErrDivByZero)
 		}
-		result := a / b
-		if a == math.MinInt64 && b == -1 {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+		leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			execerror.NonVectorizedPanic(err)
 		}
-		r = result
+	}
+
+	return r
+}
+
+func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Add(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Sub(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Mul(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+
+	{
+		tmpDec := &apd.Decimal{}
+		tmpDec.SetFinite(int64(a), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, tmpDec, &b); err != nil {
+			execerror.NonVectorizedPanic(err)
+		}
 	}
 
 	return r
@@ -331,27 +1587,75 @@ func performDivFloat32Float32(a float32, b float32) float32 {
 	return r
 }
 
+func performPlusFloat32Float64(a float32, b float64) float64 {
+	var r float64
+	r = float64(a) + float64(b)
+	return r
+}
+
+func performMinusFloat32Float64(a float32, b float64) float64 {
+	var r float64
+	r = float64(a) - float64(b)
+	return r
+}
+
+func performMultFloat32Float64(a float32, b float64) float64 {
+	var r float64
+	r = float64(a) * float64(b)
+	return r
+}
+
+func performDivFloat32Float64(a float32, b float64) float64 {
+	var r float64
+	r = float64(a) / float64(b)
+	return r
+}
+
+func performPlusFloat64Float32(a float64, b float32) float64 {
+	var r float64
+	r = float64(a) + float64(b)
+	return r
+}
+
+func performMinusFloat64Float32(a float64, b float32) float64 {
+	var r float64
+	r = float64(a) - float64(b)
+	return r
+}
+
+func performMultFloat64Float32(a float64, b float32) float64 {
+	var r float64
+	r = float64(a) * float64(b)
+	return r
+}
+
+func performDivFloat64Float32(a float64, b float32) float64 {
+	var r float64
+	r = float64(a) / float64(b)
+	return r
+}
+
 func performPlusFloat64Float64(a float64, b float64) float64 {
 	var r float64
-	r = a + b
+	r = float64(a) + float64(b)
 	return r
 }
 
 func performMinusFloat64Float64(a float64, b float64) float64 {
 	var r float64
-	r = a - b
+	r = float64(a) - float64(b)
 	return r
 }
 
 func performMultFloat64Float64(a float64, b float64) float64 {
 	var r float64
-	r = a * b
+	r = float64(a) * float64(b)
 	return r
 }
 
 func performDivFloat64Float64(a float64, b float64) float64 {
 	var r float64
-	r = a / b
+	r = float64(a) / float64(b)
 	return r
 }
 

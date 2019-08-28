@@ -4521,6 +4521,838 @@ func (p projGEDecimalDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusDecimalInt8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalInt8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalInt8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultDecimalInt8Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalInt8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivDecimalInt8Op) Init() {
+	p.input.Init()
+}
+
 type projEQDecimalInt8ConstOp struct {
 	OneInputNode
 
@@ -5910,6 +6742,838 @@ func (p projGEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEDecimalInt8Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalInt16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalInt16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultDecimalInt16Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivDecimalInt16Op) Init() {
 	p.input.Init()
 }
 
@@ -7305,6 +8969,838 @@ func (p projGEDecimalInt16Op) Init() {
 	p.input.Init()
 }
 
+type projPlusDecimalInt32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalInt32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultDecimalInt32Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivDecimalInt32Op) Init() {
+	p.input.Init()
+}
+
 type projEQDecimalInt32ConstOp struct {
 	OneInputNode
 
@@ -8694,6 +11190,838 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEDecimalInt32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalInt64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusDecimalConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDecimalInt64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusDecimalInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusDecimalInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusDecimalConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDecimalInt64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusDecimalInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusDecimalInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultDecimalConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMultDecimalInt64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultDecimalInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultDecimalInt64Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivDecimalConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projDivDecimalInt64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivDecimalInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Decimal()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivDecimalInt64Op) Init() {
 	p.input.Init()
 }
 
@@ -13017,6 +16345,838 @@ func (p projGEDecimalFloat64Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt8DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt8DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt8DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt8DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt8DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt8DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt8ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt8DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt8DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt8DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt8DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt8ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt8DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt8DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt8DecimalOp) Init() {
+	p.input.Init()
+}
+
 type projEQInt8DecimalConstOp struct {
 	OneInputNode
 
@@ -15085,14 +19245,14 @@ type projDivInt8Int8ConstOp struct {
 }
 
 func (p projDivInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int8}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int8)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -15100,7 +19260,7 @@ func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int8()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int8()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
@@ -15110,11 +19270,12 @@ func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				if p.constArg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt8 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg), 0)
+				rightTmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -15129,11 +19290,12 @@ func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 				if p.constArg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt8 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg), 0)
+				rightTmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -15159,14 +19321,14 @@ type projDivInt8ConstInt8Op struct {
 }
 
 func (p projDivInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int8}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int8)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -15174,7 +19336,7 @@ func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int8()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int8()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
@@ -15184,11 +19346,12 @@ func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 				if arg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt8 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(p.constArg), 0)
+				rightTmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -15203,11 +19366,12 @@ func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 				if arg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt8 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(p.constArg), 0)
+				rightTmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -15233,20 +19397,20 @@ type projDivInt8Int8Op struct {
 }
 
 func (p projDivInt8Int8Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int8}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int8)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
 	}
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int8()
+	projCol := projVec.Decimal()
 	vec1 := batch.ColVec(p.col1Idx)
 	vec2 := batch.ColVec(p.col2Idx)
 	col1 := vec1.Int8()
@@ -15261,11 +19425,12 @@ func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt8 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg1), 0)
+				rightTmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -15282,11 +19447,12 @@ func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt8 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg1), 0)
+				rightTmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -16873,6 +21039,904 @@ func (p projGEInt8Int8Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt8Int16Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt8Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt8ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt8Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt8Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt8Int16Op) Init() {
+	p.input.Init()
+}
+
 type projEQInt8Int16ConstOp struct {
 	OneInputNode
 
@@ -18445,6 +23509,904 @@ func (p projGEInt8Int16Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt8Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt8ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt8Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt8Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt8Int32Op) Init() {
+	p.input.Init()
+}
+
 type projEQInt8Int32ConstOp struct {
 	OneInputNode
 
@@ -20014,6 +25976,904 @@ func (p projGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt8Int32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt8Int64Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt8Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt8ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt8ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt8Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt8Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt8Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int8()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt8Int64Op) Init() {
 	p.input.Init()
 }
 
@@ -25309,6 +32169,838 @@ func (p projGEInt8Float64Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt16DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt16DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt16DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt16DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt16DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt16DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt16DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt16DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt16ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt16DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt16DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt16DecimalOp) Init() {
+	p.input.Init()
+}
+
 type projEQInt16DecimalConstOp struct {
 	OneInputNode
 
@@ -26698,6 +34390,904 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt16DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt16Int8Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt16Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt16ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt16Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt16Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt16Int8Op) Init() {
 	p.input.Init()
 }
 
@@ -28949,14 +37539,14 @@ type projDivInt16Int16ConstOp struct {
 }
 
 func (p projDivInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -28964,7 +37554,7 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int16()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
@@ -28974,11 +37564,12 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				if p.constArg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt16 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg), 0)
+				rightTmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -28993,11 +37584,12 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 				if p.constArg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt16 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg), 0)
+				rightTmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -29023,14 +37615,14 @@ type projDivInt16ConstInt16Op struct {
 }
 
 func (p projDivInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -29038,7 +37630,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int16()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
@@ -29048,11 +37640,12 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				if arg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt16 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(p.constArg), 0)
+				rightTmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -29067,11 +37660,12 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				if arg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt16 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(p.constArg), 0)
+				rightTmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -29097,20 +37691,20 @@ type projDivInt16Int16Op struct {
 }
 
 func (p projDivInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
 	}
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int16()
+	projCol := projVec.Decimal()
 	vec1 := batch.ColVec(p.col1Idx)
 	vec2 := batch.ColVec(p.col2Idx)
 	col1 := vec1.Int16()
@@ -29125,11 +37719,12 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt16 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg1), 0)
+				rightTmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -29146,11 +37741,12 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt16 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg1), 0)
+				rightTmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -30737,6 +39333,904 @@ func (p projGEInt16Int16Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt16Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt16ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt16Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt16Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt16Int32Op) Init() {
+	p.input.Init()
+}
+
 type projEQInt16Int32ConstOp struct {
 	OneInputNode
 
@@ -32306,6 +41800,904 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt16Int32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt16Int64Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt16Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt16ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt16Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt16Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int16()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt16Int64Op) Init() {
 	p.input.Init()
 }
 
@@ -37601,6 +47993,838 @@ func (p projGEInt16Float64Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt32DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt32DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt32DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt32DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt32DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt32DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt32DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt32DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt32ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt32DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt32DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt32DecimalOp) Init() {
+	p.input.Init()
+}
+
 type projEQInt32DecimalConstOp struct {
 	OneInputNode
 
@@ -38990,6 +50214,904 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt32DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt32Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt32ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt32Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt32Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt32Int8Op) Init() {
 	p.input.Init()
 }
 
@@ -40562,6 +52684,904 @@ func (p projGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt32Int8Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt32Int16Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt32Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt32ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt32Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt32Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt32Int16Op) Init() {
 	p.input.Init()
 }
 
@@ -42813,14 +55833,14 @@ type projDivInt32Int32ConstOp struct {
 }
 
 func (p projDivInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -42828,7 +55848,7 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int32()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
@@ -42838,11 +55858,12 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				if p.constArg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt32 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg), 0)
+				rightTmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -42857,11 +55878,12 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 				if p.constArg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt32 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg), 0)
+				rightTmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -42887,14 +55909,14 @@ type projDivInt32ConstInt32Op struct {
 }
 
 func (p projDivInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -42902,7 +55924,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int32()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
@@ -42912,11 +55934,12 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				if arg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt32 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(p.constArg), 0)
+				rightTmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -42931,11 +55954,12 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				if arg == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt32 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(p.constArg), 0)
+				rightTmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -42961,20 +55985,20 @@ type projDivInt32Int32Op struct {
 }
 
 func (p projDivInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
 	}
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int32()
+	projCol := projVec.Decimal()
 	vec1 := batch.ColVec(p.col1Idx)
 	vec2 := batch.ColVec(p.col2Idx)
 	col1 := vec1.Int32()
@@ -42989,11 +56013,12 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt32 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg1), 0)
+				rightTmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -43010,11 +56035,12 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt32 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(arg1), 0)
+				rightTmpDec.SetFinite(int64(arg2), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -44598,6 +57624,904 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt32Int32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt32Int64Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt32Int64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt32ConstInt64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt32Int64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt32Int64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int32()
+	col2 := vec2.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt32Int64Op) Init() {
 	p.input.Init()
 }
 
@@ -49893,6 +63817,838 @@ func (p projGEInt32Float64Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt64DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projPlusInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt64DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt64DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMinusInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt64DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt64DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt64DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projMultInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt64ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt64DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt64DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt64DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt64DecimalConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg apd.Decimal
+
+	outputIdx int
+}
+
+func (p projDivInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt64ConstDecimalOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(p.constArg), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt64DecimalOp struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt64DecimalOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				tmpDec := &apd.Decimal{}
+				tmpDec.SetFinite(int64(arg1), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt64DecimalOp) Init() {
+	p.input.Init()
+}
+
 type projEQInt64DecimalConstOp struct {
 	OneInputNode
 
@@ -51282,6 +66038,904 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt64DecimalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projPlusInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMinusInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projMultInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt64Int8Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt64Int8ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int8
+
+	outputIdx int
+}
+
+func (p projDivInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64Int8ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt64ConstInt8Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int8()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64ConstInt8Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt64Int8Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt64Int8Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64Int8Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int8()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt64Int8Op) Init() {
 	p.input.Init()
 }
 
@@ -52857,6 +68511,904 @@ func (p projGEInt64Int8Op) Init() {
 	p.input.Init()
 }
 
+type projPlusInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projPlusInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMinusInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projMultInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt64Int16ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int16
+
+	outputIdx int
+}
+
+func (p projDivInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt64ConstInt16Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt64Int16Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt64Int16Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int16()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt64Int16Op) Init() {
+	p.input.Init()
+}
+
 type projEQInt64Int16ConstOp struct {
 	OneInputNode
 
@@ -54426,6 +70978,904 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt64Int16Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projPlusInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projPlusInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMinusInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMinusInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
+					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projMultInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(p.constArg) != int64(arg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projMultInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg) != int64(p.constArg) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMultInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+}
+
+func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Int64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Int64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
+						if (result < 0) == sameSign {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						} else if result/int64(arg2) != int64(arg1) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+					}
+				}
+				projCol[i] = result
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultInt64Int32Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt64Int32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int32
+
+	outputIdx int
+}
+
+func (p projDivInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(p.constArg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivInt64ConstInt32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg int64
+
+	outputIdx int
+}
+
+func (p projDivInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+
+			{
+				if int64(arg) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projDivInt64Int32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivInt64Int32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+}
+
+func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Decimal)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Decimal()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Int64()
+	col2 := vec2.Int32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+
+			{
+				if int64(arg2) == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
+				}
+			}
+
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivInt64Int32Op) Init() {
 	p.input.Init()
 }
 
@@ -56033,8 +73483,8 @@ func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[int(i)]
 
 			{
-				result := arg + p.constArg
-				if (result < arg) != (p.constArg < 0) {
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56049,8 +73499,8 @@ func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				result := arg + p.constArg
-				if (result < arg) != (p.constArg < 0) {
+				result := int64(arg) + int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) < 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56101,8 +73551,8 @@ func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[int(i)]
 
 			{
-				result := p.constArg + arg
-				if (result < p.constArg) != (arg < 0) {
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56117,8 +73567,8 @@ func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				result := p.constArg + arg
-				if (result < p.constArg) != (arg < 0) {
+				result := int64(p.constArg) + int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) < 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56172,8 +73622,8 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[int(i)]
 
 			{
-				result := arg1 + arg2
-				if (result < arg1) != (arg2 < 0) {
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56190,8 +73640,8 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[i]
 
 			{
-				result := arg1 + arg2
-				if (result < arg1) != (arg2 < 0) {
+				result := int64(arg1) + int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) < 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56241,8 +73691,8 @@ func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[int(i)]
 
 			{
-				result := arg - p.constArg
-				if (result < arg) != (p.constArg > 0) {
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56257,8 +73707,8 @@ func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				result := arg - p.constArg
-				if (result < arg) != (p.constArg > 0) {
+				result := int64(arg) - int64(p.constArg)
+				if (result < int64(arg)) != (int64(p.constArg) > 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56309,8 +73759,8 @@ func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[int(i)]
 
 			{
-				result := p.constArg - arg
-				if (result < p.constArg) != (arg > 0) {
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56325,8 +73775,8 @@ func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				result := p.constArg - arg
-				if (result < p.constArg) != (arg > 0) {
+				result := int64(p.constArg) - int64(arg)
+				if (result < int64(p.constArg)) != (int64(arg) > 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56380,8 +73830,8 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[int(i)]
 
 			{
-				result := arg1 - arg2
-				if (result < arg1) != (arg2 > 0) {
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56398,8 +73848,8 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[i]
 
 			{
-				result := arg1 - arg2
-				if (result < arg1) != (arg2 > 0) {
+				result := int64(arg1) - int64(arg2)
+				if (result < int64(arg1)) != (int64(arg2) > 0) {
 					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 				}
 				projCol[i] = result
@@ -56449,13 +73899,13 @@ func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[int(i)]
 
 			{
-				result := arg * p.constArg
-				if arg > math.MaxInt32 || arg < math.MinInt32 || p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 {
-					if arg != 0 && p.constArg != 0 {
-						sameSign := (arg < 0) == (p.constArg < 0)
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
 						if (result < 0) == sameSign {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-						} else if result/p.constArg != arg {
+						} else if result/int64(p.constArg) != int64(arg) {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 						}
 					}
@@ -56472,13 +73922,13 @@ func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				result := arg * p.constArg
-				if arg > math.MaxInt32 || arg < math.MinInt32 || p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 {
-					if arg != 0 && p.constArg != 0 {
-						sameSign := (arg < 0) == (p.constArg < 0)
+				result := int64(arg) * int64(p.constArg)
+				if int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 || int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 {
+					if int64(arg) != 0 && int64(p.constArg) != 0 {
+						sameSign := (int64(arg) < 0) == (int64(p.constArg) < 0)
 						if (result < 0) == sameSign {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-						} else if result/p.constArg != arg {
+						} else if result/int64(p.constArg) != int64(arg) {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 						}
 					}
@@ -56531,13 +73981,13 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[int(i)]
 
 			{
-				result := p.constArg * arg
-				if p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 || arg > math.MaxInt32 || arg < math.MinInt32 {
-					if p.constArg != 0 && arg != 0 {
-						sameSign := (p.constArg < 0) == (arg < 0)
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
 						if (result < 0) == sameSign {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-						} else if result/arg != p.constArg {
+						} else if result/int64(arg) != int64(p.constArg) {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 						}
 					}
@@ -56554,13 +74004,13 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				result := p.constArg * arg
-				if p.constArg > math.MaxInt32 || p.constArg < math.MinInt32 || arg > math.MaxInt32 || arg < math.MinInt32 {
-					if p.constArg != 0 && arg != 0 {
-						sameSign := (p.constArg < 0) == (arg < 0)
+				result := int64(p.constArg) * int64(arg)
+				if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
+					if int64(p.constArg) != 0 && int64(arg) != 0 {
+						sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
 						if (result < 0) == sameSign {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-						} else if result/arg != p.constArg {
+						} else if result/int64(arg) != int64(p.constArg) {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 						}
 					}
@@ -56616,13 +74066,13 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[int(i)]
 
 			{
-				result := arg1 * arg2
-				if arg1 > math.MaxInt32 || arg1 < math.MinInt32 || arg2 > math.MaxInt32 || arg2 < math.MinInt32 {
-					if arg1 != 0 && arg2 != 0 {
-						sameSign := (arg1 < 0) == (arg2 < 0)
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
 						if (result < 0) == sameSign {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-						} else if result/arg2 != arg1 {
+						} else if result/int64(arg2) != int64(arg1) {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 						}
 					}
@@ -56641,13 +74091,13 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[i]
 
 			{
-				result := arg1 * arg2
-				if arg1 > math.MaxInt32 || arg1 < math.MinInt32 || arg2 > math.MaxInt32 || arg2 < math.MinInt32 {
-					if arg1 != 0 && arg2 != 0 {
-						sameSign := (arg1 < 0) == (arg2 < 0)
+				result := int64(arg1) * int64(arg2)
+				if int64(arg1) > math.MaxInt32 || int64(arg1) < math.MinInt32 || int64(arg2) > math.MaxInt32 || int64(arg2) < math.MinInt32 {
+					if int64(arg1) != 0 && int64(arg2) != 0 {
+						sameSign := (int64(arg1) < 0) == (int64(arg2) < 0)
 						if (result < 0) == sameSign {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-						} else if result/arg2 != arg1 {
+						} else if result/int64(arg2) != int64(arg1) {
 							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
 						}
 					}
@@ -56677,14 +74127,14 @@ type projDivInt64Int64ConstOp struct {
 }
 
 func (p projDivInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -56692,21 +74142,22 @@ func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int64()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
 			{
-				if p.constArg == 0 {
+				if int64(p.constArg) == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt64 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -56718,14 +74169,15 @@ func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				if p.constArg == 0 {
+				if int64(p.constArg) == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg / p.constArg
-				if arg == math.MinInt64 && p.constArg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg)), 0)
+				rightTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -56751,14 +74203,14 @@ type projDivInt64ConstInt64Op struct {
 }
 
 func (p projDivInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -56766,21 +74218,22 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int64()
+	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
 			{
-				if arg == 0 {
+				if int64(arg) == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt64 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -56792,14 +74245,15 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 			arg := col[i]
 
 			{
-				if arg == 0 {
+				if int64(arg) == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := p.constArg / arg
-				if p.constArg == math.MinInt64 && arg == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -56825,20 +74279,20 @@ type projDivInt64Int64Op struct {
 }
 
 func (p projDivInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
 }
 
 func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		batch.AppendCol(coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
 	}
 	projVec := batch.ColVec(p.outputIdx)
-	projCol := projVec.Int64()
+	projCol := projVec.Decimal()
 	vec1 := batch.ColVec(p.col1Idx)
 	vec2 := batch.ColVec(p.col2Idx)
 	col1 := vec1.Int64()
@@ -56850,14 +74304,15 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[int(i)]
 
 			{
-				if arg2 == 0 {
+				if int64(arg2) == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt64 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -56871,14 +74326,15 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			arg2 := col2[i]
 
 			{
-				if arg2 == 0 {
+				if int64(arg2) == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
 				}
-				result := arg1 / arg2
-				if arg1 == math.MinInt64 && arg2 == -1 {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+				leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+				leftTmpDec.SetFinite(int64(int64(arg1)), 0)
+				rightTmpDec.SetFinite(int64(int64(arg2)), 0)
+				if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
+					execerror.NonVectorizedPanic(err)
 				}
-				projCol[i] = result
 			}
 
 		}
@@ -73589,6 +91045,646 @@ func (p projGEFloat32Float32Op) Init() {
 	p.input.Init()
 }
 
+type projPlusFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projPlusFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projPlusFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) + float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) + float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projPlusFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projPlusFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) + float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) + float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projPlusFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) + float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) + float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projMinusFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMinusFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) - float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) - float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projMinusFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMinusFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) - float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) - float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMinusFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) - float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) - float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projMultFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projMultFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMultFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) * float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) * float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projMultFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMultFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) * float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) * float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projMultFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMultFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) * float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) * float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
+type projDivFloat32Float64ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projDivFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projDivFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) / float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) / float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivFloat32Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivFloat32ConstFloat64Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projDivFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projDivFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) / float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) / float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivFloat32ConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projDivFloat32Float64Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivFloat32Float64Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projDivFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float32()
+	col2 := vec2.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) / float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) / float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivFloat32Float64Op) Init() {
+	p.input.Init()
+}
+
 type projEQFloat32Float64ConstOp struct {
 	OneInputNode
 
@@ -84353,6 +102449,646 @@ func (p projGEFloat64Int64Op) Init() {
 	p.input.Init()
 }
 
+type projPlusFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projPlusFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projPlusFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) + float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) + float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projPlusFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projPlusFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) + float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) + float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projPlusFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projPlusFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projPlusFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) + float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) + float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projPlusFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projMinusFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMinusFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) - float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) - float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projMinusFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMinusFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) - float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) - float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMinusFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMinusFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMinusFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) - float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) - float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMinusFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projMultFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projMultFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMultFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) * float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) * float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projMultFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMultFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) * float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) * float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projMultFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projMultFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projMultFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projMultFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) * float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) * float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projMultFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
+type projDivFloat64Float32ConstOp struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float32
+
+	outputIdx int
+}
+
+func (p projDivFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projDivFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(arg) / float64(p.constArg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(arg) / float64(p.constArg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivFloat64Float32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivFloat64ConstFloat32Op struct {
+	OneInputNode
+
+	colIdx   int
+	constArg float64
+
+	outputIdx int
+}
+
+func (p projDivFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projDivFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg := col[int(i)]
+			projCol[i] = float64(p.constArg) / float64(arg)
+		}
+	} else {
+		col = col[0:int(n)]
+		colLen := len(col)
+		_ = projCol[colLen-1]
+		for i := range col {
+			arg := col[i]
+			projCol[i] = float64(p.constArg) / float64(arg)
+		}
+	}
+	if vec.Nulls().MaybeHasNulls() {
+		nulls := vec.Nulls().Copy()
+		projVec.SetNulls(&nulls)
+	}
+	return batch
+}
+
+func (p projDivFloat64ConstFloat32Op) Init() {
+	p.input.Init()
+}
+
+type projDivFloat64Float32Op struct {
+	OneInputNode
+
+	col1Idx int
+	col2Idx int
+
+	outputIdx int
+}
+
+func (p projDivFloat64Float32Op) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+}
+
+func (p projDivFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Float64)
+	}
+	if n == 0 {
+		return batch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Float64()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Float64()
+	col2 := vec2.Float32()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			arg1 := col1[int(i)]
+			arg2 := col2[int(i)]
+			projCol[i] = float64(arg1) / float64(arg2)
+		}
+	} else {
+		col1 = col1[0:int(n)]
+		colLen := len(col1)
+		_ = projCol[colLen-1]
+		_ = col2[0 : colLen-1]
+		for i := range col1 {
+			arg1 := col1[i]
+			arg2 := col2[i]
+			projCol[i] = float64(arg1) / float64(arg2)
+		}
+	}
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		projVec.SetNulls(vec1.Nulls().Or(vec2.Nulls()))
+	}
+	return batch
+}
+
+func (p projDivFloat64Float32Op) Init() {
+	p.input.Init()
+}
+
 type projEQFloat64Float32ConstOp struct {
 	OneInputNode
 
@@ -86243,7 +104979,7 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg + p.constArg
+			projCol[i] = float64(arg) + float64(p.constArg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86251,7 +104987,7 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg + p.constArg
+			projCol[i] = float64(arg) + float64(p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86295,7 +105031,7 @@ func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg + arg
+			projCol[i] = float64(p.constArg) + float64(arg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86303,7 +105039,7 @@ func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg + arg
+			projCol[i] = float64(p.constArg) + float64(arg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86350,7 +105086,7 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 + arg2
+			projCol[i] = float64(arg1) + float64(arg2)
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -86360,7 +105096,7 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 + arg2
+			projCol[i] = float64(arg1) + float64(arg2)
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -86403,7 +105139,7 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg - p.constArg
+			projCol[i] = float64(arg) - float64(p.constArg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86411,7 +105147,7 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg - p.constArg
+			projCol[i] = float64(arg) - float64(p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86455,7 +105191,7 @@ func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch 
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg - arg
+			projCol[i] = float64(p.constArg) - float64(arg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86463,7 +105199,7 @@ func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch 
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg - arg
+			projCol[i] = float64(p.constArg) - float64(arg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86510,7 +105246,7 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 - arg2
+			projCol[i] = float64(arg1) - float64(arg2)
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -86520,7 +105256,7 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 - arg2
+			projCol[i] = float64(arg1) - float64(arg2)
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -86563,7 +105299,7 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg * p.constArg
+			projCol[i] = float64(arg) * float64(p.constArg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86571,7 +105307,7 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg * p.constArg
+			projCol[i] = float64(arg) * float64(p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86615,7 +105351,7 @@ func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg * arg
+			projCol[i] = float64(p.constArg) * float64(arg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86623,7 +105359,7 @@ func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg * arg
+			projCol[i] = float64(p.constArg) * float64(arg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86670,7 +105406,7 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 * arg2
+			projCol[i] = float64(arg1) * float64(arg2)
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -86680,7 +105416,7 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 * arg2
+			projCol[i] = float64(arg1) * float64(arg2)
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -86723,7 +105459,7 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = arg / p.constArg
+			projCol[i] = float64(arg) / float64(p.constArg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86731,7 +105467,7 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = arg / p.constArg
+			projCol[i] = float64(arg) / float64(p.constArg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86775,7 +105511,7 @@ func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			projCol[i] = p.constArg / arg
+			projCol[i] = float64(p.constArg) / float64(arg)
 		}
 	} else {
 		col = col[0:int(n)]
@@ -86783,7 +105519,7 @@ func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			projCol[i] = p.constArg / arg
+			projCol[i] = float64(p.constArg) / float64(arg)
 		}
 	}
 	if vec.Nulls().MaybeHasNulls() {
@@ -86830,7 +105566,7 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			projCol[i] = arg1 / arg2
+			projCol[i] = float64(arg1) / float64(arg2)
 		}
 	} else {
 		col1 = col1[0:int(n)]
@@ -86840,7 +105576,7 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			projCol[i] = arg1 / arg2
+			projCol[i] = float64(arg1) / float64(arg2)
 		}
 	}
 	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
@@ -88982,6 +107718,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusDecimalInt8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -89047,6 +107815,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusDecimalInt16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -89114,6 +107914,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusDecimalInt32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -89179,6 +108011,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusDecimalInt64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -89385,6 +108249,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -89549,6 +108445,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -89615,6 +108543,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -89680,6 +108640,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -89886,6 +108878,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt16DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -89951,6 +108975,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -90116,6 +109172,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -90181,6 +109269,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -90387,6 +109507,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt32DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -90453,6 +109605,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -90518,6 +109702,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -90682,6 +109898,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -90888,6 +110136,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt64DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64DecimalConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -90953,6 +110233,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int8ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -91020,6 +110332,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int16ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -91085,6 +110429,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -91817,6 +111193,38 @@ func GetProjectionRConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivFloat32Float64ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -92219,6 +111627,38 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivFloat64Float32ConstOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -92657,6 +112097,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusDecimalConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -92722,6 +112194,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusDecimalConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -92789,6 +112293,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusDecimalConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -92854,6 +112390,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusDecimalConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(apd.Decimal),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -93060,6 +112628,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -93224,6 +112824,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -93290,6 +112922,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -93355,6 +113019,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int8),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -93561,6 +113257,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt16ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -93626,6 +113354,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -93791,6 +113551,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -93856,6 +113648,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int16),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -94062,6 +113886,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt32ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -94128,6 +113984,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -94193,6 +114081,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -94357,6 +114277,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32ConstInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int32),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -94563,6 +114515,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt64ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64ConstDecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -94628,6 +114612,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64ConstInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -94695,6 +114711,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64ConstInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -94760,6 +114808,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64ConstInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(int64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -95492,6 +115572,38 @@ func GetProjectionLConstOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivFloat32ConstFloat64Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float32),
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -95894,6 +116006,38 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivFloat64ConstFloat32Op{
+						OneInputNode: NewOneInputNode(input),
+						colIdx:       colIdx,
+						constArg:     c.(float64),
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -96328,6 +116472,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusDecimalInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -96393,6 +116569,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusDecimalInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -96460,6 +116668,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusDecimalInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -96525,6 +116765,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusDecimalInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusDecimalInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultDecimalInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivDecimalInt64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -96731,6 +117003,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -96895,6 +117199,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -96961,6 +117297,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -97026,6 +117394,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt8Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -97232,6 +117632,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt16DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -97297,6 +117729,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -97462,6 +117926,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -97527,6 +118023,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt16Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -97733,6 +118261,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt32DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -97799,6 +118359,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -97864,6 +118456,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -98028,6 +118652,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt32Int64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -98234,6 +118890,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt64DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64DecimalOp{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -98299,6 +118987,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int8Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -98366,6 +119086,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int16Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -98431,6 +119183,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivInt64Int32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
@@ -99163,6 +119947,38 @@ func GetProjectionOperator(
 			case tree.BinaryOperator:
 				switch op {
 
+				case tree.Plus:
+					return &projPlusFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivFloat32Float64Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -99565,6 +120381,38 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+
+				case tree.Plus:
+					return &projPlusFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Minus:
+					return &projMinusFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Mult:
+					return &projMultFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
+
+				case tree.Div:
+					return &projDivFloat64Float32Op{
+						OneInputNode: NewOneInputNode(input),
+						col1Idx:      col1Idx,
+						col2Idx:      col2Idx,
+						outputIdx:    outputIdx,
+					}, nil
 
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
