@@ -125,6 +125,7 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 			projCol[i] = bytes.HasPrefix(arg, p.constArg)
@@ -263,6 +264,7 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 			projCol[i] = bytes.HasSuffix(arg, p.constArg)
@@ -401,6 +403,7 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 			projCol[i] = p.constArg.Match(arg)
@@ -539,6 +542,7 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 			projCol[i] = !bytes.HasPrefix(arg, p.constArg)
@@ -677,6 +681,7 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 			projCol[i] = !bytes.HasSuffix(arg, p.constArg)
@@ -815,6 +820,7 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 			projCol[i] = !p.constArg.Match(arg)

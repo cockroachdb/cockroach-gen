@@ -44,6 +44,7 @@ func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -123,6 +124,7 @@ func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -204,6 +206,7 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bool()
 	col2 := vec2.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -285,6 +288,7 @@ func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -364,6 +368,7 @@ func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -445,6 +450,7 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bool()
 	col2 := vec2.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -526,6 +532,7 @@ func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -605,6 +612,7 @@ func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -686,6 +694,7 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bool()
 	col2 := vec2.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -767,6 +776,7 @@ func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -846,6 +856,7 @@ func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -927,6 +938,7 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bool()
 	col2 := vec2.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -1008,6 +1020,7 @@ func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -1087,6 +1100,7 @@ func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -1168,6 +1182,7 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bool()
 	col2 := vec2.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -1249,6 +1264,7 @@ func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -1328,6 +1344,7 @@ func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -1409,6 +1426,7 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bool()
 	col2 := vec2.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -1490,6 +1508,7 @@ func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -1553,6 +1572,7 @@ func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -1618,6 +1638,7 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bytes()
 	col2 := vec2.Bytes()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
@@ -1683,6 +1704,7 @@ func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -1746,6 +1768,7 @@ func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -1811,6 +1834,7 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bytes()
 	col2 := vec2.Bytes()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
@@ -1876,6 +1900,7 @@ func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -1939,6 +1964,7 @@ func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2004,6 +2030,7 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bytes()
 	col2 := vec2.Bytes()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
@@ -2069,6 +2096,7 @@ func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2132,6 +2160,7 @@ func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2197,6 +2226,7 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bytes()
 	col2 := vec2.Bytes()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
@@ -2262,6 +2292,7 @@ func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2325,6 +2356,7 @@ func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2390,6 +2422,7 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bytes()
 	col2 := vec2.Bytes()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
@@ -2455,6 +2488,7 @@ func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2518,6 +2552,7 @@ func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col.Get(int(i))
 
@@ -2583,6 +2618,7 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Bytes()
 	col2 := vec2.Bytes()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1.Get(int(i))
 			arg2 := col2.Get(int(i))
@@ -2648,6 +2684,7 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
@@ -2703,6 +2740,7 @@ func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, &arg); err != nil {
@@ -2760,6 +2798,7 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -2817,6 +2856,7 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
@@ -2872,6 +2912,7 @@ func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, &arg); err != nil {
@@ -2929,6 +2970,7 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -2986,6 +3028,7 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
@@ -3041,6 +3084,7 @@ func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, &arg); err != nil {
@@ -3098,6 +3142,7 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -3155,6 +3200,7 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg); err != nil {
@@ -3210,6 +3256,7 @@ func (p projDivDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, &arg); err != nil {
@@ -3267,6 +3314,7 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -3324,6 +3372,7 @@ func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3387,6 +3436,7 @@ func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3452,6 +3502,7 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -3517,6 +3568,7 @@ func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3580,6 +3632,7 @@ func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3645,6 +3698,7 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -3710,6 +3764,7 @@ func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3773,6 +3828,7 @@ func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3838,6 +3894,7 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -3903,6 +3960,7 @@ func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -3966,6 +4024,7 @@ func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4031,6 +4090,7 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -4096,6 +4156,7 @@ func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4159,6 +4220,7 @@ func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4224,6 +4286,7 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -4289,6 +4352,7 @@ func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4352,6 +4416,7 @@ func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4417,6 +4482,7 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -4482,6 +4548,7 @@ func (p projEQDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4557,6 +4624,7 @@ func (p projEQDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4634,6 +4702,7 @@ func (p projEQDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -4711,6 +4780,7 @@ func (p projNEDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4786,6 +4856,7 @@ func (p projNEDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -4863,6 +4934,7 @@ func (p projNEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -4940,6 +5012,7 @@ func (p projLTDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5015,6 +5088,7 @@ func (p projLTDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5092,6 +5166,7 @@ func (p projLTDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -5169,6 +5244,7 @@ func (p projLEDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5244,6 +5320,7 @@ func (p projLEDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5321,6 +5398,7 @@ func (p projLEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -5398,6 +5476,7 @@ func (p projGTDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5473,6 +5552,7 @@ func (p projGTDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5550,6 +5630,7 @@ func (p projGTDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -5627,6 +5708,7 @@ func (p projGEDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5702,6 +5784,7 @@ func (p projGEDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5779,6 +5862,7 @@ func (p projGEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -5856,6 +5940,7 @@ func (p projEQDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -5931,6 +6016,7 @@ func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6008,6 +6094,7 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -6085,6 +6172,7 @@ func (p projNEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6160,6 +6248,7 @@ func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6237,6 +6326,7 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -6314,6 +6404,7 @@ func (p projLTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6389,6 +6480,7 @@ func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6466,6 +6558,7 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -6543,6 +6636,7 @@ func (p projLEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6618,6 +6712,7 @@ func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6695,6 +6790,7 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -6772,6 +6868,7 @@ func (p projGTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6847,6 +6944,7 @@ func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -6924,6 +7022,7 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -7001,6 +7100,7 @@ func (p projGEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7076,6 +7176,7 @@ func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7153,6 +7254,7 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -7230,6 +7332,7 @@ func (p projEQDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7305,6 +7408,7 @@ func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7382,6 +7486,7 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -7459,6 +7564,7 @@ func (p projNEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7534,6 +7640,7 @@ func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7611,6 +7718,7 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -7688,6 +7796,7 @@ func (p projLTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7763,6 +7872,7 @@ func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7840,6 +7950,7 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -7917,6 +8028,7 @@ func (p projLEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -7992,6 +8104,7 @@ func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8069,6 +8182,7 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -8146,6 +8260,7 @@ func (p projGTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8221,6 +8336,7 @@ func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8298,6 +8414,7 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -8375,6 +8492,7 @@ func (p projGEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8450,6 +8568,7 @@ func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8527,6 +8646,7 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -8604,6 +8724,7 @@ func (p projEQDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8679,6 +8800,7 @@ func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8756,6 +8878,7 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -8833,6 +8956,7 @@ func (p projNEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8908,6 +9032,7 @@ func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -8985,6 +9110,7 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -9062,6 +9188,7 @@ func (p projLTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9137,6 +9264,7 @@ func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9214,6 +9342,7 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -9291,6 +9420,7 @@ func (p projLEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9366,6 +9496,7 @@ func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9443,6 +9574,7 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -9520,6 +9652,7 @@ func (p projGTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9595,6 +9728,7 @@ func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9672,6 +9806,7 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -9749,6 +9884,7 @@ func (p projGEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9824,6 +9960,7 @@ func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -9901,6 +10038,7 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -9978,6 +10116,7 @@ func (p projEQDecimalFloat32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10057,6 +10196,7 @@ func (p projEQDecimalConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10138,6 +10278,7 @@ func (p projEQDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -10219,6 +10360,7 @@ func (p projNEDecimalFloat32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10298,6 +10440,7 @@ func (p projNEDecimalConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10379,6 +10522,7 @@ func (p projNEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -10460,6 +10604,7 @@ func (p projLTDecimalFloat32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10539,6 +10684,7 @@ func (p projLTDecimalConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10620,6 +10766,7 @@ func (p projLTDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -10701,6 +10848,7 @@ func (p projLEDecimalFloat32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10780,6 +10928,7 @@ func (p projLEDecimalConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -10861,6 +11010,7 @@ func (p projLEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -10942,6 +11092,7 @@ func (p projGTDecimalFloat32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11021,6 +11172,7 @@ func (p projGTDecimalConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11102,6 +11254,7 @@ func (p projGTDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -11183,6 +11336,7 @@ func (p projGEDecimalFloat32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11262,6 +11416,7 @@ func (p projGEDecimalConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11343,6 +11498,7 @@ func (p projGEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -11424,6 +11580,7 @@ func (p projEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11503,6 +11660,7 @@ func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11584,6 +11742,7 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -11665,6 +11824,7 @@ func (p projNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11744,6 +11904,7 @@ func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11825,6 +11986,7 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -11906,6 +12068,7 @@ func (p projLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -11985,6 +12148,7 @@ func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12066,6 +12230,7 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -12147,6 +12312,7 @@ func (p projLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12226,6 +12392,7 @@ func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12307,6 +12474,7 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -12388,6 +12556,7 @@ func (p projGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12467,6 +12636,7 @@ func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12548,6 +12718,7 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -12629,6 +12800,7 @@ func (p projGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12708,6 +12880,7 @@ func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12789,6 +12962,7 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Decimal()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -12870,6 +13044,7 @@ func (p projEQInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -12945,6 +13120,7 @@ func (p projEQInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13022,6 +13198,7 @@ func (p projEQInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -13099,6 +13276,7 @@ func (p projNEInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13174,6 +13352,7 @@ func (p projNEInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13251,6 +13430,7 @@ func (p projNEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -13328,6 +13508,7 @@ func (p projLTInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13403,6 +13584,7 @@ func (p projLTInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13480,6 +13662,7 @@ func (p projLTInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -13557,6 +13740,7 @@ func (p projLEInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13632,6 +13816,7 @@ func (p projLEInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13709,6 +13894,7 @@ func (p projLEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -13786,6 +13972,7 @@ func (p projGTInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13861,6 +14048,7 @@ func (p projGTInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -13938,6 +14126,7 @@ func (p projGTInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -14015,6 +14204,7 @@ func (p projGEInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14090,6 +14280,7 @@ func (p projGEInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14167,6 +14358,7 @@ func (p projGEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -14244,6 +14436,7 @@ func (p projPlusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14311,6 +14504,7 @@ func (p projPlusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14380,6 +14574,7 @@ func (p projPlusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -14449,6 +14644,7 @@ func (p projMinusInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14516,6 +14712,7 @@ func (p projMinusInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14585,6 +14782,7 @@ func (p projMinusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -14654,6 +14852,7 @@ func (p projMultInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14735,6 +14934,7 @@ func (p projMultInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14818,6 +15018,7 @@ func (p projMultInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -14901,6 +15102,7 @@ func (p projDivInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -14974,6 +15176,7 @@ func (p projDivInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15049,6 +15252,7 @@ func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -15124,6 +15328,7 @@ func (p projEQInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15209,6 +15414,7 @@ func (p projEQInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15296,6 +15502,7 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -15383,6 +15590,7 @@ func (p projNEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15468,6 +15676,7 @@ func (p projNEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15555,6 +15764,7 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -15642,6 +15852,7 @@ func (p projLTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15727,6 +15938,7 @@ func (p projLTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15814,6 +16026,7 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -15901,6 +16114,7 @@ func (p projLEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -15986,6 +16200,7 @@ func (p projLEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16073,6 +16288,7 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -16160,6 +16376,7 @@ func (p projGTInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16245,6 +16462,7 @@ func (p projGTInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16332,6 +16550,7 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -16419,6 +16638,7 @@ func (p projGEInt8Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16504,6 +16724,7 @@ func (p projGEInt8ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16591,6 +16812,7 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -16678,6 +16900,7 @@ func (p projEQInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16763,6 +16986,7 @@ func (p projEQInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -16850,6 +17074,7 @@ func (p projEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -16937,6 +17162,7 @@ func (p projNEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17022,6 +17248,7 @@ func (p projNEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17109,6 +17336,7 @@ func (p projNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -17196,6 +17424,7 @@ func (p projLTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17281,6 +17510,7 @@ func (p projLTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17368,6 +17598,7 @@ func (p projLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -17455,6 +17686,7 @@ func (p projLEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17540,6 +17772,7 @@ func (p projLEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17627,6 +17860,7 @@ func (p projLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -17714,6 +17948,7 @@ func (p projGTInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17799,6 +18034,7 @@ func (p projGTInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -17886,6 +18122,7 @@ func (p projGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -17973,6 +18210,7 @@ func (p projGEInt8Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18058,6 +18296,7 @@ func (p projGEInt8ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18145,6 +18384,7 @@ func (p projGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -18232,6 +18472,7 @@ func (p projEQInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18317,6 +18558,7 @@ func (p projEQInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18404,6 +18646,7 @@ func (p projEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -18491,6 +18734,7 @@ func (p projNEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18576,6 +18820,7 @@ func (p projNEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18663,6 +18908,7 @@ func (p projNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -18750,6 +18996,7 @@ func (p projLTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18835,6 +19082,7 @@ func (p projLTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -18922,6 +19170,7 @@ func (p projLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -19009,6 +19258,7 @@ func (p projLEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19094,6 +19344,7 @@ func (p projLEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19181,6 +19432,7 @@ func (p projLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -19268,6 +19520,7 @@ func (p projGTInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19353,6 +19606,7 @@ func (p projGTInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19440,6 +19694,7 @@ func (p projGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -19527,6 +19782,7 @@ func (p projGEInt8Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19612,6 +19868,7 @@ func (p projGEInt8ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19699,6 +19956,7 @@ func (p projGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -19786,6 +20044,7 @@ func (p projEQInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19871,6 +20130,7 @@ func (p projEQInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -19958,6 +20218,7 @@ func (p projEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -20045,6 +20306,7 @@ func (p projNEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20130,6 +20392,7 @@ func (p projNEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20217,6 +20480,7 @@ func (p projNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -20304,6 +20568,7 @@ func (p projLTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20389,6 +20654,7 @@ func (p projLTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20476,6 +20742,7 @@ func (p projLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -20563,6 +20830,7 @@ func (p projLEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20648,6 +20916,7 @@ func (p projLEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20735,6 +21004,7 @@ func (p projLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -20822,6 +21092,7 @@ func (p projGTInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20907,6 +21178,7 @@ func (p projGTInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -20994,6 +21266,7 @@ func (p projGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -21081,6 +21354,7 @@ func (p projGEInt8Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -21166,6 +21440,7 @@ func (p projGEInt8ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -21253,6 +21528,7 @@ func (p projGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -21340,6 +21616,7 @@ func (p projEQInt8Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -21441,6 +21718,7 @@ func (p projEQInt8ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -21544,6 +21822,7 @@ func (p projEQInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -21647,6 +21926,7 @@ func (p projNEInt8Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -21748,6 +22028,7 @@ func (p projNEInt8ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -21851,6 +22132,7 @@ func (p projNEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -21954,6 +22236,7 @@ func (p projLTInt8Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22055,6 +22338,7 @@ func (p projLTInt8ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22158,6 +22442,7 @@ func (p projLTInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -22261,6 +22546,7 @@ func (p projLEInt8Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22362,6 +22648,7 @@ func (p projLEInt8ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22465,6 +22752,7 @@ func (p projLEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -22568,6 +22856,7 @@ func (p projGTInt8Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22669,6 +22958,7 @@ func (p projGTInt8ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22772,6 +23062,7 @@ func (p projGTInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -22875,6 +23166,7 @@ func (p projGEInt8Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -22976,6 +23268,7 @@ func (p projGEInt8ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -23079,6 +23372,7 @@ func (p projGEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -23182,6 +23476,7 @@ func (p projEQInt8Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -23283,6 +23578,7 @@ func (p projEQInt8ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -23386,6 +23682,7 @@ func (p projEQInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -23489,6 +23786,7 @@ func (p projNEInt8Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -23590,6 +23888,7 @@ func (p projNEInt8ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -23693,6 +23992,7 @@ func (p projNEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -23796,6 +24096,7 @@ func (p projLTInt8Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -23897,6 +24198,7 @@ func (p projLTInt8ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24000,6 +24302,7 @@ func (p projLTInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -24103,6 +24406,7 @@ func (p projLEInt8Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24204,6 +24508,7 @@ func (p projLEInt8ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24307,6 +24612,7 @@ func (p projLEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -24410,6 +24716,7 @@ func (p projGTInt8Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24511,6 +24818,7 @@ func (p projGTInt8ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24614,6 +24922,7 @@ func (p projGTInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -24717,6 +25026,7 @@ func (p projGEInt8Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24818,6 +25128,7 @@ func (p projGEInt8ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -24921,6 +25232,7 @@ func (p projGEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int8()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -25024,6 +25336,7 @@ func (p projEQInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25099,6 +25412,7 @@ func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25176,6 +25490,7 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -25253,6 +25568,7 @@ func (p projNEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25328,6 +25644,7 @@ func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25405,6 +25722,7 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -25482,6 +25800,7 @@ func (p projLTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25557,6 +25876,7 @@ func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25634,6 +25954,7 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -25711,6 +26032,7 @@ func (p projLEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25786,6 +26108,7 @@ func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -25863,6 +26186,7 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -25940,6 +26264,7 @@ func (p projGTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26015,6 +26340,7 @@ func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26092,6 +26418,7 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -26169,6 +26496,7 @@ func (p projGEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26244,6 +26572,7 @@ func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26321,6 +26650,7 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -26398,6 +26728,7 @@ func (p projEQInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26483,6 +26814,7 @@ func (p projEQInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26570,6 +26902,7 @@ func (p projEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -26657,6 +26990,7 @@ func (p projNEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26742,6 +27076,7 @@ func (p projNEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -26829,6 +27164,7 @@ func (p projNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -26916,6 +27252,7 @@ func (p projLTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27001,6 +27338,7 @@ func (p projLTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27088,6 +27426,7 @@ func (p projLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -27175,6 +27514,7 @@ func (p projLEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27260,6 +27600,7 @@ func (p projLEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27347,6 +27688,7 @@ func (p projLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -27434,6 +27776,7 @@ func (p projGTInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27519,6 +27862,7 @@ func (p projGTInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27606,6 +27950,7 @@ func (p projGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -27693,6 +28038,7 @@ func (p projGEInt16Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27778,6 +28124,7 @@ func (p projGEInt16ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -27865,6 +28212,7 @@ func (p projGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -27952,6 +28300,7 @@ func (p projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28019,6 +28368,7 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28088,6 +28438,7 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -28157,6 +28508,7 @@ func (p projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28224,6 +28576,7 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28293,6 +28646,7 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -28362,6 +28716,7 @@ func (p projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28443,6 +28798,7 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28526,6 +28882,7 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -28609,6 +28966,7 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28682,6 +29040,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28757,6 +29116,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -28832,6 +29192,7 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -28917,6 +29278,7 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29004,6 +29366,7 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -29091,6 +29454,7 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29176,6 +29540,7 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29263,6 +29628,7 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -29350,6 +29716,7 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29435,6 +29802,7 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29522,6 +29890,7 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -29609,6 +29978,7 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29694,6 +30064,7 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29781,6 +30152,7 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -29868,6 +30240,7 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -29953,6 +30326,7 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30040,6 +30414,7 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -30127,6 +30502,7 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30212,6 +30588,7 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30299,6 +30676,7 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -30386,6 +30764,7 @@ func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30471,6 +30850,7 @@ func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30558,6 +30938,7 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -30645,6 +31026,7 @@ func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30730,6 +31112,7 @@ func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30817,6 +31200,7 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -30904,6 +31288,7 @@ func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -30989,6 +31374,7 @@ func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31076,6 +31462,7 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -31163,6 +31550,7 @@ func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31248,6 +31636,7 @@ func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31335,6 +31724,7 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -31422,6 +31812,7 @@ func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31507,6 +31898,7 @@ func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31594,6 +31986,7 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -31681,6 +32074,7 @@ func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31766,6 +32160,7 @@ func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -31853,6 +32248,7 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -31940,6 +32336,7 @@ func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32025,6 +32422,7 @@ func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32112,6 +32510,7 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -32199,6 +32598,7 @@ func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32284,6 +32684,7 @@ func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32371,6 +32772,7 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -32458,6 +32860,7 @@ func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32543,6 +32946,7 @@ func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32630,6 +33034,7 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -32717,6 +33122,7 @@ func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32802,6 +33208,7 @@ func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -32889,6 +33296,7 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -32976,6 +33384,7 @@ func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33061,6 +33470,7 @@ func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33148,6 +33558,7 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -33235,6 +33646,7 @@ func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33320,6 +33732,7 @@ func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33407,6 +33820,7 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -33494,6 +33908,7 @@ func (p projEQInt16Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33595,6 +34010,7 @@ func (p projEQInt16ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33698,6 +34114,7 @@ func (p projEQInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -33801,6 +34218,7 @@ func (p projNEInt16Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -33902,6 +34320,7 @@ func (p projNEInt16ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34005,6 +34424,7 @@ func (p projNEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -34108,6 +34528,7 @@ func (p projLTInt16Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34209,6 +34630,7 @@ func (p projLTInt16ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34312,6 +34734,7 @@ func (p projLTInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -34415,6 +34838,7 @@ func (p projLEInt16Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34516,6 +34940,7 @@ func (p projLEInt16ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34619,6 +35044,7 @@ func (p projLEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -34722,6 +35148,7 @@ func (p projGTInt16Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34823,6 +35250,7 @@ func (p projGTInt16ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -34926,6 +35354,7 @@ func (p projGTInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -35029,6 +35458,7 @@ func (p projGEInt16Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -35130,6 +35560,7 @@ func (p projGEInt16ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -35233,6 +35664,7 @@ func (p projGEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -35336,6 +35768,7 @@ func (p projEQInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -35437,6 +35870,7 @@ func (p projEQInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -35540,6 +35974,7 @@ func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -35643,6 +36078,7 @@ func (p projNEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -35744,6 +36180,7 @@ func (p projNEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -35847,6 +36284,7 @@ func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -35950,6 +36388,7 @@ func (p projLTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36051,6 +36490,7 @@ func (p projLTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36154,6 +36594,7 @@ func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -36257,6 +36698,7 @@ func (p projLEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36358,6 +36800,7 @@ func (p projLEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36461,6 +36904,7 @@ func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -36564,6 +37008,7 @@ func (p projGTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36665,6 +37110,7 @@ func (p projGTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36768,6 +37214,7 @@ func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -36871,6 +37318,7 @@ func (p projGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -36972,6 +37420,7 @@ func (p projGEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37075,6 +37524,7 @@ func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int16()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -37178,6 +37628,7 @@ func (p projEQInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37253,6 +37704,7 @@ func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37330,6 +37782,7 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -37407,6 +37860,7 @@ func (p projNEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37482,6 +37936,7 @@ func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37559,6 +38014,7 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -37636,6 +38092,7 @@ func (p projLTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37711,6 +38168,7 @@ func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37788,6 +38246,7 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -37865,6 +38324,7 @@ func (p projLEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -37940,6 +38400,7 @@ func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38017,6 +38478,7 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -38094,6 +38556,7 @@ func (p projGTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38169,6 +38632,7 @@ func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38246,6 +38710,7 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -38323,6 +38788,7 @@ func (p projGEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38398,6 +38864,7 @@ func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38475,6 +38942,7 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -38552,6 +39020,7 @@ func (p projEQInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38637,6 +39106,7 @@ func (p projEQInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38724,6 +39194,7 @@ func (p projEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -38811,6 +39282,7 @@ func (p projNEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38896,6 +39368,7 @@ func (p projNEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -38983,6 +39456,7 @@ func (p projNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -39070,6 +39544,7 @@ func (p projLTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39155,6 +39630,7 @@ func (p projLTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39242,6 +39718,7 @@ func (p projLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -39329,6 +39806,7 @@ func (p projLEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39414,6 +39892,7 @@ func (p projLEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39501,6 +39980,7 @@ func (p projLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -39588,6 +40068,7 @@ func (p projGTInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39673,6 +40154,7 @@ func (p projGTInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39760,6 +40242,7 @@ func (p projGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -39847,6 +40330,7 @@ func (p projGEInt32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -39932,6 +40416,7 @@ func (p projGEInt32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40019,6 +40504,7 @@ func (p projGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -40106,6 +40592,7 @@ func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40191,6 +40678,7 @@ func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40278,6 +40766,7 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -40365,6 +40854,7 @@ func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40450,6 +40940,7 @@ func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40537,6 +41028,7 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -40624,6 +41116,7 @@ func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40709,6 +41202,7 @@ func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40796,6 +41290,7 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -40883,6 +41378,7 @@ func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -40968,6 +41464,7 @@ func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41055,6 +41552,7 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -41142,6 +41640,7 @@ func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41227,6 +41726,7 @@ func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41314,6 +41814,7 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -41401,6 +41902,7 @@ func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41486,6 +41988,7 @@ func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41573,6 +42076,7 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -41660,6 +42164,7 @@ func (p projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41727,6 +42232,7 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41796,6 +42302,7 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -41865,6 +42372,7 @@ func (p projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -41932,6 +42440,7 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42001,6 +42510,7 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -42070,6 +42580,7 @@ func (p projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42151,6 +42662,7 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42234,6 +42746,7 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -42317,6 +42830,7 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42390,6 +42904,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42465,6 +42980,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -42540,6 +43056,7 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42625,6 +43142,7 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42712,6 +43230,7 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -42799,6 +43318,7 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42884,6 +43404,7 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -42971,6 +43492,7 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -43058,6 +43580,7 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43143,6 +43666,7 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43230,6 +43754,7 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -43317,6 +43842,7 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43402,6 +43928,7 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43489,6 +44016,7 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -43576,6 +44104,7 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43661,6 +44190,7 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43748,6 +44278,7 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -43835,6 +44366,7 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -43920,6 +44452,7 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44007,6 +44540,7 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -44094,6 +44628,7 @@ func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44179,6 +44714,7 @@ func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44266,6 +44802,7 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -44353,6 +44890,7 @@ func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44438,6 +44976,7 @@ func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44525,6 +45064,7 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -44612,6 +45152,7 @@ func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44697,6 +45238,7 @@ func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44784,6 +45326,7 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -44871,6 +45414,7 @@ func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -44956,6 +45500,7 @@ func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45043,6 +45588,7 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -45130,6 +45676,7 @@ func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45215,6 +45762,7 @@ func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45302,6 +45850,7 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -45389,6 +45938,7 @@ func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45474,6 +46024,7 @@ func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45561,6 +46112,7 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -45648,6 +46200,7 @@ func (p projEQInt32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45749,6 +46302,7 @@ func (p projEQInt32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -45852,6 +46406,7 @@ func (p projEQInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -45955,6 +46510,7 @@ func (p projNEInt32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46056,6 +46612,7 @@ func (p projNEInt32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46159,6 +46716,7 @@ func (p projNEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -46262,6 +46820,7 @@ func (p projLTInt32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46363,6 +46922,7 @@ func (p projLTInt32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46466,6 +47026,7 @@ func (p projLTInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -46569,6 +47130,7 @@ func (p projLEInt32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46670,6 +47232,7 @@ func (p projLEInt32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46773,6 +47336,7 @@ func (p projLEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -46876,6 +47440,7 @@ func (p projGTInt32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -46977,6 +47542,7 @@ func (p projGTInt32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -47080,6 +47646,7 @@ func (p projGTInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -47183,6 +47750,7 @@ func (p projGEInt32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -47284,6 +47852,7 @@ func (p projGEInt32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -47387,6 +47956,7 @@ func (p projGEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -47490,6 +48060,7 @@ func (p projEQInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -47591,6 +48162,7 @@ func (p projEQInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -47694,6 +48266,7 @@ func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -47797,6 +48370,7 @@ func (p projNEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -47898,6 +48472,7 @@ func (p projNEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48001,6 +48576,7 @@ func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -48104,6 +48680,7 @@ func (p projLTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48205,6 +48782,7 @@ func (p projLTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48308,6 +48886,7 @@ func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -48411,6 +48990,7 @@ func (p projLEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48512,6 +49092,7 @@ func (p projLEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48615,6 +49196,7 @@ func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -48718,6 +49300,7 @@ func (p projGTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48819,6 +49402,7 @@ func (p projGTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -48922,6 +49506,7 @@ func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -49025,6 +49610,7 @@ func (p projGEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49126,6 +49712,7 @@ func (p projGEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49229,6 +49816,7 @@ func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -49332,6 +49920,7 @@ func (p projEQInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49407,6 +49996,7 @@ func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49484,6 +50074,7 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -49561,6 +50152,7 @@ func (p projNEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49636,6 +50228,7 @@ func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49713,6 +50306,7 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -49790,6 +50384,7 @@ func (p projLTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49865,6 +50460,7 @@ func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -49942,6 +50538,7 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -50019,6 +50616,7 @@ func (p projLEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50094,6 +50692,7 @@ func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50171,6 +50770,7 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -50248,6 +50848,7 @@ func (p projGTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50323,6 +50924,7 @@ func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50400,6 +51002,7 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -50477,6 +51080,7 @@ func (p projGEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50552,6 +51156,7 @@ func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50629,6 +51234,7 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -50706,6 +51312,7 @@ func (p projEQInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50791,6 +51398,7 @@ func (p projEQInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -50878,6 +51486,7 @@ func (p projEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -50965,6 +51574,7 @@ func (p projNEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51050,6 +51660,7 @@ func (p projNEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51137,6 +51748,7 @@ func (p projNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -51224,6 +51836,7 @@ func (p projLTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51309,6 +51922,7 @@ func (p projLTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51396,6 +52010,7 @@ func (p projLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -51483,6 +52098,7 @@ func (p projLEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51568,6 +52184,7 @@ func (p projLEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51655,6 +52272,7 @@ func (p projLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -51742,6 +52360,7 @@ func (p projGTInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51827,6 +52446,7 @@ func (p projGTInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -51914,6 +52534,7 @@ func (p projGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -52001,6 +52622,7 @@ func (p projGEInt64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52086,6 +52708,7 @@ func (p projGEInt64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52173,6 +52796,7 @@ func (p projGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -52260,6 +52884,7 @@ func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52345,6 +52970,7 @@ func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52432,6 +53058,7 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -52519,6 +53146,7 @@ func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52604,6 +53232,7 @@ func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52691,6 +53320,7 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -52778,6 +53408,7 @@ func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52863,6 +53494,7 @@ func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -52950,6 +53582,7 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -53037,6 +53670,7 @@ func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53122,6 +53756,7 @@ func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53209,6 +53844,7 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -53296,6 +53932,7 @@ func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53381,6 +54018,7 @@ func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53468,6 +54106,7 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -53555,6 +54194,7 @@ func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53640,6 +54280,7 @@ func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53727,6 +54368,7 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -53814,6 +54456,7 @@ func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53899,6 +54542,7 @@ func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -53986,6 +54630,7 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -54073,6 +54718,7 @@ func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54158,6 +54804,7 @@ func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54245,6 +54892,7 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -54332,6 +54980,7 @@ func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54417,6 +55066,7 @@ func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54504,6 +55154,7 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -54591,6 +55242,7 @@ func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54676,6 +55328,7 @@ func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54763,6 +55416,7 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -54850,6 +55504,7 @@ func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -54935,6 +55590,7 @@ func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55022,6 +55678,7 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -55109,6 +55766,7 @@ func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55194,6 +55852,7 @@ func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55281,6 +55940,7 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -55368,6 +56028,7 @@ func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55435,6 +56096,7 @@ func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55504,6 +56166,7 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -55573,6 +56236,7 @@ func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55640,6 +56304,7 @@ func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55709,6 +56374,7 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -55778,6 +56444,7 @@ func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55859,6 +56526,7 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -55942,6 +56610,7 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -56025,6 +56694,7 @@ func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56098,6 +56768,7 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56173,6 +56844,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -56248,6 +56920,7 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56333,6 +57006,7 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56420,6 +57094,7 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -56507,6 +57182,7 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56592,6 +57268,7 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56679,6 +57356,7 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -56766,6 +57444,7 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56851,6 +57530,7 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -56938,6 +57618,7 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -57025,6 +57706,7 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57110,6 +57792,7 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57197,6 +57880,7 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -57284,6 +57968,7 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57369,6 +58054,7 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57456,6 +58142,7 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -57543,6 +58230,7 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57628,6 +58316,7 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57715,6 +58404,7 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -57802,6 +58492,7 @@ func (p projEQInt64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -57903,6 +58594,7 @@ func (p projEQInt64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58006,6 +58698,7 @@ func (p projEQInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -58109,6 +58802,7 @@ func (p projNEInt64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58210,6 +58904,7 @@ func (p projNEInt64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58313,6 +59008,7 @@ func (p projNEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -58416,6 +59112,7 @@ func (p projLTInt64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58517,6 +59214,7 @@ func (p projLTInt64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58620,6 +59318,7 @@ func (p projLTInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -58723,6 +59422,7 @@ func (p projLEInt64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58824,6 +59524,7 @@ func (p projLEInt64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -58927,6 +59628,7 @@ func (p projLEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -59030,6 +59732,7 @@ func (p projGTInt64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -59131,6 +59834,7 @@ func (p projGTInt64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -59234,6 +59938,7 @@ func (p projGTInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -59337,6 +60042,7 @@ func (p projGEInt64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -59438,6 +60144,7 @@ func (p projGEInt64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -59541,6 +60248,7 @@ func (p projGEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -59644,6 +60352,7 @@ func (p projEQInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -59745,6 +60454,7 @@ func (p projEQInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -59848,6 +60558,7 @@ func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -59951,6 +60662,7 @@ func (p projNEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60052,6 +60764,7 @@ func (p projNEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60155,6 +60868,7 @@ func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -60258,6 +60972,7 @@ func (p projLTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60359,6 +61074,7 @@ func (p projLTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60462,6 +61178,7 @@ func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -60565,6 +61282,7 @@ func (p projLEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60666,6 +61384,7 @@ func (p projLEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60769,6 +61488,7 @@ func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -60872,6 +61592,7 @@ func (p projGTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -60973,6 +61694,7 @@ func (p projGTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61076,6 +61798,7 @@ func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -61179,6 +61902,7 @@ func (p projGEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61280,6 +62004,7 @@ func (p projGEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61383,6 +62108,7 @@ func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Int64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -61486,6 +62212,7 @@ func (p projEQFloat32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61565,6 +62292,7 @@ func (p projEQFloat32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61646,6 +62374,7 @@ func (p projEQFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -61727,6 +62456,7 @@ func (p projNEFloat32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61806,6 +62536,7 @@ func (p projNEFloat32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -61887,6 +62618,7 @@ func (p projNEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -61968,6 +62700,7 @@ func (p projLTFloat32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62047,6 +62780,7 @@ func (p projLTFloat32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62128,6 +62862,7 @@ func (p projLTFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -62209,6 +62944,7 @@ func (p projLEFloat32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62288,6 +63024,7 @@ func (p projLEFloat32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62369,6 +63106,7 @@ func (p projLEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -62450,6 +63188,7 @@ func (p projGTFloat32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62529,6 +63268,7 @@ func (p projGTFloat32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62610,6 +63350,7 @@ func (p projGTFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -62691,6 +63432,7 @@ func (p projGEFloat32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62770,6 +63512,7 @@ func (p projGEFloat32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -62851,6 +63594,7 @@ func (p projGEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -62932,6 +63676,7 @@ func (p projEQFloat32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63033,6 +63778,7 @@ func (p projEQFloat32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63136,6 +63882,7 @@ func (p projEQFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -63239,6 +63986,7 @@ func (p projNEFloat32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63340,6 +64088,7 @@ func (p projNEFloat32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63443,6 +64192,7 @@ func (p projNEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -63546,6 +64296,7 @@ func (p projLTFloat32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63647,6 +64398,7 @@ func (p projLTFloat32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63750,6 +64502,7 @@ func (p projLTFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -63853,6 +64606,7 @@ func (p projLEFloat32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -63954,6 +64708,7 @@ func (p projLEFloat32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64057,6 +64812,7 @@ func (p projLEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -64160,6 +64916,7 @@ func (p projGTFloat32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64261,6 +65018,7 @@ func (p projGTFloat32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64364,6 +65122,7 @@ func (p projGTFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -64467,6 +65226,7 @@ func (p projGEFloat32Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64568,6 +65328,7 @@ func (p projGEFloat32ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64671,6 +65432,7 @@ func (p projGEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -64774,6 +65536,7 @@ func (p projEQFloat32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64875,6 +65638,7 @@ func (p projEQFloat32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -64978,6 +65742,7 @@ func (p projEQFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -65081,6 +65846,7 @@ func (p projNEFloat32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -65182,6 +65948,7 @@ func (p projNEFloat32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -65285,6 +66052,7 @@ func (p projNEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -65388,6 +66156,7 @@ func (p projLTFloat32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -65489,6 +66258,7 @@ func (p projLTFloat32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -65592,6 +66362,7 @@ func (p projLTFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -65695,6 +66466,7 @@ func (p projLEFloat32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -65796,6 +66568,7 @@ func (p projLEFloat32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -65899,6 +66672,7 @@ func (p projLEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -66002,6 +66776,7 @@ func (p projGTFloat32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -66103,6 +66878,7 @@ func (p projGTFloat32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -66206,6 +66982,7 @@ func (p projGTFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -66309,6 +67086,7 @@ func (p projGEFloat32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -66410,6 +67188,7 @@ func (p projGEFloat32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -66513,6 +67292,7 @@ func (p projGEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -66616,6 +67396,7 @@ func (p projEQFloat32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -66717,6 +67498,7 @@ func (p projEQFloat32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -66820,6 +67602,7 @@ func (p projEQFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -66923,6 +67706,7 @@ func (p projNEFloat32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67024,6 +67808,7 @@ func (p projNEFloat32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67127,6 +67912,7 @@ func (p projNEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -67230,6 +68016,7 @@ func (p projLTFloat32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67331,6 +68118,7 @@ func (p projLTFloat32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67434,6 +68222,7 @@ func (p projLTFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -67537,6 +68326,7 @@ func (p projLEFloat32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67638,6 +68428,7 @@ func (p projLEFloat32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67741,6 +68532,7 @@ func (p projLEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -67844,6 +68636,7 @@ func (p projGTFloat32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -67945,6 +68738,7 @@ func (p projGTFloat32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68048,6 +68842,7 @@ func (p projGTFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -68151,6 +68946,7 @@ func (p projGEFloat32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68252,6 +69048,7 @@ func (p projGEFloat32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68355,6 +69152,7 @@ func (p projGEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -68458,6 +69256,7 @@ func (p projEQFloat32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68559,6 +69358,7 @@ func (p projEQFloat32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68662,6 +69462,7 @@ func (p projEQFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -68765,6 +69566,7 @@ func (p projNEFloat32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68866,6 +69668,7 @@ func (p projNEFloat32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -68969,6 +69772,7 @@ func (p projNEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -69072,6 +69876,7 @@ func (p projLTFloat32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -69173,6 +69978,7 @@ func (p projLTFloat32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -69276,6 +70082,7 @@ func (p projLTFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -69379,6 +70186,7 @@ func (p projLEFloat32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -69480,6 +70288,7 @@ func (p projLEFloat32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -69583,6 +70392,7 @@ func (p projLEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -69686,6 +70496,7 @@ func (p projGTFloat32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -69787,6 +70598,7 @@ func (p projGTFloat32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -69890,6 +70702,7 @@ func (p projGTFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -69993,6 +70806,7 @@ func (p projGEFloat32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -70094,6 +70908,7 @@ func (p projGEFloat32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -70197,6 +71012,7 @@ func (p projGEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -70300,6 +71116,7 @@ func (p projPlusFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg + p.constArg
@@ -70351,6 +71168,7 @@ func (p projPlusFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg + arg
@@ -70404,6 +71222,7 @@ func (p projPlusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -70457,6 +71276,7 @@ func (p projMinusFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg - p.constArg
@@ -70508,6 +71328,7 @@ func (p projMinusFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg - arg
@@ -70561,6 +71382,7 @@ func (p projMinusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -70614,6 +71436,7 @@ func (p projMultFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg * p.constArg
@@ -70665,6 +71488,7 @@ func (p projMultFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg * arg
@@ -70718,6 +71542,7 @@ func (p projMultFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -70771,6 +71596,7 @@ func (p projDivFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg / p.constArg
@@ -70822,6 +71648,7 @@ func (p projDivFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg / arg
@@ -70875,6 +71702,7 @@ func (p projDivFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -70928,6 +71756,7 @@ func (p projEQFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71029,6 +71858,7 @@ func (p projEQFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71132,6 +71962,7 @@ func (p projEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -71235,6 +72066,7 @@ func (p projNEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71336,6 +72168,7 @@ func (p projNEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71439,6 +72272,7 @@ func (p projNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -71542,6 +72376,7 @@ func (p projLTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71643,6 +72478,7 @@ func (p projLTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71746,6 +72582,7 @@ func (p projLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -71849,6 +72686,7 @@ func (p projLEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -71950,6 +72788,7 @@ func (p projLEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72053,6 +72892,7 @@ func (p projLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -72156,6 +72996,7 @@ func (p projGTFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72257,6 +73098,7 @@ func (p projGTFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72360,6 +73202,7 @@ func (p projGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -72463,6 +73306,7 @@ func (p projGEFloat32Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72564,6 +73408,7 @@ func (p projGEFloat32ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72667,6 +73512,7 @@ func (p projGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -72770,6 +73616,7 @@ func (p projEQFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72871,6 +73718,7 @@ func (p projEQFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -72974,6 +73822,7 @@ func (p projEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -73077,6 +73926,7 @@ func (p projNEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -73178,6 +74028,7 @@ func (p projNEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -73281,6 +74132,7 @@ func (p projNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -73384,6 +74236,7 @@ func (p projLTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -73485,6 +74338,7 @@ func (p projLTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -73588,6 +74442,7 @@ func (p projLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -73691,6 +74546,7 @@ func (p projLEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -73792,6 +74648,7 @@ func (p projLEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -73895,6 +74752,7 @@ func (p projLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -73998,6 +74856,7 @@ func (p projGTFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74099,6 +74958,7 @@ func (p projGTFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74202,6 +75062,7 @@ func (p projGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -74305,6 +75166,7 @@ func (p projGEFloat32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74406,6 +75268,7 @@ func (p projGEFloat32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74509,6 +75372,7 @@ func (p projGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float32()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -74612,6 +75476,7 @@ func (p projEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74691,6 +75556,7 @@ func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74772,6 +75638,7 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -74853,6 +75720,7 @@ func (p projNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -74932,6 +75800,7 @@ func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75013,6 +75882,7 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -75094,6 +75964,7 @@ func (p projLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75173,6 +76044,7 @@ func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75254,6 +76126,7 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -75335,6 +76208,7 @@ func (p projLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75414,6 +76288,7 @@ func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75495,6 +76370,7 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -75576,6 +76452,7 @@ func (p projGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75655,6 +76532,7 @@ func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75736,6 +76614,7 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -75817,6 +76696,7 @@ func (p projGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75896,6 +76776,7 @@ func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -75977,6 +76858,7 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Decimal()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -76058,6 +76940,7 @@ func (p projEQFloat64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -76159,6 +77042,7 @@ func (p projEQFloat64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -76262,6 +77146,7 @@ func (p projEQFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -76365,6 +77250,7 @@ func (p projNEFloat64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -76466,6 +77352,7 @@ func (p projNEFloat64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -76569,6 +77456,7 @@ func (p projNEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -76672,6 +77560,7 @@ func (p projLTFloat64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -76773,6 +77662,7 @@ func (p projLTFloat64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -76876,6 +77766,7 @@ func (p projLTFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -76979,6 +77870,7 @@ func (p projLEFloat64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -77080,6 +77972,7 @@ func (p projLEFloat64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -77183,6 +78076,7 @@ func (p projLEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -77286,6 +78180,7 @@ func (p projGTFloat64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -77387,6 +78282,7 @@ func (p projGTFloat64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -77490,6 +78386,7 @@ func (p projGTFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -77593,6 +78490,7 @@ func (p projGEFloat64Int8ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -77694,6 +78592,7 @@ func (p projGEFloat64ConstInt8Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -77797,6 +78696,7 @@ func (p projGEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int8()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -77900,6 +78800,7 @@ func (p projEQFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78001,6 +78902,7 @@ func (p projEQFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78104,6 +79006,7 @@ func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -78207,6 +79110,7 @@ func (p projNEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78308,6 +79212,7 @@ func (p projNEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78411,6 +79316,7 @@ func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -78514,6 +79420,7 @@ func (p projLTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78615,6 +79522,7 @@ func (p projLTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78718,6 +79626,7 @@ func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -78821,6 +79730,7 @@ func (p projLEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -78922,6 +79832,7 @@ func (p projLEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79025,6 +79936,7 @@ func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -79128,6 +80040,7 @@ func (p projGTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79229,6 +80142,7 @@ func (p projGTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79332,6 +80246,7 @@ func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -79435,6 +80350,7 @@ func (p projGEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79536,6 +80452,7 @@ func (p projGEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79639,6 +80556,7 @@ func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int16()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -79742,6 +80660,7 @@ func (p projEQFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79843,6 +80762,7 @@ func (p projEQFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -79946,6 +80866,7 @@ func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -80049,6 +80970,7 @@ func (p projNEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -80150,6 +81072,7 @@ func (p projNEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -80253,6 +81176,7 @@ func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -80356,6 +81280,7 @@ func (p projLTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -80457,6 +81382,7 @@ func (p projLTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -80560,6 +81486,7 @@ func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -80663,6 +81590,7 @@ func (p projLEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -80764,6 +81692,7 @@ func (p projLEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -80867,6 +81796,7 @@ func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -80970,6 +81900,7 @@ func (p projGTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81071,6 +82002,7 @@ func (p projGTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81174,6 +82106,7 @@ func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -81277,6 +82210,7 @@ func (p projGEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81378,6 +82312,7 @@ func (p projGEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81481,6 +82416,7 @@ func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -81584,6 +82520,7 @@ func (p projEQFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81685,6 +82622,7 @@ func (p projEQFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81788,6 +82726,7 @@ func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -81891,6 +82830,7 @@ func (p projNEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -81992,6 +82932,7 @@ func (p projNEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -82095,6 +83036,7 @@ func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -82198,6 +83140,7 @@ func (p projLTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -82299,6 +83242,7 @@ func (p projLTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -82402,6 +83346,7 @@ func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -82505,6 +83450,7 @@ func (p projLEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -82606,6 +83552,7 @@ func (p projLEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -82709,6 +83656,7 @@ func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -82812,6 +83760,7 @@ func (p projGTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -82913,6 +83862,7 @@ func (p projGTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83016,6 +83966,7 @@ func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -83119,6 +84070,7 @@ func (p projGEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83220,6 +84172,7 @@ func (p projGEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83323,6 +84276,7 @@ func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Int64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -83426,6 +84380,7 @@ func (p projEQFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83527,6 +84482,7 @@ func (p projEQFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83630,6 +84586,7 @@ func (p projEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -83733,6 +84690,7 @@ func (p projNEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83834,6 +84792,7 @@ func (p projNEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -83937,6 +84896,7 @@ func (p projNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -84040,6 +85000,7 @@ func (p projLTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -84141,6 +85102,7 @@ func (p projLTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -84244,6 +85206,7 @@ func (p projLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -84347,6 +85310,7 @@ func (p projLEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -84448,6 +85412,7 @@ func (p projLEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -84551,6 +85516,7 @@ func (p projLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -84654,6 +85620,7 @@ func (p projGTFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -84755,6 +85722,7 @@ func (p projGTFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -84858,6 +85826,7 @@ func (p projGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -84961,6 +85930,7 @@ func (p projGEFloat64Float32ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -85062,6 +86032,7 @@ func (p projGEFloat64ConstFloat32Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -85165,6 +86136,7 @@ func (p projGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float32()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -85268,6 +86240,7 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg + p.constArg
@@ -85319,6 +86292,7 @@ func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg + arg
@@ -85372,6 +86346,7 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -85425,6 +86400,7 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg - p.constArg
@@ -85476,6 +86452,7 @@ func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch 
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg - arg
@@ -85529,6 +86506,7 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -85582,6 +86560,7 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg * p.constArg
@@ -85633,6 +86612,7 @@ func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg * arg
@@ -85686,6 +86666,7 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -85739,6 +86720,7 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = arg / p.constArg
@@ -85790,6 +86772,7 @@ func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 			projCol[i] = p.constArg / arg
@@ -85843,6 +86826,7 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -85896,6 +86880,7 @@ func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -85997,6 +86982,7 @@ func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -86100,6 +87086,7 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -86203,6 +87190,7 @@ func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -86304,6 +87292,7 @@ func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -86407,6 +87396,7 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -86510,6 +87500,7 @@ func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -86611,6 +87602,7 @@ func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -86714,6 +87706,7 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -86817,6 +87810,7 @@ func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -86918,6 +87912,7 @@ func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -87021,6 +88016,7 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -87124,6 +88120,7 @@ func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -87225,6 +88222,7 @@ func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -87328,6 +88326,7 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
@@ -87431,6 +88430,7 @@ func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -87532,6 +88532,7 @@ func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(p.outputIdx)
 	projCol := projVec.Bool()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
 
@@ -87635,6 +88636,7 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	col1 := vec1.Float64()
 	col2 := vec2.Float64()
 	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
