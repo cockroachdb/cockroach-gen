@@ -8855,6 +8855,63 @@ func (e *JsonSomeExistsExpr) DataType() *types.T {
 	return types.Bool
 }
 
+type OverlapsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &OverlapsExpr{}
+
+func (e *OverlapsExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *OverlapsExpr) Op() opt.Operator {
+	return opt.OverlapsOp
+}
+
+func (e *OverlapsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *OverlapsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OverlapsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *OverlapsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *OverlapsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *OverlapsExpr) DataType() *types.T {
+	return types.Bool
+}
+
 // AnyScalarExpr is the form of ANY which refers to an ANY operation on a
 // tuple or array, as opposed to Any which operates on a subquery.
 type AnyScalarExpr struct {
@@ -16457,6 +16514,24 @@ func (m *Memo) MemoizeJsonSomeExists(
 	return interned
 }
 
+func (m *Memo) MemoizeOverlaps(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *OverlapsExpr {
+	const size = int64(unsafe.Sizeof(OverlapsExpr{}))
+	e := &OverlapsExpr{
+		Left:  left,
+		Right: right,
+		id:    m.NextID(),
+	}
+	interned := m.interner.InternOverlaps(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeAnyScalar(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -18901,6 +18976,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternJsonAllExists(t)
 	case *JsonSomeExistsExpr:
 		return in.InternJsonSomeExists(t)
+	case *OverlapsExpr:
+		return in.InternOverlaps(t)
 	case *AnyScalarExpr:
 		return in.InternAnyScalar(t)
 	case *BitandExpr:
@@ -21111,6 +21188,26 @@ func (in *interner) InternJsonSomeExists(val *JsonSomeExistsExpr) *JsonSomeExist
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*JsonSomeExistsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternOverlaps(val *OverlapsExpr) *OverlapsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.OverlapsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*OverlapsExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
 				return existing

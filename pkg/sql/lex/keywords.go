@@ -20,6 +20,7 @@ var KeywordsCategories = map[string]string{
 	"asc":                       "R",
 	"asymmetric":                "R",
 	"at":                        "U",
+	"authorization":             "U",
 	"automatic":                 "U",
 	"backup":                    "U",
 	"begin":                     "U",
@@ -421,6 +422,7 @@ var KeywordNames = []string{
 	"asc",
 	"asymmetric",
 	"at",
+	"authorization",
 	"automatic",
 	"backup",
 	"begin",
@@ -844,6 +846,8 @@ func GetKeywordID(k string) int32 {
 		return ASYMMETRIC
 	case "at":
 		return AT
+	case "authorization":
+		return AUTHORIZATION
 	case "automatic":
 		return AUTOMATIC
 	case "backup":
