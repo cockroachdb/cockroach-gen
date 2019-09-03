@@ -2687,7 +2687,7 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
+			if _, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2697,7 +2697,7 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
+			if _, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2743,7 +2743,7 @@ func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, &arg); err != nil {
+			if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, &arg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2753,7 +2753,7 @@ func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, &arg); err != nil {
+			if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, &arg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2802,7 +2802,7 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
+			if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2814,7 +2814,7 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
+			if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2859,7 +2859,7 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
+			if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2869,7 +2869,7 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
+			if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2915,7 +2915,7 @@ func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch 
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, &arg); err != nil {
+			if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, &arg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2925,7 +2925,7 @@ func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch 
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, &arg); err != nil {
+			if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, &arg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2974,7 +2974,7 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
+			if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -2986,7 +2986,7 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
+			if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -3031,7 +3031,7 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
+			if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -3041,7 +3041,7 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
+			if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -3087,7 +3087,7 @@ func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		sel = sel[:n]
 		for _, i := range sel {
 			arg := col[int(i)]
-			if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, &arg); err != nil {
+			if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, &arg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -3097,7 +3097,7 @@ func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		_ = projCol[colLen-1]
 		for i := range col {
 			arg := col[i]
-			if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, &arg); err != nil {
+			if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, &arg); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -3146,7 +3146,7 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for _, i := range sel {
 			arg1 := col1[int(i)]
 			arg2 := col2[int(i)]
-			if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
+			if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -3158,7 +3158,7 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
-			if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
+			if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
 				execerror.NonVectorizedPanic(err)
 			}
 		}
@@ -4604,7 +4604,7 @@ func (p projPlusDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4621,7 +4621,7 @@ func (p projPlusDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4674,7 +4674,7 @@ func (p projPlusDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4691,7 +4691,7 @@ func (p projPlusDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4747,7 +4747,7 @@ func (p projPlusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4766,7 +4766,7 @@ func (p projPlusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4818,7 +4818,7 @@ func (p projMinusDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4835,7 +4835,7 @@ func (p projMinusDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4888,7 +4888,7 @@ func (p projMinusDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4905,7 +4905,7 @@ func (p projMinusDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4961,7 +4961,7 @@ func (p projMinusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -4980,7 +4980,7 @@ func (p projMinusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -5032,7 +5032,7 @@ func (p projMultDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -5049,7 +5049,7 @@ func (p projMultDecimalInt8ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -5102,7 +5102,7 @@ func (p projMultDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -5119,7 +5119,7 @@ func (p projMultDecimalConstInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -5175,7 +5175,7 @@ func (p projMultDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -5194,7 +5194,7 @@ func (p projMultDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -6876,7 +6876,7 @@ func (p projPlusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -6893,7 +6893,7 @@ func (p projPlusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -6946,7 +6946,7 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -6963,7 +6963,7 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7019,7 +7019,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7038,7 +7038,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7090,7 +7090,7 @@ func (p projMinusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7107,7 +7107,7 @@ func (p projMinusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7160,7 +7160,7 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7177,7 +7177,7 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7233,7 +7233,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7252,7 +7252,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7304,7 +7304,7 @@ func (p projMultDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7321,7 +7321,7 @@ func (p projMultDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7374,7 +7374,7 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7391,7 +7391,7 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7447,7 +7447,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -7466,7 +7466,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9148,7 +9148,7 @@ func (p projPlusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9165,7 +9165,7 @@ func (p projPlusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9218,7 +9218,7 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9235,7 +9235,7 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9291,7 +9291,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9310,7 +9310,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9362,7 +9362,7 @@ func (p projMinusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9379,7 +9379,7 @@ func (p projMinusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9432,7 +9432,7 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9449,7 +9449,7 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9505,7 +9505,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9524,7 +9524,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9576,7 +9576,7 @@ func (p projMultDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9593,7 +9593,7 @@ func (p projMultDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9646,7 +9646,7 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9663,7 +9663,7 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9719,7 +9719,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -9738,7 +9738,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11420,7 +11420,7 @@ func (p projPlusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11437,7 +11437,7 @@ func (p projPlusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11490,7 +11490,7 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11507,7 +11507,7 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11563,7 +11563,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11582,7 +11582,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11634,7 +11634,7 @@ func (p projMinusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11651,7 +11651,7 @@ func (p projMinusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11704,7 +11704,7 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11721,7 +11721,7 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11777,7 +11777,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11796,7 +11796,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11848,7 +11848,7 @@ func (p projMultDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11865,7 +11865,7 @@ func (p projMultDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11918,7 +11918,7 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11935,7 +11935,7 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -11991,7 +11991,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -12010,7 +12010,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg2), 0)
-				if _, err := tree.DecimalCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
+				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
@@ -16620,7 +16620,7 @@ func (p projPlusInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16639,7 +16639,7 @@ func (p projPlusInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16694,7 +16694,7 @@ func (p projPlusInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16713,7 +16713,7 @@ func (p projPlusInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16771,7 +16771,7 @@ func (p projPlusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16792,7 +16792,7 @@ func (p projPlusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16846,7 +16846,7 @@ func (p projMinusInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16865,7 +16865,7 @@ func (p projMinusInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16920,7 +16920,7 @@ func (p projMinusInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16939,7 +16939,7 @@ func (p projMinusInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -16997,7 +16997,7 @@ func (p projMinusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17018,7 +17018,7 @@ func (p projMinusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17072,7 +17072,7 @@ func (p projMultInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17091,7 +17091,7 @@ func (p projMultInt8DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17146,7 +17146,7 @@ func (p projMultInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17165,7 +17165,7 @@ func (p projMultInt8ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17223,7 +17223,7 @@ func (p projMultInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -17244,7 +17244,7 @@ func (p projMultInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32534,7 +32534,7 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32553,7 +32553,7 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32608,7 +32608,7 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32627,7 +32627,7 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32685,7 +32685,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32706,7 +32706,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32760,7 +32760,7 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32779,7 +32779,7 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32834,7 +32834,7 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32853,7 +32853,7 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32911,7 +32911,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32932,7 +32932,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -32986,7 +32986,7 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -33005,7 +33005,7 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -33060,7 +33060,7 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -33079,7 +33079,7 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -33137,7 +33137,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -33158,7 +33158,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48448,7 +48448,7 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48467,7 +48467,7 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48522,7 +48522,7 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48541,7 +48541,7 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48599,7 +48599,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48620,7 +48620,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48674,7 +48674,7 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48693,7 +48693,7 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48748,7 +48748,7 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48767,7 +48767,7 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48825,7 +48825,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48846,7 +48846,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48900,7 +48900,7 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48919,7 +48919,7 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48974,7 +48974,7 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -48993,7 +48993,7 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -49051,7 +49051,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -49072,7 +49072,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64362,7 +64362,7 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64381,7 +64381,7 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64436,7 +64436,7 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64455,7 +64455,7 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64513,7 +64513,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64534,7 +64534,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Add(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64588,7 +64588,7 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64607,7 +64607,7 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64662,7 +64662,7 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64681,7 +64681,7 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64739,7 +64739,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64760,7 +64760,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Sub(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64814,7 +64814,7 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64833,7 +64833,7 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &p.constArg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64888,7 +64888,7 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64907,7 +64907,7 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(p.constArg), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64965,7 +64965,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)
@@ -64986,7 +64986,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				tmpDec := &apd.Decimal{}
 				tmpDec.SetFinite(int64(arg1), 0)
 
-				_, err := tree.DecimalCtx.Mul(&projCol[i], tmpDec, &arg2)
+				_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
 
 				if err != nil {
 					execerror.NonVectorizedPanic(err)

@@ -18,7 +18,7 @@ func performPlusDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -33,7 +33,7 @@ func performMinusDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -48,7 +48,7 @@ func performMultDecimalInt8(a apd.Decimal, b int8) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -82,7 +82,7 @@ func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -97,7 +97,7 @@ func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -112,7 +112,7 @@ func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -146,7 +146,7 @@ func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -161,7 +161,7 @@ func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -176,7 +176,7 @@ func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -210,7 +210,7 @@ func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Add(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -225,7 +225,7 @@ func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Sub(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -240,7 +240,7 @@ func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Mul(&r, &a, tmpDec); err != nil {
+		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			execerror.NonVectorizedPanic(err)
 		}
 	}
@@ -269,7 +269,7 @@ func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 
 func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
-	if _, err := tree.DecimalCtx.Add(&r, &a, &b); err != nil {
+	if _, err := tree.ExactCtx.Add(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
 	return r
@@ -277,7 +277,7 @@ func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 
 func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
-	if _, err := tree.DecimalCtx.Sub(&r, &a, &b); err != nil {
+	if _, err := tree.ExactCtx.Sub(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
 	return r
@@ -285,7 +285,7 @@ func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 
 func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
-	if _, err := tree.DecimalCtx.Mul(&r, &a, &b); err != nil {
+	if _, err := tree.ExactCtx.Mul(&r, &a, &b); err != nil {
 		execerror.NonVectorizedPanic(err)
 	}
 	return r
@@ -582,7 +582,7 @@ func performPlusInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Add(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -599,7 +599,7 @@ func performMinusInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Sub(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -616,7 +616,7 @@ func performMultInt8Decimal(a int8, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Mul(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -921,7 +921,7 @@ func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Add(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -938,7 +938,7 @@ func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Sub(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -955,7 +955,7 @@ func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Mul(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -1260,7 +1260,7 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Add(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -1277,7 +1277,7 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Sub(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -1294,7 +1294,7 @@ func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Mul(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -1599,7 +1599,7 @@ func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Add(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -1616,7 +1616,7 @@ func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Sub(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)
@@ -1633,7 +1633,7 @@ func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		tmpDec := &apd.Decimal{}
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.DecimalCtx.Mul(&r, tmpDec, &b)
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
 			execerror.NonVectorizedPanic(err)

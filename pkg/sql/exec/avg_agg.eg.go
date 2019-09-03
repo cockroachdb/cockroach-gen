@@ -140,7 +140,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					if _, err := tree.DecimalCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
+					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 					a.scratch.curCount++
@@ -178,7 +178,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
 				if !isNull {
-					if _, err := tree.DecimalCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
+					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 					a.scratch.curCount++
@@ -216,7 +216,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					if _, err := tree.DecimalCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
+					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 					a.scratch.curCount++
@@ -252,7 +252,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					if _, err := tree.DecimalCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
+					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 					a.scratch.curCount++
