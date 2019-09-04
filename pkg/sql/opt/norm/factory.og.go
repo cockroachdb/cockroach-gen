@@ -7225,9 +7225,14 @@ func (_f *Factory) ConstructDistinctOn(
 ) memo.RelExpr {
 	// [EliminateDistinct]
 	{
+		aggs := aggregations
 		if _f.funcs.GroupingColsAreKey(groupingPrivate, input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-				_expr := input
+				_expr := _f.ConstructProject(
+					input,
+					memo.EmptyProjectionsExpr,
+					_f.funcs.GroupingOutputCols(groupingPrivate, aggs),
+				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
 				}
