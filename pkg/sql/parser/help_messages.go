@@ -265,7 +265,7 @@ IMPORT TABLE <tablename>
 
 Formats:
    CSV
-   MYSQLOUTFILE
+   DELIMITED
    MYSQLDUMP
    PGCOPY
    PGDUMP
