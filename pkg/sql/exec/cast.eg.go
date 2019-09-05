@@ -472,11 +472,12 @@ func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 					r = v
 					projCol[int(i)] = r
@@ -493,8 +494,9 @@ func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 				r = v
 				projCol[int(i)] = r
@@ -556,11 +558,12 @@ func (c *castOpBoolInt8) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int8
 
 					r = 0
@@ -587,8 +590,9 @@ func (c *castOpBoolInt8) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int8
 
 				r = 0
@@ -655,11 +659,12 @@ func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int16
 
 					r = 0
@@ -686,8 +691,9 @@ func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int16
 
 				r = 0
@@ -754,11 +760,12 @@ func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int32
 
 					r = 0
@@ -785,8 +792,9 @@ func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int32
 
 				r = 0
@@ -853,11 +861,12 @@ func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int64
 
 					r = 0
@@ -884,8 +893,9 @@ func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int64
 
 				r = 0
@@ -952,11 +962,12 @@ func (c *castOpBoolFloat32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float32
 
 					r = 0
@@ -983,8 +994,9 @@ func (c *castOpBoolFloat32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float32
 
 				r = 0
@@ -1051,11 +1063,12 @@ func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float64
 
 					r = 0
@@ -1082,8 +1095,9 @@ func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float64
 
 				r = 0
@@ -1147,11 +1161,12 @@ func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v.Sign() != 0
@@ -1172,8 +1187,9 @@ func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v.Sign() != 0
@@ -1232,11 +1248,12 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 					r = v
 					projCol[int(i)] = r
@@ -1253,8 +1270,9 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 				r = v
 				projCol[int(i)] = r
@@ -1313,11 +1331,12 @@ func (c *castOpInt8Bool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v != 0
@@ -1338,8 +1357,9 @@ func (c *castOpInt8Bool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v != 0
@@ -1400,11 +1420,12 @@ func (c *castOpInt8Decimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 
 					r = *apd.New(int64(v), 0)
@@ -1425,8 +1446,9 @@ func (c *castOpInt8Decimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 
 				r = *apd.New(int64(v), 0)
@@ -1485,11 +1507,12 @@ func (c *castOpInt8Int8) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int8
 					r = v
 					projCol[int(i)] = r
@@ -1506,8 +1529,9 @@ func (c *castOpInt8Int8) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int8
 				r = v
 				projCol[int(i)] = r
@@ -1566,11 +1590,12 @@ func (c *castOpInt8Float32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float32
 
 					r = float32(v)
@@ -1591,8 +1616,9 @@ func (c *castOpInt8Float32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float32
 
 				r = float32(v)
@@ -1653,11 +1679,12 @@ func (c *castOpInt8Float64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float64
 
 					r = float64(v)
@@ -1678,8 +1705,9 @@ func (c *castOpInt8Float64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float64
 
 				r = float64(v)
@@ -1740,11 +1768,12 @@ func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v != 0
@@ -1765,8 +1794,9 @@ func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v != 0
@@ -1827,11 +1857,12 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 
 					r = *apd.New(int64(v), 0)
@@ -1852,8 +1883,9 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 
 				r = *apd.New(int64(v), 0)
@@ -1912,11 +1944,12 @@ func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int16
 					r = v
 					projCol[int(i)] = r
@@ -1933,8 +1966,9 @@ func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int16
 				r = v
 				projCol[int(i)] = r
@@ -1993,11 +2027,12 @@ func (c *castOpInt16Float32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float32
 
 					r = float32(v)
@@ -2018,8 +2053,9 @@ func (c *castOpInt16Float32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float32
 
 				r = float32(v)
@@ -2080,11 +2116,12 @@ func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float64
 
 					r = float64(v)
@@ -2105,8 +2142,9 @@ func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float64
 
 				r = float64(v)
@@ -2167,11 +2205,12 @@ func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v != 0
@@ -2192,8 +2231,9 @@ func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v != 0
@@ -2254,11 +2294,12 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 
 					r = *apd.New(int64(v), 0)
@@ -2279,8 +2320,9 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 
 				r = *apd.New(int64(v), 0)
@@ -2339,11 +2381,12 @@ func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int32
 					r = v
 					projCol[int(i)] = r
@@ -2360,8 +2403,9 @@ func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int32
 				r = v
 				projCol[int(i)] = r
@@ -2420,11 +2464,12 @@ func (c *castOpInt32Float32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float32
 
 					r = float32(v)
@@ -2445,8 +2490,9 @@ func (c *castOpInt32Float32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float32
 
 				r = float32(v)
@@ -2507,11 +2553,12 @@ func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float64
 
 					r = float64(v)
@@ -2532,8 +2579,9 @@ func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float64
 
 				r = float64(v)
@@ -2594,11 +2642,12 @@ func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v != 0
@@ -2619,8 +2668,9 @@ func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v != 0
@@ -2681,11 +2731,12 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 
 					r = *apd.New(int64(v), 0)
@@ -2706,8 +2757,9 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 
 				r = *apd.New(int64(v), 0)
@@ -2766,11 +2818,12 @@ func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int64
 					r = v
 					projCol[int(i)] = r
@@ -2787,8 +2840,9 @@ func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int64
 				r = v
 				projCol[int(i)] = r
@@ -2847,11 +2901,12 @@ func (c *castOpInt64Float32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float32
 
 					r = float32(v)
@@ -2872,8 +2927,9 @@ func (c *castOpInt64Float32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float32
 
 				r = float32(v)
@@ -2934,11 +2990,12 @@ func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float64
 
 					r = float64(v)
@@ -2959,8 +3016,9 @@ func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float64
 
 				r = float64(v)
@@ -3021,11 +3079,12 @@ func (c *castOpFloat32Bool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v != 0
@@ -3046,8 +3105,9 @@ func (c *castOpFloat32Bool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v != 0
@@ -3115,11 +3175,12 @@ func (c *castOpFloat32Decimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 
 					{
@@ -3154,8 +3215,9 @@ func (c *castOpFloat32Decimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 
 				{
@@ -3226,11 +3288,12 @@ func (c *castOpFloat32Int8) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int8
 
 					if math.IsNaN(float64(v)) || v <= float32(math.MinInt8) || v >= float32(math.MaxInt8) {
@@ -3257,8 +3320,9 @@ func (c *castOpFloat32Int8) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int8
 
 				if math.IsNaN(float64(v)) || v <= float32(math.MinInt8) || v >= float32(math.MaxInt8) {
@@ -3325,11 +3389,12 @@ func (c *castOpFloat32Int16) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int16
 
 					if math.IsNaN(float64(v)) || v <= float32(math.MinInt16) || v >= float32(math.MaxInt16) {
@@ -3356,8 +3421,9 @@ func (c *castOpFloat32Int16) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int16
 
 				if math.IsNaN(float64(v)) || v <= float32(math.MinInt16) || v >= float32(math.MaxInt16) {
@@ -3424,11 +3490,12 @@ func (c *castOpFloat32Int32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int32
 
 					if math.IsNaN(float64(v)) || v <= float32(math.MinInt32) || v >= float32(math.MaxInt32) {
@@ -3455,8 +3522,9 @@ func (c *castOpFloat32Int32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int32
 
 				if math.IsNaN(float64(v)) || v <= float32(math.MinInt32) || v >= float32(math.MaxInt32) {
@@ -3523,11 +3591,12 @@ func (c *castOpFloat32Int64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int64
 
 					if math.IsNaN(float64(v)) || v <= float32(math.MinInt64) || v >= float32(math.MaxInt64) {
@@ -3554,8 +3623,9 @@ func (c *castOpFloat32Int64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int64
 
 				if math.IsNaN(float64(v)) || v <= float32(math.MinInt64) || v >= float32(math.MaxInt64) {
@@ -3617,11 +3687,12 @@ func (c *castOpFloat32Float32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float32
 					r = v
 					projCol[int(i)] = r
@@ -3638,8 +3709,9 @@ func (c *castOpFloat32Float32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float32
 				r = v
 				projCol[int(i)] = r
@@ -3698,11 +3770,12 @@ func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r bool
 
 					r = v != 0
@@ -3723,8 +3796,9 @@ func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r bool
 
 				r = v != 0
@@ -3792,11 +3866,12 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r apd.Decimal
 
 					{
@@ -3831,8 +3906,9 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r apd.Decimal
 
 				{
@@ -3903,11 +3979,12 @@ func (c *castOpFloat64Int8) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int8
 
 					if math.IsNaN(float64(v)) || v <= float64(math.MinInt8) || v >= float64(math.MaxInt8) {
@@ -3934,8 +4011,9 @@ func (c *castOpFloat64Int8) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int8
 
 				if math.IsNaN(float64(v)) || v <= float64(math.MinInt8) || v >= float64(math.MaxInt8) {
@@ -4002,11 +4080,12 @@ func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int16
 
 					if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
@@ -4033,8 +4112,9 @@ func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int16
 
 				if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
@@ -4101,11 +4181,12 @@ func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int32
 
 					if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
@@ -4132,8 +4213,9 @@ func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int32
 
 				if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
@@ -4200,11 +4282,12 @@ func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r int64
 
 					if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
@@ -4231,8 +4314,9 @@ func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r int64
 
 				if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
@@ -4294,11 +4378,12 @@ func (c *castOpFloat64Float64) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
 				if vecNulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[i]
+					v := col[int(i)]
 					var r float64
 					r = v
 					projCol[int(i)] = r
@@ -4315,8 +4400,9 @@ func (c *castOpFloat64Float64) Next(ctx context.Context) coldata.Batch {
 				projCol[int(i)] = r
 			}
 		} else {
+			col = col[0:int(n)]
 			for i := range col {
-				v := col[i]
+				v := col[int(i)]
 				var r float64
 				r = v
 				projCol[int(i)] = r
