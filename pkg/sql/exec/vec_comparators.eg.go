@@ -145,7 +145,7 @@ func (c *DecimalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
 		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		c.vecs[dstVecIdx][int(dstIdx)].Set(&v)
 	}
 }
 

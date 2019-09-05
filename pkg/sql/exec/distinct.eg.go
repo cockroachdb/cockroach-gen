@@ -623,7 +623,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				outputIdx := checkIdx
 
 				null := nulls.NullAt(uint16(checkIdx))
-				v := append([]byte(nil), col.Get(int(checkIdx))...)
+				v := col.Get(int(checkIdx))
 				if null != lastValNull {
 					// Either the current value is null and the previous was not or vice-versa.
 					outputCol[outputIdx] = true
@@ -639,14 +639,14 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
-				lastVal = v
+				lastVal = append(lastVal[:0], v...)
 				lastValNull = null
 			}
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
 
-				v := append([]byte(nil), col.Get(int(checkIdx))...)
+				v := col.Get(int(checkIdx))
 				var unique bool
 
 				{
@@ -656,7 +656,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
+				lastVal = append(lastVal[:0], v...)
 			}
 		}
 	} else {
@@ -669,7 +669,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				outputIdx := checkIdx
 
 				null := nulls.NullAt(uint16(checkIdx))
-				v := append([]byte(nil), col.Get(int(checkIdx))...)
+				v := col.Get(int(checkIdx))
 				if null != lastValNull {
 					// Either the current value is null and the previous was not or vice-versa.
 					outputCol[outputIdx] = true
@@ -685,14 +685,14 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
-				lastVal = v
+				lastVal = append(lastVal[:0], v...)
 				lastValNull = null
 			}
 		} else {
 			for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
 				outputIdx := checkIdx
 
-				v := append([]byte(nil), col.Get(int(checkIdx))...)
+				v := col.Get(int(checkIdx))
 				var unique bool
 
 				{
@@ -702,7 +702,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
+				lastVal = append(lastVal[:0], v...)
 			}
 		}
 	}
@@ -737,7 +737,7 @@ func (p partitionerBytes) partitionWithOrder(
 		for outputIdx, checkIdx := range order {
 
 			null := nulls.NullAt(uint16(checkIdx))
-			v := append([]byte(nil), col.Get(int(checkIdx))...)
+			v := col.Get(int(checkIdx))
 			if null != lastValNull {
 				// Either the current value is null and the previous was not or vice-versa.
 				outputCol[outputIdx] = true
@@ -753,13 +753,13 @@ func (p partitionerBytes) partitionWithOrder(
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
-			lastVal = v
+			lastVal = append(lastVal[:0], v...)
 			lastValNull = null
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
 
-			v := append([]byte(nil), col.Get(int(checkIdx))...)
+			v := col.Get(int(checkIdx))
 			var unique bool
 
 			{
@@ -769,7 +769,7 @@ func (p partitionerBytes) partitionWithOrder(
 			}
 
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
+			lastVal = append(lastVal[:0], v...)
 		}
 	}
 }
@@ -793,7 +793,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 			outputIdx := checkIdx
 
 			null := nulls.NullAt(uint16(checkIdx))
-			v := append([]byte(nil), col.Get(int(checkIdx))...)
+			v := col.Get(int(checkIdx))
 			if null != lastValNull {
 				// Either the current value is null and the previous was not or vice-versa.
 				outputCol[outputIdx] = true
@@ -809,14 +809,14 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
-			lastVal = v
+			lastVal = append(lastVal[:0], v...)
 			lastValNull = null
 		}
 	} else {
 		for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
 			outputIdx := checkIdx
 
-			v := append([]byte(nil), col.Get(int(checkIdx))...)
+			v := col.Get(int(checkIdx))
 			var unique bool
 
 			{
@@ -826,7 +826,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 			}
 
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
+			lastVal = append(lastVal[:0], v...)
 		}
 	}
 }
@@ -926,7 +926,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
-				lastVal = v
+				lastVal.Set(&v)
 				lastValNull = null
 			}
 		} else {
@@ -943,7 +943,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
+				lastVal.Set(&v)
 			}
 		}
 	} else {
@@ -972,7 +972,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
 				}
-				lastVal = v
+				lastVal.Set(&v)
 				lastValNull = null
 			}
 		} else {
@@ -989,7 +989,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
+				lastVal.Set(&v)
 			}
 		}
 	}
@@ -1040,7 +1040,7 @@ func (p partitionerDecimal) partitionWithOrder(
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
-			lastVal = v
+			lastVal.Set(&v)
 			lastValNull = null
 		}
 	} else {
@@ -1056,7 +1056,7 @@ func (p partitionerDecimal) partitionWithOrder(
 			}
 
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
+			lastVal.Set(&v)
 		}
 	}
 }
@@ -1096,7 +1096,7 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 
 				outputCol[outputIdx] = outputCol[outputIdx] || unique
 			}
-			lastVal = v
+			lastVal.Set(&v)
 			lastValNull = null
 		}
 	} else {
@@ -1113,7 +1113,7 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 			}
 
 			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
+			lastVal.Set(&v)
 		}
 	}
 }

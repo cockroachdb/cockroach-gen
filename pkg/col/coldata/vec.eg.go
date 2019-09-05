@@ -71,7 +71,21 @@ func (m *memColumn) Append(args AppendArgs) {
 		toCol := m.Decimal()
 		numToAppend := args.SrcEndIdx - args.SrcStartIdx
 		if args.Sel == nil {
-			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
+			{
+				__desiredCap := int(args.DestIdx) + int(args.SrcEndIdx) - int(args.SrcStartIdx)
+				if cap(toCol) >= __desiredCap {
+					toCol = toCol[:__desiredCap]
+				} else {
+					__new_slice := make([]apd.Decimal, __desiredCap)
+					copy(__new_slice, toCol)
+					toCol = __new_slice
+				}
+				__src_slice := fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]
+				__dst_slice := toCol[int(args.DestIdx):]
+				for __i := range __src_slice {
+					__dst_slice[__i].Set(&__src_slice[__i])
+				}
+			}
 			m.nulls.Extend(args.Src.Nulls(), args.DestIdx, args.SrcStartIdx, numToAppend)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
@@ -81,7 +95,8 @@ func (m *memColumn) Append(args AppendArgs) {
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
-				toCol = append(toCol, val)
+				toCol = append(toCol, apd.Decimal{})
+				toCol[len(toCol)-1].Set(&val)
 			}
 			// TODO(asubiotto): Change Extend* signatures to allow callers to pass in
 			// SrcEndIdx instead of numToAppend.
@@ -485,7 +500,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
 							v := fromCol[int(selIdx)]
-							toColSliced[int(selIdx)] = v
+							toColSliced[int(selIdx)].Set(&v)
 						}
 					}
 					return
@@ -496,7 +511,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					selIdx := sel[int(args.SrcStartIdx)+i]
 					v := fromCol[int(selIdx)]
-					toColSliced[int(selIdx)] = v
+					toColSliced[int(selIdx)].Set(&v)
 				}
 			} else {
 
@@ -509,7 +524,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
 							v := fromCol[int(selIdx)]
-							toColSliced[i] = v
+							toColSliced[i].Set(&v)
 						}
 					}
 					return
@@ -520,7 +535,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					selIdx := sel[int(args.SrcStartIdx)+i]
 					v := fromCol[int(selIdx)]
-					toColSliced[i] = v
+					toColSliced[i].Set(&v)
 				}
 			}
 			return
@@ -537,7 +552,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
 							v := fromCol[int(selIdx)]
-							toColSliced[int(selIdx)] = v
+							toColSliced[int(selIdx)].Set(&v)
 						}
 					}
 					return
@@ -548,7 +563,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					selIdx := sel[int(args.SrcStartIdx)+i]
 					v := fromCol[int(selIdx)]
-					toColSliced[int(selIdx)] = v
+					toColSliced[int(selIdx)].Set(&v)
 				}
 			} else {
 
@@ -561,7 +576,7 @@ func (m *memColumn) Copy(args CopyArgs) {
 							m.nulls.SetNull64(uint64(i) + args.DestIdx)
 						} else {
 							v := fromCol[int(selIdx)]
-							toColSliced[i] = v
+							toColSliced[i].Set(&v)
 						}
 					}
 					return
@@ -572,13 +587,19 @@ func (m *memColumn) Copy(args CopyArgs) {
 				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 					selIdx := sel[int(args.SrcStartIdx)+i]
 					v := fromCol[int(selIdx)]
-					toColSliced[i] = v
+					toColSliced[i].Set(&v)
 				}
 			}
 			return
 		}
 		// No Sel or Sel64.
-		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
+		{
+			__tgt_slice := toCol[int(args.DestIdx):]
+			__src_slice := fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]
+			for __i := range __src_slice {
+				__tgt_slice[__i].Set(&__src_slice[__i])
+			}
+		}
 		if args.Src.MaybeHasNulls() {
 			// TODO(asubiotto): This should use Extend but Extend only takes uint16
 			// arguments.
@@ -1435,7 +1456,7 @@ func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 	case coltypes.Decimal:
 		target := v.Decimal()
 		newVal := elem.(apd.Decimal)
-		target[int(rowIdx)] = newVal
+		target[int(rowIdx)].Set(&newVal)
 	case coltypes.Int8:
 		target := v.Int8()
 		newVal := elem.(int8)

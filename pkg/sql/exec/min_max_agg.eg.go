@@ -612,7 +612,8 @@ func (a *minDecimalAgg) Init(groups []bool, v coldata.Vec) {
 
 func (a *minDecimalAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroDecimalColumn) {
+	for n := 0; n < len(a.vec); n++ {
+		a.vec[n].SetInt64(0)
 	}
 	a.curAgg = zeroDecimalColumn[0]
 	a.curIdx = -1
@@ -630,7 +631,8 @@ func (a *minDecimalAgg) SetOutputIndex(idx int) {
 		a.curIdx = idx
 		vecLen := len(a.vec)
 		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroDecimalColumn) {
+		for n := 0; n < len(target); n++ {
+			target[n].SetInt64(0)
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -648,7 +650,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.vec[a.curIdx].Set(&a.curAgg)
 		a.curIdx++
 		a.done = true
 		return
@@ -668,7 +670,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -711,7 +713,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -756,7 +758,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -799,7 +801,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -3272,7 +3274,8 @@ func (a *maxDecimalAgg) Init(groups []bool, v coldata.Vec) {
 
 func (a *maxDecimalAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroDecimalColumn) {
+	for n := 0; n < len(a.vec); n++ {
+		a.vec[n].SetInt64(0)
 	}
 	a.curAgg = zeroDecimalColumn[0]
 	a.curIdx = -1
@@ -3290,7 +3293,8 @@ func (a *maxDecimalAgg) SetOutputIndex(idx int) {
 		a.curIdx = idx
 		vecLen := len(a.vec)
 		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroDecimalColumn) {
+		for n := 0; n < len(target); n++ {
+			target[n].SetInt64(0)
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -3308,7 +3312,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.vec[a.curIdx].Set(&a.curAgg)
 		a.curIdx++
 		a.done = true
 		return
@@ -3328,7 +3332,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -3371,7 +3375,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -3416,7 +3420,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false
@@ -3459,7 +3463,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !a.foundNonNullForCurrentGroup {
 							a.nulls.SetNull(uint16(a.curIdx))
 						}
-						a.vec[a.curIdx] = a.curAgg
+						a.vec[a.curIdx].Set(&a.curAgg)
 					}
 					a.curIdx++
 					a.foundNonNullForCurrentGroup = false

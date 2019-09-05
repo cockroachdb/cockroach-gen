@@ -49493,7 +49493,7 @@ LeftColLoop:
 								if !isNull {
 									val = srcCol[srcStartIdx]
 									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
+										outCol[outStartIdx].Set(&val)
 										outStartIdx++
 									}
 								}
@@ -50024,7 +50024,7 @@ LeftColLoop:
 								if !isNull {
 									val = srcCol[srcStartIdx]
 									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
+										outCol[outStartIdx].Set(&val)
 										outStartIdx++
 									}
 								}
@@ -50539,7 +50539,7 @@ LeftColLoop:
 								if !isNull {
 									val = srcCol[srcStartIdx]
 									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
+										outCol[outStartIdx].Set(&val)
 										outStartIdx++
 									}
 								}
@@ -51061,7 +51061,7 @@ LeftColLoop:
 								if !isNull {
 									val = srcCol[srcStartIdx]
 									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
+										outCol[outStartIdx].Set(&val)
 										outStartIdx++
 									}
 								}
@@ -51591,11 +51591,11 @@ RightColLoop:
 								// instead of copy.
 								if toAppend == 1 {
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									outCol[outStartIdx] = v
+									outCol[outStartIdx].Set(&v)
 								} else {
 									for i := 0; i < toAppend; i++ {
 										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
+										outCol[i+outStartIdx].Set(&v)
 									}
 								}
 							}
@@ -52071,11 +52071,11 @@ RightColLoop:
 								// instead of copy.
 								if toAppend == 1 {
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									outCol[outStartIdx] = v
+									outCol[outStartIdx].Set(&v)
 								} else {
 									for i := 0; i < toAppend; i++ {
 										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
+										outCol[i+outStartIdx].Set(&v)
 									}
 								}
 							}
@@ -52544,9 +52544,15 @@ RightColLoop:
 								// instead of copy.
 								if toAppend == 1 {
 									v := srcCol[o.builderState.right.curSrcStartIdx]
-									outCol[outStartIdx] = v
+									outCol[outStartIdx].Set(&v)
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									{
+										__tgt_slice := outCol[outStartIdx:]
+										__src_slice := srcCol[o.builderState.right.curSrcStartIdx : o.builderState.right.curSrcStartIdx+toAppend]
+										for __i := range __src_slice {
+											__tgt_slice[__i].Set(&__src_slice[__i])
+										}
+									}
 								}
 							}
 
@@ -52997,9 +53003,15 @@ RightColLoop:
 								// instead of copy.
 								if toAppend == 1 {
 									v := srcCol[o.builderState.right.curSrcStartIdx]
-									outCol[outStartIdx] = v
+									outCol[outStartIdx].Set(&v)
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									{
+										__tgt_slice := outCol[outStartIdx:]
+										__src_slice := srcCol[o.builderState.right.curSrcStartIdx : o.builderState.right.curSrcStartIdx+toAppend]
+										for __i := range __src_slice {
+											__tgt_slice[__i].Set(&__src_slice[__i])
+										}
+									}
 								}
 							}
 

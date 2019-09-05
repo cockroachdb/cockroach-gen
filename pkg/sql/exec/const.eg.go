@@ -190,12 +190,12 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	col := batch.ColVec(c.outputIdx).Decimal()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
+			col[int(i)].Set(&c.constVal)
 		}
 	} else {
 		col = col[0:int(n)]
 		for i := range col {
-			col[i] = c.constVal
+			col[i].Set(&c.constVal)
 		}
 	}
 	return batch

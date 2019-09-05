@@ -25,7 +25,7 @@ import (
 )
 
 // Use execgen package to remove unused import warning.
-var _ interface{} = execgen.GET
+var _ interface{} = execgen.UNSAFEGET
 
 func GetCastOperator(
 	input Operator, colIdx int, resultIdx int, fromType *semtypes.T, toType *semtypes.T,
@@ -1244,7 +1244,7 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 					v := col[int(i)]
 					var r apd.Decimal
 					r = v
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -1256,7 +1256,7 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 					v := col[int(i)]
 					var r apd.Decimal
 					r = v
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -1267,7 +1267,7 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 				v := col[int(i)]
 				var r apd.Decimal
 				r = v
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -1275,7 +1275,7 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 				v := col[int(i)]
 				var r apd.Decimal
 				r = v
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}
@@ -1416,7 +1416,7 @@ func (c *castOpInt8Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -1430,7 +1430,7 @@ func (c *castOpInt8Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -1443,7 +1443,7 @@ func (c *castOpInt8Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -1453,7 +1453,7 @@ func (c *castOpInt8Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}
@@ -1853,7 +1853,7 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -1867,7 +1867,7 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -1880,7 +1880,7 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -1890,7 +1890,7 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}
@@ -2290,7 +2290,7 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -2304,7 +2304,7 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -2317,7 +2317,7 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -2327,7 +2327,7 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}
@@ -2727,7 +2727,7 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -2741,7 +2741,7 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 
 					r = *apd.New(int64(v), 0)
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -2754,7 +2754,7 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -2764,7 +2764,7 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 
 				r = *apd.New(int64(v), 0)
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}
@@ -3171,7 +3171,7 @@ func (c *castOpFloat32Decimal) Next(ctx context.Context) coldata.Batch {
 						r = tmpDec
 					}
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -3192,7 +3192,7 @@ func (c *castOpFloat32Decimal) Next(ctx context.Context) coldata.Batch {
 						r = tmpDec
 					}
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -3212,7 +3212,7 @@ func (c *castOpFloat32Decimal) Next(ctx context.Context) coldata.Batch {
 					r = tmpDec
 				}
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -3229,7 +3229,7 @@ func (c *castOpFloat32Decimal) Next(ctx context.Context) coldata.Batch {
 					r = tmpDec
 				}
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}
@@ -3862,7 +3862,7 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 						r = tmpDec
 					}
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		} else {
@@ -3883,7 +3883,7 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 						r = tmpDec
 					}
 
-					projCol[int(i)] = r
+					projCol[int(i)].Set(&r)
 				}
 			}
 		}
@@ -3903,7 +3903,7 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 					r = tmpDec
 				}
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		} else {
 			col = col[0:int(n)]
@@ -3920,7 +3920,7 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 					r = tmpDec
 				}
 
-				projCol[int(i)] = r
+				projCol[int(i)].Set(&r)
 			}
 		}
 	}

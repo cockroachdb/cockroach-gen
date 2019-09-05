@@ -156,7 +156,7 @@ func (ht *hashTable) rehash(
 
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
-				_ = append([]byte(nil), keys.Get(int(nKeys-1))...)
+				_ = keys.Get(int(nKeys - 1))
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i
@@ -193,7 +193,7 @@ func (ht *hashTable) rehash(
 
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
-				_ = append([]byte(nil), keys.Get(int(nKeys-1))...)
+				_ = keys.Get(int(nKeys - 1))
 				for i := uint64(0); i < nKeys; i++ {
 					ht.cancelChecker.check(ctx)
 					selIdx := i

@@ -428,7 +428,8 @@ func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullDecimalAgg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroDecimalColumn) {
+	for n := 0; n < len(a.vec); n++ {
+		a.vec[n].SetInt64(0)
 	}
 	a.curIdx = -1
 	a.done = false
@@ -445,7 +446,8 @@ func (a *anyNotNullDecimalAgg) SetOutputIndex(idx int) {
 		a.curIdx = idx
 		vecLen := len(a.vec)
 		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroDecimalColumn) {
+		for n := 0; n < len(target); n++ {
+			target[n].SetInt64(0)
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -494,7 +496,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// from the rest of the template file.
 					// TODO(asubiotto): Figure out a way to alias this.
 					v := col[int(i)]
-					a.vec[a.curIdx] = v
+					a.vec[a.curIdx].Set(&v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -522,7 +524,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// from the rest of the template file.
 					// TODO(asubiotto): Figure out a way to alias this.
 					v := col[int(i)]
-					a.vec[a.curIdx] = v
+					a.vec[a.curIdx].Set(&v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -552,7 +554,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// from the rest of the template file.
 					// TODO(asubiotto): Figure out a way to alias this.
 					v := col[int(i)]
-					a.vec[a.curIdx] = v
+					a.vec[a.curIdx].Set(&v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
@@ -580,7 +582,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// from the rest of the template file.
 					// TODO(asubiotto): Figure out a way to alias this.
 					v := col[int(i)]
-					a.vec[a.curIdx] = v
+					a.vec[a.curIdx].Set(&v)
 					a.foundNonNullForCurrentGroup = true
 				}
 			}
