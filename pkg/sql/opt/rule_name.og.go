@@ -104,7 +104,9 @@ const (
 	SimplifyLeftJoinWithFilters
 	SimplifyRightJoinWithFilters
 	EliminateSemiJoin
+	SimplifyZeroCardinalitySemiJoin
 	EliminateAntiJoin
+	SimplifyZeroCardinalityAntiJoin
 	EliminateJoinNoColsLeft
 	EliminateJoinNoColsRight
 	HoistJoinProjectRight

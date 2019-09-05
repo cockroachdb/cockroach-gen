@@ -4106,6 +4106,19 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [SimplifyZeroCardinalitySemiJoin]
+	{
+		if _f.funcs.HasZeroRows(right) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyZeroCardinalitySemiJoin) {
+				_expr := _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(left)).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyZeroCardinalitySemiJoin, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [SimplifyJoinNotNullEquality]
 	{
 		for i := range on {
@@ -4540,6 +4553,21 @@ func (_f *Factory) ConstructAntiJoin(
 					_f.appliedRule(opt.EliminateAntiJoin, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [SimplifyZeroCardinalityAntiJoin]
+	{
+		if !_f.funcs.CanHaveZeroRows(right) {
+			if len(on) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyZeroCardinalityAntiJoin) {
+					_expr := _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(left)).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyZeroCardinalityAntiJoin, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
@@ -6500,6 +6528,19 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [SimplifyZeroCardinalitySemiJoin]
+	{
+		if _f.funcs.HasZeroRows(right) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyZeroCardinalitySemiJoin) {
+				_expr := _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(left)).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyZeroCardinalitySemiJoin, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [SimplifyJoinNotNullEquality]
 	{
 		for i := range on {
@@ -6901,6 +6942,21 @@ func (_f *Factory) ConstructAntiJoinApply(
 					_f.appliedRule(opt.EliminateAntiJoin, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [SimplifyZeroCardinalityAntiJoin]
+	{
+		if !_f.funcs.CanHaveZeroRows(right) {
+			if len(on) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyZeroCardinalityAntiJoin) {
+					_expr := _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(left)).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyZeroCardinalityAntiJoin, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}
