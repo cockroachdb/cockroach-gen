@@ -11,6 +11,7 @@ package exec
 
 import (
 	"context"
+	"fmt"
 	"math"
 
 	"github.com/cockroachdb/apd"
@@ -30,6 +31,14 @@ var _ interface{} = execgen.UNSAFEGET
 func GetCastOperator(
 	input Operator, colIdx int, resultIdx int, fromType *semtypes.T, toType *semtypes.T,
 ) (Operator, error) {
+	if fromType.Family() == semtypes.UnknownFamily {
+		return &castOpNullAny{
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			toType:       typeconv.FromColumnType(toType),
+		}, nil
+	}
 	switch from := typeconv.FromColumnType(fromType); from {
 	case coltypes.Bool:
 		switch to := typeconv.FromColumnType(toType); to {
@@ -423,6 +432,57 @@ func GetCastOperator(
 	default:
 		return nil, errors.Errorf("unhandled FROM type: %s", from)
 	}
+}
+
+type castOpNullAny struct {
+	OneInputNode
+	colIdx    int
+	outputIdx int
+	toType    coltypes.T
+}
+
+var _ StaticMemoryOperator = &castOpNullAny{}
+
+func (c *castOpNullAny) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+}
+
+func (c *castOpNullAny) Init() {
+	c.input.Init()
+}
+
+func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
+	batch := c.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return batch
+	}
+	if c.outputIdx == batch.Width() {
+		batch.AppendCol(c.toType)
+	}
+	vec := batch.ColVec(c.colIdx)
+	projVec := batch.ColVec(c.outputIdx)
+	vecNulls := vec.Nulls()
+	projNulls := projVec.Nulls()
+	if sel := batch.Selection(); sel != nil {
+		sel = sel[:n]
+		for _, i := range sel {
+			if vecNulls.NullAt(i) {
+				projNulls.SetNull(i)
+			} else {
+				execerror.VectorizedInternalPanic(errors.Errorf("unexpected non-null at index %d", i))
+			}
+		}
+	} else {
+		for i := uint16(0); i < n; i++ {
+			if vecNulls.NullAt(uint16(i)) {
+				projNulls.SetNull(uint16(i))
+			} else {
+				execerror.VectorizedInternalPanic(fmt.Errorf("unexpected non-null at index %d", i))
+			}
+		}
+	}
+	return batch
 }
 
 type castOpBoolBool struct {
